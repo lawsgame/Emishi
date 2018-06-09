@@ -2,33 +2,24 @@ package com.lawsgame.emishitactics.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-
-import com.lawsgame.emishitactics.engine.patterns.Observable;
 
 
 /**
  *
  */
-public abstract class GamePhase extends Observable implements Disposable, GameElement {
+public abstract class GamePhase implements Disposable, GameElement {
 	protected GPM gpm;                      // allow to switch to another phase
 	protected AssetManager asm;             // allow to have access to all the required assets: xml, sounds, textures.
-	
-	private OrthographicCamera gameCam;     // level camera
-	private Viewport gamePort;              // defines the dimension of the frame through the player see the level
-	private Rectangle scissors;
-	private Rectangle clipBounds;
-	private float levelWidth;               // defines the rectangle within the camera is allowed to move.
-    private float levelHeight;              // defines the rectangle within the camera is allowed to move.
 
-	private OrthographicCamera uiCam;       // UI camera
-	private Viewport uiPort;
+
+	private Rectangle scissors;
+
+	private CameraManager gameCM;
+	private CameraManager uiCM;
 
 	private float acc1 = 0;
 	private float acc3 = 0;
@@ -53,25 +44,11 @@ public abstract class GamePhase extends Observable implements Disposable, GameEl
 	 * |
 	 * (0,0)------> 1
 	 */
-	public GamePhase (GPM gpm, AssetManager asm, float gamePortWidth, float uiPortWidth, float worldWidth, float worldHeight){
+	public GamePhase (GPM gpm, AssetManager asm, float gamePortWidth, float uiPortWidth, float gameWorldWidth, float gameWorldHeight){
 		this.gpm = gpm;
 		this.asm = asm;
-        float gamePortHeight = gamePortWidth*getAspRatio();
-        this.clipBounds = new Rectangle(0,0,gamePortWidth, gamePortHeight);
-        this.setLevelDimension(worldWidth, worldHeight);
-
-
-		this.gameCam = new OrthographicCamera();
-		this.gamePort = new FitViewport(gamePortWidth, gamePortHeight, gameCam);
-		this.gameCam.setToOrtho(false, gamePortWidth, gamePortHeight);
-		this.gameCam.update();
-
-        float uiPortHeight = uiPortWidth*getAspRatio();
-		this.uiCam = new OrthographicCamera();
-		this.uiPort = new FitViewport(uiPortWidth, uiPortHeight);
-		this.uiCam.setToOrtho(false, uiPortWidth, uiPortHeight);
-		this.uiCam.update();
-
+		this.gameCM = new CameraManager(gameWorldWidth, gameWorldHeight, gamePortWidth);
+		this.uiCM = new CameraManager(uiPortWidth);
 	}
 
 	public GamePhase (GPM gsm, AssetManager asm, float gamePortWidth, float worldWidth, float worldHeight){
@@ -131,10 +108,10 @@ public abstract class GamePhase extends Observable implements Disposable, GameEl
         /**
          * renderUnderlyingMapPart textures and shaders
          */
-		batch.setProjectionMatrix(gameCam.combined);
+		batch.setProjectionMatrix(gameCM.getCamera().combined);
 		batch.begin();
 		scissors = new Rectangle();
-		ScissorStack.calculateScissors(gameCam, batch.getTransformMatrix(), clipBounds, scissors);
+		ScissorStack.calculateScissors(gameCM.getCamera(), batch.getTransformMatrix(), gameCM.getClipBounds(), scissors);
 		ScissorStack.pushScissors(scissors);
 
 		renderWorld(batch);
@@ -148,7 +125,7 @@ public abstract class GamePhase extends Observable implements Disposable, GameEl
          * others stuff to renderUnderlyingMapPart without using the SpriteBatch instance
          */
 		batch.begin();
-		batch.setProjectionMatrix(uiCam.combined);
+		batch.setProjectionMatrix(uiCM.getCamera().combined);
 
 		renderUI(batch);
 
@@ -161,55 +138,6 @@ public abstract class GamePhase extends Observable implements Disposable, GameEl
 	public abstract void renderWorld(SpriteBatch batch);
 	public abstract void renderUI(SpriteBatch batch);
 	
-	/**
-	 * 1) check whether or not the new camera position is inside the world boundaries
-	 * 2) modify the camera position consequently
-	 * 3) update the camera to take the changes into account
-	 * 4) update the clip bounds and the components instances to follow the camera accordingly
-	 */
-	public boolean translateGameCam(float dx, float dy){
-		float oldCamPosX = gameCam.position.x;
-		float oldCamPosY = gameCam.position.y;
-		
-		if(gameCam.position.x - clipBounds.width/2 + dx < 0){
-			dx = 0;
-			gameCam.position.x = clipBounds.width/2;
-		}
-		if(gameCam.position.y - clipBounds.height/2 + dy < 0){
-			dy = 0;
-			gameCam.position.y = clipBounds.height/2;
-		}
-		if(gameCam.position.x + clipBounds.width/2 + dx > levelWidth){
-			dx = 0;
-			gameCam.position.x =  levelWidth- clipBounds.width/2;
-		}
-		if(gameCam.position.y + clipBounds.height/2 + dy > levelHeight){
-			dy = 0;
-			gameCam.position.y =  levelHeight - clipBounds.height/2;
-		}
-	
-		gameCam.translate(dx, dy);
-		gameCam.update();
-		clipBounds.x += gameCam.position.x - oldCamPosX;
-		clipBounds.y += gameCam.position.y - oldCamPosY;
-
-		notifyAllObservers(null);
-		return !((dx == 0f) && (dy == 0f));
-		
-	}
-
-	public void setGameCamPos(float x, float y){
-		if(x < clipBounds.width/2f) x = clipBounds.width/2;
-		if(x > levelWidth - clipBounds.width/2f) x = levelWidth - clipBounds.width/2;
-		if(y < clipBounds.height/2f) y = clipBounds.height/2f;
-		if(y > levelHeight - clipBounds.height/2f) y = levelHeight - clipBounds.height/2f;
-
-		gameCam.position.x = x;
-		gameCam.position.y = y;
-		clipBounds.x = x - clipBounds.width/2f;
-		clipBounds.y = y - clipBounds.height/2f;
-		gameCam.update();
-	}
 
 	//-------- SETTERS & GETTERS ---------
 
@@ -218,38 +146,6 @@ public abstract class GamePhase extends Observable implements Disposable, GameEl
 		return asm;
 	}
 
-	public OrthographicCamera getGameCam() {
-		return gameCam;
-	}
-
-	public float getLevelWidth() {
-		return levelWidth;
-	}
-
-    public float getLevelHeight() {
-        return levelHeight;
-    }
-
-	public void setLevelDimension(float w, float h) {
-		if( w < clipBounds.width) w =  clipBounds.width;
-		if( h < clipBounds.height) h = clipBounds.height;
-		this.levelWidth = w;
-		this.levelHeight = h;
-	}
-
-	public float getGamePortWidth() {return gamePort.getWorldWidth();}
-
-	public float getGamePortHeigth() {
-		return gamePort.getWorldHeight();
-	}
-
-	public float getUIPortWidth(){ return this.uiPort.getWorldWidth(); }
-
-	public float getUIPortHeigth(){ return this.uiPort.getWorldHeight(); }
-
-	public Viewport getGamePort(){
-		return gamePort;
-	}
 
 	public static float getAspRatio(){
 		if(aspectRatio == 0){
@@ -257,4 +153,8 @@ public abstract class GamePhase extends Observable implements Disposable, GameEl
 		}
 		return aspectRatio;
 	}
+
+    public CameraManager getGameCM() {
+        return gameCM;
+    }
 }

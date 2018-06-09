@@ -9,6 +9,8 @@ import com.lawsgame.emishitactics.engine.geometry.Shape;
  * which is integrated in a tree-like dependency relation with other widget regarding the displacement of its parent
  *
  */
+
+
 public abstract class GameWidget implements GameElement, Shape{
 	protected Array<GameWidget> children;
 

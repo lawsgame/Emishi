@@ -33,7 +33,7 @@ public class EmishiTacticsGame extends ApplicationAdapter {
 
 	@Override
 	public void resize (int width, int height){
-		this.gpm.getCurrentGamePhase().getGamePort().update(width,height);
+		this.gpm.getCurrentGamePhase().getGameCM().getPort().update(width,height);
 	}
 
 	@Override

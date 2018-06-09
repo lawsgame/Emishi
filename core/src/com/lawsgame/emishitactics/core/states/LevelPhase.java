@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.constants.Props;
 import com.lawsgame.emishitactics.core.managers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.managers.Sprite2DPool;
 import com.lawsgame.emishitactics.core.managers.interfaces.ISpritePool;
@@ -35,7 +34,7 @@ public class LevelPhase extends GamePhase {
         loadRequiredAssets(battlefieldId);
 
         this.battlefield = BattlefieldLoader.load(this, battlefieldId);
-        this.setLevelDimension(battlefield.getWidth(), battlefield.getHeight());
+        this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
 
         TextureAtlas tileAtlas = asm.get(Assets.ATLAS_TILES);
         ISpritePool spritePool = new Sprite2DPool(tileAtlas);
@@ -63,10 +62,10 @@ public class LevelPhase extends GamePhase {
     @Override
     public void update60(float dt) {
 
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)) this.translateGameCam(0, 0.1f);
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) this.translateGameCam(0, -0.1f);
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) this.translateGameCam(-0.1f, 0);
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) this.translateGameCam(0.1f, 0);
+        if(Gdx.input.isKeyPressed(Input.Keys.UP)) this.getGameCM().translateGameCam(0, 0.1f);
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) this.getGameCM().translateGameCam(0, -0.1f);
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) this.getGameCM().translateGameCam(-0.1f, 0);
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) this.getGameCM().translateGameCam(0.1f, 0);
 
 
     }
