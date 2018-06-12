@@ -57,13 +57,12 @@ public class Unit extends Observable{
     /**
      * battle execution related attributes
      */
-    protected float x = 0;
-    protected float y = 0;
     protected Props.Orientation orientation;
     protected Props.Behaviour behaviour;
     protected boolean moved = false;
     protected boolean acted = false;
     protected DefensiveStance stance = DefensiveStance.DODGE;
+    protected ActionState actionState;
 
 
 
@@ -937,22 +936,6 @@ public class Unit extends Observable{
         if(name != null) {
             this.name = name;
         }
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public void setX(float x) {
-        this.x = x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public void setY(float y) {
-        this.y = y;
     }
 
     public boolean isDone() {
