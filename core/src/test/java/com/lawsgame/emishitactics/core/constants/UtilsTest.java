@@ -45,4 +45,14 @@ public class UtilsTest {
         assertTrue(Utils.getOrientationFromCoords(2, 2, 5, 3) == Props.Orientation.NORTH);
         assertTrue(Utils.getOrientationFromCoords(2, 2, 1, -5) == Props.Orientation.WEST);
     }
+
+
+    @Test
+    public void testSwitchBetweenRGBAAnd32bitsColor(){
+        int r = 28;
+        int g = 39;
+        int b = 125;
+        int[] rgbaRes = Utils.getRGBA(Utils.getColor32Bits(r,g,b));
+        assertTrue(r == rgbaRes[0] && g == rgbaRes[1] && b == rgbaRes[2]);
+    }
 }

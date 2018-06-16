@@ -2,13 +2,12 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Props;
-import com.lawsgame.emishitactics.engine.patterns.Observable;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-public abstract class AArmy extends Observable{
+public abstract class AbstractArmy extends Observable{
 
 
     public abstract int getId();
-    public abstract boolean getAligment();
     public abstract void setAligment(boolean aligment);
     public abstract Unit getWarlord();
     public abstract Array<Unit> getWarChiefs();
@@ -23,7 +22,7 @@ public abstract class AArmy extends Observable{
     public abstract boolean disengage(Unit unit);
     public abstract void resetComposition();
 
-    public abstract boolean mobilize(Unit unit);
+    public abstract boolean isUnitMobilized(Unit unit);
     public abstract boolean contains(Unit unit);
     public abstract boolean add(Unit unit);
     public abstract void remove(Unit unit);

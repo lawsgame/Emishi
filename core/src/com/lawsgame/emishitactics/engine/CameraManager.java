@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.lawsgame.emishitactics.engine.patterns.Observable;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import static com.lawsgame.emishitactics.engine.GamePhase.getAspRatio;
 

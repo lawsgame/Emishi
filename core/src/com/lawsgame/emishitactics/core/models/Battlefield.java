@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Props;
 import com.lawsgame.emishitactics.core.constants.Props.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.engine.patterns.Observable;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.HashMap;
 
@@ -16,33 +16,35 @@ import java.util.HashMap;
  *      - getShortestPathToAttack
  *
  *
+ *
+ * battle field tiles coordinate system
+ * ^
+ * |
+ * |
+ * |
+ * (0,0)------>
+ *
  */
 
 public class Battlefield extends Observable {
     private TileType[][] tiles;
     private Unit[][] units;
     private boolean[][] looted;
+    private Array<int[]> deploymentArea;
+
     private CheckMap checkmap;
 
     private HashMap<Integer, Unit> recruits;
     private HashMap<Integer, Item> tombItems;
 
 
-    /**
-     * battle field tiles coordinate system
-     * ^
-     * |
-     * |
-     * |
-     * (0,0)------>
-     */
-    public Battlefield(int nbRows, int nbCols){
+    public Battlefield (int nbRows, int nbCols){
         if(nbRows > 0 && nbCols > 0) {
             this.tiles = new TileType[nbRows][nbCols];
             this.looted = new boolean[nbRows][nbCols];
             this.units = new Unit[nbRows][nbCols];
         }
-
+        this.deploymentArea = new Array<int[]>();
         this.recruits = new HashMap<Integer, Unit>();
         this.tombItems = new HashMap<Integer, Item>();
     }
@@ -83,6 +85,7 @@ public class Battlefield extends Observable {
         if(checkIndexes(r,c) && type != null){
             _resetTile(r,c);
             getTiles()[r][c] = type;
+            notifyAllObservers(new int[]{r, c});
             return true;
         }
         return false;
@@ -166,6 +169,15 @@ public class Battlefield extends Observable {
 
      */
 
+    public boolean isTileDeploymentTile(int row, int col) {
+        for(int i = 0; i < deploymentArea.size; i++){
+            if(deploymentArea.get(i).length == 2 && deploymentArea.get(i)[0] == row && deploymentArea.get(i)[1] == col){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean checkIndexes(int r, int c) {
         return r > -1 && r < getNbRows() && c > -1 && c < getNbColumns();
     }
@@ -209,7 +221,7 @@ public class Battlefield extends Observable {
     }
 
     public boolean isTileOccupiedByFoe(int row , int col, Unit unit){
-        return isTileOccupied(row, col) && !this.units[row][col].fightWith(unit);
+        return isTileOccupied(row, col) && !this.units[row][col].isEnemyWith(unit);
     }
 
 
@@ -217,6 +229,10 @@ public class Battlefield extends Observable {
 
     //----------------- UNIT MANAGEMENT ----------------------
 
+
+    public void MoveUnit(int rowI, int colI, int rowf, int colf){
+        //TODO:
+    }
 
     public boolean addUnit(int row, int col, Unit unit){
         if(units != null && !isTileOccupied(row, col) && isTileReachable(row, col, unit.has(PassiveAbility.PATHFINDER))){
@@ -330,7 +346,6 @@ public class Battlefield extends Observable {
         return units;
     }
 
-
     static class CheckMap{
         /**
          *
@@ -391,24 +406,33 @@ public class Battlefield extends Observable {
             }
 
         }
-    }
 
+        public String toString(){
+            String res = "";
+            for(int r = getNbRows()-1; r> -1; r--){
+                for(int c = 0; c<getNbCols(); c++){
+                    if(map[r][c][1] == 10) res +=" .";
+                    else if(map[r][c][1] == 1) res +=" _";
+                    else res += " "+(int)(map[r][c][1] -1 );
 
-    public String checkMapToString(){
-        String res = "";
-        for(int r = checkmap.getNbRows()-1; r> -1; r--){
-            for(int c = 0; c<checkmap.getNbCols(); c++){
-                if(checkmap.map[r][c][1] == 10) res +=" .";
-                else if(checkmap.map[r][c][1] == 1) res +=" _";
-                else res += " "+(int)(checkmap.map[r][c][1] -1 );
-
+                }
+                res +="\n";
             }
-            res +="\n";
+            return res;
         }
-        return res;
     }
 
 
+    public boolean atActionRange(int row, int col){
+        return false;
+    }
+
+    /**
+     *
+     * @param row
+     * @param col
+     * @return the area where the action can be performed by the unit at (row, col)
+     */
     public Array<float[]> getActionArea(int row, int col){
         Array<float[]> area = new Array<float[]>();
 
@@ -510,6 +534,8 @@ public class Battlefield extends Observable {
             _cancelTrackBackValues(initRow, initCol, (int) checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][2], (int) checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][3]);
         }
     }
+
+
 
     /**
      * @return an array like that {[row, col]} witch is the path from one tile to another
@@ -742,125 +768,6 @@ public class Battlefield extends Observable {
     }
     */
 
-
-    public boolean atActionRange(int rowPerformer, int colPerformer, ActionState action){
-        if(isTileOccupied(rowPerformer, colPerformer)){
-            Unit performer = getUnit(rowPerformer, colPerformer);
-
-            int rangeMin = 1;
-            int rangeMax = 1;
-            switch (action){
-                case SWITCH_POSITION: break;
-                case PUSH: break;
-                case STEAL: break;
-                case BUILD: break;
-                case HEAL:
-                    rangeMax = Props.RANGE_MAX_HEAL;
-                    break;
-                case ATTACK:
-                case BACKSTAB:
-                    rangeMin = performer.getCurrentRangeMin();
-                    rangeMax = performer.getCurrentRangeMax(getTile(rowPerformer, colPerformer), isStandardBearerAtRange(rowPerformer, colPerformer));
-                    break;
-            }
-
-            int dist;
-            for(int r = rowPerformer - rangeMax; r <= rowPerformer + rangeMax; r++){
-                for(int c = rowPerformer - rangeMax; c <= rowPerformer + rangeMax; c++){
-                    dist = Utils.dist(rowPerformer,colPerformer, r, c);
-                    if(dist <= rangeMax && dist >= rangeMin && isTileOccupied(r,c)){
-                        if(isTileOccupied(r, c)){
-                            Unit target = getUnit(r,c);
-                            switch(action) {
-                                case SWITCH_POSITION:
-                                case PUSH:
-                                    if(target.sameAligmentAs(performer))
-                                        return true;
-                                    break;
-                                case HEAL:
-                                    if(target.sameAligmentAs(performer) && target.getCurrentHitpoints() < target.getAppStat(Stat.HIT_POINTS))
-                                        return true;
-                                    break;
-                                case STEAL:
-                                    if(target.fightWith(performer) && target.possessItemStealable())
-                                        return true;
-                                    break;
-                                case ATTACK:
-                                    if(target.fightWith(performer) && Utils.getOrientationFromCoords(rowPerformer, colPerformer, r, c) == target.getOrientation())
-                                        return true;
-                                    break;
-                                case BACKSTAB:
-                                    if(target.fightWith(performer) && !(Utils.getOrientationFromCoords(rowPerformer, colPerformer, r, c) == target.getOrientation()))
-                                        return true;
-                                    break;
-                            }
-                        }else{
-                            if(action == ActionState.BUILD) {
-                                TileType tileType = getTile(r, c);
-                                if (tileType == TileType.SHALLOWS || tileType == TileType.FOREST)
-                                    return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean atActionRange(int rowPerformer, int colPerformer, OffensiveAbility ability){
-        if(isTileOccupied(rowPerformer, colPerformer)) {
-            Unit performer = getUnit(rowPerformer, colPerformer);
-
-            int rangeMin = performer.getCurrentRangeMin();
-            int rangeMax = performer.getCurrentRangeMax(getTile(rowPerformer, colPerformer), isStandardBearerAtRange(rowPerformer, colPerformer));
-
-            Array<int[]> actionArea = _getEreaFromRange(rangeMin, rangeMax);
-            Array<int[]> impactArea;
-
-
-            for (int i = 0; i < actionArea.size; i++) {
-                // test for foe presence on the target tile
-                if(isTileOccupiedByFoe(actionArea.get(i)[0], actionArea.get(i)[1], performer)){
-                    return true;
-                }
-
-                //test for foe presence wihin the area of impact.
-                impactArea = ability.getOrientedArea(Utils.getOrientationFromCoords(rowPerformer, colPerformer, actionArea.get(i)[0], actionArea.get(i)[1]));
-                for (int j = 0; j < impactArea.size; j++) {
-                    if(isTileOccupiedByFoe(actionArea.get(i)[0] + impactArea.get(i)[0], actionArea.get(i)[1] + impactArea.get(i)[0], performer)){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @param rangeMin
-     * @param rangeMax
-     * @return an array of valid (r,c)
-     */
-    private Array<int[]> _getEreaFromRange(int rangeMin, int rangeMax){
-        Array<int[]> area = new Array<int[]>();
-        for(int r = -rangeMax ; r <= rangeMax; r++){
-            for(int c = -rangeMax ; c <= rangeMax; c++){
-                if(isTileExisted(r,c)) {
-                    int dist = Utils.dist(0, 0, r, c);
-                    if (dist <= rangeMax && rangeMin <= dist) {
-                        area.add(new int[]{r, c});
-                    }
-                }
-
-            }
-        }
-        return area;
-    }
-
-
-
     //-------------------GETTERS & SETTERS -------------------------
 
 
@@ -881,6 +788,33 @@ public class Battlefield extends Observable {
     public Unit[][] getUnits() {
         return units;
     }
+
+    public Array<int[]> getDeploymentArea() {
+        return deploymentArea;
+    }
+
+    public void addDeploymentTile(int row, int col){
+        if(isTileReachable(row, col, false)){
+            this.deploymentArea.add(new int[]{row, col});
+        }
+    }
+
+    public Array<int[]> getEreaFromRange( int rangeMin, int rangeMax){
+        Array<int[]> area = new Array<int[]>();
+        for(int r = -rangeMax ; r <= rangeMax; r++){
+            for(int c = -rangeMax ; c <= rangeMax; c++){
+                if(isTileExisted(r,c)) {
+                    int dist = Utils.dist(0, 0, r, c);
+                    if (dist <= rangeMax && rangeMin <= dist) {
+                        area.add(new int[]{r, c});
+                    }
+                }
+
+            }
+        }
+        return area;
+    }
+
 
 
     //----------------- NODE CLASSES -------------------

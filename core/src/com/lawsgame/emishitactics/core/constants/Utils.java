@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.constants;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 
 public class Utils {
 
@@ -95,5 +96,18 @@ public class Utils {
             rangePOMax = (weapon.getRangeMax() > rangePOMax) ? weapon.getRangeMax(): rangePOMax;
         }
         return rangePOMax + 3;
+    }
+
+
+    public static int getColor32Bits(int r, int g, int b) {
+        return 255 + 256*b + 256*256*g + 256*256*256*r;
+    }
+
+    public static int[] getRGBA(int color32bits){
+        int r = (color32bits)&0xFF;
+        int g = (color32bits>>8)&0xFF;
+        int b = (color32bits>>16)&0xFF;
+        int a = (color32bits>>24)&0xFF;
+        return new int[]{a,b,g,r};
     }
 }

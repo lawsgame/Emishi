@@ -6,7 +6,7 @@ repeat: none
 map0
   rotate: false
   xy: 0, 0
-  size: 20, 20
-  orig: 20, 20
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1

@@ -149,14 +149,6 @@ public class UnitTest {
         }
     }
 
-    @Test
-    public void testIsWeaponAvailable(){
-        assertTrue(merovee.isWeaponAvailable(Props.Weapon.WARABITE, true));
-        assertTrue(!merovee.isWeaponAvailable(Props.Weapon.KANABO, true));
-        assertTrue(merovee.isWeaponAvailable(Props.Weapon.KANABO, false));
-        assertTrue(!merovee.isWeaponAvailable(Props.Weapon.SAI, false));
-    }
-
 
     @Test
     public void testSameSquadAs(){
@@ -175,6 +167,25 @@ public class UnitTest {
         assertTrue(jean.sameAligmentAs(merovee));
         assertTrue(!jean.sameAligmentAs(pierre));
         assertTrue(pierre.sameAligmentAs(pierre));
+    }
+
+    @Test
+    public void testIsWeaponAvailable(){
+        assertTrue(merovee.isWeaponAvailable(Props.Weapon.WARABITE, true));
+        assertTrue(!merovee.isWeaponAvailable(Props.Weapon.KANABO, true));
+        assertTrue(merovee.isWeaponAvailable(Props.Weapon.KANABO, false));
+        assertTrue(!merovee.isWeaponAvailable(Props.Weapon.SAI, false));
+        assertTrue(merovee.has(Props.Weapon.YUMI) || merovee.isWeaponAvailable(Props.Weapon.YUMI, true));
+    }
+
+    @Test
+    public void testSetWeapon(){
+        assertTrue(!clovus.setWeapon(Props.Weapon.KANABO, true));
+        assertTrue(!clovus.setWeapon(Props.Weapon.KANABO, false));
+        assertTrue(clovus.setWeapon(Props.Weapon.KATANA, true));
+        assertTrue(merovee.setWeapon(Props.Weapon.WARABITE, true));
+        assertTrue(merovee.has(Props.Weapon.YUMI) || merovee.setWeapon(Props.Weapon.YUMI, true));
+        assertTrue(merovee.setWeapon(Props.Weapon.KANABO, false));
     }
 
 

@@ -9,14 +9,14 @@ import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Props;
 import com.lawsgame.emishitactics.core.constants.Props.*;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.AArmy;
+import com.lawsgame.emishitactics.core.models.AbstractArmy;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.states.LevelPhase;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Random;
 
 public class BattlefieldLoader {
     private static XmlReader reader = new XmlReader();
@@ -28,8 +28,6 @@ public class BattlefieldLoader {
     // ------------- LOAD BATTLEFIELD ------------------
 
     public static Battlefield load(LevelPhase phase, int bfId){
-
-        Random rand = Props.R.getR();
 
         // load required files
 
@@ -55,25 +53,55 @@ public class BattlefieldLoader {
                 cols++;
             }
         }
-        Battlefield bf = new Battlefield(rows,cols);
+        Battlefield bf = new Battlefield(rows/2,cols/2);
 
 
         // LOAD TILES
 
         HashMap<Integer, TileType> colorToFieldTypeMap = new HashMap<Integer, TileType>();
         for(TileType type: TileType.values()){
-            colorToFieldTypeMap.put(type.get32Bits(), type);
+            colorToFieldTypeMap.put(Utils.getColor32Bits(type.getR(), type.getG(), type.getB()), type);
         }
         TileType fieldType;
         int colorKey;
+        int rowTile;
+        int colTile;
+        int[] rgb;
         for(int r = 0; r < rows; r++){
             for(int c = 0; c < cols; c++){
+
+                rowTile = bf.getNbRows() -1 - r/2;
+                colTile = c/2;
                 colorKey = layoutPixmap.getPixel(c, r);
-                fieldType = colorToFieldTypeMap.get(colorKey);
-                if(fieldType == null){
-                    fieldType = TileType.getStandard();
+                if(r % 2 == 0){
+                    if(c % 2 == 0){
+                        // SET THE TILE TYPE
+                        fieldType = colorToFieldTypeMap.get(colorKey);
+                        if(fieldType == null){
+                            fieldType = TileType.getStandard();
+                        }
+                        bf.setTile(rowTile, colTile, fieldType);
+
+                    }else{
+
+
+
+                    }
+                }else{
+                    if(c % 2 == 0){
+                        // WHETHER OR NOT THE TILE IS A DEPLOYMENT TILE
+                        rgb = Utils.getRGBA(colorKey);
+                        if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0){
+                            bf.addDeploymentTile(rowTile, colTile);
+                        }
+                    }else{
+
+                    }
                 }
-                bf.setTile(bf.getNbRows() -1 - r, c, fieldType);
+
+
+
+
             }
         }
 
@@ -87,9 +115,8 @@ public class BattlefieldLoader {
             XmlReader.Element armyElt;
             XmlReader.Element squadElt;
             XmlReader.Element unitElt;
-            XmlReader.Element attributeElt;
             Unit unit;
-            AArmy army;
+            AbstractArmy army;
             for (int i = 0; i < battlesElt.getChildCount(); i++) {
 
                 battleElt = battlesElt.getChild(i);
@@ -111,7 +138,9 @@ public class BattlefieldLoader {
                                 int colUnit = unitElt.getInt("col");
 
                                 // add to the battlefield
-                                bf.addUnit(rowUnit, colUnit, unit);
+                                if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
+                                    bf.addUnit(rowUnit, colUnit, unit);
+                                }
 
                                 // add to the army composition
                                 if(n == 0){
@@ -263,5 +292,4 @@ public class BattlefieldLoader {
         }
 
     }
-
 }

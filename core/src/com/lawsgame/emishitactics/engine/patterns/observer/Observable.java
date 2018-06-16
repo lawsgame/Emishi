@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.engine.patterns;
+package com.lawsgame.emishitactics.engine.patterns.observer;
 
 import com.badlogic.gdx.utils.Array;
 
@@ -14,5 +14,4 @@ public abstract class Observable {
 			observers.get(i).getNotification(dataBundle);
 		}
 	}
-
 }

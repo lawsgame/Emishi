@@ -6,43 +6,39 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.managers.BattlefieldLoader;
-import com.lawsgame.emishitactics.core.managers.Sprite2DPool;
-import com.lawsgame.emishitactics.core.managers.interfaces.ISpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.renderers.Battlefield2DRenderer;
-import com.lawsgame.emishitactics.core.renderers.interfaces.ABattlefieldRenderer;
+import com.lawsgame.emishitactics.core.renderers.TempoBattlefield2DRenderer;
+import com.lawsgame.emishitactics.core.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
+
 
 public class LevelPhase extends GamePhase {
     static final float GAME_PORT_WIDTH = 19f;
 
 
     Battlefield battlefield;
-    ABattlefieldRenderer bfRenderer;
+    BattlefieldRenderer bfRenderer;
 
 
-    public void loadRequiredAssets(int bfId) {
+    public void loadRequiredAssets() {
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
         asm.load(Assets.ATLAS_TILES, TextureAtlas.class);
+        asm.load(Assets.ATLAS_UI, TextureAtlas.class);
+        asm.load(Assets.ATLAS_UNITS, TextureAtlas.class);
         asm.finishLoading();
 
     }
 
     public LevelPhase(GPM gsm,int battlefieldId ){
         super(gsm, GAME_PORT_WIDTH);
-        loadRequiredAssets(battlefieldId);
+        loadRequiredAssets();
 
         this.battlefield = BattlefieldLoader.load(this, battlefieldId);
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
-
-        TextureAtlas tileAtlas = asm.get(Assets.ATLAS_TILES);
-        ISpritePool spritePool = new Sprite2DPool(tileAtlas);
-        bfRenderer = new Battlefield2DRenderer(battlefield, spritePool);
+        this.bfRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
     }
-
-
 
     @Override
     public void update1(float dt) {
@@ -59,9 +55,10 @@ public class LevelPhase extends GamePhase {
         bfRenderer.update(dt);
     }
 
+
     @Override
     public void update60(float dt) {
-
+        //TEST
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) this.getGameCM().translateGameCam(0, 0.1f);
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) this.getGameCM().translateGameCam(0, -0.1f);
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) this.getGameCM().translateGameCam(-0.1f, 0);
@@ -69,6 +66,7 @@ public class LevelPhase extends GamePhase {
 
 
     }
+    private boolean one = true;
 
     @Override
     public void preRender(SpriteBatch batch) {

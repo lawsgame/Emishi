@@ -17,44 +17,51 @@ selected_area_attack_range
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_foe
+selected_area_deployment
   rotate: false
   xy: 128, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_move_range
+selected_area_foe
   rotate: false
   xy: 192, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_same_army
+selected_area_move_range
   rotate: false
   xy: 256, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_same_squad
+selected_area_same_army
   rotate: false
   xy: 320, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_seleced_unit
+selected_area_same_squad
   rotate: false
   xy: 384, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
+selected_area_seleced_unit
+  rotate: false
+  xy: 448, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 black_background
   rotate: false
-  xy: 448, 32
+  xy: 512, 32
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

@@ -2,8 +2,21 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Props;
-import com.lawsgame.emishitactics.core.constants.Props.*;
-import com.lawsgame.emishitactics.engine.patterns.Observable;
+import com.lawsgame.emishitactics.core.constants.Props.BannerSign;
+import com.lawsgame.emishitactics.core.constants.Props.Behaviour;
+import com.lawsgame.emishitactics.core.constants.Props.DefensiveStance;
+import com.lawsgame.emishitactics.core.constants.Props.EquipMsg;
+import com.lawsgame.emishitactics.core.constants.Props.Ethnicity;
+import com.lawsgame.emishitactics.core.constants.Props.Item;
+import com.lawsgame.emishitactics.core.constants.Props.ItemType;
+import com.lawsgame.emishitactics.core.constants.Props.OffensiveAbility;
+import com.lawsgame.emishitactics.core.constants.Props.Orientation;
+import com.lawsgame.emishitactics.core.constants.Props.PassiveAbility;
+import com.lawsgame.emishitactics.core.constants.Props.TileType;
+import com.lawsgame.emishitactics.core.constants.Props.UnitAppointmentErrorMsg;
+import com.lawsgame.emishitactics.core.constants.Props.UnitTemplate;
+import com.lawsgame.emishitactics.core.constants.Props.Weapon;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import static com.lawsgame.emishitactics.core.constants.Props.LVL_GAP_FACTOR;
 
@@ -24,12 +37,12 @@ public class Unit extends Observable{
     protected String job;
     protected boolean rightHanded;
     protected UnitTemplate template;
-    protected Weapon primaryWeapon;
-    protected Weapon secondaryWeapon;
+    protected Weapon primaryWeapon = Weapon.NONE;
+    protected Weapon secondaryWeapon = Weapon.NONE;
     protected boolean primaryWeaponEquipped = true;
     protected boolean horseman;
 
-    private AArmy army = null;
+    private AbstractArmy army = null;
 
     protected int mobility;
     protected int charisma;
@@ -52,6 +65,7 @@ public class Unit extends Observable{
     protected PassiveAbility pasAb1 = PassiveAbility.NONE;
     protected PassiveAbility pasAb2 = PassiveAbility.NONE;
     protected OffensiveAbility offAb = OffensiveAbility.NONE;
+    protected int numberOfOAUses = 0;
     protected Banner banner = new Banner();
 
     /**
@@ -62,7 +76,6 @@ public class Unit extends Observable{
     protected boolean moved = false;
     protected boolean acted = false;
     protected DefensiveStance stance = DefensiveStance.DODGE;
-    protected ActionState actionState;
 
 
 
@@ -103,7 +116,7 @@ public class Unit extends Observable{
         this.skill = template.getBaseSk();
         this.bravery = template.getBaseBr();
         this.currentHitPoints = hitPoints;
-        this.currentMoral = getMoral();
+        this.currentMoral = calculateInitialMoral();
 
         this.primaryWeapon = (isWeaponAvailable(primaryWeapon, true)) ? primaryWeapon : pickWeapon(true);
         Weapon chosenSecondaryW = (isWeaponAvailable(secondaryWeapon, true))? secondaryWeapon : pickWeapon(false);
@@ -192,6 +205,9 @@ public class Unit extends Observable{
         }
         this.secondaryWeapon = secondaryWeapon;
         this.mobility += mob;
+
+        notifyAllObservers(null);
+
         return mob;
     }
 
@@ -308,6 +324,10 @@ public class Unit extends Observable{
         return new int[]{hpt, mob, cha, ld, str, def, dex, agi, ski, bra};
     }
 
+
+    //------------------- WEAPON RELATED METHODS -----------------------------------
+
+
     public Weapon pickWeapon(boolean primaryWeaponChoice){
         int randId;
         Weapon chosenW = Weapon.NONE;
@@ -331,9 +351,11 @@ public class Unit extends Observable{
     public boolean isWeaponAvailable(Weapon weapon, boolean primaryWeaponChoice){
         boolean available = false;
         if(primaryWeaponChoice){
-            for (int i = 0; i < template.getJob().getAvailableWeapons().length; i++) {
-                if (weapon == template.getJob().getAvailableWeapons()[i]) {
-                    available= true;
+            if(weapon != secondaryWeapon) {
+                for (int i = 0; i < template.getJob().getAvailableWeapons().length; i++) {
+                    if (weapon == template.getJob().getAvailableWeapons()[i]) {
+                        available = true;
+                    }
                 }
             }
         }else {
@@ -347,6 +369,38 @@ public class Unit extends Observable{
         }
         return available;
     }
+
+    public boolean setWeapon(Weapon weapon, boolean primaryWeaponChoice){
+        if((isPromoted() || primaryWeaponChoice) && isWeaponAvailable(weapon, primaryWeaponChoice)){
+            if(primaryWeaponChoice){
+                this.primaryWeapon = weapon;
+            }else{
+                this.secondaryWeapon = weapon;
+            }
+            notifyAllObservers(null);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void switchWeapon(){
+        this.primaryWeaponEquipped = !primaryWeaponEquipped;
+        notifyAllObservers(null);
+    }
+
+    public void setCurrentWeapon(boolean primaryWeaponEquiped) {
+        this.primaryWeaponEquipped = primaryWeaponEquiped;
+        notifyAllObservers(null);
+    }
+
+    public Weapon getCurrentWeapon() {
+        return (primaryWeaponEquipped)? primaryWeapon: secondaryWeapon;
+    }
+
+
+
+    //-------------- ARMY RELATED METHODS --------------
 
     public boolean sameSquadAs(Unit unit){
         boolean res = false;
@@ -375,7 +429,7 @@ public class Unit extends Observable{
         return unit != null && army != null && ((army.isAlly() && unit.army.isAlly()) ||(!army.isAlly() && !unit.army.isAlly())) ;
     }
 
-    public boolean fightWith(Unit unit){
+    public boolean isEnemyWith(Unit unit){
         return unit != null && army != null && ((army.isAlly() && !unit.army.isAlly()) ||(!army.isAlly() && unit.army.isAlly())) ;
     }
 
@@ -470,9 +524,8 @@ public class Unit extends Observable{
     }
 
     public int getExperienceFrom(int levelKilled){
-        double exp = 50 * Math.atan((levelKilled - getLevel())*LVL_GAP_FACTOR) - getLevel();
+        double exp = Props.EXP_BASE_MODIFIER * Math.atan((levelKilled - getLevel())*LVL_GAP_FACTOR) - getLevel();
         return (exp > 1) ? (int)exp : 1;
-
     }
 
 
@@ -541,6 +594,8 @@ public class Unit extends Observable{
             }
         }
 
+        notifyAllObservers(null);
+
         return msg;
     }
 
@@ -556,12 +611,22 @@ public class Unit extends Observable{
         return used;
     }
 
+    public boolean isUsingShield(){
+        for(Item item: Item.values()){
+            if(isUsing(item) && item.getItemType() == ItemType.SHIELD){
+                return  true;
+            }
+        }
+        return  false;
+    }
+
     public boolean possessItemStealable() {
         return (item1 != Item.NONE) && itemStealable;
     }
 
     public void setItemStealable(boolean itemStealable) {
         this.itemStealable = itemStealable;
+        notifyAllObservers(null);
     }
 
     public boolean has(PassiveAbility abb) {
@@ -578,6 +643,7 @@ public class Unit extends Observable{
 
     public void setBanner(Banner banner) {
         this.banner = banner;
+        notifyAllObservers(null);
     }
 
     public boolean isDead() {
@@ -634,10 +700,12 @@ public class Unit extends Observable{
 
     public void setPasAb1(PassiveAbility pasAb1) {
         this.pasAb1 = pasAb1;
+        notifyAllObservers(null);
     }
 
     public void setPasAb2(PassiveAbility pasAb2) {
         this.pasAb2 = pasAb2;
+        notifyAllObservers(null);
     }
 
     public void addPassiveAbility(PassiveAbility ability){
@@ -646,10 +714,12 @@ public class Unit extends Observable{
         }else if(pasAb2 == PassiveAbility.NONE){
             this.pasAb2 = ability;
         }
+        notifyAllObservers(null);
     }
 
     public void setOffensiveAbility(OffensiveAbility offAb) {
         this.offAb = offAb;
+        notifyAllObservers(null);
     }
 
     public String getName() {
@@ -696,16 +766,30 @@ public class Unit extends Observable{
 
     public void setLeadership(int leadership) {
         this.leadership = leadership;
+        notifyAllObservers(null);
     }
 
     public void resetHPAndMoral(){
         currentHitPoints = hitPoints;
-        currentMoral = getMoral();
+        currentMoral = calculateInitialMoral();
+        notifyAllObservers(null);
     }
 
-    public int getMoral(){
+    public void heal(int gainHitPoints){
+        if(gainHitPoints > hitPoints){
+            currentHitPoints  = hitPoints;
+            currentMoral = calculateInitialMoral();
+        }else{
+            currentHitPoints += gainHitPoints;
+            currentMoral += gainHitPoints;
+        }
+        notifyAllObservers(null);
+    }
+
+    public int calculateInitialMoral(){
         int moralFactor = (int) (0.9 - 0.8 * Math.exp(-(getAppStat(Props.Stat.BRAVERY) + getChaChiefsBonus())/13.0));
-        return (this.hitPoints > 0)?  hitPoints*moralFactor: 1;
+        int moral = moralFactor * this.hitPoints;
+        return (moral > 0)?  moral: 1;
     }
 
     public int getBaseStat(Props.Stat stat){
@@ -907,22 +991,6 @@ public class Unit extends Observable{
         return offAb;
     }
 
-    public void setCurrentWeapon(boolean primaryWeaponEquiped) {
-        this.primaryWeaponEquipped = primaryWeaponEquiped;
-    }
-
-    public Weapon getCurrentWeapon() {
-        return (primaryWeaponEquipped)? primaryWeapon: secondaryWeapon;
-    }
-
-    public DefensiveStance getStance() {
-        return stance;
-    }
-
-    public void setStance(DefensiveStance stance) {
-        this.stance = stance;
-    }
-
     public int getSquadBannerBonus(BannerSign sign, boolean bannerAtRange){
         int bonus = 0;
         if(army != null && bannerAtRange) {
@@ -935,6 +1003,7 @@ public class Unit extends Observable{
     public void setName(String name) {
         if(name != null) {
             this.name = name;
+            notifyAllObservers(null);
         }
     }
 
@@ -942,13 +1011,13 @@ public class Unit extends Observable{
         return moved && acted;
     }
 
-    public AArmy getArmy() {
+    public AbstractArmy getArmy() {
         return army;
     }
 
     public boolean isMobilized(){
         if(army != null)
-            return army.mobilize(this);
+            return army.isUnitMobilized(this);
         return  false;
     }
 
@@ -958,6 +1027,7 @@ public class Unit extends Observable{
 
     public void setMoved(boolean moved){
         this.moved = moved;
+        notifyAllObservers(null);
     }
 
     public boolean hasActed() {
@@ -966,14 +1036,16 @@ public class Unit extends Observable{
 
     public void setActed(boolean acted) {
         this.acted = acted;
+        notifyAllObservers(null);
     }
 
-    public Props.Orientation getOrientation() {
+    public Props.Orientation getCurrentOrientation() {
         return orientation;
     }
 
     public void setOrientation(Props.Orientation orientation) {
         this.orientation = orientation;
+        notifyAllObservers(null);
     }
 
     public Props.Ethnicity getEthnicity() {
@@ -982,64 +1054,74 @@ public class Unit extends Observable{
 
     public void setEthnicity(Props.Ethnicity ethnicity) {
         this.ethnicity = ethnicity;
+        notifyAllObservers(null);
     }
 
-    public boolean setWeapon(Weapon weapon, boolean primaryWeaponChoice){
-        if(isWeaponAvailable(weapon, primaryWeaponChoice)){
-            if(primaryWeaponChoice){
-                this.primaryWeapon = weapon;
-            }else{
-                this.secondaryWeapon = weapon;
-            }
-            return true;
-        }else{
-            if(primaryWeaponChoice){
-                this.primaryWeapon = pickWeapon(primaryWeaponChoice);
-            }else{
-                this.secondaryWeapon = pickWeapon(primaryWeaponChoice);
-            }
-        }
-        return false;
+    public boolean has(Weapon weapon){
+        return weapon == primaryWeapon || weapon == secondaryWeapon;
     }
 
+    public DefensiveStance getStance() {
+        return stance;
+    }
+
+    public void setStance(DefensiveStance stance) {
+        this.stance = stance;
+        notifyAllObservers(stance);
+    }
+
+    public int getNumberOfOAUses(){
+        return  numberOfOAUses;
+    }
+
+    public void incremenOAtUses(){
+        numberOfOAUses++;
+    }
+
+    public int getLeadershipEXP() {
+        return leadershipEXP;
+    }
+
+    public void setLeadershipEXP(int leadershipEXP) {
+        this.leadershipEXP = leadershipEXP;
+    }
 
     @Override
     public String toString() {
-        return "Unit{" +
-                "name='" + name + '\'' +
-                ", ethnicity=" + ethnicity +
-                ", level=" + level +
-                ", leadershipEXP=" + leadershipEXP +
-                ", job='" + job + '\'' +
-                ", rightHanded=" + rightHanded +
-                ", template=" + template +
-                ", primaryWeapon=" + primaryWeapon +
-                ", secondaryWeapon=" + secondaryWeapon +
-                ", primaryWeaponEquipped=" + primaryWeaponEquipped +
-                ", horseman=" + horseman +
-                ", army=" + army +
-                ", mobility=" + mobility +
-                ", charisma=" + charisma +
-                ", leadership=" + leadership +
-                ", hitPoints=" + hitPoints +
-                ", strength=" + strength +
-                ", defense=" + defense +
-                ", dexterity=" + dexterity +
-                ", agility=" + agility +
-                ", skill=" + skill +
-                ", bravery=" + bravery +
-                ", currentMoral=" + currentMoral +
-                ", currentHitPoints=" + currentHitPoints +
-                ", item1=" + item1 +
-                ", item2=" + item2 +
-                ", itemStealable=" + itemStealable +
-                ", pasAb1=" + pasAb1 +
-                ", pasAb2=" + pasAb2 +
-                ", offAb=" + offAb +
-                ", banner=" + banner +
-                ", orientation=" + orientation +
-                ", behaviour=" + behaviour +
-                ", stance=" + stance +
+        return "UNIT\n" +
+                "\nname='" + name + '\'' +
+                "\nethnicity=" + ethnicity +
+                "\nlevel=" + level +
+                "\njob='" + job + '\'' +
+                "\nrightHanded=" + rightHanded +
+                "\ntemplate=" + template +
+                "\nhorseman=" + horseman +
+                "\narmy=" + army.getId() +
+                "\n\nprimaryWeapon=" + primaryWeapon +
+                "\nsecondaryWeapon=" + secondaryWeapon +
+                "\nprimaryWeaponEquipped=" + primaryWeaponEquipped +
+                "\n\nmobility=" + mobility +
+                "\ncharisma=" + charisma +
+                "\nleadership=" + leadership +
+                "\nhitPoints=" + hitPoints +
+                "\nstrength=" + strength +
+                "\ndefense=" + defense +
+                "\ndexterity=" + dexterity +
+                "\nagility=" + agility +
+                "\nskill=" + skill +
+                "\nbravery=" + bravery +
+                "\n\ncurrentMoral=" + currentMoral +
+                "\ncurrentHitPoints=" + currentHitPoints +
+                "\n\nitem1=" + item1 +
+                "\nitem2=" + item2 +
+                "\nitemStealable=" + itemStealable +
+                "\npasAb1=" + pasAb1 +
+                "\npasAb2=" + pasAb2 +
+                "\noffAb=" + offAb +
+                "\nbanner=" + banner +
+                "\n\norientation=" + orientation +
+                "\nbehaviour=" + behaviour +
+                "\nstance=" + stance +
                 '}';
     }
 
@@ -1073,7 +1155,7 @@ public class Unit extends Observable{
 
 
 
-    public static class Army extends AArmy {
+    public static class Army extends AbstractArmy {
 
         /**
          *  mob troups =
@@ -1108,11 +1190,6 @@ public class Unit extends Observable{
         @Override
         public int getId() {
             return id;
-        }
-
-        @Override
-        public boolean getAligment() {
-            return aligment;
         }
 
         @Override
@@ -1176,6 +1253,7 @@ public class Unit extends Observable{
                 mobilizedTroups.add(new Array<Unit>());
                 mobilizedTroups.get(0).add(warlord);
                 nonMobTroups.removeValue(warlord, true);
+                warlord.notifyAllObservers(null);
             }
         }
 
@@ -1213,6 +1291,7 @@ public class Unit extends Observable{
                 } else {
                     if (getWarlord() != null && (getNbOfSquads() < getWarlord().getNbMaxWarChiefs() || (0 < squadIndex && squadIndex < mobilizedTroups.size))) {
                         if (!unit.isWarChief()) {
+
                             remove(unit);
                             unit.army = this;
                             Array<Unit> newSquad = new Array<Unit>();
@@ -1224,6 +1303,8 @@ public class Unit extends Observable{
                             } else {
                                 mobilizedTroups.add(newSquad);
                             }
+                            unit.notifyAllObservers(null);
+
                         } else {
                             msg = UnitAppointmentErrorMsg.IS_ALREADY_A_WC;
                         }
@@ -1288,6 +1369,7 @@ public class Unit extends Observable{
                                     } else {
                                         mobilizedTroups.get(squadIndex).add(unit);
                                     }
+                                    unit.notifyAllObservers(null);
 
                                 } else {
                                     msg = UnitAppointmentErrorMsg.HAS_ALREADY_STANDARD_BEARER;
@@ -1348,6 +1430,7 @@ public class Unit extends Observable{
 
                     }
                 }
+                unit.notifyAllObservers(null);
                 return true;
             }
             return false;
@@ -1361,23 +1444,25 @@ public class Unit extends Observable{
             for(int i = 0 ; i <  mobilizedTroups.size; i++){
                 for(int j = 0; j <  mobilizedTroups.get(i).size; j++){
                     nonMobTroups.add(mobilizedTroups.get(i).get(j));
+                    mobilizedTroups.get(i).get(j).notifyAllObservers(null);
                 }
             }
             mobilizedTroups.clear();
         }
 
         @Override
-        public boolean mobilize(Unit unit){
+        public boolean isUnitMobilized(Unit unit){
             for(int i = 0; i < getNbOfSquads(); i++){
-                if(mobilizedTroups.get(i).contains(unit, true))
+                if(mobilizedTroups.get(i).contains(unit, true)) {
                     return true;
+                }
             }
             return false;
         }
 
         @Override
         public boolean contains(Unit unit){
-            return nonMobTroups.contains(unit, true) || mobilize(unit);
+            return nonMobTroups.contains(unit, true) || isUnitMobilized(unit);
         }
 
         /**
@@ -1394,11 +1479,12 @@ public class Unit extends Observable{
             boolean successfullytAdded = false;
             if( unit != null && !contains(unit) ){
                 if (unit.army != null) {
-                    AArmy army = unit.army;
+                    AbstractArmy army = unit.army;
                     army.remove(unit);
                 }
                 unit.army = this;
                 nonMobTroups.add(unit);
+                unit.notifyAllObservers(null);
                 successfullytAdded = true;
             }
             return successfullytAdded ;

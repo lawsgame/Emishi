@@ -17,7 +17,7 @@ public class PropsTest {
 
     @Test
     public void testOffensiveAbilityGetOrientedArea(){
-        OffensiveAbility ability = OffensiveAbility.SWIRLING_BLOW;
+        Props.ActionChoice ability = Props.ActionChoice.SWIRLING_BLOW;
 
         for(Orientation or : Orientation.values()) {
             Array<int[]> orientedArea = ability.getOrientedArea(or);

@@ -6,12 +6,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Disposable;
+import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
 
 
 /**
  *
  */
-public abstract class GamePhase implements Disposable, GameElement {
+public abstract class GamePhase implements State, GameElement {
 	protected GPM gpm;                      // allow to switch to another phase
 	protected AssetManager asm;             // allow to have access to all the required assets: xml, sounds, textures.
 
@@ -43,6 +44,13 @@ public abstract class GamePhase implements Disposable, GameElement {
 	 * |
 	 * |
 	 * (0,0)------> 1
+	 *
+	 *
+	 *	the GamePhase.class is the root to all update/render loops
+	 *	futhermore, it aggregates two différent cameras:
+	 *		- the game one : focus on the level
+	 *		- the UI one : focus on the UI
+	 *	Finally, it also aggregates an AssetManager
 	 */
 	public GamePhase (GPM gpm, AssetManager asm, float gamePortWidth, float uiPortWidth, float gameWorldWidth, float gameWorldHeight){
 		this.gpm = gpm;

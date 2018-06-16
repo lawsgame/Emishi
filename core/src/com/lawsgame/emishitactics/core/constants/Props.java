@@ -326,152 +326,192 @@ public class Props {
         public static TileType getStandard(){
             return PLAIN;
         }
-
-        public int get32Bits() {
-            return 255 + 256*b + 256*256*g + 256*256*256*r;
-        }
     }
 
-    /**
-     * for animation / rendering purposes
-     */
-    public enum ActionState{
-        WALK,
-        SWITCH_WEAPON,
-        SWITCH_POSITION,
-        PUSH,
-        HEAL,
-        STEAL,
-        BUILD,
-        REST,
-        ATTACK,
-        PARRIED_ATTACK,
-        USE_OFFENSIVE_ABILITY,
-        DODGE,
-        PARRY,
-        BLOCK,
-        BACKSTAB,
-        WOUNDED,
-        FLEE,
-        DIE
+    public enum OffensiveAbility {
+        FOCUSED_BLOW,
+        CRIPPLING_BLOW,
+        SWIRLING_BLOW,
+        SWIFT_BLOW,
+        HEAVY_BLOW,
+        CRUNCHING_BLOW,
+        WAR_CRY,
+        POISONOUS_ATTACK,
+        GUARD_BREAK,
+        LINIENT_BLOW,
+        FURY,
+        NONE
     }
 
     public enum PassiveAbility{
         NONE,
-        HEALER,             //
+        PRAYER,
+        HEALER,
         PATHFINDER,         // OK
         THIEF,
         BEAST,
         SHADOW,
         VIGILANT,
         GUARDIAN,
-        ENGINEER;
+        ENGINEER
 
-        public static PassiveAbility getStandard(){
-            return NONE;
-        }
     }
 
-    /*
-    ( 0, 0) = targeted tile
-    ( 1, 0) = in front of targeted tile
-    ( 0, 1) = right of targeted tile
-    ( 0,-1) = left of targeted tile
-    (-1, 0) = in the back of targeted tile
+    /**
+     * for animation / rendering purposes : trigger the relevant animation to render
      */
-    public enum OffensiveAbility {
-        NONE(new int[][]{{}}, false),
-        FOCUSED_BLOW(new int[][]{{}}, false),
-        CRIPPLING_BLOW(new int[][]{{}}, false),
-        SWIRLING_BLOW(new int[][]{{-1,1}, {-1,-1}}, true),
-        SWIFT_BLOW(new int[][]{}, true),
-        HEAVY_BLOW(new int[][]{}, true),
-        CRUNCHING_BLOW(new int[][]{{1, 0}, {-1, 0}}, true),
-        WAR_CRY(new int[][]{{}}, false),
-        POISONOUS_ATTACK(new int[][]{{}}, false),
-        GUARD_BREAK(new int[][]{{}}, false),
-        LINIENT_BLOW(new int[][]{{}}, false),
-        FURY(new int[][]{{}}, false);
+    public enum ActionState{
+        WALK,
+        SWITCH_POSITION,        // use WALK animations
+        PUSH,
+        HEAL,
+        GUARD,
+        HEALED,                 // use LEVEL_UP animations
+        LEVEL_UP,
+        STEAL,
+        BUILD,
+        REST,
+        ATTACK,
+        DODGE,
+        PARRY,
+        BLOCK,
+        BACKSTAB,
+        WOUNDED,
+        FLEE,                   // use WALK animations
+        DIE
+    }
 
-        private Array<int[]> area;
-        private boolean meleeOnly;
 
-        OffensiveAbility(int[][] area, boolean meleeOnly){
-            this.area = new Array<int[]>();
-            for(int i = 0; i < area.length; i++){
-                this.area.add(area[i]);
+    /**
+     * modelize the choice make by the player other than walking
+     *
+     *
+     * Area of impact :
+     * ( 0, 0) = targeted tile
+     * ( 1, 0) = in front of targeted tile
+     * ( 0, 1) = right of targeted tile
+     * ( 0,-1) = left of targeted tile
+     * (-1, 0) = in the back of targeted tile
+     */
+    public enum ActionChoice {
+        WALK                        (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        SWITCH_WEAPON               (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        SWITCH_POSITION             (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        PUSH                        (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        HEAL                        (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        HEAL_ALL                    (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        STEAL                       (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        BUILD                       (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        ATTACK                      (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        CHOOSE_ORIENTATION          (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        CHOOSE_STANCE               (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        FOCUSED_BLOW                (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
+        CRIPPLING_BLOW              (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
+        SWIRLING_BLOW               (1, 1, false, true, TypeOfDamage.EDGED, new int[][]{{-1,1}, {-1,-1}}),
+        SWIFT_BLOW                  (0, 0, true, false, TypeOfDamage.EDGED, new int[][]{}),
+        HEAVY_BLOW                  (0, 0, true, false, TypeOfDamage.BLUNT, new int[][]{}),
+        CRUNCHING_BLOW              (1, 1, false, true, TypeOfDamage.BLUNT, new int[][]{{1, 0}, {-1, 0}}),
+        WAR_CRY                     (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        POISONOUS_ATTACK            (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        GUARD_BREAK                 (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        LINIENT_BLOW                (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        FURY                        (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}});
+
+        private int rangeMax;
+        private int rangeMin;
+        private boolean weaponBasedRange;
+        private boolean meleeWeaponEquipedRequired;
+        private TypeOfDamage damageTypeRequired;
+        private Array<int[]> impactArea;
+
+
+        ActionChoice(int rangeMax, int rangeMin, boolean weaponBasedRange, boolean meleeWeaponEquipedRequired, TypeOfDamage damageTypeRequired, int[][] impactArea) {
+            this.rangeMax = rangeMax;
+            this.rangeMin = rangeMin;
+            this.weaponBasedRange = weaponBasedRange;
+            this.meleeWeaponEquipedRequired = meleeWeaponEquipedRequired;
+            this.impactArea = new Array<int[]>();
+            for(int[] relativeTileCoordinates : impactArea){
+                this.impactArea.add(relativeTileCoordinates);
             }
+
         }
 
-        public Array<int[]> getArea(){
-            return  area;
+        public int getRangeMax() {
+            return rangeMax;
+        }
+
+        public int getRangeMin() {
+            return rangeMin;
+        }
+
+        public boolean isWeaponBasedRange() {
+            return weaponBasedRange;
+        }
+
+        public boolean isMeleeWeaponEquipedRequired() {
+            return meleeWeaponEquipedRequired;
         }
 
         /*
-        NORTH (standard):
-                         ( 1, 0)
-         ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
+                        NORTH (standard):
+                                         ( 1, 0)
+                         ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
 
-                         (-2, 0)
+                                         (-2, 0)
 
-         SOUTH: rowf = -r colf = -c
-                          ( 2, 0)
+                         SOUTH: rowf = -r colf = -c
+                                          ( 2, 0)
 
-                 ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
-                          (-1, 0)
+                                 ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
+                                          (-1, 0)
 
-         EAST: rowf = -c colf = r
-                             ( 2, 0)
-                             ( 1, 0)
-                  ( 0,-2)    ( 0, 0) ( 0, 1)
-                             (-1, 0)
+                         EAST: rowf = -c colf = r
+                                             ( 2, 0)
+                                             ( 1, 0)
+                                  ( 0,-2)    ( 0, 0) ( 0, 1)
+                                             (-1, 0)
 
-         WEST: rowf = -c colf = -r
-                    ( 1, 0)
-             ( 0,-1)( 0, 0)     ( 0, 2)
-                    (-1, 0)
-                    ( 2, 0)
+                         WEST: rowf = -c colf = -r
+                                    ( 1, 0)
+                             ( 0,-1)( 0, 0)     ( 0, 2)
+                                    (-1, 0)
+                                    ( 2, 0)
 
 
-         */
+                         */
         public Array<int[]> getOrientedArea(Props.Orientation orientation) {
             Array<int[]> orientedArea = new Array<int[]>();
             switch (orientation){
                 case WEST:
-                    for(int i = 0; i < area.size; i++){
-                        orientedArea.add(new int[]{-area.get(i)[1], -area.get(i)[0]});
+                    for(int i = 0; i < impactArea.size; i++){
+                        orientedArea.add(new int[]{-impactArea.get(i)[1], -impactArea.get(i)[0]});
                     }
                     break;
                 case NORTH:
-                    orientedArea.addAll(area);
+                    orientedArea.addAll(impactArea);
                     break;
                 case SOUTH:
-                    for(int i = 0; i < area.size; i++){
-                        orientedArea.add(new int[]{-area.get(i)[0], -area.get(i)[1]});
+                    for(int i = 0; i < impactArea.size; i++){
+                        orientedArea.add(new int[]{-impactArea.get(i)[0], -impactArea.get(i)[1]});
                     }
                     break;
                 case EAST:
-                    for(int i = 0; i < area.size; i++){
-                        orientedArea.add(new int[]{-area.get(i)[1], area.get(i)[0]});
+                    for(int i = 0; i < impactArea.size; i++){
+                        orientedArea.add(new int[]{-impactArea.get(i)[1], impactArea.get(i)[0]});
                     }
                     break;
             }
             return orientedArea;
         }
 
-        public boolean isMeleeOnly() {
-            return meleeOnly;
-        }
-
-        public static OffensiveAbility getStandard(){
-            return NONE;
-        }
     }
 
     public enum TypeOfDamage{
         EDGED,
         PIERCING,
-        BLUNT
+        BLUNT,
+        NONE
     }
 
     public enum WeaponArt{
