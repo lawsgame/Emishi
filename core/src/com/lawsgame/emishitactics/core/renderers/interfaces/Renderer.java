@@ -1,10 +1,10 @@
 package com.lawsgame.emishitactics.core.renderers.interfaces;
 
-import com.lawsgame.emishitactics.engine.GameElement;
+import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
-public abstract class Renderer<M extends Observable> implements Observer, GameElement{
+public abstract class Renderer<M extends Observable> implements Observer, GameUpdatableEntity{
       protected M model;
 
     public Renderer(M model){

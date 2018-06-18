@@ -18,7 +18,6 @@ import com.lawsgame.emishitactics.core.constants.Props.UnitTemplate;
 import com.lawsgame.emishitactics.core.constants.Props.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-import static com.lawsgame.emishitactics.core.constants.Props.LVL_GAP_FACTOR;
 
 
 /**
@@ -66,7 +65,7 @@ public class Unit extends Observable{
     protected PassiveAbility pasAb2 = PassiveAbility.NONE;
     protected OffensiveAbility offAb = OffensiveAbility.NONE;
     protected int numberOfOAUses = 0;
-    protected Banner banner = new Banner();
+    protected final Banner banner = new Banner();
 
     /**
      * battle execution related attributes
@@ -75,7 +74,9 @@ public class Unit extends Observable{
     protected Props.Behaviour behaviour;
     protected boolean moved = false;
     protected boolean acted = false;
+    protected boolean builded = false;
     protected DefensiveStance stance = DefensiveStance.DODGE;
+
 
 
 
@@ -205,9 +206,6 @@ public class Unit extends Observable{
         }
         this.secondaryWeapon = secondaryWeapon;
         this.mobility += mob;
-
-        notifyAllObservers(null);
-
         return mob;
     }
 
@@ -321,11 +319,18 @@ public class Unit extends Observable{
             this.skill += ski;
             this.bravery += bra;
         }
-        return new int[]{hpt, mob, cha, ld, str, def, dex, agi, ski, bra};
+
+        int[] gainlvl = new int[]{hpt, mob, cha, ld, str, def, dex, agi, ski, bra};
+        notifyAllObservers(gainlvl);
+        return gainlvl;
     }
 
 
+
+
     //------------------- WEAPON RELATED METHODS -----------------------------------
+
+
 
 
     public Weapon pickWeapon(boolean primaryWeaponChoice){
@@ -386,7 +391,7 @@ public class Unit extends Observable{
 
     public void switchWeapon(){
         this.primaryWeaponEquipped = !primaryWeaponEquipped;
-        notifyAllObservers(null);
+        notifyAllObservers(getCurrentWeapon());
     }
 
     public void setCurrentWeapon(boolean primaryWeaponEquiped) {
@@ -401,6 +406,9 @@ public class Unit extends Observable{
 
 
     //-------------- ARMY RELATED METHODS --------------
+
+
+
 
     public boolean sameSquadAs(Unit unit){
         boolean res = false;
@@ -524,9 +532,46 @@ public class Unit extends Observable{
     }
 
     public int getExperienceFrom(int levelKilled){
-        double exp = Props.EXP_BASE_MODIFIER * Math.atan((levelKilled - getLevel())*LVL_GAP_FACTOR) - getLevel();
+        double exp = Props.EXP_BASE_MODIFIER * Math.atan((levelKilled - getLevel())*Props.LVL_GAP_FACTOR) - getLevel();
         return (exp > 1) ? (int)exp : 1;
     }
+
+    public void receiveDamage(int damageTaken){
+        if(this.currentHitPoints < damageTaken){
+            this.currentHitPoints -= damageTaken;
+            if(this.getCurrentMoral() < damageTaken){
+                this.currentMoral -= damageTaken;
+                notifyAllObservers(damageTaken);
+            }else{
+                this.currentMoral = 0;
+                notifyAllObservers(false);
+            }
+        }else{
+            this.currentHitPoints = 0;
+            this.currentMoral = 0;
+            notifyAllObservers(true);
+        }
+    }
+
+    public void heal(int rawHealPower){
+        int[] oldHpts = new int[]{currentHitPoints, currentMoral};
+        if(rawHealPower > hitPoints){
+            currentHitPoints  = hitPoints;
+            currentMoral = calculateInitialMoral();
+        }else{
+            currentHitPoints += rawHealPower;
+            if(currentMoral > 0) {
+                currentMoral += rawHealPower;
+            }else{
+                currentMoral = calculateInitialMoral() + currentHitPoints - getAppStat(Props.Stat.HIT_POINTS);
+                if(currentMoral < 0){
+                    currentMoral = 0;
+                }
+            }
+        }
+        notifyAllObservers(oldHpts);
+    }
+
 
 
 
@@ -542,13 +587,16 @@ public class Unit extends Observable{
         return item1;
     }
 
+
     public Item getItem2() {
         return item2;
     }
 
+
     public int getNbItemsEquiped(){
         return ((item1 !=  Item.NONE) ? 1 : 0) + ((item2 !=  Item.NONE) ? 1 : 0);
     }
+
 
     public Props.EquipMsg equip(Item item, boolean firstSlot) {
         int currentLd = getAppStat(Props.Stat.LEADERSHIP);
@@ -595,13 +643,14 @@ public class Unit extends Observable{
         }
 
         notifyAllObservers(null);
-
         return msg;
     }
+
 
     public void unequip(boolean firstSlot){
         equip(Item.NONE, firstSlot);
     }
+
 
     public boolean isUsing(Item eq){
         boolean used = item1 == eq || item2 == eq;
@@ -610,6 +659,7 @@ public class Unit extends Observable{
         }
         return used;
     }
+
 
     public boolean isUsingShield(){
         for(Item item: Item.values()){
@@ -637,13 +687,9 @@ public class Unit extends Observable{
         return abb == offAb;
     }
 
+
     public Banner getBanner() {
         return banner;
-    }
-
-    public void setBanner(Banner banner) {
-        this.banner = banner;
-        notifyAllObservers(null);
     }
 
     public boolean isDead() {
@@ -775,16 +821,6 @@ public class Unit extends Observable{
         notifyAllObservers(null);
     }
 
-    public void heal(int gainHitPoints){
-        if(gainHitPoints > hitPoints){
-            currentHitPoints  = hitPoints;
-            currentMoral = calculateInitialMoral();
-        }else{
-            currentHitPoints += gainHitPoints;
-            currentMoral += gainHitPoints;
-        }
-        notifyAllObservers(null);
-    }
 
     public int calculateInitialMoral(){
         int moralFactor = (int) (0.9 - 0.8 * Math.exp(-(getAppStat(Props.Stat.BRAVERY) + getChaChiefsBonus())/13.0));
@@ -1021,23 +1057,13 @@ public class Unit extends Observable{
         return  false;
     }
 
-    public boolean hasMoved(){
-        return moved;
-    }
+    public boolean hasMoved(){ return moved; }
 
-    public void setMoved(boolean moved){
-        this.moved = moved;
-        notifyAllObservers(null);
-    }
+    public void setMoved(boolean moved){ this.moved = moved; }
 
-    public boolean hasActed() {
-        return acted;
-    }
+    public boolean hasActed() { return acted; }
 
-    public void setActed(boolean acted) {
-        this.acted = acted;
-        notifyAllObservers(null);
-    }
+    public void setActed(boolean acted) { this.acted = acted; }
 
     public Props.Orientation getCurrentOrientation() {
         return orientation;
@@ -1074,7 +1100,7 @@ public class Unit extends Observable{
         return  numberOfOAUses;
     }
 
-    public void incremenOAtUses(){
+    public void incrementOfOAUses(){
         numberOfOAUses++;
     }
 
@@ -1084,6 +1110,12 @@ public class Unit extends Observable{
 
     public void setLeadershipEXP(int leadershipEXP) {
         this.leadershipEXP = leadershipEXP;
+    }
+
+    public boolean isBuilded() { return builded; }
+
+    public void setBuilded(boolean builded) {
+        this.builded = builded;
     }
 
     @Override
@@ -1229,6 +1261,17 @@ public class Unit extends Observable{
         @Override
         public Array<Array<Unit>> getAllSquads() {
             return mobilizedTroups;
+        }
+
+        @Override
+        public Array<Unit> getMobilizedUnits() {
+            Array<Unit> res = new Array<Unit>();
+            for(int i = 0; i < mobilizedTroups.size; i++){
+                for(int j = 0; j < mobilizedTroups.get(i).size; j++){
+                    res.add(mobilizedTroups.get(i).get(j));
+                }
+            }
+            return res;
         }
 
         @Override

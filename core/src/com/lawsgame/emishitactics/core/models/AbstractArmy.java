@@ -13,6 +13,7 @@ public abstract class AbstractArmy extends Observable{
     public abstract Array<Unit> getWarChiefs();
     public abstract Array<Unit> getSquad(Unit unit);
     public abstract Array<Array<Unit>> getAllSquads();
+    public abstract Array<Unit> getMobilizedUnits();
     public abstract Array<Unit> getNonMobilizedUnits();
     public abstract boolean isAlly();
 

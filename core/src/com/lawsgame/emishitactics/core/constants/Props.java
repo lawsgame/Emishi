@@ -91,6 +91,15 @@ public class Props {
         public static Orientation getStandard(){
             return SOUTH;
         }
+
+        public Orientation getOpposite() {
+            Orientation opposite = null;
+            if(this == NORTH) opposite = SOUTH;
+            if(this == SOUTH) opposite = NORTH;
+            if(this == EAST) opposite = WEST;
+            if(this == WEST) opposite = EAST;
+            return opposite;
+        }
     }
 
     public enum Stat {
@@ -358,32 +367,47 @@ public class Props {
     }
 
     /**
-     * for animation / rendering purposes : trigger the relevant animation to render
+     * for animation / rendering purposes, use to define:
+     *  - ids of animation sprite sets.
+     *  - ids of animations
      */
-    public enum ActionState{
-        WALK,
-        SWITCH_POSITION,        // use WALK animations
+    public enum AnimationId {
+        WALK,               //automatized
+        SWITCH_WEAPON,      //automatized
+        SWITCH_POSITION,    //automatized
         PUSH,
         HEAL,
-        GUARD,
-        HEALED,                 // use LEVEL_UP animations
-        LEVEL_UP,
+        PRAY,               //use HEAL animation
         STEAL,
         BUILD,
+        GUARD,
+        LEVEL_UP,           //automatized
+        HEALED,
         REST,
         ATTACK,
+        PARRIED_ATTACK,
         DODGE,
-        PARRY,
         BLOCK,
-        BACKSTAB,
-        WOUNDED,
-        FLEE,                   // use WALK animations
-        DIE
+        PARRY,
+        BACKSTABBED,
+        TAKE_HIT,           //automatized
+        FLEE,               //automatized, use WALK animation
+        DIE,                //automatized
+        FOCUSED_BLOW,
+        CRIPPLING_BLOW,
+        SWIRLING_BLOW,
+        SWIFT_BLOW,
+        HEAVY_BLOW,
+        CRUNCHING_BLOW,
+        WAR_CRY,
+        POISONOUS_ATTACK,
+        GUARD_BREAK,
+        LINIENT_BLOW,
+        FURY
     }
 
-
     /**
-     * modelize the choice make by the player other than walking
+     * modelize the choice made by the player foa a unit to perform a given action
      *
      *
      * Area of impact :
@@ -394,28 +418,28 @@ public class Props {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                        (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        SWITCH_WEAPON               (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        SWITCH_POSITION             (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        PUSH                        (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        HEAL                        (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        HEAL_ALL                    (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        STEAL                       (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        BUILD                       (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        ATTACK                      (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        CHOOSE_ORIENTATION          (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        CHOOSE_STANCE               (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        FOCUSED_BLOW                (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
-        CRIPPLING_BLOW              (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
-        SWIRLING_BLOW               (1, 1, false, true, TypeOfDamage.EDGED, new int[][]{{-1,1}, {-1,-1}}),
-        SWIFT_BLOW                  (0, 0, true, false, TypeOfDamage.EDGED, new int[][]{}),
-        HEAVY_BLOW                  (0, 0, true, false, TypeOfDamage.BLUNT, new int[][]{}),
-        CRUNCHING_BLOW              (1, 1, false, true, TypeOfDamage.BLUNT, new int[][]{{1, 0}, {-1, 0}}),
-        WAR_CRY                     (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        POISONOUS_ATTACK            (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        GUARD_BREAK                 (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        LINIENT_BLOW                (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        FURY                        (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}});
+        WALK                            (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        SWITCH_WEAPON                   (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        SWITCH_POSITION                 (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        PUSH                            (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        PRAY                            (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        HEAL                            (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        STEAL                           (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        BUILD                           (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        ATTACK                          (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        CHOOSE_ORIENTATION              (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        CHOOSE_STANCE                   (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
+        USE_FOCUSED_BLOW                (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
+        USE_CRIPPLING_BLOW              (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
+        USE_SWIRLING_BLOW               (1, 1, false, true, TypeOfDamage.EDGED, new int[][]{{-1,1}, {-1,-1}}),
+        USE_SWIFT_BLOW                  (0, 0, true, false, TypeOfDamage.EDGED, new int[][]{}),
+        USE_HEAVY_BLOW                  (0, 0, true, false, TypeOfDamage.BLUNT, new int[][]{}),
+        USE_CRUNCHING_BLOW              (1, 1, false, true, TypeOfDamage.BLUNT, new int[][]{{1, 0}, {-1, 0}}),
+        USE_WAR_CRY                     (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        USE_POISONOUS_ATTACK            (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        USE_GUARD_BREAK                 (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        USE_LINIENT_BLOW                (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
+        USE_FURY                        (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}});
 
         private int rangeMax;
         private int rangeMin;
@@ -453,33 +477,37 @@ public class Props {
             return meleeWeaponEquipedRequired;
         }
 
+        public TypeOfDamage getDamageTypeRequired() {
+            return damageTypeRequired;
+        }
+
         /*
-                        NORTH (standard):
-                                         ( 1, 0)
-                         ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
+                                NORTH (standard):
+                                                 ( 1, 0)
+                                 ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
 
-                                         (-2, 0)
+                                                 (-2, 0)
 
-                         SOUTH: rowf = -r colf = -c
-                                          ( 2, 0)
+                                 SOUTH: rowf = -r colf = -c
+                                                  ( 2, 0)
 
-                                 ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
-                                          (-1, 0)
+                                         ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
+                                                  (-1, 0)
 
-                         EAST: rowf = -c colf = r
-                                             ( 2, 0)
-                                             ( 1, 0)
-                                  ( 0,-2)    ( 0, 0) ( 0, 1)
-                                             (-1, 0)
+                                 EAST: rowf = -c colf = r
+                                                     ( 2, 0)
+                                                     ( 1, 0)
+                                          ( 0,-2)    ( 0, 0) ( 0, 1)
+                                                     (-1, 0)
 
-                         WEST: rowf = -c colf = -r
-                                    ( 1, 0)
-                             ( 0,-1)( 0, 0)     ( 0, 2)
-                                    (-1, 0)
-                                    ( 2, 0)
+                                 WEST: rowf = -c colf = -r
+                                            ( 1, 0)
+                                     ( 0,-1)( 0, 0)     ( 0, 2)
+                                            (-1, 0)
+                                            ( 2, 0)
 
 
-                         */
+                                 */
         public Array<int[]> getOrientedArea(Props.Orientation orientation) {
             Array<int[]> orientedArea = new Array<int[]>();
             switch (orientation){

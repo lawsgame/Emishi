@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.managers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.renderers.TempoBattlefield2DRenderer;
+import com.lawsgame.emishitactics.core.renderers.Battlefield2DRenderer;
 import com.lawsgame.emishitactics.core.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
@@ -36,7 +36,9 @@ public class LevelPhase extends GamePhase {
 
         this.battlefield = BattlefieldLoader.load(this, battlefieldId);
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
-        this.bfRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
+        this.bfRenderer = new Battlefield2DRenderer(battlefield, asm);
+
+        System.out.println(battlefield.isTileOccupied(9, 9));
 
     }
 
@@ -66,7 +68,6 @@ public class LevelPhase extends GamePhase {
 
 
     }
-    private boolean one = true;
 
     @Override
     public void preRender(SpriteBatch batch) {
@@ -75,7 +76,8 @@ public class LevelPhase extends GamePhase {
 
     @Override
     public void renderWorld(SpriteBatch batch) {
-        bfRenderer.render(batch);
+        bfRenderer.renderTiles(batch);
+        bfRenderer.renderUnits(batch);
     }
 
     @Override

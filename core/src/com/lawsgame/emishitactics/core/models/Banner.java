@@ -1,8 +1,9 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.lawsgame.emishitactics.core.constants.Props.*;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-public class Banner {
+public class Banner extends Observable{
     private BannerSign sign1;
     private BannerSign sign2;
     private BannerSign sign3;
@@ -26,6 +27,7 @@ public class Banner {
                     sign3 = sign;
                     break;
             }
+            notifyAllObservers(null);
             return true;
         }
         return false;
@@ -39,6 +41,7 @@ public class Banner {
         }else if(sign3  == BannerSign.NONE){
             sign3 = sign;
         }else {
+            notifyAllObservers(null);
             return false;
         }
         return true;

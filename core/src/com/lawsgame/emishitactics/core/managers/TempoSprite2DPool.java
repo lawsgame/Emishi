@@ -25,14 +25,15 @@ public class TempoSprite2DPool {
 
     private HashMap<Props.TileType, TextureRegion> tileSprites;
     private HashMap<Assets.UIAssetId, TextureRegion> uiSprites;
-    private HashMap<Props.ActionState, TextureRegion> unitSprites;
-    private HashMap<Props.ActionState, TextureRegion> foeSprites;
-    private HashMap<Props.ActionState, TextureRegion> unitDoneSprites;
+    private HashMap<Props.AnimationId, TextureRegion> unitSprites;
+    private HashMap<Props.AnimationId, TextureRegion> foeSprites;
+    private HashMap<Props.AnimationId, TextureRegion> unitDoneSprites;
     private HashMap<Props.DefensiveStance, TextureRegion> unitStanceSprites;
     private HashMap<Props.DefensiveStance, TextureRegion> foeStanceSprites;
     private HashMap<Props.DefensiveStance, TextureRegion> unitStanceDoneSprites;
     private HashMap<Props.Weapon, TextureRegion> weaponSprites;
     private HashMap<Props.Orientation, TextureRegion> orientationSprites;
+    private HashMap<Props.OffensiveAbility, TextureRegion> offensiveAbilitySprites;
     private TextureRegion shieldSprite;
     private TextureRegion mountedSprite;
 
@@ -40,14 +41,15 @@ public class TempoSprite2DPool {
     private TempoSprite2DPool(){
         this.tileSprites = new HashMap<Props.TileType, TextureRegion>();
         this.uiSprites = new HashMap<Assets.UIAssetId, TextureRegion>();
-        this.unitSprites = new HashMap<Props.ActionState, TextureRegion>();
-        this.foeSprites = new HashMap<Props.ActionState, TextureRegion>();
-        this.unitDoneSprites = new HashMap<Props.ActionState, TextureRegion>();
+        this.unitSprites = new HashMap<Props.AnimationId, TextureRegion>();
+        this.foeSprites = new HashMap<Props.AnimationId, TextureRegion>();
+        this.unitDoneSprites = new HashMap<Props.AnimationId, TextureRegion>();
         this.unitStanceSprites = new HashMap<Props.DefensiveStance, TextureRegion>();
         this.foeStanceSprites = new HashMap<Props.DefensiveStance, TextureRegion>();
         this.unitStanceDoneSprites = new HashMap<Props.DefensiveStance, TextureRegion>();
         this.weaponSprites = new HashMap<Props.Weapon, TextureRegion>();
         this.orientationSprites = new HashMap<Props.Orientation, TextureRegion>();
+        this.offensiveAbilitySprites = new HashMap<Props.OffensiveAbility, TextureRegion>();
         shieldSprite = null;
         mountedSprite = null;
     }
@@ -77,51 +79,40 @@ public class TempoSprite2DPool {
                 region = atlas.findRegion(Assets.REGION_UNIT_SPRITES);
                 TextureRegion[][] unitRegions = region.split(32,32);
                 TextureRegion[][] iconRegions = region.split(8,8);
+                TextureRegion[][] offabbRegions = region.split(32,8);
 
-                unitSprites.put(Props.ActionState.ATTACK, unitRegions[3][0]);
-                unitSprites.put(Props.ActionState.PUSH, unitRegions[4][0]);
-                unitSprites.put(Props.ActionState.HEAL, unitRegions[5][0]);
-                unitSprites.put(Props.ActionState.STEAL, unitRegions[6][0]);
-                unitSprites.put(Props.ActionState.BUILD, unitRegions[7][0]);
-                unitSprites.put(Props.ActionState.WALK, unitRegions[8][0]);
-                unitSprites.put(Props.ActionState.DODGE, unitRegions[9][0]);
-                unitSprites.put(Props.ActionState.BLOCK, unitRegions[10][0]);
-                unitSprites.put(Props.ActionState.PARRY, unitRegions[11][0]);
-                unitSprites.put(Props.ActionState.BACKSTAB, unitRegions[12][0]);
-                unitSprites.put(Props.ActionState.WOUNDED, unitRegions[13][0]);
-                unitSprites.put(Props.ActionState.DIE, unitRegions[14][0]);
+                unitSprites.put(Props.AnimationId.ATTACK, unitRegions[3][0]);
+                unitSprites.put(Props.AnimationId.PUSH, unitRegions[4][0]);
+                unitSprites.put(Props.AnimationId.HEAL, unitRegions[5][0]);
+                unitSprites.put(Props.AnimationId.STEAL, unitRegions[6][0]);
+                unitSprites.put(Props.AnimationId.BUILD, unitRegions[7][0]);
+                unitSprites.put(Props.AnimationId.WALK, unitRegions[8][0]);
+                unitSprites.put(Props.AnimationId.DODGE, unitRegions[9][0]);
+                unitSprites.put(Props.AnimationId.BLOCK, unitRegions[10][0]);
+                unitSprites.put(Props.AnimationId.PARRY, unitRegions[11][0]);
+                unitSprites.put(Props.AnimationId.BACKSTABBED, unitRegions[12][0]);
+                unitSprites.put(Props.AnimationId.TAKE_HIT, unitRegions[13][0]);
+                unitSprites.put(Props.AnimationId.DIE, unitRegions[14][0]);
                 unitStanceSprites.put(Props.DefensiveStance.DODGE, unitRegions[0][0]);
                 unitStanceSprites.put(Props.DefensiveStance.BLOCK, unitRegions[1][0]);
                 unitStanceSprites.put(Props.DefensiveStance.PARRY, unitRegions[2][0]);
 
-                foeSprites.put(Props.ActionState.ATTACK, unitRegions[3][4]);
-                foeSprites.put(Props.ActionState.PUSH, unitRegions[4][4]);
-                foeSprites.put(Props.ActionState.HEAL, unitRegions[5][4]);
-                foeSprites.put(Props.ActionState.STEAL, unitRegions[6][4]);
-                foeSprites.put(Props.ActionState.BUILD, unitRegions[7][4]);
-                foeSprites.put(Props.ActionState.WALK, unitRegions[8][4]);
-                foeSprites.put(Props.ActionState.DODGE, unitRegions[9][4]);
-                foeSprites.put(Props.ActionState.BLOCK, unitRegions[10][4]);
-                foeSprites.put(Props.ActionState.PARRY, unitRegions[11][4]);
-                foeSprites.put(Props.ActionState.BACKSTAB, unitRegions[12][4]);
-                foeSprites.put(Props.ActionState.WOUNDED, unitRegions[13][4]);
-                foeSprites.put(Props.ActionState.DIE, unitRegions[14][4]);
+                foeSprites.put(Props.AnimationId.ATTACK, unitRegions[3][4]);
+                foeSprites.put(Props.AnimationId.PUSH, unitRegions[4][4]);
+                foeSprites.put(Props.AnimationId.HEAL, unitRegions[5][4]);
+                foeSprites.put(Props.AnimationId.STEAL, unitRegions[6][4]);
+                foeSprites.put(Props.AnimationId.BUILD, unitRegions[7][4]);
+                foeSprites.put(Props.AnimationId.WALK, unitRegions[8][4]);
+                foeSprites.put(Props.AnimationId.DODGE, unitRegions[9][4]);
+                foeSprites.put(Props.AnimationId.BLOCK, unitRegions[10][4]);
+                foeSprites.put(Props.AnimationId.PARRY, unitRegions[11][4]);
+                foeSprites.put(Props.AnimationId.BACKSTABBED, unitRegions[12][4]);
+                foeSprites.put(Props.AnimationId.TAKE_HIT, unitRegions[13][4]);
+                foeSprites.put(Props.AnimationId.DIE, unitRegions[14][4]);
                 foeStanceSprites.put(Props.DefensiveStance.DODGE, unitRegions[0][4]);
                 foeStanceSprites.put(Props.DefensiveStance.BLOCK, unitRegions[1][4]);
                 foeStanceSprites.put(Props.DefensiveStance.PARRY, unitRegions[2][4]);
 
-                unitDoneSprites.put(Props.ActionState.ATTACK, unitRegions[3][6]);
-                unitDoneSprites.put(Props.ActionState.PUSH, unitRegions[4][6]);
-                unitDoneSprites.put(Props.ActionState.HEAL, unitRegions[5][6]);
-                unitDoneSprites.put(Props.ActionState.STEAL, unitRegions[6][6]);
-                unitDoneSprites.put(Props.ActionState.BUILD, unitRegions[7][6]);
-                unitDoneSprites.put(Props.ActionState.WALK, unitRegions[8][6]);
-                unitDoneSprites.put(Props.ActionState.DODGE, unitRegions[9][6]);
-                unitDoneSprites.put(Props.ActionState.BLOCK, unitRegions[10][6]);
-                unitDoneSprites.put(Props.ActionState.PARRY, unitRegions[11][6]);
-                unitDoneSprites.put(Props.ActionState.BACKSTAB, unitRegions[12][6]);
-                unitDoneSprites.put(Props.ActionState.WOUNDED, unitRegions[13][6]);
-                unitDoneSprites.put(Props.ActionState.DIE, unitRegions[14][6]);
                 unitStanceDoneSprites.put(Props.DefensiveStance.DODGE, unitRegions[0][6]);
                 unitStanceDoneSprites.put(Props.DefensiveStance.BLOCK, unitRegions[1][6]);
                 unitStanceDoneSprites.put(Props.DefensiveStance.PARRY, unitRegions[2][6]);
@@ -142,6 +133,18 @@ public class TempoSprite2DPool {
                 orientationSprites.put(Props.Orientation.EAST, iconRegions[3][13]);
                 orientationSprites.put(Props.Orientation.WEST, iconRegions[3][14]);
                 orientationSprites.put(Props.Orientation.SOUTH, iconRegions[3][15]);
+
+                offensiveAbilitySprites.put(Props.OffensiveAbility.FOCUSED_BLOW,    offabbRegions[0][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.CRIPPLING_BLOW,  offabbRegions[1][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.SWIRLING_BLOW,   offabbRegions[2][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.SWIFT_BLOW,      offabbRegions[3][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.HEAVY_BLOW,      offabbRegions[4][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.CRUNCHING_BLOW,  offabbRegions[5][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.WAR_CRY,         offabbRegions[6][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.POISONOUS_ATTACK, offabbRegions[7][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.GUARD_BREAK,     offabbRegions[8][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.LINIENT_BLOW,    offabbRegions[9][8]);
+                offensiveAbilitySprites.put(Props.OffensiveAbility.FURY,            offabbRegions[10][8]);
             }
 
             if(asm.isLoaded(Assets.ATLAS_UI)) {
@@ -174,16 +177,12 @@ public class TempoSprite2DPool {
         return shieldSprite;
     }
 
-    public TextureRegion getUnitSprite(Props.ActionState actionState, boolean foe, boolean done){
+    public TextureRegion getUnitSprite(Props.AnimationId animationId, boolean foe){
         TextureRegion res;
-        if(done){
-            res = unitDoneSprites.get(actionState);
+        if(foe){
+            res = foeSprites.get(animationId);
         }else{
-            if(foe){
-                res = foeSprites.get(actionState);
-            }else{
-                res = unitSprites.get(actionState);
-            }
+            res = unitSprites.get(animationId);
         }
         return res;
     }
@@ -208,5 +207,9 @@ public class TempoSprite2DPool {
 
     public TextureRegion getOrientationSprite(Props.Orientation orientation) {
         return orientationSprites.get(orientation);
+    }
+
+    public TextureRegion getOffensiveAbbSprite(Props.OffensiveAbility offensiveAbility){
+        return offensiveAbilitySprites.get(offensiveAbility);
     }
 }

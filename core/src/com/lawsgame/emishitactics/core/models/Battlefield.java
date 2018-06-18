@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Props;
 import com.lawsgame.emishitactics.core.constants.Props.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -202,7 +201,7 @@ public class Battlefield extends Observable {
     }
 
     public boolean isTileOccupied(int row , int col){
-        if(isTileExisted(row, col)){
+        if(isTileExisted(row, col) && units != null){
             return this.units[row][col] != null;
         }
         return false;
@@ -212,8 +211,8 @@ public class Battlefield extends Observable {
         return isTileReachable(row, col, pathfinder) && !isTileOccupied(row, col);
     }
 
-    public boolean isTileOccupiedBySameArmyUnit(int row , int col, Unit unit){
-        return isTileOccupied(row, col) && this.units[row][col].sameArmyAs(unit);
+    public boolean isTileOccupiedBySameSquadAs(int row , int col, Unit unit){
+        return isTileOccupied(row, col) && this.units[row][col].sameSquadAs(unit);
     }
 
     public boolean isTileOccupiedByAlly(int row , int col, Unit unit){
@@ -230,14 +229,85 @@ public class Battlefield extends Observable {
     //----------------- UNIT MANAGEMENT ----------------------
 
 
-    public void MoveUnit(int rowI, int colI, int rowf, int colf){
-        //TODO:
+
+
+    public void randomlyDeployArmy(AbstractArmy army){
+        if(army != null) {
+            Array<Unit> mobilizedTroops = army.getMobilizedUnits();
+            Array<int[]> remainingAvailableTiles = new Array<int[]>();
+
+            if(remainingAvailableTiles.size >= mobilizedTroops.size) {
+                // check the availability of each tile of the deployment area
+                int[] coords;
+                for (int i = 0; i < remainingAvailableTiles.size; i++) {
+                    coords = remainingAvailableTiles.get(i);
+                    if (coords.length == 2 && isTileAvailable(coords[0], coords[1], false)) {
+                        remainingAvailableTiles.removeIndex(i);
+                        i--;
+                    }
+                }
+
+                Unit unit;
+                while (mobilizedTroops.size > 0) {
+                    coords = remainingAvailableTiles.removeIndex(R.getR().nextInt(remainingAvailableTiles.size));
+                    unit = mobilizedTroops.removeIndex(R.getR().nextInt(mobilizedTroops.size));
+                    deployUnit(coords[0], coords[1], unit);
+                }
+            }
+        }
     }
 
-    public boolean addUnit(int row, int col, Unit unit){
-        if(units != null && !isTileOccupied(row, col) && isTileReachable(row, col, unit.has(PassiveAbility.PATHFINDER))){
+    public boolean deployUnit(int row, int col, Unit unit){
+        if(isTileAvailable(row, col, unit.has(PassiveAbility.PATHFINDER)) && !isUnitAlreadydeployed(unit)){
             this.units[row][col] = unit;
+            notifyAllObservers(new int[]{row, col});
             return true;
+        }
+
+        return false;
+    }
+
+    public boolean switchUnitsPosition(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
+        if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2) && Utils.dist(rowUnit1, colUnit1, rowUnit2, colUnit2) == 1){
+            Unit unit1 = getUnit(rowUnit1, colUnit1);
+            Unit unit2 = getUnit(rowUnit2, colUnit2);
+            if(isTileReachable(rowUnit1, colUnit1, unit2.has(PassiveAbility.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(PassiveAbility.PATHFINDER)))){
+                notifyAllObservers(new int[]{rowUnit1, colUnit1, rowUnit2, colUnit2});
+                this.units[rowUnit2][colUnit2] = unit1;
+                this.units[rowUnit1][colUnit1] = unit2;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Array<int[]> MoveUnit(int rowI, int colI, int rowf, int colf){
+        Array<int[]> path = new Array<int[]>();
+        if(isTileOccupied(rowI, colI)) {
+            Unit unit = getUnit(rowI, colI);
+            if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
+                path = getShortestPath(rowI, colI, rowf, colf);
+
+                // add the tile where initially stand the unit to the path for the renderers before remove it once again
+                path.insert(0, new int[]{rowI,colI});
+                notifyAllObservers(path);
+                path.removeIndex(0);
+
+                this.units[rowf][colf] = unit;
+                this.units[rowI][colI] = null;
+                return path;
+            }
+        }
+        return path;
+    }
+
+    public boolean isUnitAlreadydeployed(Unit unit){
+        for(int r = 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbRows(); c++){
+                if(this.units[r][c] == unit){
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -261,6 +331,7 @@ public class Battlefield extends Observable {
     public Unit removeUnit(int row, int col){
         Unit unit = this.units[row][col];
         this.units[row][col] = null;
+        notifyAllObservers(unit);
         return unit;
     }
 
@@ -276,6 +347,18 @@ public class Battlefield extends Observable {
         return target;
     }
 
+    public int[] getUnitPos(Unit unit) {
+        int[] targetCoords = new int[]{-1, -1};
+        for(int r = getNbRows()-1; r > -1 ; r--){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileOccupied(r, c) && getUnit(r, c) == unit){
+                    targetCoords = new int[] {r, c};
+                }
+            }
+        }
+        return targetCoords;
+    }
+
     public boolean  isStandardBearerAtRange(int row, int col){
         if(isTileOccupied(row, col)) {
             Unit unit = getUnit(row, col);
@@ -283,9 +366,8 @@ public class Battlefield extends Observable {
                 int bannerRange = unit.getArmy().getBannerRange();
                 for (int r = row - bannerRange; r < row + bannerRange + 1; r++) {
                     for (int c = col - bannerRange; c < col + bannerRange + 1; c++) {
-                        if (isTileOccupied(r, c)
+                        if (isTileOccupiedBySameSquadAs(r, c, getUnit(r, c))
                                 && Utils.dist(row, col, r, c) > 0
-                                && unit.sameSquadAs(getUnit(r, c))
                                 && getUnit(r, c).getTemplate().getJob().isStandardBearer()) {
                             return true;
                         }
@@ -311,7 +393,7 @@ public class Battlefield extends Observable {
         return availableNeighbourTiles;
     }
 
-    public boolean isNextToGardien(int row, int  col){
+    public boolean isUnitNearGardien(int row, int  col){
         if(isTileOccupied(row, col)) {
             Unit unit = getUnit(row, col);
             for (int r = row - 1; r < row + 2; r++) {
@@ -345,6 +427,7 @@ public class Battlefield extends Observable {
         }
         return units;
     }
+
 
     static class CheckMap{
         /**
@@ -422,10 +505,6 @@ public class Battlefield extends Observable {
         }
     }
 
-
-    public boolean atActionRange(int row, int col){
-        return false;
-    }
 
     /**
      *
@@ -536,12 +615,15 @@ public class Battlefield extends Observable {
     }
 
 
+    public boolean atActionRange(int row, int col){
+        return false;
+    }
 
     /**
      * @return an array like that {[row, col]} witch is the path from one tile to another
      */
-    public Array<float[]> getShortestPath(int rowI, int colI, int rowf, int colf){
-        Array<float[]> res = new Array<float[]>();
+    public Array<int[]> getShortestPath(int rowI, int colI, int rowf, int colf){
+        Array<int[]> res = new Array<int[]>();
 
         if(isTileOccupied(rowI, colI)) {
             Unit unit = getUnit(rowI, colI);
@@ -622,7 +704,7 @@ public class Battlefield extends Observable {
             }
 
             for (int i = path.size - 2; i > -1; i--) {
-                res.add(new float[]{path.get(i).getCol(), path.get(i).getRow()});
+                res.add(new int[]{path.get(i).getCol(), path.get(i).getRow()});
             }
         }
         return res;
@@ -904,4 +986,5 @@ public class Battlefield extends Observable {
 
     }
     */
+
 }

@@ -2,12 +2,17 @@ package com.lawsgame.emishitactics.core.constants;
 
 import com.badlogic.gdx.utils.Array;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
 public class UtilsTest {
 
+
+    @BeforeClass
+    public static void printest(){
+    }
 
 
     @Test

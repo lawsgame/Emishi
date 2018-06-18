@@ -75,7 +75,7 @@ public class BattlefieldLoader {
                 colorKey = layoutPixmap.getPixel(c, r);
                 if(r % 2 == 0){
                     if(c % 2 == 0){
-                        // SET THE TILE TYPE
+                        // set the tile type
                         fieldType = colorToFieldTypeMap.get(colorKey);
                         if(fieldType == null){
                             fieldType = TileType.getStandard();
@@ -84,24 +84,21 @@ public class BattlefieldLoader {
 
                     }else{
 
-
+                        //TODO: available for unit loading
 
                     }
                 }else{
                     if(c % 2 == 0){
-                        // WHETHER OR NOT THE TILE IS A DEPLOYMENT TILE
+                        // whether or not the tile is to be added to the deployment tile
                         rgb = Utils.getRGBA(colorKey);
-                        if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0){
+                        if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0 && bf.isTileReachable(r/2, c/2, false)){
                             bf.addDeploymentTile(rowTile, colTile);
                         }
                     }else{
 
+                        //TODO: available for loot loading (shrine, village, etc...)
                     }
                 }
-
-
-
-
             }
         }
 
@@ -139,7 +136,7 @@ public class BattlefieldLoader {
 
                                 // add to the battlefield
                                 if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
-                                    bf.addUnit(rowUnit, colUnit, unit);
+                                    bf.deployUnit(rowUnit, colUnit, unit);
                                 }
 
                                 // add to the army composition
