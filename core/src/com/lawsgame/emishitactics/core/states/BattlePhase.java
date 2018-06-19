@@ -43,6 +43,11 @@ public class BattlePhase extends GamePhase {
 
         BattleInteractionState firstBIS = new BattleInteractionState(bis) {
             @Override
+            public void update(float dt) {
+
+            }
+
+            @Override
             public void update1(float dt) {
 
             }
@@ -73,12 +78,12 @@ public class BattlePhase extends GamePhase {
             }
 
             @Override
-            public void dispose() {
+            public void onTouch(float gameX, float gameY) {
 
             }
 
             @Override
-            public void onSingleTap(float gameX, float gameY) {
+            public void dispose() {
 
             }
         };

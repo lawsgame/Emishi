@@ -22,7 +22,7 @@ public abstract class BattleInteractionState extends InteractionState {
     public abstract void renderAhead(SpriteBatch batch);
 
     @Override
-    public void onDoubleTap(float gameX, float gameY) {
+    public void onLongTouch(float gameX, float gameY) {
         if(infoDisplayable){
             //TODO:
             System.out.println("display info of ("+(int)gameY+","+(int)gameX+")");
@@ -30,11 +30,10 @@ public abstract class BattleInteractionState extends InteractionState {
     }
 
     @Override
-    public boolean pan(float gameDX, float gameDY) {
+    public void pan(float gameDX, float gameDY) {
         if(mapSlidable) {
             bis.gameCM.translateGameCam(gameDX, gameDY);
         }
-        return false;
     }
 
     // ------------------- SETTERS & GETTERS ---------------------------
