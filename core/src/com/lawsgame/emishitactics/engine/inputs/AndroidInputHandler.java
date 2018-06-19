@@ -34,6 +34,7 @@ public abstract class AndroidInputHandler implements InputProcessor, GameUpdatab
 	private Vector3 pos = new Vector3();
 	private Vector3 newPanPos = new Vector3();
 	private Vector3 diff = new Vector3();
+
 	protected OrthographicCamera gameCam;
 
 	public enum InputState{

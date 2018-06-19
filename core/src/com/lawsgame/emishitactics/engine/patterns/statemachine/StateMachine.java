@@ -11,6 +11,7 @@ public abstract class StateMachine <S extends State> {
 
     public void push (S s){
         states.push(s);
+        s.init();
     }
 
     public void pop(){

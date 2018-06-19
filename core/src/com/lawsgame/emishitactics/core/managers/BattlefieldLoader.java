@@ -13,7 +13,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.AbstractArmy;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.states.LevelPhase;
+import com.lawsgame.emishitactics.core.states.BattlePhase;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class BattlefieldLoader {
 
     // ------------- LOAD BATTLEFIELD ------------------
 
-    public static Battlefield load(LevelPhase phase, int bfId){
+    public static Battlefield load(BattlePhase phase, int bfId){
 
         // load required files
 
