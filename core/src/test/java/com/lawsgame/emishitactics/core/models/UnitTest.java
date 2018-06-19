@@ -71,8 +71,8 @@ public class UnitTest {
         luc.setName(name8);
         luc.setLeadership(lowLd);
 
-        army1 = new Unit.Army(clovus, true);
-        army2 = new Unit.Army(pierre, false);
+        army1 = new Unit.Army(clovus, Unit.Army.ArmyType.ALLY);
+        army2 = new Unit.Army(pierre, Unit.Army.ArmyType.FOE);
 
         army1.appointWarChief(merovee);
         army1.appointSoldier(jean,0);

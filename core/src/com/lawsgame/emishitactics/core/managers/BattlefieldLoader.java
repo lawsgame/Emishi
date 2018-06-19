@@ -114,6 +114,7 @@ public class BattlefieldLoader {
             XmlReader.Element unitElt;
             Unit unit;
             AbstractArmy army;
+            boolean ally;
             for (int i = 0; i < battlesElt.getChildCount(); i++) {
 
                 battleElt = battlesElt.getChild(i);
@@ -121,7 +122,8 @@ public class BattlefieldLoader {
                     for (int j = 0; j < battleElt.getChildCount(); j++) {
 
                         armyElt = battleElt.getChild(i);
-                        army = new Unit.Army(armyElt.getBoolean("ally"));
+                        ally = armyElt.getBoolean("ally");
+                        army = new Unit.Army((ally) ? AbstractArmy.ArmyType.ALLY: AbstractArmy.ArmyType.FOE);
 
                         // IF: an amry with the relevant battlefield ID
 

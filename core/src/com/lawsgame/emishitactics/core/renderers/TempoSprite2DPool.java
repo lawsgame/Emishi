@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.managers;
+package com.lawsgame.emishitactics.core.renderers;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -36,6 +36,8 @@ public class TempoSprite2DPool {
     private HashMap<Props.OffensiveAbility, TextureRegion> offensiveAbilitySprites;
     private TextureRegion shieldSprite;
     private TextureRegion mountedSprite;
+    private TextureRegion bridgeInConstruction;
+    private TextureRegion towerInConstruction;
 
 
     private TempoSprite2DPool(){
@@ -72,6 +74,9 @@ public class TempoSprite2DPool {
 
                     }
                 }
+
+                bridgeInConstruction = atlas.findRegion("future_bridge");
+                towerInConstruction = atlas.findRegion("future_watch_tower");
             }
 
             if(asm.isLoaded(Assets.ATLAS_UNITS)) {
@@ -211,5 +216,13 @@ public class TempoSprite2DPool {
 
     public TextureRegion getOffensiveAbbSprite(Props.OffensiveAbility offensiveAbility){
         return offensiveAbilitySprites.get(offensiveAbility);
+    }
+
+    public TextureRegion getBridgeInConstruction() {
+        return bridgeInConstruction;
+    }
+
+    public TextureRegion getTowerInConstruction() {
+        return towerInConstruction;
     }
 }

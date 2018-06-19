@@ -1,7 +1,5 @@
 package com.lawsgame.emishitactics.core.constants;
 
-import com.lawsgame.emishitactics.core.managers.TempoSprite2DPool;
-
 public class Assets {
 
     //XML

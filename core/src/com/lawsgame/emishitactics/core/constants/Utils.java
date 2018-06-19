@@ -39,16 +39,25 @@ public class Utils {
 
     /**
      *
+     *        NORTH
+     *          ^
+     *          |
+     WEST  -- (0,0) -> EAST
+     *          |
+     *          |
+     *        SOUTH
+     *
+     *
      * @param rowI
      * @param colI
      * @param rowTarget
      * @param colTarget
      * @return the general orientation of the vector (rowT - rowI, colT - colI)
      */
-    public static Props.Orientation getOrientationFromCoords(int rowI, int colI, int rowTarget, int colTarget){
+    public static Props.Orientation getOrientationFromCoords(float rowI, float colI, float rowTarget, float colTarget){
         Props.Orientation resOr;
-        int deltaR = rowTarget - rowI;
-        int deltaC = colTarget - colI; // light factor to prioritized an orientation over another when both are equally valid option.
+        float deltaR = rowTarget - rowI;
+        float deltaC = colTarget - colI; // light factor to prioritized an orientation over another when both are equally valid option.
 
         if(deltaR > 0){
             if(deltaC > 0){
@@ -83,21 +92,6 @@ public class Utils {
 
         return resOr;
     }
-
-
-    /**
-     * 3 = terrain (1) + item (1) + banner (1)
-     *
-     * @return
-     */
-    public static int getTheoricRangeMax(){
-        int rangePOMax = 0;
-        for(Props.Weapon weapon: Props.Weapon.values()){
-            rangePOMax = (weapon.getRangeMax() > rangePOMax) ? weapon.getRangeMax(): rangePOMax;
-        }
-        return rangePOMax + 3;
-    }
-
 
     public static int getColor32Bits(int r, int g, int b) {
         return 255 + 256*b + 256*256*g + 256*256*256*r;

@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Props;
-import com.lawsgame.emishitactics.core.managers.TempoSprite2DPool;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.renderers.interfaces.UnitRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
+
+import static com.lawsgame.emishitactics.core.constants.Props.SPEED_WALK;
 
 public class TempoUnitRenderer extends UnitRenderer {
     protected float x;
@@ -22,8 +24,12 @@ public class TempoUnitRenderer extends UnitRenderer {
 
     private boolean targeted = false;
     private boolean proceeding = false;
-
     private CountDown countDown = new CountDown(2f);
+
+    //walk attributes
+    private float dl;
+    private boolean updatePoint = false;
+    private Array<int[]> remainingPath = new Array<int[]>();
 
     public TempoUnitRenderer(int row, int col, Unit model) {
         super(model);
@@ -31,7 +37,6 @@ public class TempoUnitRenderer extends UnitRenderer {
         this.y = row;
         this.triggerAnimation(Props.AnimationId.REST);
         this.updateRenderer();
-        System.out.println("HEY");
     }
 
     //------------------ GAME ELEMENT METHODS -------------------------------------------
@@ -40,13 +45,55 @@ public class TempoUnitRenderer extends UnitRenderer {
     public void update(float dt) {
         countDown.update(dt);
 
-        if( countDown.isFinished()){
+        // go back to rest animation after performing animation
+        if (countDown.isFinished()) {
             triggerAnimation(Props.AnimationId.REST);
             offabbTexture = null;
             updateRenderer();
             countDown.reset();
         }
+
+        // handle walk animation
+        if (remainingPath.size > 0) {
+            dl = dt * SPEED_WALK;
+            if (x == remainingPath.get(0)[1]) {
+                if ((y < remainingPath.get(0)[0] && y + dl >= remainingPath.get(0)[0])
+                        || (y > remainingPath.get(0)[0] && y + dl <= remainingPath.get(0)[0])) {
+                    y = remainingPath.get(0)[0];
+                    updatePoint = true;
+                } else if (y < remainingPath.get(0)[0]) {
+                    y += dl;
+                } else if (y > remainingPath.get(0)[0]) {
+                    y -= dl;
+                }
+            }
+            if (y == remainingPath.get(0)[0]) {
+                if ((x < remainingPath.get(0)[1] && x + dl >= remainingPath.get(0)[1])
+                        || (x > remainingPath.get(0)[1] && x + dl <= remainingPath.get(0)[1])) {
+                    x = remainingPath.get(0)[1];
+                    updatePoint = true;
+                } else if (x < remainingPath.get(0)[1]) {
+                    x += dl;
+                } else if (x > remainingPath.get(0)[1])
+                    x -= dl;
+            }
+
+            if (updatePoint) {
+                updatePoint = false;
+                remainingPath.removeIndex(0);
+
+                if (remainingPath.size == 0) {
+                    proceeding = false;
+                } else {
+                    model.setOrientation(Utils.getOrientationFromCoords(y, x, remainingPath.get(0)[0], remainingPath.get(0)[1]));
+
+                }
+            }
+        }
+
+
     }
+
 
     @Override
     public void render(SpriteBatch batch) {
@@ -66,9 +113,50 @@ public class TempoUnitRenderer extends UnitRenderer {
 
     @Override
     public void triggerMoveAnimation(Array<int[]> path) {
-        //TODO:
-        this.x = path.peek()[0];
-        this.y = path.peek()[1];
+        boolean validPath = true;
+        int[] oldCoords = new int[]{(int)y, (int)x};
+
+        /*
+        CHECK PATH VALIDITY
+        for the path to be explotable, it is required to collect tile coords of tiles which each of them are neighbours of its predecessor and follower in the list.
+         */
+        for(int[] coords: path) {
+            if(coords.length < 2 || 1 != Utils.dist(oldCoords[0], oldCoords[1], coords[0], coords[1])) {
+                validPath = false;
+                continue;
+            }
+            oldCoords = coords;
+        }
+        if(validPath) {
+            this.remainingPath.addAll(path);
+
+                /*
+            CLEAN PATH
+            remove unnecesary entries
+             */
+            if(path.size > 1) {
+                int[] pPreviousEntry;
+                int[] previousEntry;
+                int[] entry;
+                for (int i = 2; i < remainingPath.size; i++) {
+                    entry = remainingPath.get(i);
+                    previousEntry = remainingPath.get(i - 1);
+                    pPreviousEntry = remainingPath.get(i - 2);
+
+                    if ( (entry[0] == previousEntry[0] && previousEntry [0] == pPreviousEntry[0]) || (entry[1] == previousEntry[1] && previousEntry [1] == pPreviousEntry[1])){
+                        remainingPath.removeIndex(i-1);
+                        i--;
+                    }
+
+                }
+            }
+
+
+            proceeding = true;
+        }
+
+
+
     }
 
     @Override
@@ -84,7 +172,7 @@ public class TempoUnitRenderer extends UnitRenderer {
 
     @Override
     protected void triggerFleeAnimation() {
-        unitTexture = TempoSprite2DPool.get().getUnitSprite(Props.AnimationId.TAKE_HIT, model.getArmy().isAlly());
+        unitTexture = TempoSprite2DPool.get().getUnitSprite(Props.AnimationId.WALK, model.getArmy().isAlly());
         orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation().getOpposite());
         countDown.run();
     }
@@ -166,6 +254,7 @@ public class TempoUnitRenderer extends UnitRenderer {
             case GUARD_BREAK:
             case LINIENT_BLOW:
             case FURY:
+                unitTexture = TempoSprite2DPool.get().getUnitSprite(Props.AnimationId.ATTACK, model.getArmy().isAlly());
                 for(Props.OffensiveAbility ability : Props.OffensiveAbility.values()) {
                     if(ability.name().equals(id.name()))
                         offabbTexture = TempoSprite2DPool.get().getOffensiveAbbSprite(ability);
@@ -209,6 +298,11 @@ public class TempoUnitRenderer extends UnitRenderer {
         }
     }
 
+    public void setX(float x) {
+        this.x = x;
+    }
 
-
+    public void setY(float y) {
+        this.y = y;
+    }
 }

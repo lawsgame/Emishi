@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Props;
 import com.lawsgame.emishitactics.core.constants.Props.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -281,24 +282,16 @@ public class Battlefield extends Observable {
         return false;
     }
 
-    public Array<int[]> MoveUnit(int rowI, int colI, int rowf, int colf){
-        Array<int[]> path = new Array<int[]>();
+    public boolean MoveUnit(int rowI, int colI, int rowf, int colf){
         if(isTileOccupied(rowI, colI)) {
             Unit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
-                path = getShortestPath(rowI, colI, rowf, colf);
-
-                // add the tile where initially stand the unit to the path for the renderers before remove it once again
-                path.insert(0, new int[]{rowI,colI});
-                notifyAllObservers(path);
-                path.removeIndex(0);
-
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
-                return path;
+                return true;
             }
         }
-        return path;
+        return false;
     }
 
     public boolean isUnitAlreadydeployed(Unit unit){
@@ -345,18 +338,6 @@ public class Battlefield extends Observable {
             }
         }
         return target;
-    }
-
-    public int[] getUnitPos(Unit unit) {
-        int[] targetCoords = new int[]{-1, -1};
-        for(int r = getNbRows()-1; r > -1 ; r--){
-            for(int c = 0; c < getNbColumns(); c++){
-                if(isTileOccupied(r, c) && getUnit(r, c) == unit){
-                    targetCoords = new int[] {r, c};
-                }
-            }
-        }
-        return targetCoords;
     }
 
     public boolean  isStandardBearerAtRange(int row, int col){
@@ -520,7 +501,7 @@ public class Battlefield extends Observable {
             Unit unit = getUnit(row, col);
             int moveRange = unit.hasMoved()? 0 : unit.getCurrentMob(tileType);
 
-            int theoricAttMaxRange = Utils.getTheoricRangeMax();
+            int theoricAttMaxRange = Props.THEORICAL_MAX_RANGE;
             int rowCM = (row - moveRange - theoricAttMaxRange - 1< 0)? 0: row - moveRange - theoricAttMaxRange - 1;
             int colCM = (col - moveRange - theoricAttMaxRange - 1< 0)? 0: col - moveRange - theoricAttMaxRange - 1;
             int rowCMf = (row + moveRange + theoricAttMaxRange + 1> getNbRows()-1)? getNbRows()-1: row + moveRange + theoricAttMaxRange + 1;
@@ -612,11 +593,6 @@ public class Battlefield extends Observable {
             checkmap.map[row- checkmap.rowCM][col - checkmap.colCM][1] = 1;
             _cancelTrackBackValues(initRow, initCol, (int) checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][2], (int) checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][3]);
         }
-    }
-
-
-    public boolean atActionRange(int row, int col){
-        return false;
     }
 
     /**

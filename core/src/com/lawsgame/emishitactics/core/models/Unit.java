@@ -687,7 +687,6 @@ public class Unit extends Observable{
         return abb == offAb;
     }
 
-
     public Banner getBanner() {
         return banner;
     }
@@ -1202,31 +1201,36 @@ public class Unit extends Observable{
         private static int ids = 0;
 
         private int id;
-        private boolean aligment;
+        private ArmyType armyType;
         private Array<Array<Unit>> mobilizedTroups;
         private Array<Unit> nonMobTroups;
 
-        public Army(Unit warlord, boolean aligment){
+        public Army(Unit warlord, ArmyType aligment){
             this(aligment);
             appointWarLord(warlord);
         }
 
-        public Army(boolean aligment){
+        public Army(ArmyType armyType){
             this.id = ids++;
-            this.aligment = aligment;
+
+            this.armyType = armyType;
             this.mobilizedTroups = new Array<Array<Unit>>();
             this.nonMobTroups = new Array<Unit>();
         }
-
 
         @Override
         public int getId() {
             return id;
         }
 
+
         @Override
-        public void setAligment(boolean aligment) {
-            this.aligment = aligment;
+        public void setArmyType(ArmyType type) {
+            this.armyType = type;
+        }
+
+        public ArmyType getArmyType(){
+            return armyType;
         }
 
         @Override
@@ -1281,7 +1285,12 @@ public class Unit extends Observable{
 
         @Override
         public boolean isAlly() {
-            return aligment;
+            return armyType != ArmyType.FOE;
+        }
+
+        @Override
+        public boolean isPlayerControlled(){
+            return this.armyType == ArmyType.PLAYER;
         }
 
         public int getNbOfSquads(){

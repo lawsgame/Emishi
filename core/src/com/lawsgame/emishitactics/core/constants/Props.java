@@ -13,6 +13,8 @@ public class Props {
     public static final int HEAL_BASE_POWER = 5;
     public static final float MAX_UNITS_UNDER_WARLORD = 5f; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 4f; // including the war chief himself / herself
+    public static final float SPEED_WALK = 1.5f;  //tile/s
+    public static final int THEORICAL_MAX_RANGE = 5;
 
     // item bonus
     public static final int DEF_BONUS_YAYOI_SHIELD = 2;
@@ -44,12 +46,10 @@ public class Props {
     public static final int AB_TRIGGER_RATE_SKILL_FACTOR = 2;
     public static final int DEX_FAC_DROP_RATE = 2;
 
-    // ability ranges
-    public static final int RANGE_MAX_HEAL = 1;
-
     // experience parameter
     public static final double LVL_GAP_FACTOR = 0.35;
     public static final int EXP_BASE_MODIFIER = 50;
+
 
 
     public enum Behaviour {
@@ -70,14 +70,7 @@ public class Props {
         }
     }
 
-    /*        NORTH
-                ^
-                |
-     WEST  -- (0,0) -> EAST
-                |
-                |
-              SOUTH
-     */
+
     public enum  Orientation{
         WEST,
         NORTH,
@@ -88,10 +81,6 @@ public class Props {
             return (or == WEST && this == EAST )|| (or == SOUTH && this == NORTH);
         }
 
-        public static Orientation getStandard(){
-            return SOUTH;
-        }
-
         public Orientation getOpposite() {
             Orientation opposite = null;
             if(this == NORTH) opposite = SOUTH;
@@ -99,6 +88,10 @@ public class Props {
             if(this == EAST) opposite = WEST;
             if(this == WEST) opposite = EAST;
             return opposite;
+        }
+
+        public static Orientation getStandard(){
+            return SOUTH;
         }
     }
 
@@ -116,7 +109,9 @@ public class Props {
         PRIMARY_WEAPON_RANGE_MIN,
         PRIMARY_WEAPON_RANGE_MAX,
         SECONDARY_WEAPON_RANGE_MIN,
-        SECONDARY_WEAPON_RANGE_MAX, CURRENT_WEAPON_RANGE_MIN, CURRENT_WEAPON_RANGE_MAX;
+        SECONDARY_WEAPON_RANGE_MAX,
+        CURRENT_WEAPON_RANGE_MIN,
+        CURRENT_WEAPON_RANGE_MAX;
 
     }
 
@@ -225,23 +220,24 @@ public class Props {
     }
 
     public enum TileType {
-        VILLAGE(    "village", 204, 143, 37,                true, true, true, true,         0, 0, 1, 0, 0, false),
-        SANCTUARY(  "sanctuary", 228, 56, 56,               true, true, true, true,         0, 0, 1, 0, 0, false),
-        STOCKADE(   "stockade", 204, 112, 37,               true, true, false, true,        0, 0, 2, 0, 0, false),
-        CASTLE(     "castle", 204, 73 ,37 ,                 true, true, false, true,        0, 0, 3, 0, 0, true),
-        FORGE(      "forge", 176, 104, 104,                 true, true, true, true,         0, 0, 1, 0, 0, false),
-        TOMB(       "kofun burial mount", 38 ,67, 47,       true, true, true, true,         0, 1, 0, 0, 0, true),
-        RUINS(      "ruins", 152, 152, 152,                 true, false, false, true,       0, 0, 1, 0, 0, false),
-        MOUNTAINS(   "mountain", 101, 91, 16,               false, false, false, false,     0, 0, 0, 0, 0, false),
-        FOREST(     "deep forest", 5, 96, 34,               false, false, false, false,     0, 0, 0, 0, 0, false),
-        OCEAN(      "deep waters", 25, 157, 197,            false, false, false, false,     0, 0, 0, 0, 0, false),
-        SHALLOWS(   "shallows", 30, 211, 227,               false, false, false, false,     0, 0, 0, 0, 0, false),
-        HILLS(      "hill", 146, 134, 40,                   false, false, false, true,      0, 1, 0, 0, 0, true),
-        WOODS(      "woods", 10, 158, 57,                   false, false, false, true,      0, 0, 0, 15, 0, false),
-        SWAMP(      "swamp", 112, 155, 80,                  false, false, false, true,      0, 0, 0, 0, -15, false),
-        PLAIN(      "plain", 17, 215, 80,                   false, false, false, true,      0, 0, 0, 0, 0, false),
-        BRIDGE(      "wooden bridge", 85, 96, 134,          false, false, false, true,      0, 0, 0, 0, 0, false),
-        BROKEN_BRIDGE("broken wooden bridge", 95, 101, 124, false, false, false, false,     0, 0, 0, 0, 0, false);
+        VILLAGE(    "village", 204, 143, 37,                    true, true, true, true,         5, 0, 1, 0, 0, false),
+        SANCTUARY(  "sanctuary", 228, 56, 56,                   true, true, true, true,         5, 0, 1, 0, 0, false),
+        STOCKADE(   "stockade", 204, 112, 37,                   true, true, false, true,        5, 0, 2, 0, 0, false),
+        CASTLE(     "castle", 204, 73 ,37 ,                     true, true, false, true,        5, 0, 3, 20, 0, false),
+        FORGE(      "forge", 176, 104, 104,                     true, true, true, true,         0, 0, 1, 0, 0, false),
+        TOMB(       "kofun burial mount", 38 ,67, 47,           true, true, true, true,         0, 1, 0, 0, 0, true),
+        RUINS(      "ruins", 152, 152, 152,                     true, false, false, true,       0, 0, 1, 0, 0, false),
+        MOUNTAINS(   "mountain", 101, 91, 16,                   false, false, false, false,     0, 0, 0, 0, 0, false),
+        FOREST(     "deep forest", 5, 96, 34,                   false, false, false, false,     0, 0, 0, 0, 0, false),
+        OCEAN(      "deep waters", 25, 157, 197,                false, false, false, false,     0, 0, 0, 0, 0, false),
+        SHALLOWS(   "shallows", 30, 211, 227,                   false, false, false, false,     0, 0, 0, 0, 0, false),
+        HILLS(      "hill", 146, 134, 40,                       false, false, false, true,      0, 1, 0, 0, 0, true),
+        WOODS(      "woods", 10, 158, 57,                       false, false, false, true,      0, 0, 0, 15, 0, false),
+        SWAMP(      "swamp", 112, 155, 80,                      false, false, false, true,      0, 0, 0, 0, -15, false),
+        PLAIN(      "plain", 17, 215, 80,                       false, false, false, true,      0, 0, 0, 0, 0, false),
+        BRIDGE(      "wooden bridge", 85, 96, 134,              false, false, false, true,      0, 0, 0, 0, 0, false),
+        BROKEN_BRIDGE("broken wooden bridge", 95, 101, 124,     false, false, false, false,     0, 0, 0, 0, 0, false),
+        WATCH_TOWER("future bridge", 193, 26, 137,              true, true, false, true,      3, 0, 1, 0, 0, true);
 
         private String name;
 
@@ -406,8 +402,18 @@ public class Props {
         FURY
     }
 
+
+    public enum TargetType{
+        SPECIFIC,
+        AVAILABLE_TILE,
+        ONE_SELF,
+        ALLY,
+        WOUNDED_ALLY,
+        ENEMY
+    }
+
     /**
-     * modelize the choice made by the player foa a unit to perform a given action
+     *  1) Modelize the choice made by the player foa a unit to perform a given action
      *
      *
      * Area of impact :
@@ -418,42 +424,46 @@ public class Props {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                            (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        SWITCH_WEAPON                   (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        SWITCH_POSITION                 (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        PUSH                            (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        PRAY                            (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        HEAL                            (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        STEAL                           (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        BUILD                           (1, 1, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        ATTACK                          (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        CHOOSE_ORIENTATION              (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        CHOOSE_STANCE                   (0, 0, false, false, TypeOfDamage.NONE, new int[][]{{}}),
-        USE_FOCUSED_BLOW                (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
-        USE_CRIPPLING_BLOW              (0, 0, true, false, TypeOfDamage.PIERCING, new int[][]{{}}),
-        USE_SWIRLING_BLOW               (1, 1, false, true, TypeOfDamage.EDGED, new int[][]{{-1,1}, {-1,-1}}),
-        USE_SWIFT_BLOW                  (0, 0, true, false, TypeOfDamage.EDGED, new int[][]{}),
-        USE_HEAVY_BLOW                  (0, 0, true, false, TypeOfDamage.BLUNT, new int[][]{}),
-        USE_CRUNCHING_BLOW              (1, 1, false, true, TypeOfDamage.BLUNT, new int[][]{{1, 0}, {-1, 0}}),
-        USE_WAR_CRY                     (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        USE_POISONOUS_ATTACK            (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        USE_GUARD_BREAK                 (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        USE_LINIENT_BLOW                (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}}),
-        USE_FURY                        (0, 0, true, false, TypeOfDamage.NONE, new int[][]{{}});
+        WALK                            (0, 0, false, false, DamageType.NONE, TargetType.AVAILABLE_TILE, new int[][]{{}}),
+        SWITCH_WEAPON                   (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
+        SWITCH_POSITION                 (1, 1, false, false, DamageType.NONE, TargetType.ALLY, new int[][]{{}}),
+        PUSH                            (1, 1, false, false, DamageType.NONE, TargetType.ALLY, new int[][]{{}}),
+        PRAY                            (1, 1, false, false, DamageType.NONE, TargetType.WOUNDED_ALLY, new int[][]{{}}),
+        HEAL                            (1, 1, false, false, DamageType.NONE, TargetType.WOUNDED_ALLY,new int[][]{{}}),
+        STEAL                           (1, 1, false, false, DamageType.NONE, TargetType.ENEMY,new int[][]{{}}),
+        BUILD                           (1, 1, false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
+        ATTACK                          (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        CHOOSE_ORIENTATION              (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
+        CHOOSE_STANCE                   (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
+        TAKE                            (0, 0, false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
+        USE_FOCUSED_BLOW                (0, 0, true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
+        USE_CRIPPLING_BLOW              (0, 0, true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
+        USE_SWIRLING_BLOW               (1, 1, false, true, DamageType.EDGED, TargetType.ENEMY, new int[][]{{-1,1}, {-1,-1}}),
+        USE_SWIFT_BLOW                  (0, 0, true, false, DamageType.EDGED, TargetType.ENEMY, new int[][]{}),
+        USE_HEAVY_BLOW                  (0, 0, true, false, DamageType.BLUNT, TargetType.ENEMY, new int[][]{}),
+        USE_CRUNCHING_BLOW              (1, 1, false, true, DamageType.BLUNT, TargetType.ENEMY, new int[][]{{1, 0}, {-1, 0}}),
+        USE_WAR_CRY                     (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_POISONOUS_ATTACK            (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_GUARD_BREAK                 (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_LINIENT_BLOW                (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_FURY                        (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}});
 
         private int rangeMax;
         private int rangeMin;
         private boolean weaponBasedRange;
         private boolean meleeWeaponEquipedRequired;
-        private TypeOfDamage damageTypeRequired;
+        private DamageType damageTypeRequired;
+        private TargetType targetType;
         private Array<int[]> impactArea;
 
 
-        ActionChoice(int rangeMax, int rangeMin, boolean weaponBasedRange, boolean meleeWeaponEquipedRequired, TypeOfDamage damageTypeRequired, int[][] impactArea) {
+        ActionChoice(int rangeMax, int rangeMin, boolean weaponBasedRange, boolean meleeWeaponEquipedRequired, DamageType damageTypeRequired, TargetType targetType, int[][] impactArea) {
             this.rangeMax = rangeMax;
             this.rangeMin = rangeMin;
             this.weaponBasedRange = weaponBasedRange;
             this.meleeWeaponEquipedRequired = meleeWeaponEquipedRequired;
+            this.damageTypeRequired = damageTypeRequired;
+            this.targetType = targetType;
             this.impactArea = new Array<int[]>();
             for(int[] relativeTileCoordinates : impactArea){
                 this.impactArea.add(relativeTileCoordinates);
@@ -477,37 +487,37 @@ public class Props {
             return meleeWeaponEquipedRequired;
         }
 
-        public TypeOfDamage getDamageTypeRequired() {
-            return damageTypeRequired;
-        }
+        public DamageType getDamageTypeRequired() { return damageTypeRequired; }
+
+        public TargetType getTargetType() { return targetType; }
 
         /*
-                                NORTH (standard):
-                                                 ( 1, 0)
-                                 ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
+                                        NORTH (standard):
+                                                         ( 1, 0)
+                                         ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
 
-                                                 (-2, 0)
+                                                         (-2, 0)
 
-                                 SOUTH: rowf = -r colf = -c
-                                                  ( 2, 0)
+                                         SOUTH: rowf = -r colf = -c
+                                                          ( 2, 0)
 
-                                         ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
-                                                  (-1, 0)
+                                                 ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
+                                                          (-1, 0)
 
-                                 EAST: rowf = -c colf = r
-                                                     ( 2, 0)
-                                                     ( 1, 0)
-                                          ( 0,-2)    ( 0, 0) ( 0, 1)
-                                                     (-1, 0)
+                                         EAST: rowf = -c colf = r
+                                                             ( 2, 0)
+                                                             ( 1, 0)
+                                                  ( 0,-2)    ( 0, 0) ( 0, 1)
+                                                             (-1, 0)
 
-                                 WEST: rowf = -c colf = -r
-                                            ( 1, 0)
-                                     ( 0,-1)( 0, 0)     ( 0, 2)
-                                            (-1, 0)
-                                            ( 2, 0)
+                                         WEST: rowf = -c colf = -r
+                                                    ( 1, 0)
+                                             ( 0,-1)( 0, 0)     ( 0, 2)
+                                                    (-1, 0)
+                                                    ( 2, 0)
 
 
-                                 */
+                                         */
         public Array<int[]> getOrientedArea(Props.Orientation orientation) {
             Array<int[]> orientedArea = new Array<int[]>();
             switch (orientation){
@@ -535,7 +545,7 @@ public class Props {
 
     }
 
-    public enum TypeOfDamage{
+    public enum DamageType {
         EDGED,
         PIERCING,
         BLUNT,
@@ -555,16 +565,16 @@ public class Props {
     }
 
     public enum Weapon{
-        NONE(false, false,      0, 0, 0, 0, 0, 0,TypeOfDamage.EDGED, WeaponArt.NONE),
-        KATANA(false, false,    3, 70, 6, 5, 1, 1, TypeOfDamage.EDGED, WeaponArt.KENJUTSU),
-        WARABITE(false, false,  4, 70, 5, 5, 1, 1, TypeOfDamage.EDGED, WeaponArt.KENJUTSU),
-        SAI(true, true,         2, 90, 8, 3, 1, 1, TypeOfDamage.PIERCING, WeaponArt.CRITICAL_PARRY),
-        NAGINATA(true, false,   4, 65, 4, 4, 1, 1, TypeOfDamage.EDGED, WeaponArt.NAGINATA_JUTSU),
-        NODACHI(true, true,     5, 60, 4, 2, 1, 1, TypeOfDamage.BLUNT, WeaponArt.NODACHI_JUSTU ),
-        YARI(false, false,      3, 80, 3, 3, 1, 1, TypeOfDamage.PIERCING, WeaponArt.HORSEMAN_SLAYER),
-        YUMI(true, false,       4, 60, 0, 1, 2, 2, TypeOfDamage.PIERCING, WeaponArt.COVERING_FIRE),
-        BO(true, true,          3, 65, 3, 5, 1, 1, TypeOfDamage.BLUNT, WeaponArt.FIRST_STRIKE),
-        KANABO(true, true,      5, 55, 1, 1, 1, 1, TypeOfDamage.BLUNT, WeaponArt.ARMOR_SLAYER);
+        NONE(false, false,      0, 0, 0, 0, 0, 0, DamageType.EDGED, WeaponArt.NONE),
+        KATANA(false, false,    3, 70, 6, 5, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
+        WARABITE(false, false,  4, 70, 5, 5, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
+        SAI(true, true,         2, 90, 8, 3, 1, 1, DamageType.PIERCING, WeaponArt.CRITICAL_PARRY),
+        NAGINATA(true, false,   4, 65, 4, 4, 1, 1, DamageType.EDGED, WeaponArt.NAGINATA_JUTSU),
+        NODACHI(true, true,     5, 60, 4, 2, 1, 1, DamageType.BLUNT, WeaponArt.NODACHI_JUSTU ),
+        YARI(false, false,      3, 80, 3, 3, 1, 1, DamageType.PIERCING, WeaponArt.HORSEMAN_SLAYER),
+        YUMI(true, false,       4, 60, 0, 1, 2, 2, DamageType.PIERCING, WeaponArt.COVERING_FIRE),
+        BO(true, true,          3, 65, 3, 5, 1, 1, DamageType.BLUNT, WeaponArt.FIRST_STRIKE),
+        KANABO(true, true,      5, 55, 1, 1, 1, 1, DamageType.BLUNT, WeaponArt.ARMOR_SLAYER);
 
         private boolean dualWieldingRequired;
         private boolean footmanOnly;
@@ -574,10 +584,10 @@ public class Props {
         private int parryVulnerability;
         private int rangeMin;
         private int rangeMax;
-        private TypeOfDamage type;
+        private DamageType type;
         private WeaponArt art;
 
-        Weapon(boolean dualWieldingRequired, boolean footmanOnly, int damage, int accuracy, int parryCapacity, int parryVulnerability, int rangeMin, int rangeMax, TypeOfDamage type, WeaponArt art) {
+        Weapon(boolean dualWieldingRequired, boolean footmanOnly, int damage, int accuracy, int parryCapacity, int parryVulnerability, int rangeMin, int rangeMax, DamageType type, WeaponArt art) {
             this.dualWieldingRequired = dualWieldingRequired;
             this.footmanOnly = footmanOnly;
             this.damage = damage;
@@ -626,7 +636,7 @@ public class Props {
             return rangeMax;
         }
 
-        public TypeOfDamage getType() {
+        public DamageType getType() {
             return type;
         }
 

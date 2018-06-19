@@ -14,10 +14,6 @@ public class Vector {
 		this(copy.x, copy.y);
 	}
 	
-	public Vector duplicate(){
-		return new Vector(this);
-	}
-	
 	public void normalize(){
 		float xtempo = x;
 		if(x != 0 && y != 0){
