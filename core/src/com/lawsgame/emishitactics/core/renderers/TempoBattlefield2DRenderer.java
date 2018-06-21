@@ -130,7 +130,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     /*
      * Useful for some overlapping animations to be performed by before and / or after like attacking by instance.
      * @param models : array of models of which their UR should be rendered in the given order (first before)
-
+    */
     public void rearrangeURRenderingOrder(Array<Unit> models){
         UnitRenderer[] urs = new UnitRenderer[models.size];
         for(int m = 0; m < models.size; m++) {
@@ -149,7 +149,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
 
     }
-    */
+
 
     @Override
     public UnitRenderer getUnitRenderer(Unit model) {

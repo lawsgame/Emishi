@@ -5,7 +5,6 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 
 public class Utils {
 
-
     /**
      *
      * @param row
@@ -17,7 +16,6 @@ public class Utils {
     public static int dist(int row, int col, int rowTarget, int colTarget){
         return Math.abs(row  - rowTarget) + Math.abs(col - colTarget);
     }
-
 
     public static boolean arrayContains(Array<int[]> intArray, int[] coords){
         boolean coordsFound;

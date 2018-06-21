@@ -36,6 +36,9 @@ public abstract class BattleInteractionState extends InteractionState {
         }
     }
 
+    //--------------------SHARED METHODS ------------------------------
+
+
     // ------------------- SETTERS & GETTERS ---------------------------
 
     public void setBattlefieldDisplayed(boolean battlefieldDisplayed) {

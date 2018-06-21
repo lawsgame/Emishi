@@ -1,7 +1,8 @@
 package com.lawsgame.emishitactics.engine;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.engine.geometry.Shape;
+import com.lawsgame.emishitactics.engine.math.geometry.Shape;
 
 
 /**
@@ -14,15 +15,18 @@ import com.lawsgame.emishitactics.engine.geometry.Shape;
 public abstract class GameWidget implements GameElement, Shape{
 	protected Array<GameWidget> children;
 
+	Rectangle r = new Rectangle();
+
+
 	public GameWidget(float x, float y) {
-		this.setX(x);
-		this.setY(y);
+		this.setXCenter(x);
+		this.setYCenter(y);
 		children = new Array<GameWidget>();
 	}
 
 	public GameWidget() {
-		this.setX(0);
-		this.setY(0);
+		this.setXCenter(0);
+		this.setYCenter(0);
 	}
 
 	public Array<GameWidget> getChildren() {
@@ -38,21 +42,21 @@ public abstract class GameWidget implements GameElement, Shape{
 	}
 	
 	@Override
-	public void setX(float x){
-		float dx = x - this.getX();
+	public void setXCenter(float x){
+		float dx = x - this.getXCenter();
 		for(int i=0; i<children.size; i++){
 			children.get(i).translate(dx,0);
 		}
-		setX(x);
+		setXCenter(x);
 	}
 	
 	@Override
-	public void setY(float y){
-		float dy = y - this.getY();
+	public void setYCenter(float y){
+		float dy = y - this.getYCenter();
 		for(int i=0; i<children.size; i++){
 			children.get(i).translate(0, dy);
 		}
-		setY(y);
+		setYCenter(y);
 	}
 	
 	public void addChild(GameWidget child){

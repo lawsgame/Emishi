@@ -30,12 +30,12 @@ public abstract class GamePhase implements State, GameElement {
 
 	/**
 	 * world GAME coordinate system (gdx.SpriteBatch)
-	 * y
+	 * yCenter
 	 * ^
 	 * |
 	 * |
 	 * |
-	 * (y0,x0)------> x
+	 * (y0,x0)------> xCenter
 	 *
 	 * world UI coordinate system (gdx.SpriteBatch)
 	 * 1*aspect ratio

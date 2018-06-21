@@ -18,5 +18,4 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract UnitRenderer getUnitRenderer(Unit model);
     public abstract void triggerBuildAnimation(int row, int col, Props.TileType type, Unit builder);
 
-
 }
