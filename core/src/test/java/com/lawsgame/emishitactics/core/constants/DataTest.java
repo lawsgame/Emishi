@@ -4,20 +4,20 @@ import com.badlogic.gdx.utils.Array;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.lawsgame.emishitactics.core.constants.Props.*;
+import com.lawsgame.emishitactics.core.constants.Data.*;
 
-public class PropsTest {
+public class DataTest {
 
     @BeforeClass
     public static void beforeAll(){
 
-        System.out.println("\n---+++$$$ Props TEST $$$+++---\n");
+        System.out.println("\n---+++$$$ Data TEST $$$+++---\n");
 
     }
 
     @Test
     public void testOffensiveAbilityGetOrientedArea(){
-        Props.ActionChoice ability = Props.ActionChoice.USE_SWIRLING_BLOW;
+        Data.ActionChoice ability = Data.ActionChoice.USE_SWIRLING_BLOW;
 
         for(Orientation or : Orientation.values()) {
             Array<int[]> orientedArea = ability.getOrientedArea(or);

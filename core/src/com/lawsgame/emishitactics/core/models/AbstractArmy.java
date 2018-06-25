@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Props;
+import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public abstract class AbstractArmy extends Observable{
@@ -24,8 +24,8 @@ public abstract class AbstractArmy extends Observable{
     public abstract boolean isPlayerControlled();
 
     public abstract void appointWarLord(Unit unit);
-    public abstract Props.UnitAppointmentErrorMsg appointWarChief(Unit unit);
-    public abstract Props.UnitAppointmentErrorMsg appointSoldier(Unit unit, int squadId);
+    public abstract Data.UnitAppointmentErrorMsg appointWarChief(Unit unit);
+    public abstract Data.UnitAppointmentErrorMsg appointSoldier(Unit unit, int squadId);
     public abstract boolean disengage(Unit unit);
     public abstract void resetComposition();
 

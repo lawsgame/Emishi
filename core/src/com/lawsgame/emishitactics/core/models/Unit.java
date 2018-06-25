@@ -1,23 +1,24 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Props;
-import com.lawsgame.emishitactics.core.constants.Props.BannerSign;
-import com.lawsgame.emishitactics.core.constants.Props.Behaviour;
-import com.lawsgame.emishitactics.core.constants.Props.DefensiveStance;
-import com.lawsgame.emishitactics.core.constants.Props.EquipMsg;
-import com.lawsgame.emishitactics.core.constants.Props.Ethnicity;
-import com.lawsgame.emishitactics.core.constants.Props.Item;
-import com.lawsgame.emishitactics.core.constants.Props.ItemType;
-import com.lawsgame.emishitactics.core.constants.Props.OffensiveAbility;
-import com.lawsgame.emishitactics.core.constants.Props.Orientation;
-import com.lawsgame.emishitactics.core.constants.Props.PassiveAbility;
-import com.lawsgame.emishitactics.core.constants.Props.TileType;
-import com.lawsgame.emishitactics.core.constants.Props.UnitAppointmentErrorMsg;
-import com.lawsgame.emishitactics.core.constants.Props.UnitTemplate;
-import com.lawsgame.emishitactics.core.constants.Props.Weapon;
+import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.constants.Data.BannerSign;
+import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
+import com.lawsgame.emishitactics.core.constants.Data.DefensiveStance;
+import com.lawsgame.emishitactics.core.constants.Data.EquipMsg;
+import com.lawsgame.emishitactics.core.constants.Data.Ethnicity;
+import com.lawsgame.emishitactics.core.constants.Data.Item;
+import com.lawsgame.emishitactics.core.constants.Data.ItemType;
+import com.lawsgame.emishitactics.core.constants.Data.OffensiveAbility;
+import com.lawsgame.emishitactics.core.constants.Data.Orientation;
+import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
+import com.lawsgame.emishitactics.core.constants.Data.TileType;
+import com.lawsgame.emishitactics.core.constants.Data.UnitAppointmentErrorMsg;
+import com.lawsgame.emishitactics.core.constants.Data.UnitTemplate;
+import com.lawsgame.emishitactics.core.constants.Data.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
+import static com.lawsgame.emishitactics.core.constants.Data.*;
 
 
 /**
@@ -70,11 +71,11 @@ public class Unit extends Observable{
     /**
      * battle execution related attributes
      */
-    protected Props.Orientation orientation;
-    protected Props.Behaviour behaviour;
+    protected Orientation orientation;
+    protected Behaviour behaviour;
     protected boolean moved = false;
     protected boolean acted = false;
-    protected boolean builded = false;
+    protected boolean buildingResourcesConsumed = false;
     protected DefensiveStance stance = DefensiveStance.DODGE;
 
 
@@ -93,13 +94,13 @@ public class Unit extends Observable{
      *  - setItem1
      *  - setItem2
      *  - setStealableItem
-     *  - setBanner if relevant
+     *  - addBannerSign(...) x3 if relevant
      */
     public Unit(boolean rightHanded, UnitTemplate template, int gainLvl, Ethnicity ethnicity, Orientation or, Behaviour behaviour,  Weapon primaryWeapon, Weapon secondaryWeapon, boolean homogeneousLevelUp){
         this.level = template.getStartLevel();
         this.rightHanded = rightHanded;
         this.template = (template == null) ? UnitTemplate.CONSCRIPT: template;
-        this.job = (Props.PROMOTION_LEVEL <= gainLvl + template.getStartLevel())? template.getJob().getPromotionName() : template.getJob().getRecruitName();
+        this.job = (PROMOTION_LEVEL <= gainLvl + template.getStartLevel())? template.getJob().getPromotionName() : template.getJob().getRecruitName();
         this.name = "";
         this.ethnicity = (ethnicity == null)? Ethnicity.JAPANESE :ethnicity;
         this.behaviour = (behaviour == null) ? Behaviour.PASSIVE : behaviour;
@@ -122,7 +123,7 @@ public class Unit extends Observable{
         this.primaryWeapon = (isWeaponAvailable(primaryWeapon, true)) ? primaryWeapon : pickWeapon(true);
         Weapon chosenSecondaryW = (isWeaponAvailable(secondaryWeapon, true))? secondaryWeapon : pickWeapon(false);
 
-        if(template.getStartLevel() >= Props.PROMOTION_LEVEL)
+        if(template.getStartLevel() >= PROMOTION_LEVEL)
             _promote(chosenSecondaryW);
 
         // levels up the build
@@ -157,52 +158,17 @@ public class Unit extends Observable{
 
 
 
-
-    public int getLdExp(boolean[] secondaryObjectiveDone, int[] bonusSecondaryObjective, int nbOfTurnsToCompletion, int nbOfTurnMin, int nbOfTurnMax) {
-        float exp = 0f;
-        if(isWarChief()) {
-            int nbTurns;
-            if (nbOfTurnsToCompletion <= nbOfTurnMin) {
-                nbTurns = nbOfTurnMin;
-            } else if (nbOfTurnMax <= nbOfTurnsToCompletion) {
-                nbTurns = nbOfTurnMax;
-            } else {
-                nbTurns = nbOfTurnsToCompletion;
-            }
-
-            //calculate the base exp gained
-            exp = 100f * getAppGrowthRate(Props.Stat.LEADERSHIP) * ((float)(nbOfTurnMax - nbTurns)) / ((float)(nbOfTurnMax - nbOfTurnMin));
-
-            //factorize the size of the squad in the equation
-            exp *= 1f + (float)(getSquad().size - 1) / ((isWarlord())?Props.MAX_UNITS_UNDER_WARLORD - 1: Props.MAX_UNITS_UNDER_WAR_CHIEF - 1) ;
-
-            //add secondary objective completion bonus
-            for (int i = 0; i < secondaryObjectiveDone.length; i++) {
-                if (i < bonusSecondaryObjective.length && secondaryObjectiveDone[i]) {
-                    exp += bonusSecondaryObjective[i];
-                }
-            }
-        }
-        return (int)exp;
-    }
-
-
-    public void inscreaseLeadership(){
-        this.leadership++;
-    }
-
-
     public boolean isPromoted(){
-        return level > Props.PROMOTION_LEVEL;
+        return level > PROMOTION_LEVEL;
     }
 
     protected int _promote(Weapon secondaryWeapon){
         int mob = 0;
         this.job = template.getJob().getPromotionName();
-        mob += Props.MOBILITY_BONUS_PROMOTED;
+        mob += MOBILITY_BONUS_PROMOTED;
         if (!this.primaryWeapon.isFootmanOnly() && !secondaryWeapon.isFootmanOnly()) {
             this.horseman = true;
-            mob += Props.MOBILITY_BONUS_HORSEMAN;
+            mob += MOBILITY_BONUS_HORSEMAN;
         }
         this.secondaryWeapon = secondaryWeapon;
         this.mobility += mob;
@@ -211,7 +177,7 @@ public class Unit extends Observable{
 
      private void _growUp(int gainLvl, Weapon secondaryWeapon){
         if(gainLvl < 0) gainLvl = 0;
-        if(gainLvl + getLevel() > Props.MAX_LEVEL)  gainLvl = Props.MAX_LEVEL - getLevel();
+        if(gainLvl + getLevel() > MAX_LEVEL)  gainLvl = MAX_LEVEL - getLevel();
 
         float cha = 0;
         float ld = 0;
@@ -225,13 +191,13 @@ public class Unit extends Observable{
 
         int prePromotionLvl = 0;
         int postPromotionLvl = 0;
-        if(getLevel() + gainLvl >= Props.PROMOTION_LEVEL){
+        if(getLevel() + gainLvl >= PROMOTION_LEVEL){
             _promote(secondaryWeapon);
-            if(getLevel() >= Props.PROMOTION_LEVEL){
+            if(getLevel() >= PROMOTION_LEVEL){
                 postPromotionLvl = gainLvl;
             }else{
-                prePromotionLvl = Props.PROMOTION_LEVEL - getLevel() - 1;
-                postPromotionLvl = getLevel() + gainLvl + 1 - Props.PROMOTION_LEVEL;
+                prePromotionLvl = PROMOTION_LEVEL - getLevel() - 1;
+                postPromotionLvl = getLevel() + gainLvl + 1 - PROMOTION_LEVEL;
             }
         }else{
             prePromotionLvl = gainLvl;
@@ -283,10 +249,10 @@ public class Unit extends Observable{
         int ski = 0;
         int bra = 0;
 
-        if(this.level < Props.MAX_LEVEL) {
+        if(this.level < MAX_LEVEL) {
             this.level++;
 
-            if (Props.PROMOTION_LEVEL == level) {
+            if (PROMOTION_LEVEL == level) {
                 mob += _promote(secondaryWeapon);
                 cha += template.getProBoCha();
                 ld += template.getProBoLd();
@@ -298,15 +264,15 @@ public class Unit extends Observable{
                 ski += template.getProBoSk();
                 bra += template.getProBoBr();
             } else {
-                cha += (getAppGrowthRate(Props.Stat.CHARISMA) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                ld += (getAppGrowthRate(Props.Stat.LEADERSHIP) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                hpt += (getAppGrowthRate(Props.Stat.HIT_POINTS) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                str += (getAppGrowthRate(Props.Stat.STRENGTH) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                def += (getAppGrowthRate(Props.Stat.DEFENSE) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                dex += (getAppGrowthRate(Props.Stat.DEXTERITY) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                agi += (getAppGrowthRate(Props.Stat.AGILITY) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                ski += (getAppGrowthRate(Props.Stat.SKILL) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
-                bra += (getAppGrowthRate(Props.Stat.BRAVERY) * 100 > Props.R.getR().nextInt(100)) ? 1 : 0;
+                cha += (getAppGrowthRate(Stat.CHARISMA) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                ld += (getAppGrowthRate(Stat.LEADERSHIP) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                hpt += (getAppGrowthRate(Stat.HIT_POINTS) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                str += (getAppGrowthRate(Stat.STRENGTH) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                def += (getAppGrowthRate(Stat.DEFENSE) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                dex += (getAppGrowthRate(Stat.DEXTERITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                agi += (getAppGrowthRate(Stat.AGILITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                ski += (getAppGrowthRate(Stat.SKILL) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                bra += (getAppGrowthRate(Stat.BRAVERY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
             }
 
             this.charisma += cha;
@@ -338,14 +304,14 @@ public class Unit extends Observable{
         Weapon chosenW = Weapon.NONE;
         if(primaryWeaponChoice) {
             if (this.template.getJob().getAvailableWeapons().length > 0) {
-                randId = Props.R.getR().nextInt(this.template.getJob().getAvailableWeapons().length);
+                randId = R.getR().nextInt(this.template.getJob().getAvailableWeapons().length);
                 chosenW = this.template.getJob().getAvailableWeapons()[randId];
             }
         }else{
             chosenW = this.primaryWeapon;
             if(this.template.getJob().getAvailableWeaponsAfterPromotion().length > 1) {
                 while (chosenW == this.primaryWeapon) {
-                    randId = Props.R.getR().nextInt(this.template.getJob().getAvailableWeaponsAfterPromotion().length);
+                    randId = R.getR().nextInt(this.template.getJob().getAvailableWeaponsAfterPromotion().length);
                     chosenW = this.template.getJob().getAvailableWeaponsAfterPromotion()[randId];
                 }
             }
@@ -390,7 +356,8 @@ public class Unit extends Observable{
     }
 
     public void switchWeapon(){
-        this.primaryWeaponEquipped = !primaryWeaponEquipped;
+        if(isPromoted())
+            this.primaryWeaponEquipped = !primaryWeaponEquipped;
         notifyAllObservers(getCurrentWeapon());
     }
 
@@ -408,13 +375,17 @@ public class Unit extends Observable{
     //-------------- ARMY RELATED METHODS --------------
 
 
-
+    public boolean isMobilized(){
+        if(army != null)
+            return army.isUnitMobilized(this);
+        return  false;
+    }
 
     public boolean sameSquadAs(Unit unit){
         boolean res = false;
         boolean thisBelongSquad = false;
         boolean unitBelongSquad = false;
-        if(army != null && army == unit.army){
+        if(army != null && unit != null && unit.army != null && army == unit.army){
             Array<Array<Unit>> squads = army.getAllSquads();
             for(int i=0; i< squads.size; i++){
                 for(int j=0; j < squads.get(i).size; j++){
@@ -433,22 +404,42 @@ public class Unit extends Observable{
         return res;
     }
 
-    public boolean sameAligmentAs(Unit unit){
-        return unit != null && army != null && ((army.isAlly() && unit.army.isAlly()) ||(!army.isAlly() && !unit.army.isAlly())) ;
-    }
-
-    public boolean isEnemyWith(Unit unit){
-        return unit != null && army != null && ((army.isAlly() && !unit.army.isAlly()) ||(!army.isAlly() && unit.army.isAlly())) ;
-    }
-
     public boolean sameArmyAs(Unit unit){
-        return unit != null && army != null && army.getId() == unit.army.getId();
+        return unit != null && unit.army != null && army != null && army.getId() == unit.army.getId();
     }
+
+    public Allegeance getAllegeance(){
+        Allegeance a = null;
+        if(army == null){
+            a = Allegeance.NEUTRAL;
+        }else{
+            if(army.isAlly()){
+                a = Allegeance.ALLY;
+            }else{
+                a = Allegeance.ENEMY;
+            }
+        }
+        return a;
+    }
+
+    public boolean sideWith(Allegeance a){
+        return getAllegeance() == a;
+    }
+
+    public boolean fightWith(Allegeance a){ return (a == Allegeance.ENEMY && getAllegeance() == Allegeance.ALLY) || (a == Allegeance.ALLY && getAllegeance() == Allegeance.ENEMY); }
 
     public Array<Unit> getSquad(){
         return army.getSquad(this);
     }
 
+    public boolean isStandardBearer(){ return !banner.isEmpty(); }
+
+    public boolean addBannerSign(BannerSign sign) {
+        if(template.getJob().couldBeStandardBearerJob()){
+           return banner.addSign(sign);
+        }
+        return false;
+    }
 
 
 
@@ -459,18 +450,19 @@ public class Unit extends Observable{
      - avoidance
      - trigger ability rate
      - drop / steal chance of sucess
+     - gain of leadership
      */
 
 
 
 
     public int getAttackDamage(){
-        return getCurrentWeapon().getDamage() + getAppStat(Props.Stat.STRENGTH);
+        return getCurrentWeapon().getDamage() + getAppStat(Stat.STRENGTH);
     }
 
-    public int getCurrentAttackDamage(TileType type, Unit foe, boolean crit, boolean bannerAtRange){
-        int str = getCurrentWeapon().getDamage() + getCurrentStrength(type,foe, bannerAtRange);
-        if(crit) str *= getCurrentCritDamageModifier(foe);
+    public int getCurrentAttackDamage(TileType attackerTile, Unit defender, boolean critical, boolean bannerAtRange){
+        int str = getCurrentWeapon().getDamage() + getCurrentStrength(attackerTile,defender, bannerAtRange);
+        if(critical) str *= getCurrentCritDamageModifier(defender);
         return str;
     }
 
@@ -478,68 +470,138 @@ public class Unit extends Observable{
         int avoidance = 0;
         switch(stance){
             case DODGE:
-                avoidance = Props.AGI_DODGE_FACTOR* getAppStat(Props.Stat.AGILITY);
+                avoidance = AGI_DODGE_FACTOR* getAppStat(Stat.AGILITY);
                 break;
             case PARRY:
                 // multiple the parry capacity of the current wielded weapon with the average parry vulnerability of the weapon roster
                 float parryAverageAbility = (float) Math.sqrt(getCurrentWeapon().getParryCapacity() * Weapon.getHighAverageParryVulnerabilty());
-                avoidance = (int) (Props.DEX_PARRY_FACTOR* getAppStat(Props.Stat.DEXTERITY)*parryAverageAbility);
+                avoidance = (int) (DEX_PARRY_FACTOR* getAppStat(Stat.DEXTERITY)*parryAverageAbility);
                 break;
             default: break;
         }
         return avoidance;
     }
 
-    public int getCurrentAvoidance(TileType tileType, Unit attacker, boolean bannerAtRange){
+    public int getCurrentAvoidance(TileType defenderTile, Unit attacker, boolean bannerAtRange){
         int avoidance = 0;
         switch(stance){
             case DODGE:
-                avoidance = Props.AGI_DODGE_FACTOR* getCurrentAg(attacker);
+                avoidance = AGI_DODGE_FACTOR* getCurrentAg(attacker);
                 break;
             case PARRY:
                 float parryAbility = (float) Math.sqrt(getCurrentWeapon().getParryCapacity() * attacker.getCurrentWeapon().getParryVulnerability());
-                avoidance = (int) ( Props.DEX_PARRY_FACTOR * getCurrentDex(tileType, bannerAtRange) * parryAbility);
+                avoidance = (int) ( DEX_PARRY_FACTOR * getCurrentDex(defenderTile, bannerAtRange) * parryAbility);
                 break;
             default: break;
         }
-        return avoidance + tileType.getAvoidBonus();
+        return avoidance + defenderTile.getAvoidBonus();
     }
 
     public int getAttackAccuracy(){
-        return getCurrentWeapon().getAccuracy() + getChaChiefsBonus() + Props.DEX_HIT_FACTOR* getAppStat(Props.Stat.DEXTERITY);
+        return getCurrentWeapon().getAccuracy() + getChaChiefsBonus() + DEX_HIT_FACTOR* getAppStat(Stat.DEXTERITY);
     }
 
-    public int getCurrentAttackAccuracy(TileType tileType, boolean crit, boolean bannerAtRange){
-        int acc = getCurrentWeapon().getAccuracy() + getChaChiefsBonus() + Props.DEX_HIT_FACTOR* getCurrentDex(tileType, bannerAtRange);
-        if(crit) acc += Props.ACCURACY_BONUS_CRIT;
+    public int getCurrentAttackAccuracy(TileType attackerTile, boolean critical, boolean bannerAtRange){
+        int acc = getCurrentWeapon().getAccuracy() + getChaChiefsBonus() + DEX_HIT_FACTOR* getCurrentDex(attackerTile, bannerAtRange);
+        if(critical) acc += ACCURACY_BONUS_CRIT;
         return acc;
     }
 
-    public int getAbilityTriggerRate(Banner bannerAtRange){
-        return Props.AB_TRIGGER_RATE_SKILL_FACTOR * getCurrentSk() + getChaChiefsBonus() + bannerAtRange.getBonusRelativeTo(BannerSign.IZANAGI);
+    public int getCurrentAbilityTriggerRate(boolean bannerAtRange){
+        return AB_TRIGGER_RATE_SKILL_FACTOR * getCurrentSk() + getChaChiefsBonus() + getSquadBannerBonus(BannerSign.IZANAGI, bannerAtRange);
     }
 
-    public int getStealRate(Unit target, TileType tileType, boolean bannerAtRange){
-        int rate = 100 + 10*(target.getCurrentAg(this) - getCurrentDex(tileType, bannerAtRange));
+    public int getCurrentStealRate(Unit target, TileType stealerTile, boolean bannerAtRange){
+        int rate = 100 + 10*(target.getCurrentAg(this) - getCurrentDex(stealerTile, bannerAtRange));
         if(rate > 100) rate = 100;
         if(rate < 0) rate = 0;
         return rate;
     }
 
-    public int getDropRate(TileType tileType, boolean bannerAtRange){
-        int rate = Props.DEX_FAC_DROP_RATE * getCurrentDex(tileType, bannerAtRange) + getChaChiefsBonus();
+    public int getCurrentDropRate(TileType dropperTile, boolean bannerAtRange){
+        int rate = DEX_FAC_DROP_RATE * getCurrentDex(dropperTile, bannerAtRange) + getChaChiefsBonus();
         return rate;
     }
 
-    public int getExperienceFrom(int levelKilled){
-        double exp = Props.EXP_BASE_MODIFIER * Math.atan((levelKilled - getLevel())*Props.LVL_GAP_FACTOR) - getLevel();
+    public int getCurrentHealPower(){
+        return HEAL_BASE_POWER + level + (isUsing(Item.CHARM) ? CHARM_HEAL_BONUS: 0);
+    }
+
+    public void heal(int healPower){
+        int[] oldHpts = new int[]{currentHitPoints, currentMoral};
+        if(healPower > hitPoints){
+            currentHitPoints  = hitPoints;
+            currentMoral = calculateInitialMoral();
+        }else{
+            currentHitPoints += healPower;
+            if(currentMoral > 0) {
+                currentMoral += healPower;
+            }else{
+                currentMoral = calculateInitialMoral() + currentHitPoints - getAppStat(Stat.HIT_POINTS);
+                if(currentMoral < 0){
+                    currentMoral = 0;
+                }
+            }
+        }
+        notifyAllObservers(oldHpts);
+    }
+
+    public int getExperiencePoints(int levelKilled){
+        double exp = EXP_BASE_MODIFIER * Math.atan((levelKilled - getLevel())* LVL_GAP_FACTOR) - getLevel();
         return (exp > 1) ? (int)exp : 1;
     }
 
+    public int getLdExpPoints(boolean[] secondaryObjectiveDone, int[] bonusSecondaryObjective, int nbOfTurnsToCompletion, int nbOfTurnMin, int nbOfTurnMax) {
+        float exp = 0f;
+        if(isWarChief()) {
+            int nbTurns;
+            if (nbOfTurnsToCompletion <= nbOfTurnMin) {
+                nbTurns = nbOfTurnMin;
+            } else if (nbOfTurnMax <= nbOfTurnsToCompletion) {
+                nbTurns = nbOfTurnMax;
+            } else {
+                nbTurns = nbOfTurnsToCompletion;
+            }
+
+            //calculate the base exp gained
+            exp = 100f * getAppGrowthRate(Stat.LEADERSHIP) * ((float)(nbOfTurnMax - nbTurns)) / ((float)(nbOfTurnMax - nbOfTurnMin));
+
+            //factorize the size of the squad in the equation
+            exp *= 1f + (float)(getSquad().size - 1) / ((isWarlord())? MAX_UNITS_UNDER_WARLORD - 1: MAX_UNITS_UNDER_WAR_CHIEF - 1) ;
+
+            //add secondary objective completion bonus
+            for (int i = 0; i < secondaryObjectiveDone.length; i++) {
+                if (i < bonusSecondaryObjective.length && secondaryObjectiveDone[i]) {
+                    exp += bonusSecondaryObjective[i];
+                }
+            }
+        }
+        return (int)exp;
+    }
+
+    public int addLeadershipEXP(int gainEXP) {
+        this.leadershipEXP += gainEXP;
+        int gainLd = this.leadershipEXP / Data.EXP_REQUIRED_LD_LEVEL_UP;
+        this.leadership  = gainLd;
+        this.leadership = this.leadershipEXP % Data.EXP_REQUIRED_LD_LEVEL_UP;
+        return gainLd;
+    }
+
+    public static int getHitRate(Unit attacker, Unit defender, boolean critical, TileType attackerTile, TileType defenderTile, boolean attackBannerAtRange, boolean defenderBannerAtRange){
+        return attacker.getCurrentAttackAccuracy(attackerTile, critical, attackBannerAtRange) - defender.getCurrentAvoidance(defenderTile, attacker, defenderBannerAtRange) ;
+    }
+
+    public static int getDealtDamage(Unit attacker, Unit defender, boolean critical, TileType attackerTile, TileType defenderTile, boolean attackBannerAtRange, boolean defenderBannerAtRange){
+        int dealtDamage = attacker.getCurrentAttackDamage(attackerTile, defender, critical, attackBannerAtRange) - defender.getCurrentDef(defenderTile, attacker, defenderBannerAtRange);
+        dealtDamage *= ((defender.getStance() == DefensiveStance.BLOCK) ? BLOCK_REDUCTION_DAMAGE : 1);
+        dealtDamage -= BLOCK_RAW_REDUCTION_DAMAGE;
+        return  dealtDamage;
+    }
+
     public void receiveDamage(int damageTaken){
-        if(this.currentHitPoints < damageTaken){
+        if(this.currentHitPoints > damageTaken){
             this.currentHitPoints -= damageTaken;
-            if(this.getCurrentMoral() < damageTaken){
+            if(this.getCurrentMoral() > damageTaken){
                 this.currentMoral -= damageTaken;
                 notifyAllObservers(damageTaken);
             }else{
@@ -553,24 +615,9 @@ public class Unit extends Observable{
         }
     }
 
-    public void heal(int rawHealPower){
-        int[] oldHpts = new int[]{currentHitPoints, currentMoral};
-        if(rawHealPower > hitPoints){
-            currentHitPoints  = hitPoints;
-            currentMoral = calculateInitialMoral();
-        }else{
-            currentHitPoints += rawHealPower;
-            if(currentMoral > 0) {
-                currentMoral += rawHealPower;
-            }else{
-                currentMoral = calculateInitialMoral() + currentHitPoints - getAppStat(Props.Stat.HIT_POINTS);
-                if(currentMoral < 0){
-                    currentMoral = 0;
-                }
-            }
-        }
-        notifyAllObservers(oldHpts);
-    }
+
+
+
 
 
 
@@ -598,52 +645,50 @@ public class Unit extends Observable{
     }
 
 
-    public Props.EquipMsg equip(Item item, boolean firstSlot) {
-        int currentLd = getAppStat(Props.Stat.LEADERSHIP);
-        Props.EquipMsg msg = Props.EquipMsg.FAILED_TO_EQUIP;
+    public boolean equip(Item item, boolean firstSlot) {
+        int currentLd = getAppStat(Stat.LEADERSHIP);
+        boolean armyRecomposed = false;
+        EquipMsg msg;
 
-        if(item.getItemType() != ItemType.SHIELD || ( !template.getJob().isAllowedWieldShield()  && !template.getJob().isStandardBearer())) {
-
-            // check if the unit does not hold yet the item of the same type
-            if (firstSlot) {
-                if (item2.getItemType() != item.getItemType()) {
-                    this.item1 = item;
-                    msg = Props.EquipMsg.SUCCESSFULLY_EQUIPED;
-                }else{
-                    msg = Props.EquipMsg.TYPE_ALREADY_EQUIPED;
-                }
-            } else {
-                if (item1.getItemType() != item.getItemType()) {
-                    this.item2 = item;
-                    msg = Props.EquipMsg.SUCCESSFULLY_EQUIPED;
-                }else{
-                    msg = Props.EquipMsg.TYPE_ALREADY_EQUIPED;
-                }
-            }
-
-            // update army composition
-            if (getAppStat(Props.Stat.LEADERSHIP) < currentLd && isWarChief()) {
-                if (isWarlord()) {
-                    army.appointWarLord(this);
-                    msg = EquipMsg.SUCCESSFULLY_EQUIPED_AND_ARMY_RECOMPOSED_WL;
-                } else {
-                    army.disengage(this);
-                    army.appointWarChief(this);
-                    msg = EquipMsg.SUCCESSFULLY_EQUIPED_AND_ARMY_RECOMPOSED_WC;
-                }
-            }
-
+        if(item1.getItemType() == ItemType.SHIELD && !template.getJob().isAllowedWieldShield()){
+            msg = EquipMsg.JOB_DOES_NOT_ALLOW_SHIELD_BEARING;
         }else{
-            if(template.getJob().isAllowedWieldShield()){
-                msg = EquipMsg.JOB_DOES_NOT_ALLOW_SHIELD_BEARING;
-            }
-            if (template.getJob().isStandardBearer()){
+            if(item1.getItemType() == ItemType.SHIELD || !isStandardBearer()){
                 msg = EquipMsg.STANDARD_BEARER_CANNOT_EQUIP_SHIELD;
+            }else{
+
+                // check if the unit does not hold yet the item of the same type
+                if (firstSlot) {
+                    if (item2.getItemType() != item.getItemType()) {
+                        this.item1 = item;
+                        msg = EquipMsg.SUCCESSFULLY_EQUIPED;
+                    }else{
+                        msg = EquipMsg.TYPE_ALREADY_EQUIPED;
+                    }
+                } else {
+                    if (item1.getItemType() != item.getItemType()) {
+                        this.item2 = item;
+                        msg = EquipMsg.SUCCESSFULLY_EQUIPED;
+                    }else{
+                        msg = EquipMsg.TYPE_ALREADY_EQUIPED;
+                    }
+                }
+
+                // update army composition
+                if (getAppStat(Stat.LEADERSHIP) < currentLd && isWarChief()) {
+                    armyRecomposed = true;
+                    if (isWarlord()) {
+                        army.appointWarLord(this);
+                    } else {
+                        army.disengage(this);
+                        army.appointWarChief(this);
+                    }
+                }
             }
         }
 
-        notifyAllObservers(null);
-        return msg;
+        notifyAllObservers(msg);
+        return armyRecomposed;
     }
 
 
@@ -662,12 +707,7 @@ public class Unit extends Observable{
 
 
     public boolean isUsingShield(){
-        for(Item item: Item.values()){
-            if(isUsing(item) && item.getItemType() == ItemType.SHIELD){
-                return  true;
-            }
-        }
-        return  false;
+        return  (item1.getItemType() == ItemType.SHIELD && isUsing(item1)) || (item2.getItemType() == ItemType.SHIELD && isUsing(item2));
     }
 
     public boolean possessItemStealable() {
@@ -687,9 +727,7 @@ public class Unit extends Observable{
         return abb == offAb;
     }
 
-    public Banner getBanner() {
-        return banner;
-    }
+    public Banner getBanner() { return banner; }
 
     public boolean isDead() {
         return currentHitPoints == 0;
@@ -714,17 +752,17 @@ public class Unit extends Observable{
     public int getNbMaxUnits(){
         int nbMax = 0;
         if(isWarlord()){
-            nbMax = (int) (3 + (getAppStat(Props.Stat.LEADERSHIP) + 2)/5.0f);
-            if(nbMax > Props.MAX_UNITS_UNDER_WARLORD ) nbMax = (int) Props.MAX_UNITS_UNDER_WARLORD;
+            nbMax = (int) (3 + (getAppStat(Stat.LEADERSHIP) + 2)/5.0f);
+            if(nbMax > MAX_UNITS_UNDER_WARLORD ) nbMax = (int) MAX_UNITS_UNDER_WARLORD;
         }else if(isWarChief()){
-            nbMax = (int) (2 + (getAppStat(Props.Stat.LEADERSHIP) + 1)/5.0f);
-            if(nbMax > Props.MAX_UNITS_UNDER_WAR_CHIEF ) nbMax = (int) Props.MAX_UNITS_UNDER_WAR_CHIEF;
+            nbMax = (int) (2 + (getAppStat(Stat.LEADERSHIP) + 1)/5.0f);
+            if(nbMax > MAX_UNITS_UNDER_WAR_CHIEF ) nbMax = (int) MAX_UNITS_UNDER_WAR_CHIEF;
         }
         return nbMax;
     }
 
     public int getNbMaxWarChiefs(){
-        return 1 + (int) ((isWarlord())? getAppStat(Props.Stat.LEADERSHIP)/6.0f: 0);
+        return 1 + (int) ((isWarlord())? getAppStat(Stat.LEADERSHIP)/6.0f: 0);
     }
 
     public int getChaChiefsBonus(){
@@ -734,8 +772,8 @@ public class Unit extends Observable{
             for(int i=0; i< squads.size; i++){
                 for(int j=0; j < squads.get(i).size; j++){
                     if(squads.get(i).get(j) == this){
-                        bonus += squads.get(0).get(0).getCurrentCha();
-                        bonus += squads.get(i).get(0).getCurrentCha();
+                        bonus += (squads.get(0).get(0).isOutOfCombat()) ? squads.get(0).get(0).getCurrentCha() : 0;
+                        bonus += (squads.get(i).get(0).isOutOfCombat()) ? squads.get(i).get(0).getCurrentCha() : 0;
                     }
                 }
             }
@@ -822,12 +860,12 @@ public class Unit extends Observable{
 
 
     public int calculateInitialMoral(){
-        int moralFactor = (int) (0.9 - 0.8 * Math.exp(-(getAppStat(Props.Stat.BRAVERY) + getChaChiefsBonus())/13.0));
+        int moralFactor = (int) (0.9 - 0.8 * Math.exp(-(getAppStat(Stat.BRAVERY) + getChaChiefsBonus())/13.0));
         int moral = moralFactor * this.hitPoints;
         return (moral > 0)?  moral: 1;
     }
 
-    public int getBaseStat(Props.Stat stat){
+    public int getBaseStat(Stat stat){
         int statValue = 0;
         switch(stat){
             case CHARISMA: statValue = charisma; break;
@@ -850,19 +888,19 @@ public class Unit extends Observable{
         return statValue;
     }
 
-    public int getAppStat(Props.Stat stat){
+    public int getAppStat(Stat stat){
         int statValue = 0;
         switch(stat){
-            case CHARISMA: statValue = charisma + (isUsing(Item.KABUTO)? Props.UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0) ; break;
-            case LEADERSHIP: statValue = leadership + (isUsing(Item.WAR_CHIEF_CLOAK)? Props.UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0) ; break;
+            case CHARISMA: statValue = charisma + (isUsing(Item.KABUTO)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0) ; break;
+            case LEADERSHIP: statValue = leadership + (isUsing(Item.WAR_CHIEF_CLOAK)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0) ; break;
             case MOBILITY: statValue =  mobility + (isUsing(Item.WEI_BOOTS)? 1: 0); break;
             case HIT_POINTS: statValue = hitPoints; break;
-            case STRENGTH:  statValue = strength + (isUsing(Item.GAUNLET)? Props.UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); break;
-            case DEFENSE:  statValue = defense + (isUsing(Item.OYOROI_ARMOR)? Props.DEF_BONUS_OYOROI : 0); break;
-            case DEXTERITY: statValue = dexterity + (isUsing(Item.ARMBAND)? Props.UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); break;
+            case STRENGTH:  statValue = strength + (isUsing(Item.GAUNLET)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); break;
+            case DEFENSE:  statValue = defense + (isUsing(Item.OYOROI_ARMOR)? DEF_BONUS_OYOROI : 0); break;
+            case DEXTERITY: statValue = dexterity + (isUsing(Item.ARMBAND)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); break;
             case AGILITY:  statValue = agility; break;
             case BRAVERY:  statValue = bravery; break;
-            case SKILL:  statValue = skill + (isUsing(Item.MASTER_BELT)? Props.UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); break;
+            case SKILL:  statValue = skill + (isUsing(Item.MASTER_BELT)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); break;
             case PRIMARY_WEAPON_RANGE_MIN: statValue = primaryWeapon.getRangeMin(); break;
             case PRIMARY_WEAPON_RANGE_MAX: statValue = primaryWeapon.getRangeMax() + ((isUsing(Item.EMISHI_RING) && primaryWeapon.isRangedW())? 1: 0);break;
             case SECONDARY_WEAPON_RANGE_MIN: statValue = secondaryWeapon.getRangeMin(); break;
@@ -874,11 +912,11 @@ public class Unit extends Observable{
     }
 
     public int getCurrentCha() {
-        return getAppStat(Props.Stat.CHARISMA);
+        return getAppStat(Stat.CHARISMA);
     }
 
     public int getCurrentMob(TileType type){
-        return getAppStat(Props.Stat.MOBILITY);
+        return getAppStat(Stat.MOBILITY);
     }
 
     public int getCurrentHitpoints() {
@@ -889,13 +927,13 @@ public class Unit extends Observable{
         return currentMoral;
     }
 
-    public int getCurrentStrength(TileType tileType, Unit foe, boolean bannerAtRange) {
-        int str = getAppStat(Props.Stat.STRENGTH);
-        if(foe.isHorseman()){
+    public int getCurrentStrength(TileType tileType, Unit defender, boolean bannerAtRange) {
+        int str = getAppStat(Stat.STRENGTH);
+        if(defender.isHorseman()){
             if(getCurrentWeapon() == Weapon.YARI)
-                str += Props.STR_FIXE_BONUS_YARI_1 + getCurrentSk()/ Props.STR_FIXE_BONUS_YARI_2;
+                str += STR_FIXE_BONUS_YARI_1 + getCurrentSk()/ STR_FIXE_BONUS_YARI_2;
             else if(getCurrentWeapon() == Weapon.NAGINATA)
-                str += Props.STR_FIXE_BONUS_NAGINATA_1 + getCurrentSk()/ Props.STR_FIXE_BONUS_NAGINATE_2;
+                str += STR_FIXE_BONUS_NAGINATA_1 + getCurrentSk()/ STR_FIXE_BONUS_NAGINATE_2;
         }
         return str + tileType.getStrengthBonus() + getSquadBannerBonus(BannerSign.APEHUCI,bannerAtRange);
     }
@@ -906,21 +944,21 @@ public class Unit extends Observable{
     3)
      */
     public int getCurrentDef(TileType tileType, Unit attacker, boolean bannerAtRange) {
-        int def = getAppStat(Props.Stat.DEFENSE);
+        int def = getAppStat(Stat.DEFENSE);
 
         int damageSpecificDefense = 0;
         switch(attacker.getCurrentWeapon().getType()){
             case PIERCING:
                 if(isUsing(Item.YAYOI_SHIELD))
-                    damageSpecificDefense += Props.DEF_BONUS_YAYOI_SHIELD;
+                    damageSpecificDefense += DEF_BONUS_YAYOI_SHIELD;
                 else if(isUsing(Item.GREAT_SHIELD))
-                    damageSpecificDefense += Props.DEF_BONUS_GREAT_SHIELD;
+                    damageSpecificDefense += DEF_BONUS_GREAT_SHIELD;
                 break;
             case EDGED:
                 if(isUsing(Item.TANKO_ARMOR))
-                    damageSpecificDefense += Props.DEF_BONUS_TANKO;
+                    damageSpecificDefense += DEF_BONUS_TANKO;
                 else if(isUsing(Item.KEIKO_ARMOR))
-                    damageSpecificDefense += Props.DEF_BONUS_KEIKO;
+                    damageSpecificDefense += DEF_BONUS_KEIKO;
                 break;
             default: break;
         }
@@ -936,21 +974,21 @@ public class Unit extends Observable{
     }
 
     public int getCurrentAg(Unit attacker) {
-        int agi = getAppStat(Props.Stat.AGILITY);
+        int agi = getAppStat(Stat.AGILITY);
         switch(attacker.getCurrentWeapon().getType()){
             case PIERCING:
                 if(isUsing(Item.YAYOI_SHIELD))
-                    agi += Props.DEX_BONUS_YAYOI_SHIELD;
+                    agi += DEX_BONUS_YAYOI_SHIELD;
                 break;
             case BLUNT:
                 if(isUsing(Item.TANKO_ARMOR))
-                    agi += Props.DEX_BONUS_TANKO;
+                    agi += DEX_BONUS_TANKO;
                 break;
             case EDGED:
                 if(isUsing(Item.EMISHI_LEGGINGS))
-                    agi += Props.DEX_BONUS_EMISHI_LEGGINS;
+                    agi += DEX_BONUS_EMISHI_LEGGINS;
                 if(isUsing(Item.YAMATO_TROUSERS))
-                    agi += Props.DEX_BONUS_YAMATO_TROUSERS;
+                    agi += DEX_BONUS_YAMATO_TROUSERS;
                 break;
             default: break;
         }
@@ -958,22 +996,22 @@ public class Unit extends Observable{
     }
 
     public int getCurrentDex(TileType tileType, boolean bannerAtRange) {
-        return getAppStat(Props.Stat.DEXTERITY) + getSquadBannerBonus(BannerSign.SHIRAMBA, bannerAtRange);
+        return getAppStat(Stat.DEXTERITY) + getSquadBannerBonus(BannerSign.SHIRAMBA, bannerAtRange);
     }
 
     public int getCurrentSk() {
-        return getAppStat(Props.Stat.SKILL);
+        return getAppStat(Stat.SKILL);
     }
 
-    public int getCurrentRangeMin(){ return (primaryWeaponEquipped)? getAppStat(Props.Stat.PRIMARY_WEAPON_RANGE_MIN): getAppStat(Props.Stat.SECONDARY_WEAPON_RANGE_MIN); }
+    public int getCurrentRangeMin(){ return (primaryWeaponEquipped)? getAppStat(Stat.PRIMARY_WEAPON_RANGE_MIN): getAppStat(Stat.SECONDARY_WEAPON_RANGE_MIN); }
 
     public int getCurrentRangeMax(TileType tile, boolean bannerAtRange){
-        int rangeMax =  (primaryWeaponEquipped)             ? getAppStat(Props.Stat.PRIMARY_WEAPON_RANGE_MAX)                                               : getAppStat(Props.Stat.SECONDARY_WEAPON_RANGE_MAX);
+        int rangeMax =  (primaryWeaponEquipped)             ? getAppStat(Stat.PRIMARY_WEAPON_RANGE_MAX)                                               : getAppStat(Stat.SECONDARY_WEAPON_RANGE_MAX);
         rangeMax +=     (getCurrentWeapon().isRangedW())    ? (tile.enhanceRange() ? 1 : 0) + getSquadBannerBonus(BannerSign.AMATERASU, bannerAtRange)     : 0;
         return rangeMax;
     }
 
-    public float getBaseGrowthRate(Props.Stat stat){
+    public float getBaseGrowthRate(Stat stat){
         float gr = 0.0f;
         switch (stat){
             case CHARISMA: gr = isPromoted()? template.getProGrowthCha() : template.getGrowthCha(); break;
@@ -990,27 +1028,27 @@ public class Unit extends Observable{
         return  gr;
     }
 
-    public float getAppGrowthRate(Props.Stat stat){
+    public float getAppGrowthRate(Stat stat){
         float gr = 0.0f;
         switch (stat){
-            case CHARISMA: gr = getBaseGrowthRate(Props.Stat.CHARISMA) + (isUsing(Item.KABUTO)? Props.UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
-            case LEADERSHIP: gr = getBaseGrowthRate(Props.Stat.LEADERSHIP); break;
-            case MOBILITY: gr = getBaseGrowthRate(Props.Stat.MOBILITY); break;
-            case HIT_POINTS: gr = getBaseGrowthRate(Props.Stat.HIT_POINTS); break;
-            case STRENGTH: gr = getBaseGrowthRate(Props.Stat.STRENGTH) + (isUsing(Item.GAUNLET)? Props.UNIQUE_EQUIPMENT_LOW_GROWTH_BONUS :0); break;
-            case DEFENSE: gr = getBaseGrowthRate(Props.Stat.DEFENSE); break;
-            case DEXTERITY: gr = getBaseGrowthRate(Props.Stat.DEXTERITY) + (isUsing(Item.ARMBAND)? Props.UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
-            case AGILITY: gr = getBaseGrowthRate(Props.Stat.AGILITY); break;
-            case SKILL: gr = getBaseGrowthRate(Props.Stat.SKILL) + (isUsing(Item.MASTER_BELT)? Props.UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
-            case BRAVERY: gr = getBaseGrowthRate(Props.Stat.BRAVERY); break;
+            case CHARISMA: gr = getBaseGrowthRate(Stat.CHARISMA) + (isUsing(Item.KABUTO)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
+            case LEADERSHIP: gr = getBaseGrowthRate(Stat.LEADERSHIP); break;
+            case MOBILITY: gr = getBaseGrowthRate(Stat.MOBILITY); break;
+            case HIT_POINTS: gr = getBaseGrowthRate(Stat.HIT_POINTS); break;
+            case STRENGTH: gr = getBaseGrowthRate(Stat.STRENGTH) + (isUsing(Item.GAUNLET)? UNIQUE_EQUIPMENT_LOW_GROWTH_BONUS :0); break;
+            case DEFENSE: gr = getBaseGrowthRate(Stat.DEFENSE); break;
+            case DEXTERITY: gr = getBaseGrowthRate(Stat.DEXTERITY) + (isUsing(Item.ARMBAND)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
+            case AGILITY: gr = getBaseGrowthRate(Stat.AGILITY); break;
+            case SKILL: gr = getBaseGrowthRate(Stat.SKILL) + (isUsing(Item.MASTER_BELT)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
+            case BRAVERY: gr = getBaseGrowthRate(Stat.BRAVERY); break;
         }
         return  gr;
     }
 
-    public float getCurrentCritDamageModifier(Unit foe){
-        float critDamMod = Props.CRITICAL_DAMAGE_MODIFIER;
-        critDamMod += (isUsing(Item.IMPERIAL_GAUNTLET))? Props.CRIT_BONUS_IMP_GAUNLET: 0;
-        critDamMod -= foe.isUsing(Item.IMPERIAL_ARMBAND)? 1f: 0;
+    public float getCurrentCritDamageModifier(Unit defender){
+        float critDamMod = CRITICAL_DAMAGE_MODIFIER;
+        critDamMod += (isUsing(Item.IMPERIAL_GAUNTLET))? CRIT_BONUS_IMP_GAUNLET: 0;
+        critDamMod -= defender.isUsing(Item.IMPERIAL_ARMBAND)? 1f: 0;
         return  critDamMod;
     }
 
@@ -1050,12 +1088,6 @@ public class Unit extends Observable{
         return army;
     }
 
-    public boolean isMobilized(){
-        if(army != null)
-            return army.isUnitMobilized(this);
-        return  false;
-    }
-
     public boolean hasMoved(){ return moved; }
 
     public void setMoved(boolean moved){ this.moved = moved; }
@@ -1064,20 +1096,20 @@ public class Unit extends Observable{
 
     public void setActed(boolean acted) { this.acted = acted; }
 
-    public Props.Orientation getCurrentOrientation() {
+    public Orientation getCurrentOrientation() {
         return orientation;
     }
 
-    public void setOrientation(Props.Orientation orientation) {
+    public void setOrientation(Orientation orientation) {
         this.orientation = orientation;
         notifyAllObservers(null);
     }
 
-    public Props.Ethnicity getEthnicity() {
+    public Ethnicity getEthnicity() {
         return ethnicity;
     }
 
-    public void setEthnicity(Props.Ethnicity ethnicity) {
+    public void setEthnicity(Ethnicity ethnicity) {
         this.ethnicity = ethnicity;
         notifyAllObservers(null);
     }
@@ -1107,14 +1139,12 @@ public class Unit extends Observable{
         return leadershipEXP;
     }
 
-    public void setLeadershipEXP(int leadershipEXP) {
-        this.leadershipEXP = leadershipEXP;
-    }
+    public boolean isBuildingResourcesConsumed() { return buildingResourcesConsumed; }
 
-    public boolean isBuilded() { return builded; }
+    public void setBuildingResourcesConsumed(boolean buildingResourcesConsumed) { this.buildingResourcesConsumed = buildingResourcesConsumed; }
 
-    public void setBuilded(boolean builded) {
-        this.builded = builded;
+    public boolean isWounded() {
+        return currentHitPoints < getAppStat(Stat.HIT_POINTS);
     }
 
     @Override
@@ -1205,17 +1235,16 @@ public class Unit extends Observable{
         private Array<Array<Unit>> mobilizedTroups;
         private Array<Unit> nonMobTroups;
 
-        public Army(Unit warlord, ArmyType aligment){
-            this(aligment);
-            appointWarLord(warlord);
-        }
-
         public Army(ArmyType armyType){
             this.id = ids++;
-
             this.armyType = armyType;
             this.mobilizedTroups = new Array<Array<Unit>>();
             this.nonMobTroups = new Array<Unit>();
+        }
+
+        public Army(Unit warlord, ArmyType aligment){
+            this(aligment);
+            appointWarLord(warlord);
         }
 
         @Override
@@ -1227,10 +1256,6 @@ public class Unit extends Observable{
         @Override
         public void setArmyType(ArmyType type) {
             this.armyType = type;
-        }
-
-        public ArmyType getArmyType(){
-            return armyType;
         }
 
         @Override
@@ -1410,7 +1435,7 @@ public class Unit extends Observable{
                     if (0 <= squadIndex && squadIndex < getNbOfSquads()) {
                         if (0 < mobilizedTroups.get(squadIndex).size && mobilizedTroups.get(squadIndex).size < mobilizedTroups.get(squadIndex).get(0).getNbMaxUnits()) {
                             if (!mobilizedTroups.get(squadIndex).contains(unit, true)) {
-                                if (!unit.template.getJob().isStandardBearer() || !hasSquadStandardBearer(squadIndex)) {
+                                if (!unit.isStandardBearer() || !hasSquadStandardBearer(squadIndex)) {
 
                                     //all conditions required validated
                                     remove(unit);
@@ -1450,7 +1475,7 @@ public class Unit extends Observable{
         private boolean hasSquadStandardBearer(int squadId) {
             if(0 < squadId && squadId < getNbOfSquads()) {
                 for (int i = 0; i < mobilizedTroups.get(squadId).size; i++){
-                    if(mobilizedTroups.get(squadId).get(i).template.getJob().isStandardBearer()){
+                    if(mobilizedTroups.get(squadId).get(i).isStandardBearer()){
                         return true;
                     }
                 }
@@ -1556,7 +1581,7 @@ public class Unit extends Observable{
             if(unit != null) {
                 Array<Unit> squad = getSquad(unit);
                 for (Unit squadMember : squad) {
-                    if (squadMember.template.getJob().isStandardBearer()) {
+                    if (squadMember.isStandardBearer()) {
                         return squadMember.banner;
                     }
                 }
@@ -1566,7 +1591,7 @@ public class Unit extends Observable{
 
         @Override
         public int getBannerRange(){
-            return (int) Math.sqrt(getWarlord().getAppStat(Props.Stat.LEADERSHIP));
+            return (int) Math.sqrt(getWarlord().getAppStat(Stat.LEADERSHIP));
         }
 
 

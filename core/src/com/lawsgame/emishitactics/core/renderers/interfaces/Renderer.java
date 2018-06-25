@@ -1,10 +1,12 @@
 package com.lawsgame.emishitactics.core.renderers.interfaces;
 
+import com.badlogic.gdx.utils.Disposable;
+import com.lawsgame.emishitactics.engine.GameElement;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
-public abstract class Renderer<M extends Observable> implements Observer, GameUpdatableEntity{
+public abstract class Renderer<M extends Observable> implements Observer, GameUpdatableEntity, Disposable{
       protected M model;
 
     public Renderer(M model){
@@ -18,5 +20,10 @@ public abstract class Renderer<M extends Observable> implements Observer, GameUp
     public void setModel(M model){
         this.model = model;
         this.model.attach(this);
+    }
+
+    @Override
+    public void dispose(){
+        this.model.detach(this);
     }
 }

@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Props;
+import com.lawsgame.emishitactics.core.constants.Data;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -46,28 +46,28 @@ public class UnitTest {
 
     @Before
     public void before(){
-        clovus = new Unit(true, Props.UnitTemplate.CONSCRIPT, 12, Props.Weapon.BO, Props.Weapon.SAI, true);
+        clovus = new Unit(true, Data.UnitTemplate.CONSCRIPT, 12, Data.Weapon.BO, Data.Weapon.SAI, true);
         clovus.setName(name1);
         clovus.setLeadership(highLd);
-        merovee = new Unit(false, Props.UnitTemplate.EMISHI_TRIBESMAN, 19, Props.Weapon.WARABITE, Props.Weapon.NONE, true);
+        merovee = new Unit(false, Data.UnitTemplate.EMISHI_TRIBESMAN, 19, Data.Weapon.WARABITE, Data.Weapon.NONE, true);
         merovee.setName(name2);
         merovee.setLeadership(lowLd);
-        jean = new Unit(Props.UnitTemplate.CONSCRIPT, 9);
+        jean = new Unit(Data.UnitTemplate.CONSCRIPT, 9);
         jean.setName(name3);
         jean.setLeadership(lowLd);
-        phillipe = new Unit(Props.UnitTemplate.CONSCRIPT, 5);
+        phillipe = new Unit(Data.UnitTemplate.CONSCRIPT, 5);
         phillipe.setName(name4);
         phillipe.setLeadership(lowLd);
-        alexandre = new Unit(Props.UnitTemplate.CONSCRIPT, 7);
+        alexandre = new Unit(Data.UnitTemplate.CONSCRIPT, 7);
         alexandre.setName(name5);
         alexandre.setLeadership(lowLd);
-        pierre = new Unit(Props.UnitTemplate.CONSCRIPT, 14);
+        pierre = new Unit(Data.UnitTemplate.CONSCRIPT, 14);
         pierre.setName(name6);
         pierre.setLeadership(highLd);
-        andre = new Unit(Props.UnitTemplate.CONSCRIPT, 13);
+        andre = new Unit(Data.UnitTemplate.CONSCRIPT, 13);
         andre.setName(name7);
         andre.setLeadership(lowLd);
-        luc = new Unit(Props.UnitTemplate.CONSCRIPT, 15);
+        luc = new Unit(Data.UnitTemplate.CONSCRIPT, 15);
         luc.setName(name8);
         luc.setLeadership(lowLd);
 
@@ -100,7 +100,7 @@ public class UnitTest {
 
     @Test
     public void testAllMethodsArmy(){
-        Props.UnitAppointmentErrorMsg msg;
+        Data.UnitAppointmentErrorMsg msg;
 
         army1.disengage(merovee);
 
@@ -130,13 +130,13 @@ public class UnitTest {
 
     @Test
     public void testPickWeapon(){
-        Array<Props.Weapon> availableWeapon = new Array< Props.Weapon>();
-        Array<Props.Weapon> availableWeaponAfterPromotion = new Array< Props.Weapon>();
+        Array<Data.Weapon> availableWeapon = new Array< Data.Weapon>();
+        Array<Data.Weapon> availableWeaponAfterPromotion = new Array< Data.Weapon>();
         availableWeapon.addAll(clovus.template.getJob().getAvailableWeapons());
         availableWeaponAfterPromotion.addAll(clovus.template.getJob().getAvailableWeaponsAfterPromotion());
 
-        Props.Weapon primaryW;
-        Props.Weapon secondaryW;
+        Data.Weapon primaryW;
+        Data.Weapon secondaryW;
         for(int i=0; i<10; i++){
             primaryW = clovus.pickWeapon(true);
 
@@ -163,29 +163,29 @@ public class UnitTest {
 
     @Test
     public void testAligmentAs(){
-        assertTrue(jean.sameAligmentAs(alexandre));
-        assertTrue(jean.sameAligmentAs(merovee));
-        assertTrue(!jean.sameAligmentAs(pierre));
-        assertTrue(pierre.sameAligmentAs(pierre));
+        assertTrue(jean.sideWith(alexandre.getAllegeance()));
+        assertTrue(jean.sideWith(merovee.getAllegeance()));
+        assertTrue(!jean.sideWith(pierre.getAllegeance()));
+        assertTrue(pierre.sideWith(pierre.getAllegeance()));
     }
 
     @Test
     public void testIsWeaponAvailable(){
-        assertTrue(merovee.isWeaponAvailable(Props.Weapon.WARABITE, true));
-        assertTrue(!merovee.isWeaponAvailable(Props.Weapon.KANABO, true));
-        assertTrue(merovee.isWeaponAvailable(Props.Weapon.KANABO, false));
-        assertTrue(!merovee.isWeaponAvailable(Props.Weapon.SAI, false));
-        assertTrue(merovee.has(Props.Weapon.YUMI) || merovee.isWeaponAvailable(Props.Weapon.YUMI, true));
+        assertTrue(merovee.isWeaponAvailable(Data.Weapon.WARABITE, true));
+        assertTrue(!merovee.isWeaponAvailable(Data.Weapon.KANABO, true));
+        assertTrue(merovee.isWeaponAvailable(Data.Weapon.KANABO, false));
+        assertTrue(!merovee.isWeaponAvailable(Data.Weapon.SAI, false));
+        assertTrue(merovee.has(Data.Weapon.YUMI) || merovee.isWeaponAvailable(Data.Weapon.YUMI, true));
     }
 
     @Test
     public void testSetWeapon(){
-        assertTrue(!clovus.setWeapon(Props.Weapon.KANABO, true));
-        assertTrue(!clovus.setWeapon(Props.Weapon.KANABO, false));
-        assertTrue(clovus.setWeapon(Props.Weapon.KATANA, true));
-        assertTrue(merovee.setWeapon(Props.Weapon.WARABITE, true));
-        assertTrue(merovee.has(Props.Weapon.YUMI) || merovee.setWeapon(Props.Weapon.YUMI, true));
-        assertTrue(merovee.setWeapon(Props.Weapon.KANABO, false));
+        assertTrue(!clovus.setWeapon(Data.Weapon.KANABO, true));
+        assertTrue(!clovus.setWeapon(Data.Weapon.KANABO, false));
+        assertTrue(clovus.setWeapon(Data.Weapon.KATANA, true));
+        assertTrue(merovee.setWeapon(Data.Weapon.WARABITE, true));
+        assertTrue(merovee.has(Data.Weapon.YUMI) || merovee.setWeapon(Data.Weapon.YUMI, true));
+        assertTrue(merovee.setWeapon(Data.Weapon.KANABO, false));
     }
 
 

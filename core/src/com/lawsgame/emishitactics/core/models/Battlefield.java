@@ -1,8 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Props;
-import com.lawsgame.emishitactics.core.constants.Props.*;
+import com.lawsgame.emishitactics.core.constants.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
@@ -11,7 +10,7 @@ import java.util.HashMap;
 
 /*
  *  TODO:
- * 2) solve the range issue on the following methods
+ * 2) solve the requiredRange issue on the following methods
  *      - getActionArea
  *      - getShortestPathToAttack
  *
@@ -152,6 +151,7 @@ public class Battlefield extends Observable {
         return c + getNbColumns() * r;
     }
 
+
     //-------------- TILE STATE CHECK METHODS HIERARCHY ----------------------
     /*
     if one is true, its parent are as well
@@ -171,7 +171,7 @@ public class Battlefield extends Observable {
 
     public boolean isTileDeploymentTile(int row, int col) {
         for(int i = 0; i < deploymentArea.size; i++){
-            if(deploymentArea.get(i).length == 2 && deploymentArea.get(i)[0] == row && deploymentArea.get(i)[1] == col){
+            if(deploymentArea.get(i).length >= 2 && deploymentArea.get(i)[0] == row && deploymentArea.get(i)[1] == col){
                 return true;
             }
         }
@@ -212,18 +212,17 @@ public class Battlefield extends Observable {
         return isTileReachable(row, col, pathfinder) && !isTileOccupied(row, col);
     }
 
-    public boolean isTileOccupiedBySameSquadAs(int row , int col, Unit unit){
+    public boolean isTileOccupiedBySameSquad(int row , int col, Unit unit){
         return isTileOccupied(row, col) && this.units[row][col].sameSquadAs(unit);
     }
 
-    public boolean isTileOccupiedByAlly(int row , int col, Unit unit){
-        return isTileOccupied(row, col) && this.units[row][col].sameAligmentAs(unit);
+    public boolean isTileOccupiedByAlly(int row , int col, Allegeance allegeance){
+        return isTileOccupied(row, col) && getUnit(row, col).sideWith(allegeance);
     }
 
-    public boolean isTileOccupiedByFoe(int row , int col, Unit unit){
-        return isTileOccupied(row, col) && !this.units[row][col].isEnemyWith(unit);
+    public boolean isTileOccupiedByFoe(int row , int col, Allegeance allegeance){
+        return isTileOccupied(row, col) && getUnit(row, col).fightWith(allegeance);
     }
-
 
 
 
@@ -235,26 +234,30 @@ public class Battlefield extends Observable {
     public void randomlyDeployArmy(AbstractArmy army){
         if(army != null) {
             Array<Unit> mobilizedTroops = army.getMobilizedUnits();
+            Array<int[]> deploymentsTile = getDeploymentArea();
+            Unit unit;
+            int[] coords;
             Array<int[]> remainingAvailableTiles = new Array<int[]>();
+            Array<Unit> remainingUnits = new Array<Unit>();
 
-            if(remainingAvailableTiles.size >= mobilizedTroops.size) {
-                // check the availability of each tile of the deployment area
-                int[] coords;
-                for (int i = 0; i < remainingAvailableTiles.size; i++) {
-                    coords = remainingAvailableTiles.get(i);
-                    if (coords.length == 2 && isTileAvailable(coords[0], coords[1], false)) {
-                        remainingAvailableTiles.removeIndex(i);
-                        i--;
-                    }
-                }
 
-                Unit unit;
-                while (mobilizedTroops.size > 0) {
-                    coords = remainingAvailableTiles.removeIndex(R.getR().nextInt(remainingAvailableTiles.size));
-                    unit = mobilizedTroops.removeIndex(R.getR().nextInt(mobilizedTroops.size));
-                    deployUnit(coords[0], coords[1], unit);
+            for (int i = 0; i < deploymentsTile.size; i++) {
+                coords = deploymentsTile.get(i);
+                if (coords.length >= 2 && isTileAvailable(coords[0], coords[1], false)) {
+                    remainingAvailableTiles.add(coords);
                 }
             }
+            for (int i = 0; i < mobilizedTroops.size; i++) {
+                remainingUnits.add(mobilizedTroops.get(i));
+
+            }
+
+            while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
+                coords = remainingAvailableTiles.removeIndex(R.getR().nextInt(remainingAvailableTiles.size));
+                unit = remainingUnits.removeIndex(R.getR().nextInt(remainingUnits.size));
+                deployUnit(coords[0], coords[1], unit);
+            }
+
         }
     }
 
@@ -282,16 +285,19 @@ public class Battlefield extends Observable {
         return false;
     }
 
-    public boolean MoveUnit(int rowI, int colI, int rowf, int colf){
+    public Array<int[]> moveUnit(int rowI, int colI, int rowf, int colf){
+    Array<int[]> path  = new Array<int[]>();
         if(isTileOccupied(rowI, colI)) {
             Unit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
+                path  = getShortestPath(rowI, colI, rowf, colf, unit.has(PassiveAbility.PATHFINDER), unit.getAllegeance());
+                notifyAllObservers(path);
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
-                return true;
+                return path;
             }
         }
-        return false;
+        return path;
     }
 
     public boolean isUnitAlreadydeployed(Unit unit){
@@ -340,16 +346,27 @@ public class Battlefield extends Observable {
         return target;
     }
 
-    public boolean  isStandardBearerAtRange(int row, int col){
-        if(isTileOccupied(row, col)) {
-            Unit unit = getUnit(row, col);
+    public int[] getUnitPos(Unit unit){
+        int[] pos = null;
+        for(int r = getNbRows()-1; r > -1 ; r--){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileOccupied(r, c) && getUnit(r, c) == unit){
+                    pos = new int[]{r, c};
+                }
+            }
+        }
+        return pos;
+    }
+
+    public boolean  isStandardBearerAtRange(Unit unit, int row, int col){
+        if(isTileExisted(row, col)) {
             if(unit.isMobilized()) {
                 int bannerRange = unit.getArmy().getBannerRange();
                 for (int r = row - bannerRange; r < row + bannerRange + 1; r++) {
                     for (int c = col - bannerRange; c < col + bannerRange + 1; c++) {
-                        if (isTileOccupiedBySameSquadAs(r, c, getUnit(r, c))
+                        if (isTileOccupiedBySameSquad(r, c, getUnit(r, c))
                                 && Utils.dist(row, col, r, c) > 0
-                                && getUnit(r, c).getTemplate().getJob().isStandardBearer()) {
+                                && getUnit(r, c).isStandardBearer()) {
                             return true;
                         }
                     }
@@ -409,13 +426,23 @@ public class Battlefield extends Observable {
         return units;
     }
 
+    public void setAsPlain() {
+        if(tiles != null){
+            for(int r = 0; r < getNbRows(); r++){
+                for(int c = 0; c < getNbColumns(); c++){
+                    tiles[r][c] = TileType.PLAIN;
+                }
+            }
+        }
+    }
+
 
     static class CheckMap{
         /**
          *
          * (ROW , COL):
          *
-         * 0: EFFICIENCY = move range + attack range
+         * 0: EFFICIENCY = move requiredRange + attack requiredRange
          * 1: ACTION = { attack = 2 OU move = 1 }
          * 2: PREVIOUS ROW,
          * 3: PREVIOUS COL;
@@ -486,13 +513,27 @@ public class Battlefield extends Observable {
         }
     }
 
-
     /**
      *
-     * @param row
-     * @param col
+     * @param rowActor
+     * @param colActor
+     * @return
+     */
+    public Array<int[]> getMoveArea(int rowActor, int colActor){
+        Array<int[]> moveArea = new Array<int[]>();
+        if(isTileOccupied(rowActor, colActor)){
+            Unit actor = getUnit(rowActor, colActor);
+            TileType actorTile = getTile(rowActor,colActor);
+            int moveRange = actor.hasMoved()? 0 : actor.getCurrentMob(actorTile);
+
+        }
+        return moveArea;
+    }
+    /**
+     *
      * @return the area where the action can be performed by the unit at (row, col)
      */
+    /*
     public Array<float[]> getActionArea(int row, int col){
         Array<float[]> area = new Array<float[]>();
 
@@ -501,7 +542,7 @@ public class Battlefield extends Observable {
             Unit unit = getUnit(row, col);
             int moveRange = unit.hasMoved()? 0 : unit.getCurrentMob(tileType);
 
-            int theoricAttMaxRange = Props.THEORICAL_MAX_RANGE;
+            int theoricAttMaxRange = Data.THEORICAL_MAX_RANGE;
             int rowCM = (row - moveRange - theoricAttMaxRange - 1< 0)? 0: row - moveRange - theoricAttMaxRange - 1;
             int colCM = (col - moveRange - theoricAttMaxRange - 1< 0)? 0: col - moveRange - theoricAttMaxRange - 1;
             int rowCMf = (row + moveRange + theoricAttMaxRange + 1> getNbRows()-1)? getNbRows()-1: row + moveRange + theoricAttMaxRange + 1;
@@ -564,7 +605,7 @@ public class Battlefield extends Observable {
         if (isTileReachable(row, col, unit.has(PassiveAbility.PATHFINDER))
                 && checkmap.checkEfficiency(row, col, movePointLeft)
                 && (initRow != row || initCol != col)
-                && !isTileOccupiedByFoe(row, col, unit)) {
+                && !isTileOccupiedByFoe(row, col, unit.getAllegeance())) {
 
             //set previous tile
             checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][2] = previousRow;
@@ -595,21 +636,297 @@ public class Battlefield extends Observable {
         }
     }
 
+    */
+
     /**
+     * there is 3 types of requirements for an action to be performable by an actor
+     *  - abiility type
+     *  - equipement type (weapon mainly)
+     *  - target type
+     *
+     * @return whether or not an action can be physically performed by the actor if one's is standing the tile (row, col) to perform the given action while ignoring the actor's history.
+     */
+    public boolean canActionbePerformed(Unit actor, int row, int col, ActionChoice choice){
+        boolean performable = false;
+
+        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER))){
+
+            // check ABILITY REQUIREMENTS
+            switch (choice){
+                case WALK:                  break;
+                case SWITCH_WEAPON:         if(!actor.isPromoted()) return false; break;
+                case SWITCH_POSITION:       break;
+                case PUSH:                  if(actor.isHorseman()) return false; break;
+                case PRAY:                  if(!actor.has(PassiveAbility.PRAYER)) return false; break;
+                case HEAL:                  if(!actor.has(PassiveAbility.HEALER)) return false; break;
+                case STEAL:                 if(!actor.has(PassiveAbility.THIEF)) return false; break;
+                case BUILD:                 if(!actor.has(PassiveAbility.ENGINEER)) return false; break;
+                case ATTACK:                break;
+                case CHOOSE_ORIENTATION:    break;
+                case CHOOSE_STANCE:         break;
+                case USE_FOCUSED_BLOW:      if(!actor.has(OffensiveAbility.FOCUSED_BLOW)) return false; break;
+                case USE_CRIPPLING_BLOW:    if(!actor.has(OffensiveAbility.CRIPPLING_BLOW)) return false; break;
+                case USE_SWIRLING_BLOW:     if(!actor.has(OffensiveAbility.SWIRLING_BLOW)) return false; break;
+                case USE_SWIFT_BLOW:        if(!actor.has(OffensiveAbility.SWIFT_BLOW)) return false; break;
+                case USE_HEAVY_BLOW:        if(!actor.has(OffensiveAbility.HEAVY_BLOW)) return false; break;
+                case USE_CRUNCHING_BLOW:    if(!actor.has(OffensiveAbility.CRUNCHING_BLOW)) return false; break;
+                case USE_WAR_CRY:           if(!actor.has(OffensiveAbility.WAR_CRY)) return false; break;
+                case USE_POISONOUS_ATTACK:  if(!actor.has(OffensiveAbility.POISONOUS_ATTACK)) return false; break;
+                case USE_GUARD_BREAK:       if(!actor.has(OffensiveAbility.GUARD_BREAK)) return false; break;
+                case USE_LINIENT_BLOW:      if(!actor.has(OffensiveAbility.LINIENT_BLOW)) return false; break;
+                case USE_FURY:              if(!actor.has(OffensiveAbility.FURY)) return false; break;
+                default:
+
+                    return false;
+            }
+
+            // check WEAPON REQUIREMENTS
+            if((choice.getDamageTypeRequired() != DamageType.NONE  && actor.getCurrentWeapon().getType() != choice.getDamageTypeRequired())
+                    || (actor.getCurrentWeapon().isRangedW() &&  choice.isMeleeWeaponEquipedRequired())) {
+                return false;
+            }
+
+            // check TARGET REQUIREMENTS
+            performable = atActionRange(actor, row, col, choice);
+
+        }
+        return performable;
+    }
+
+    /**
+     *
+     * @param actor
+     * @param row
+     * @param col
+     * @param choice
+     * @return whether or not a target is at range by the actor performing the given action if one's is standing the tile (row, col)
+     * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon and ability requirements.
+     */
+    public boolean atActionRange(Unit actor, int row, int col, ActionChoice choice){
+        boolean atRange = false;
+        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER))){
+            if (choice.getTargetType() == TargetType.SPECIFIC) {
+                if (choice == ActionChoice.BUILD) {
+                    if(!actor.isBuildingResourcesConsumed()) {
+                        int[][] neighborTiles = new int[][]{{row + 1, col}, {row - 1, col}, {row, col + 1}, {row, col - 1}};
+                        int r;
+                        int c;
+                        for (int i = 0; i < neighborTiles.length; i++) {
+                            r = neighborTiles[i][0];
+                            c = neighborTiles[i][1];
+                            if (isTileExisted(r, c)) {
+                                if (getTile(r, c) == TileType.PLAIN) {
+
+                                    atRange =  true;
+
+                                } else if (getTile(r, c) == TileType.SHALLOWS) {
+                                    if (isTileExisted(r + 1, c) && isTileExisted(r - 1, c) && getTile(r + 1, c) == TileType.PLAIN && getTile(r - 1, c) == TileType.PLAIN) {
+
+                                        atRange = true;
+
+                                    } else if (isTileExisted(r, c + 1) && isTileExisted(r, c - 1) && getTile(r + 1, c) == TileType.PLAIN && getTile(r - 1, c) == TileType.PLAIN) {
+
+                                        atRange =  true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (choice == ActionChoice.WALK) {
+                    //TODO: if relevant check if there is at least one tile available at move range.
+
+                    atRange = true;
+
+                }
+            } else {
+                if (choice.getTargetType() == TargetType.ONE_SELF || choice.getImpactAreaSize() > 1) {
+
+                    atRange = true;
+
+                } else {
+                    //generic algorithm
+                    int rangeMin = getActionRangeMin(actor, row, col, choice);
+                    int rangeMax = getActionRangeMax(actor, row, col, choice);
+                    int dist;
+
+
+                    for (int r = row - rangeMax; r <= row + rangeMax; r++) {
+                        for (int c = col - rangeMax; c <= col + rangeMax; c++) {
+                            dist = Utils.dist(row, col, r, c);
+                            if (rangeMin <= dist && dist <= rangeMax) {
+                                if (isTileOccupiedByAlly(r, c, actor.getAllegeance())
+                                        && (choice.getTargetType() == TargetType.ALLY
+                                        || (choice.getTargetType() == TargetType.WOUNDED_ALLY && getUnit(r, c).isWounded())
+                                        || (choice.getTargetType() == TargetType.FOOTMAN_ALLY && !getUnit(r, c).isHorseman()))) {
+
+                                    atRange = true;
+
+                                } else if (isTileOccupiedByFoe(r, c, actor.getAllegeance()) && choice.getTargetType() == TargetType.ENEMY) {
+
+                                    atRange = true;
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return atRange;
+    }
+
+    /**
+     *
+     * @param actor
+     * @param row
+     * @param col
+     * @param choice
+     * @return the minimal range of actor performing the given action while standing on the given tile
+     */
+    public int getActionRangeMin(Unit actor, int row, int col, ActionChoice choice){
+        int rangeMin = 0;
+        if(isTileExisted(row, col)){
+            rangeMin = (choice.isWeaponBasedRange()) ? actor.getCurrentRangeMin() : choice.getRangeMin();
+        }
+        return rangeMin;
+    }
+    /**
+     *
+     * @param actor
+     * @param row
+     * @param col
+     * @param choice
+     * @return the maximal range of actor performing the given action while standing on the given tile
+     */
+    public int getActionRangeMax(Unit actor, int row, int col, ActionChoice choice){
+        int rangeMin = 0;
+        if(isTileExisted(row, col)){
+            TileType actorTile = getTile(row, col);
+            boolean bannerAtRange = isStandardBearerAtRange(actor, row, col);
+            rangeMin = (choice.isWeaponBasedRange()) ? actor.getCurrentRangeMax(actorTile, bannerAtRange) : choice.getRangeMin();
+        }
+        return rangeMin;
+    }
+
+
+    /**
+     * get the shortest path of a target tile using the A* algorithm
+     *
      * @return an array like that {[row, col]} witch is the path from one tile to another
      */
-    public Array<int[]> getShortestPath(int rowI, int colI, int rowf, int colf){
+    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance){
         Array<int[]> res = new Array<int[]>();
 
-        if(isTileOccupied(rowI, colI)) {
-            Unit unit = getUnit(rowI, colI);
+        Array<Node> path = new Array<Node>();
+        Array<Node> opened = new Array<Node>();
+        Array<Node> closed = new Array<Node>();
+        opened.add(new Node(rowI, colI, rowf, colf, null, this));
+        Node current = opened.get(0);
+        Array<Node> neighbours;
+        while (true) {
+
+            //no solution
+            if (opened.size == 0) break;
+
+            current = opened.get(0);
+            for (int i = 0; i < opened.size; i++) {
+                if (opened.get(i).better(current)) {
+                    current = opened.get(i);
+                }
+            }
+            opened.removeValue(current, true);
+            closed.add(current);
+
+            // path found
+            if (current.getRow() == rowf && current.getCol() == colf) break;
+
+            // get available neighbor nodes which are not yet in the closed list
+            Node node;
+            neighbours = new Array<Node>();
+            if (isTileReachable(current.row + 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)) {
+                node = new Node(current.row + 1, current.col, rowf, colf, current, this);
+                if (!closed.contains(node, false)) {
+                    neighbours.add(node);
+                }
+            }
+            if (isTileReachable(current.row, current.col + 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)) {
+                node = new Node(current.row, current.col + 1, rowf, colf, current, this);
+                if (!closed.contains(node, false)) {
+                    neighbours.add(node);
+                }
+            }
+            if (isTileReachable(current.row - 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)) {
+                node = new Node(current.row - 1, current.col, rowf, colf, current, this);
+                if (!closed.contains(node, false)) {
+                    neighbours.add(node);
+                }
+            }
+            if (isTileReachable(current.row, current.col - 1, pathfinder ) && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)) {
+                node = new Node(current.row, current.col - 1, rowf, colf, current, this);
+                if (!closed.contains(node, false)) {
+                    neighbours.add(node);
+                }
+            }
+
+            boolean isNotInOpened = true;
+            for (int i = 0; i < neighbours.size; i++) {
+                node = neighbours.get(i);
+                for (int j = 0; j < opened.size; j++) {
+                    if (opened.get(j).equals(node)) {
+                        isNotInOpened = false;
+                        if (node.better(opened.get(j))) {
+                            opened.removeIndex(j);
+                            opened.add(node);
+                        }
+                    }
+                }
+                if (isNotInOpened) {
+                    opened.add(node);
+                }
+                isNotInOpened = true;
+
+            }
+        }
+
+        if (closed.get(closed.size - 1).getRow() == rowf && closed.get(closed.size - 1).getCol() == colf) {
+            path = closed.get(closed.size - 1).getPath();
+        }
+
+        for (int i = 0; i < path.size; i++) {
+            res.add(new int[]{path.get(i).getRow(), path.get(i).getCol()});
+        }
+
+        return res;
+    }
+
+
+    /**
+     *
+     * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
+     *
+     * the initial tile is the one of the target.
+     *
+     * @return shortest path to attack the given target
+     */
+    public Array<int[]>  getShortestPath(int rowActor, int colActor, int rowf, int colf, ActionChoice choice){
+        Array<int[]> res = new Array<int[]>();
+
+        if(isTileOccupied(rowActor, colActor)) {
+            Unit actor = getUnit(rowActor, colActor);
+            StateNode node;
+            int rowNeigh;
+            int colNeigh;
+            boolean atAttackRange;
+
 
             Array<Node> path = new Array<Node>();
-            Array<Node> opened = new Array<Node>();
-            Array<Node> closed = new Array<Node>();
-            opened.add(new Node(rowI, colI, rowf, colf, null, this));
-            Node current = opened.get(0);
-            Array<Node> neighbours;
+            Array<StateNode> opened = new Array<StateNode>();
+            Array<StateNode> closed = new Array<StateNode>();
+            opened.add(new StateNode(rowf, colf, rowActor, colActor, null, this, true));
+            StateNode current;
+            Array<StateNode> neighbours;
+
+
             while (true) {
 
                 //no solution
@@ -625,35 +942,56 @@ public class Battlefield extends Observable {
                 closed.add(current);
 
                 // path found
-                if (current.getRow() == rowf && current.getCol() == colf) break;
+                if (current.getRow() == rowf && current.getCol() == colf){
+                    //TODO: handle the case where the unit is under the minimal requiredRange of one's weapon and therefore can not attack as one's is both too far and too close to the target.
+
+
+
+
+                    break;
+                }
 
                 // get available neighbor nodes which are not yet in the closed list
-                Node node;
-                neighbours = new Array<Node>();
-                if (isTileReachable(current.row + 1, current.col, unit.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row + 1, current.col, unit)) {
-                    node = new Node(current.row + 1, current.col, rowf, colf, current, this);
+                neighbours = new Array<StateNode>();
+
+
+                rowNeigh = current.row + 1;
+                colNeigh = current.col;
+                atAttackRange = atActionRange(actor, rowNeigh, colNeigh, choice);
+                node = null;
+                if(atAttackRange){
+                    /*TODO:
+                    1) think about the case where the unit is precisely at the maximum range but the tile is occupied by an ally
+                    2) implements Node.arrayContains(Node node) to replace this line : "!closed.contains(node, false)"
+                     */
+                    node = new StateNode(rowNeigh, colNeigh, rowf, colf, current, this, true);
+                }else if (isTileReachable(rowNeigh, colNeigh, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(rowNeigh, colNeigh, actor.getAllegeance())) {
+                    node = new StateNode(rowNeigh, colNeigh, rowf, colf, current, this, false);
+                }
+                if (!closed.contains(node, false)) {
+                    neighbours.add(node);
+                }
+
+
+                /*
+                if (isTileReachable(current.row, current.col + 1, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row, current.col + 1, actor.getAllegeance())) {
+                    node = new StateNode(current.row, current.col + 1, rowf, colf, current, this, false);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (isTileReachable(current.row, current.col + 1, unit.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row, current.col + 1, unit)) {
-                    node = new Node(current.row, current.col + 1, rowf, colf, current, this);
+                if (isTileReachable(current.row - 1, current.col, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row - 1, current.col, actor.getAllegeance())) {
+                    node = new StateNode(current.row - 1, current.col, rowf, colf, current, this, false);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (isTileReachable(current.row - 1, current.col, unit.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row - 1, current.col, unit)) {
-                    node = new Node(current.row - 1, current.col, rowf, colf, current, this);
+                if (isTileReachable(current.row, current.col - 1, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row, current.col - 1, actor.getAllegeance())) {
+                    node = new StateNode(current.row, current.col - 1, rowf, colf, current, this, false);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
-                }
-                if (isTileReachable(current.row, current.col - 1, unit.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row, current.col - 1, unit)) {
-                    node = new Node(current.row, current.col - 1, rowf, colf, current, this);
-                    if (!closed.contains(node, false)) {
-                        neighbours.add(node);
-                    }
-                }
+                }*/
 
                 boolean isNotInOpened = true;
                 for (int i = 0; i < neighbours.size; i++) {
@@ -680,9 +1018,10 @@ public class Battlefield extends Observable {
             }
 
             for (int i = path.size - 2; i > -1; i--) {
-                res.add(new int[]{path.get(i).getCol(), path.get(i).getRow()});
+                res.add(new int[]{path.get(i).getRow(), path.get(i).getCol()});
             }
         }
+
         return res;
     }
 
@@ -690,141 +1029,6 @@ public class Battlefield extends Observable {
 
 
 
-
-
-    /**
-     *
-     * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
-     * 
-     * the initial tile is the one of the target.
-     *
-     * @return shortest path to attack the given target
-
-    public Array<float[]> getShortestPathToAttack(int rowTarget, int colTarget, int rowUnit, int colUnit, boolean aligment, boolean pathfinder){
-
-        Array<StateNode> path = new Array<StateNode>();
-        int attackrange;
-
-        Array<StateNode> opened = new Array<Battlefield.StateNode>();
-        Array<StateNode> closed = new Array<Battlefield.StateNode>();
-        opened.add(new StateNode(rowTarget, colTarget, rowUnit, colUnit, null,this, true));
-        StateNode current;
-        Array<StateNode> neighbours;
-        while(true){
-
-            //no solution
-            if(opened.size == 0) break;
-
-            //the current node is the last node added to the closed array
-            current = opened.get(0);
-            for(int i =0; i <opened.size; i++){
-                if(opened.get(i).better(current)){
-                    current = opened.get(i);
-                }
-            }
-            opened.removeValue(current, true);
-            closed.add(current);
-
-            attackrange = attackRangeMax - closed.get(closed.size - 1).getPathTo().size;
-
-            // path found
-            if(current.getRow() == rowUnit && current.getCol() == colUnit) break;
-
-            // get available neighbor nodes which are not yet in the closed list
-            neighbours = new Array<StateNode>();
-            _collectNeighbours(Props.ORIENTATION_EAST, current, aligment, rowUnit, colUnit, closed, neighbours, pathfinder, attackrange, attackRangeMax);
-            _collectNeighbours(Props.ORIENTATION_WEST, current, aligment, rowUnit, colUnit, closed, neighbours, pathfinder, attackrange, attackRangeMax);
-            _collectNeighbours(Props.ORIENTATION_NORTH, current, aligment, rowUnit, colUnit, closed, neighbours, pathfinder, attackrange, attackRangeMax);
-            _collectNeighbours(Props.ORIENTATION_SOUTH, current, aligment, rowUnit, colUnit, closed, neighbours, pathfinder, attackrange, attackRangeMax);
-
-            StateNode node;
-            boolean isNotInOpened = true;
-            for(int i = 0; i < neighbours.size ; i++){
-                node = neighbours.get(i);
-                for(int j = 0; j <opened.size; j++){
-                    if(opened.get(j).equals(node)){
-                        isNotInOpened = false;
-                        if(node.better(opened.get(j))){
-                            opened.removeIndex(j);
-                            opened.add(node);
-                        }
-                    }
-                }
-                if(isNotInOpened){
-                    opened.add(node);
-                }
-                isNotInOpened = true;
-            }
-        }
-
-        if(closed.get(closed.size - 1).getRow() == rowUnit && closed.get(closed.size - 1).getCol() == colUnit){
-            path = closed.get(closed.size - 1).getPathTo();
-        }
-
-        Array<float[]> res = new Array<float[]>();
-        for(int i= 1;  i < path.size ; i++){
-            if(!path.get(i).atAttackRange) {
-                res.add(new float[]{path.get(i).getCol(), path.get(i).getRow()});
-            }
-        }
-        return res;
-    }
-
-    private void _collectNeighbours(int or, StateNode current, boolean aligment, int rowInit, int colInit, Array<StateNode> closed, Array<StateNode> neighbours, boolean pathfinder, int range, int rangeMax){
-        int col = current.col;
-        int row = current.row;
-        switch (or){
-            case Props.ORIENTATION_NORTH:row += 1;break;
-            case Props.ORIENTATION_SOUTH:row -= 1;break;
-            case Props.ORIENTATION_EAST: col += 1;break;
-            case Props.ORIENTATION_WEST: col -= 1;break;
-        }
-
-        StateNode node = null;
-        if(checkIndexes(row, col) ) {
-            if (range > 0) {
-                node = new StateNode(row, col, rowInit, colInit, current, this, true);
-            } else if (range == 0) {
-                if ( isTileReachable(row, col, pathfinder)	&& !isTileOccupied(row, col)) {
-                    node = new StateNode(row, col, rowInit, colInit, current, this, false);
-                } else if( rangeMax > 1 && _nearDune(current.row, current.col, row, col)){
-                    node = new StateNode(row, col, rowInit, colInit, current, this, true);
-                }
-            } else if (range == -1) {
-                if( (isTileReachable(row, col, pathfinder)	&& !isTileOccupiedByFoe(row, col, aligment)) && ((isTileReachable(current.row, current.col, pathfinder)	&& !isTileOccupied(current.row, current.col)) || getTile(row, col).type == DUNE)){
-                    node = new StateNode(row, col, rowInit, colInit, current, this, false);
-                }
-            } else{
-                if ( isTileReachable(row, col, pathfinder)	&& !isTileOccupiedByFoe(row, col, aligment)){
-                    node = new StateNode(row, col, rowInit, colInit, current, this, false);
-                }
-            }
-        }
-
-        if(node != null && !closed.contains(node,false)) neighbours.add(node);
-    }
-
-    private boolean _nearDune(int currentRow, int currentCol, int row, int col) {
-        boolean res = false;
-        int r = row + 1;
-        int c = col;
-        if(r != currentRow || c != currentCol)
-            res = res || getTile(r,c).type == DUNE;
-        r = row - 1;
-        c = col;
-        if(r != currentRow || c != currentCol)
-            res = res || getTile(r,c).type == DUNE;
-        r = row;
-        c = col + 1;
-        if(r != currentRow || c != currentCol)
-            res = res || getTile(r,c).type == DUNE;
-        r = row;
-        c = col - 1;
-        if(r != currentRow || c != currentCol)
-            res = res || getTile(r,c).type == DUNE;
-        return res;
-    }
-    */
 
     //-------------------GETTERS & SETTERS -------------------------
 
@@ -857,29 +1061,14 @@ public class Battlefield extends Observable {
         }
     }
 
-    public Array<int[]> getEreaFromRange( int rangeMin, int rangeMax){
-        Array<int[]> area = new Array<int[]>();
-        for(int r = -rangeMax ; r <= rangeMax; r++){
-            for(int c = -rangeMax ; c <= rangeMax; c++){
-                if(isTileExisted(r,c)) {
-                    int dist = Utils.dist(0, 0, r, c);
-                    if (dist <= rangeMax && rangeMin <= dist) {
-                        area.add(new int[]{r, c});
-                    }
-                }
-
-            }
-        }
-        return area;
-    }
-
 
 
     //----------------- NODE CLASSES -------------------
 
 
 
-    static class Node{
+
+    public static class Node{
         protected int row;
         protected int col;
         protected float distTarget;
@@ -897,18 +1086,22 @@ public class Battlefield extends Observable {
             this.distTarget = Utils.dist(row, col, rowf, colf);
         }
 
-        public boolean better(Node node){
+        boolean better(Node node){
             return distSource + distTarget < node.distSource + node.distTarget
                     || ((distSource + distTarget == node.distSource + node.distTarget) && distTarget < node.distTarget);
         }
 
         public Array<Node> getPath(){
-            Array<Node> path = new Array<Node>();
-            path.add(this);
-            if(this.parent != null){
-                path.addAll(parent.getPath());
+            Array<Node> bestpath;
+            if(this.parent == null){
+                bestpath = new Array<Node>();
+                bestpath.add(this);
+                return bestpath;
             }
-            return path;
+            bestpath = parent.getPath();
+            bestpath.add(this);
+            return bestpath;
+
         }
 
         @Override
@@ -932,27 +1125,37 @@ public class Battlefield extends Observable {
             return row+" "+col+" "+" cost: "+ (distSource + distTarget);
         }
 
+
     }
 
-    /*
-    static class StateNode extends Node{
+
+    public static class StateNode extends Node{
         protected boolean atAttackRange;
 
         public StateNode(int row, int col, int rowf, int colf, Node parent, Battlefield bf, boolean atAttackRange) {
             super(row, col, rowf, colf, parent, bf);
             this.atAttackRange = atAttackRange;
-            this.distSource = ((parent != null)) ? this.parent.distSource + (!atAttackRange ? 1f : 0.1f) : 0f;
+            if(atAttackRange) this.distSource = 0;
         }
 
-        // @return all nodes going through each parent
+        /**
+         * @return all nodes going through each parent until one parent is at attack requiredRange
+          */
 
-        public Array<StateNode> getPathTo(){
-            Array<StateNode> path = new Array<StateNode>();
-            path.add(this);
-            if(this.parent != null){
-                path.addAll(((StateNode)parent).getPathTo());
+        @Override
+        public Array<Node> getPath(){
+            Array<Node> bestpath;
+            if(atAttackRange){
+                bestpath = new Array<Node>();
+                bestpath.add(this);
+                return bestpath;
+
             }
-            return path;
+            StateNode parent0 = (StateNode)parent;
+            bestpath = parent0.getPath();
+            bestpath.add(this);
+            return bestpath;
+
         }
 
         @Override
@@ -961,6 +1164,6 @@ public class Battlefield extends Observable {
         }
 
     }
-    */
+
 
 }

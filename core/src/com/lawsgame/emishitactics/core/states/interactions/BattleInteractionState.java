@@ -20,6 +20,7 @@ public abstract class BattleInteractionState extends InteractionState {
     public abstract void update12(float dt);
     public abstract void renderBetween(SpriteBatch batch);
     public abstract void renderAhead(SpriteBatch batch);
+    public abstract void renderUI();
 
     @Override
     public void onLongTouch(float gameX, float gameY) {
@@ -36,10 +37,15 @@ public abstract class BattleInteractionState extends InteractionState {
         }
     }
 
+
+
     //--------------------SHARED METHODS ------------------------------
 
 
+
     // ------------------- SETTERS & GETTERS ---------------------------
+
+
 
     public void setBattlefieldDisplayed(boolean battlefieldDisplayed) {
         this.battlefieldDisplayed = battlefieldDisplayed;

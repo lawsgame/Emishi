@@ -86,7 +86,7 @@ public class Segment implements Shape{
                 } else {
                     // TODO:
                     // treat the last use case when neither of the summit are within the circle but the distance
-                    // between the center of the circle and neareat point of the associated straight line are below the radius range.
+                    // between the center of the circle and neareat point of the associated straight line are below the radius requiredRange.
                     return false;
                 }
             }

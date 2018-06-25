@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.states.commands;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Props;
+import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
@@ -10,10 +10,10 @@ import com.lawsgame.emishitactics.engine.patterns.command.Command;
 
 public abstract class BattleCommand implements Command, GameUpdatableEntity{
     protected Battlefield battlefield;
-    protected Props.ActionChoice actionChoice;
+    protected Data.ActionChoice actionChoice;
     protected Unit actor;
 
-    public BattleCommand(Battlefield bf, Props.ActionChoice choice){
+    public BattleCommand(Battlefield bf, Data.ActionChoice choice){
         this.battlefield = bf;
         this.actionChoice = choice;
         this.actor = null;
@@ -25,19 +25,13 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
     public abstract void display(SpriteBatch batch);                   // render the infos regarding the action to perform
     public abstract Array<int[]> getAvailableTargets();
     public abstract void setTarget(int rowTarget, int colTarget);
-
-    protected boolean canBeExecuted(Unit givenActor){
-        //TODO:
-
-
-
-        return false;
-    }
+    public abstract boolean isExecuting();
+    public abstract boolean isExecutionCompleted();
 
 
     //------------------ GETTERS & SETTERS ---------------------------
 
-    public Props.ActionChoice getActionChoice() {
+    public Data.ActionChoice getActionChoice() {
         return actionChoice;
     }
 

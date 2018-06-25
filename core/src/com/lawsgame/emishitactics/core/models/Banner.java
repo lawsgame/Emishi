@@ -1,6 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.lawsgame.emishitactics.core.constants.Props.*;
+import com.lawsgame.emishitactics.core.constants.Data.*;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Banner extends Observable{
@@ -33,7 +33,7 @@ public class Banner extends Observable{
         return false;
     }
 
-    public boolean addSign(BannerSign sign){
+    protected boolean addSign(BannerSign sign){
         if(sign1 == BannerSign.NONE){
             sign1 = sign;
         }else if(sign2  == BannerSign.NONE){
@@ -68,4 +68,7 @@ public class Banner extends Observable{
         return "Banner = ("+sign1.name()+" | "+sign2.name()+" | "+sign3.name()+")";
     }
 
+    public boolean isEmpty() {
+        return sign1 == BannerSign.NONE && sign2 == BannerSign.NONE && sign3 == BannerSign.NONE;
+    }
 }

@@ -17,15 +17,41 @@ public class Utils {
         return Math.abs(row  - rowTarget) + Math.abs(col - colTarget);
     }
 
-    public static boolean arrayContains(Array<int[]> intArray, int[] coords){
-        boolean coordsFound;
-        if(intArray != null && coords != null) {
-            for (int i = 0; i < intArray.size; i++) {
-                if (intArray.get(i).length == coords.length) {
-                    coordsFound = true;
-                    for (int j = 0; j < coords.length; j++) {
-                        coordsFound = coordsFound && coords[j] == intArray.get(i)[j];
+    public static Array<int[]> getEreaFromRange(Battlefield bf,  int rCenter, int cCenter, int rangeMin, int rangeMax){
+        Array<int[]> area = new Array<int[]>();
+        for(int r = rCenter - rangeMax ; r <= rCenter + rangeMax; r++){
+            for(int c = cCenter - rangeMax ; c <= cCenter + rangeMax; c++){
+                if(bf.isTileExisted(r,c)) {
+                    int dist = Utils.dist(rCenter, cCenter, r, c);
+                    if (dist <= rangeMax && rangeMin <= dist) {
+                        area.add(new int[]{r, c});
                     }
+                }
+
+            }
+        }
+        return area;
+    }
+
+    public static boolean arrayContains(Array<int[]> intArray, int[] coords){
+        if(intArray != null && coords != null && coords.length >= 2){
+            for(int i =0; i < intArray.size; i++){
+                if(intArray.get(i).length >=2 && intArray.get(i)[0] == coords[0] && intArray.get(i)[0] == coords[0]){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean arrayContains(Array<int[]> intArray, int r, int c){
+        boolean coordsFound;
+        if(intArray != null) {
+            for (int i = 0; i < intArray.size; i++) {
+                if(intArray.get(i).length >= 2) {
+                    coordsFound = true;
+                    coordsFound = coordsFound && r == intArray.get(i)[0];
+                    coordsFound = coordsFound && c == intArray.get(i)[1];
                     if (coordsFound) {
                         return true;
                     }
@@ -52,37 +78,37 @@ public class Utils {
      * @param colTarget
      * @return the general orientation of the vector (rowT - rowI, colT - colI)
      */
-    public static Props.Orientation getOrientationFromCoords(float rowI, float colI, float rowTarget, float colTarget){
-        Props.Orientation resOr;
+    public static Data.Orientation getOrientationFromCoords(float rowI, float colI, float rowTarget, float colTarget){
+        Data.Orientation resOr;
         float deltaR = rowTarget - rowI;
         float deltaC = colTarget - colI; // light factor to prioritized an orientation over another when both are equally valid option.
 
         if(deltaR > 0){
             if(deltaC > 0){
                 if(deltaR > deltaC) {
-                    resOr = Props.Orientation.NORTH;
+                    resOr = Data.Orientation.NORTH;
                 }else{
-                    resOr = Props.Orientation.EAST;
+                    resOr = Data.Orientation.EAST;
                 }
             }else{
                 if(deltaR > -deltaC) {
-                    resOr = Props.Orientation.NORTH;
+                    resOr = Data.Orientation.NORTH;
                 }else{
-                    resOr = Props.Orientation.WEST;
+                    resOr = Data.Orientation.WEST;
                 }
             }
         }else{
             if(deltaC > 0){
                 if(-deltaR > deltaC) {
-                    resOr = Props.Orientation.SOUTH;
+                    resOr = Data.Orientation.SOUTH;
                 }else{
-                    resOr = Props.Orientation.EAST;
+                    resOr = Data.Orientation.EAST;
                 }
             }else{
                 if(-deltaR > -deltaC) {
-                    resOr = Props.Orientation.SOUTH;
+                    resOr = Data.Orientation.SOUTH;
                 }else{
-                    resOr = Props.Orientation.WEST;
+                    resOr = Data.Orientation.WEST;
                 }
             }
         }

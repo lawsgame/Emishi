@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.managers;
+package com.lawsgame.emishitactics.core.helpers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.constants.Props;
-import com.lawsgame.emishitactics.core.constants.Props.*;
+import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.constants.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.AbstractArmy;
@@ -91,7 +91,7 @@ public class BattlefieldLoader {
                     if(c % 2 == 0){
                         // whether or not the tile is to be added to the deployment tile
                         rgb = Utils.getRGBA(colorKey);
-                        if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0 && bf.isTileReachable(r/2, c/2, false)){
+                       if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0 && bf.isTileReachable(rowTile, colTile, false)){
                             bf.addDeploymentTile(rowTile, colTile);
                         }
                     }else{
@@ -136,11 +136,6 @@ public class BattlefieldLoader {
                                 int rowUnit = unitElt.getInt("row");
                                 int colUnit = unitElt.getInt("col");
 
-                                // add to the battlefield
-                                if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
-                                    bf.deployUnit(rowUnit, colUnit, unit);
-                                }
-
                                 // add to the army composition
                                 if(n == 0){
                                     if(k == 0){
@@ -151,6 +146,13 @@ public class BattlefieldLoader {
                                 }else{
                                     army.appointSoldier(unit, n);
                                 }
+
+                                // add to the battlefield
+                                if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
+                                    bf.deployUnit(rowUnit, colUnit, unit);
+                                }
+
+
                             }
                         }
 
@@ -200,7 +202,7 @@ public class BattlefieldLoader {
         }
         loadNameDictionaries();
         if(japaneseNames.size > 0 && ainuNames.size >0) {
-            nameUnit = (ethnicityUnit == Props.Ethnicity.JAPANESE) ? japaneseNames.random() : ainuNames.random();
+            nameUnit = (ethnicityUnit == Data.Ethnicity.JAPANESE) ? japaneseNames.random() : ainuNames.random();
         }
         for(Orientation orientation: Orientation.values()){
             if(orientation.name().equals(unitElt.get("orientation"))){
@@ -255,7 +257,7 @@ public class BattlefieldLoader {
             }else if(attributeElt.get("id") == "banner sign"){
                 for(BannerSign sign: BannerSign.values()){
                     if(sign.name().equals(attributeElt.get("value"))){
-                        unit.getBanner().addSign(sign);
+                        unit.addBannerSign(sign);
                     }
                 }
             }

@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.Random;
 
-public class Props {
+public class Data {
 
     public static final int MOBILITY_BONUS_PROMOTED = 1;
     public static final int MOBILITY_BONUS_HORSEMAN = 2;
@@ -42,14 +42,15 @@ public class Props {
     public static final float DEX_PARRY_FACTOR = 1f;
     public static final int DEX_HIT_FACTOR = 3;
     public static final int ACCURACY_BONUS_CRIT = 15;
-    public static final float BLOCK_DAMAGE_REDUCTION = 0.5f;
+    public static final float BLOCK_REDUCTION_DAMAGE = 0.5f;
+    public static final int BLOCK_RAW_REDUCTION_DAMAGE = 3;
     public static final int AB_TRIGGER_RATE_SKILL_FACTOR = 2;
     public static final int DEX_FAC_DROP_RATE = 2;
 
     // experience parameter
     public static final double LVL_GAP_FACTOR = 0.35;
     public static final int EXP_BASE_MODIFIER = 50;
-
+    public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
 
 
     public enum Behaviour {
@@ -95,6 +96,10 @@ public class Props {
         }
     }
 
+    public enum Allegeance {
+        ALLY, ENEMY, NEUTRAL
+    }
+
     public enum Stat {
         CHARISMA,
         LEADERSHIP,
@@ -128,9 +133,6 @@ public class Props {
 
     public enum EquipMsg{
         SUCCESSFULLY_EQUIPED,
-        SUCCESSFULLY_EQUIPED_AND_ARMY_RECOMPOSED_WL,
-        SUCCESSFULLY_EQUIPED_AND_ARMY_RECOMPOSED_WC,
-        FAILED_TO_EQUIP,
         TYPE_ALREADY_EQUIPED,
         JOB_DOES_NOT_ALLOW_SHIELD_BEARING,
         STANDARD_BEARER_CANNOT_EQUIP_SHIELD;
@@ -405,9 +407,9 @@ public class Props {
 
     public enum TargetType{
         SPECIFIC,
-        AVAILABLE_TILE,
         ONE_SELF,
         ALLY,
+        FOOTMAN_ALLY,
         WOUNDED_ALLY,
         ENEMY
     }
@@ -424,18 +426,17 @@ public class Props {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                            (0, 0, false, false, DamageType.NONE, TargetType.AVAILABLE_TILE, new int[][]{{}}),
+        WALK                            (0, 0, false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
         SWITCH_WEAPON                   (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
         SWITCH_POSITION                 (1, 1, false, false, DamageType.NONE, TargetType.ALLY, new int[][]{{}}),
-        PUSH                            (1, 1, false, false, DamageType.NONE, TargetType.ALLY, new int[][]{{}}),
+        PUSH                            (1, 1, false, false, DamageType.NONE, TargetType.FOOTMAN_ALLY, new int[][]{{}}),
         PRAY                            (1, 1, false, false, DamageType.NONE, TargetType.WOUNDED_ALLY, new int[][]{{}}),
-        HEAL                            (1, 1, false, false, DamageType.NONE, TargetType.WOUNDED_ALLY,new int[][]{{}}),
+        HEAL                            (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
         STEAL                           (1, 1, false, false, DamageType.NONE, TargetType.ENEMY,new int[][]{{}}),
         BUILD                           (1, 1, false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
         ATTACK                          (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
         CHOOSE_ORIENTATION              (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
         CHOOSE_STANCE                   (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
-        TAKE                            (0, 0, false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
         USE_FOCUSED_BLOW                (0, 0, true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
         USE_CRIPPLING_BLOW              (0, 0, true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
         USE_SWIRLING_BLOW               (1, 1, false, true, DamageType.EDGED, TargetType.ENEMY, new int[][]{{-1,1}, {-1,-1}}),
@@ -518,7 +519,7 @@ public class Props {
 
 
                                          */
-        public Array<int[]> getOrientedArea(Props.Orientation orientation) {
+        public Array<int[]> getOrientedArea(Data.Orientation orientation) {
             Array<int[]> orientedArea = new Array<int[]>();
             switch (orientation){
                 case WEST:
@@ -541,6 +542,10 @@ public class Props {
                     break;
             }
             return orientedArea;
+        }
+
+        public int getImpactAreaSize(){
+            return impactArea.size;
         }
 
     }
@@ -669,7 +674,7 @@ public class Props {
         private int mobility;
         private boolean allowadToBePromotedHorseman;
         private boolean allowedWieldShield;
-        private boolean standardBearer;
+        private boolean standardBearerJob;
         private Weapon[] availableWeapons;
         private Weapon[] availableWeaponsAfterPromotion;
 
@@ -679,7 +684,7 @@ public class Props {
             this.mobility = mobility;
             this.allowadToBePromotedHorseman = allowadToBePromotedHorseman;
             this.allowedWieldShield = allowedWieldShield;
-            this.standardBearer = standardBearer;
+            this.standardBearerJob = standardBearer;
             this.availableWeapons = availableWeapons;
             this.availableWeaponsAfterPromotion = availableWeaponsAfterPromotion;
         }
@@ -710,8 +715,8 @@ public class Props {
             return availableWeaponsAfterPromotion;
         }
 
-        public boolean isStandardBearer() {
-            return standardBearer;
+        public boolean couldBeStandardBearerJob() {
+            return standardBearerJob;
         }
     }
 

@@ -4,7 +4,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Props;
+import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.renderers.interfaces.BattlefieldRenderer;
@@ -87,7 +88,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 if (tileTR != null) {
                     tileRenderers[r][c] = tileTR;
                 } else {
-                    tileRenderers[r][c] = sprite2DPool.getTileSprite(Props.TileType.getStandard());
+                    tileRenderers[r][c] = sprite2DPool.getTileSprite(Data.TileType.getStandard());
                     throw new BFRendererException("expected tile type can not be rendered :"+model.getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
                 }
             }
@@ -127,30 +128,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
 
-    /*
-     * Useful for some overlapping animations to be performed by before and / or after like attacking by instance.
-     * @param models : array of models of which their UR should be rendered in the given order (first before)
-    */
-    public void rearrangeURRenderingOrder(Array<Unit> models){
-        UnitRenderer[] urs = new UnitRenderer[models.size];
-        for(int m = 0; m < models.size; m++) {
-            for (int i = 0; i < unitRenderers.size; i++) {
-                if (unitRenderers.get(i).getModel() == models.get(m)){
-                    urs[m] = unitRenderers.removeIndex(i);
-                    i--;
-                }
-            }
-        }
-
-        for(int m = 0; m < models.size; m++) {
-            if(urs[m] != null){
-                unitRenderers.add(urs[m]);
-            }
-        }
-
-    }
-
-
     @Override
     public UnitRenderer getUnitRenderer(Unit model) {
         for(int i = 0; i < unitRenderers.size; i++){
@@ -161,14 +138,22 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public void triggerBuildAnimation(int row, int col, Props.TileType type, Unit builder){
-        if(model.checkIndexes(row, col) && (type == Props.TileType.BRIDGE || type == Props.TileType.WATCH_TOWER) ){
+    public void triggerBuildAnimation(int row, int col, Data.TileType buildingType, Unit builder){
+        if(model.checkIndexes(row, col) && (buildingType == Data.TileType.BRIDGE || buildingType == Data.TileType.WATCH_TOWER) ){
             rBuild = row;
             cBuild = col;
-            getUnitRenderer(builder).triggerAnimation(Props.AnimationId.BUILD);
+            getUnitRenderer(builder).triggerAnimation(Data.AnimationId.BUILD);
             constructionCountDown.run();
-            buildingInContructionTR = (type == Props.TileType.BRIDGE) ? TempoSprite2DPool.get().getBridgeInConstruction() : TempoSprite2DPool.get().getTowerInConstruction();
+            buildingInContructionTR = (buildingType == Data.TileType.BRIDGE) ? TempoSprite2DPool.get().getBridgeInConstruction() : TempoSprite2DPool.get().getTowerInConstruction();
 
+        }
+    }
+
+    @Override
+    public void dispose(){
+        super.dispose();
+        for(int i =0; i < unitRenderers.size; i++){
+            unitRenderers.get(i).dispose();
         }
     }
 
@@ -189,9 +174,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             coords = (int[]) data;
             if (coords.length == 2) {
 
-
                 if(model.isTileOccupied(coords[0], coords[1])){
-
                     // add a unit renderer to a newly deployed unit
                     addUnitRenderer(coords[0], coords[1]);
                 }else {
@@ -211,6 +194,19 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                     path.add(new int[]{coords[0], coords[1]});
                     ur2.triggerMoveAnimation(path);
                 }
+            }
+        }else if(data instanceof Array){
+            if(((Array)data).size > 0 && ((Array)data).get(0) instanceof int[]){
+                Array<int[]> path = (Array<int[]>) data;
+                //TODO: trigger walk animation!!
+
+                int[] unitCoords = path.removeIndex(0);
+                if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
+                    Unit unit = model.getUnit(unitCoords[0], unitCoords[1]);
+                    getUnitRenderer(unit).triggerMoveAnimation(path);
+                }
+
+
             }
         }
     }
