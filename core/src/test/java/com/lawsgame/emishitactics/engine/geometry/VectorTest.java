@@ -18,7 +18,7 @@ public class VectorTest {
 
     @BeforeClass
     public static void beforeClass(){
-        System.out.println("---+++$$$ Vector TEST $$$+++--");
+        System.out.println("\n---+++$$$ Vector TEST $$$+++--\n");
     }
 
     @Test

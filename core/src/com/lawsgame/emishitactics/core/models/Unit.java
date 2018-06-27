@@ -69,7 +69,7 @@ public class Unit extends Observable{
     protected final Banner banner = new Banner();
 
     /**
-     * battle execution related attributes
+     * battlefield execution related attributes
      */
     protected Orientation orientation;
     protected Behaviour behaviour;
@@ -117,23 +117,25 @@ public class Unit extends Observable{
         this.agility = template.getBaseAg();
         this.skill = template.getBaseSk();
         this.bravery = template.getBaseBr();
-        this.currentHitPoints = hitPoints;
-        this.currentMoral = calculateInitialMoral();
 
         this.primaryWeapon = (isWeaponAvailable(primaryWeapon, true)) ? primaryWeapon : pickWeapon(true);
         Weapon chosenSecondaryW = (isWeaponAvailable(secondaryWeapon, true))? secondaryWeapon : pickWeapon(false);
 
         if(template.getStartLevel() >= PROMOTION_LEVEL)
-            _promote(chosenSecondaryW);
+            promote(chosenSecondaryW);
 
         // levels up the build
         if(homogeneousLevelUp){
-            _growUp(gainLvl, chosenSecondaryW);
+            growUpHomogeneously(gainLvl, chosenSecondaryW);
         }else {
             for (int lvl = 0; lvl < gainLvl; lvl++) {
-                levelUp(chosenSecondaryW);
+                levelUp();
+                if(lvl == PROMOTION_LEVEL){
+                    promote(chosenSecondaryW);
+                }
             }
         }
+        setInitialHPAndMoral();
     }
 
     /**
@@ -162,8 +164,9 @@ public class Unit extends Observable{
         return level > PROMOTION_LEVEL;
     }
 
-    protected int _promote(Weapon secondaryWeapon){
+    public int[] promote(Weapon secondaryWeapon){
         int mob = 0;
+
         this.job = template.getJob().getPromotionName();
         mob += MOBILITY_BONUS_PROMOTED;
         if (!this.primaryWeapon.isFootmanOnly() && !secondaryWeapon.isFootmanOnly()) {
@@ -171,11 +174,35 @@ public class Unit extends Observable{
             mob += MOBILITY_BONUS_HORSEMAN;
         }
         this.secondaryWeapon = secondaryWeapon;
+
+
+        int cha = template.getProBoCha();
+        int ld = template.getProBoLd();
+        int hpt = template.getProBoHP();
+        int str = template.getProBoStr();
+        int def = template.getProBoDef();
+        int dex = template.getProBoDex();
+        int agi = template.getProBoAg();
+        int ski = template.getProBoSk();
+        int bra = template.getProBoBr();
+
         this.mobility += mob;
-        return mob;
+        this.charisma +=  cha;
+        this.leadership += ld;
+        this.hitPoints += hpt;
+        this.strength += str;
+        this.defense += def;
+        this.dexterity += dex;
+        this.agility += agi;
+        this.skill += ski;
+        this.bravery += bra;
+
+        int[] gainlvl = new int[]{hpt, mob, cha, ld, str, def, dex, agi, ski, bra};
+        notifyAllObservers(gainlvl);
+        return gainlvl;
     }
 
-     private void _growUp(int gainLvl, Weapon secondaryWeapon){
+     public void growUpHomogeneously(int gainLvl, Weapon secondaryWeapon){
         if(gainLvl < 0) gainLvl = 0;
         if(gainLvl + getLevel() > MAX_LEVEL)  gainLvl = MAX_LEVEL - getLevel();
 
@@ -192,7 +219,7 @@ public class Unit extends Observable{
         int prePromotionLvl = 0;
         int postPromotionLvl = 0;
         if(getLevel() + gainLvl >= PROMOTION_LEVEL){
-            _promote(secondaryWeapon);
+            promote(secondaryWeapon);
             if(getLevel() >= PROMOTION_LEVEL){
                 postPromotionLvl = gainLvl;
             }else{
@@ -237,7 +264,7 @@ public class Unit extends Observable{
 
     }
 
-    public int[] levelUp(Weapon secondaryWeapon){
+    public int[] levelUp(){
         int mob = 0;
         int cha = 0;
         int ld = 0;
@@ -252,18 +279,7 @@ public class Unit extends Observable{
         if(this.level < MAX_LEVEL) {
             this.level++;
 
-            if (PROMOTION_LEVEL == level) {
-                mob += _promote(secondaryWeapon);
-                cha += template.getProBoCha();
-                ld += template.getProBoLd();
-                hpt += template.getProBoHP();
-                str += template.getProBoStr();
-                def += template.getProBoDef();
-                dex += template.getProBoDex();
-                agi += template.getProBoAg();
-                ski += template.getProBoSk();
-                bra += template.getProBoBr();
-            } else {
+            if (PROMOTION_LEVEL != level) {
                 cha += (getAppGrowthRate(Stat.CHARISMA) * 100 > R.getR().nextInt(100)) ? 1 : 0;
                 ld += (getAppGrowthRate(Stat.LEADERSHIP) * 100 > R.getR().nextInt(100)) ? 1 : 0;
                 hpt += (getAppGrowthRate(Stat.HIT_POINTS) * 100 > R.getR().nextInt(100)) ? 1 : 0;
@@ -460,13 +476,15 @@ public class Unit extends Observable{
         return getCurrentWeapon().getDamage() + getAppStat(Stat.STRENGTH);
     }
 
-    public int getCurrentAttackDamage(TileType attackerTile, Unit defender, boolean critical, boolean bannerAtRange){
+    public int getCurrentAttackDamage(TileType attackerTile, Unit defender, boolean critical,boolean counterattack,  boolean bannerAtRange){
         int str = getCurrentWeapon().getDamage() + getCurrentStrength(attackerTile,defender, bannerAtRange);
-        if(critical) str *= getCurrentCritDamageModifier(defender);
-        return str;
+        int factor = 1;
+        if(critical) factor *= getCurrentCritDamageModifier(defender);
+        if(counterattack) factor *= Data.COUNTER_ATTACK_DAMAGE_MODIFIER;
+        return str*factor;
     }
 
-    public int getAvoidance(){
+    public int getAvoidance(DefensiveStance stance){
         int avoidance = 0;
         switch(stance){
             case DODGE:
@@ -530,14 +548,13 @@ public class Unit extends Observable{
     public void heal(int healPower){
         int[] oldHpts = new int[]{currentHitPoints, currentMoral};
         if(healPower > hitPoints){
-            currentHitPoints  = hitPoints;
-            currentMoral = calculateInitialMoral();
+            setInitialHPAndMoral();
         }else{
             currentHitPoints += healPower;
             if(currentMoral > 0) {
                 currentMoral += healPower;
             }else{
-                currentMoral = calculateInitialMoral() + currentHitPoints - getAppStat(Stat.HIT_POINTS);
+                currentMoral = getInitialMoral() + currentHitPoints - getAppStat(Stat.HIT_POINTS);
                 if(currentMoral < 0){
                     currentMoral = 0;
                 }
@@ -591,28 +608,51 @@ public class Unit extends Observable{
         return attacker.getCurrentAttackAccuracy(attackerTile, critical, attackBannerAtRange) - defender.getCurrentAvoidance(defenderTile, attacker, defenderBannerAtRange) ;
     }
 
-    public static int getDealtDamage(Unit attacker, Unit defender, boolean critical, TileType attackerTile, TileType defenderTile, boolean attackBannerAtRange, boolean defenderBannerAtRange){
-        int dealtDamage = attacker.getCurrentAttackDamage(attackerTile, defender, critical, attackBannerAtRange) - defender.getCurrentDef(defenderTile, attacker, defenderBannerAtRange);
+    public static int getDealtDamage(Unit attacker, Unit defender, boolean critical, TileType attackerTile, TileType defenderTile, boolean attackBannerAtRange, boolean defenderBannerAtRange, boolean counterattack){
+        int dealtDamage = attacker.getCurrentAttackDamage(attackerTile, defender, critical, counterattack, attackBannerAtRange) - defender.getCurrentDef(defenderTile, attacker, defenderBannerAtRange);
         dealtDamage *= ((defender.getStance() == DefensiveStance.BLOCK) ? BLOCK_REDUCTION_DAMAGE : 1);
         dealtDamage -= BLOCK_RAW_REDUCTION_DAMAGE;
         return  dealtDamage;
     }
 
-    public void receiveDamage(int damageTaken){
-        if(this.currentHitPoints > damageTaken){
-            this.currentHitPoints -= damageTaken;
-            if(this.getCurrentMoral() > damageTaken){
-                this.currentMoral -= damageTaken;
-                notifyAllObservers(damageTaken);
+    public void receiveDamage(int damageTaken, boolean moralDamageOnly){
+        if(this.currentMoral > damageTaken){
+            // the unit survive
+            this.currentMoral -= damageTaken;
+            if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
+
+        }else{
+            // the unit dies or flies
+            if(this.currentHitPoints > damageTaken){
+                this.currentMoral = 0;
+                if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
             }else{
                 this.currentMoral = 0;
-                notifyAllObservers(false);
+                if(!moralDamageOnly) this.currentHitPoints =0;
             }
-        }else{
-            this.currentHitPoints = 0;
-            this.currentMoral = 0;
-            notifyAllObservers(true);
+
+            // if the unit is a war chief, the consequences deepens
+            if(isWarChief()){
+                int moralDamage = getAppStat(Stat.CHARISMA);
+                if(isWarlord()){
+                    Array<Array<Unit>> army = getArmy().getAllSquads();
+                    for(int i = 0; i < army.size; i++) {
+                        for(int j = 0; j < army.get(i).size; j++){
+                            if( i + j > 0)
+                                army.get(i).get(j).receiveDamage((i == 0)? moralDamage*2 : moralDamage, true);
+                        }
+                    }
+                }else{
+                    Array<Unit> squad = getArmy().getSquad(this);
+                    for(int i = 1; i < squad.size; i++){
+                        squad.get(i).receiveDamage(moralDamage, true);
+                    }
+                }
+            }
+
         }
+
+        notifyAllObservers(damageTaken);
     }
 
 
@@ -761,6 +801,18 @@ public class Unit extends Observable{
         return nbMax;
     }
 
+    public int getNbMaxUnits(boolean asWarlord){
+        int nbMax = 0;
+        if(asWarlord){
+            nbMax = (int) (3 + (getAppStat(Stat.LEADERSHIP) + 2)/5.0f);
+            if(nbMax > MAX_UNITS_UNDER_WARLORD ) nbMax = (int) MAX_UNITS_UNDER_WARLORD;
+        }else {
+            nbMax = (int) (2 + (getAppStat(Stat.LEADERSHIP) + 1)/5.0f);
+            if(nbMax > MAX_UNITS_UNDER_WAR_CHIEF ) nbMax = (int) MAX_UNITS_UNDER_WAR_CHIEF;
+        }
+        return nbMax;
+    }
+
     public int getNbMaxWarChiefs(){
         return 1 + (int) ((isWarlord())? getAppStat(Stat.LEADERSHIP)/6.0f: 0);
     }
@@ -772,8 +824,8 @@ public class Unit extends Observable{
             for(int i=0; i< squads.size; i++){
                 for(int j=0; j < squads.get(i).size; j++){
                     if(squads.get(i).get(j) == this){
-                        bonus += (squads.get(0).get(0).isOutOfCombat()) ? squads.get(0).get(0).getCurrentCha() : 0;
-                        bonus += (squads.get(i).get(0).isOutOfCombat()) ? squads.get(i).get(0).getCurrentCha() : 0;
+                        bonus += (!squads.get(0).get(0).isOutOfCombat()) ? squads.get(0).get(0).getAppStat(Stat.CHARISMA) : 0;
+                        bonus += (!squads.get(i).get(0).isOutOfCombat()) ? squads.get(i).get(0).getAppStat(Stat.CHARISMA) : 0;
                     }
                 }
             }
@@ -842,8 +894,8 @@ public class Unit extends Observable{
 
     the stats go in 3 different flavors:
      - BASE : no modified by any factor
-     - APPARENT : value of the stat enhance with battle-permanent bonus such as those given by items.
-     - CURRENT : value of the stat at one specific moment of the battle
+     - APPARENT : value of the stat enhance with battlefield-permanent bonus such as those given by items.
+     - CURRENT : value of the stat at one specific moment of the battlefield
 
      */
 
@@ -852,17 +904,16 @@ public class Unit extends Observable{
         notifyAllObservers(null);
     }
 
-    public void resetHPAndMoral(){
+    public void setInitialHPAndMoral(){
         currentHitPoints = hitPoints;
-        currentMoral = calculateInitialMoral();
+        currentMoral = getInitialMoral();
         notifyAllObservers(null);
     }
 
-
-    public int calculateInitialMoral(){
-        int moralFactor = (int) (0.9 - 0.8 * Math.exp(-(getAppStat(Stat.BRAVERY) + getChaChiefsBonus())/13.0));
-        int moral = moralFactor * this.hitPoints;
-        return (moral > 0)?  moral: 1;
+    public int getInitialMoral(){
+        int moral = getAppStat(Stat.BRAVERY) + getChaChiefsBonus();
+        if(moral >= currentHitPoints) moral = currentHitPoints - 1;
+        return moral;
     }
 
     public int getBaseStat(Stat stat){
@@ -911,11 +962,7 @@ public class Unit extends Observable{
         return statValue;
     }
 
-    public int getCurrentCha() {
-        return getAppStat(Stat.CHARISMA);
-    }
-
-    public int getCurrentMob(TileType type){
+    public int getCurrentMob(){
         return getAppStat(Stat.MOBILITY);
     }
 
@@ -1209,9 +1256,6 @@ public class Unit extends Observable{
                 "\ncurrentHitPoints = " + currentHitPoints;
     }
 
-
-
-
     //---------------------- ARMY CLASS --------------------------------
 
 
@@ -1330,6 +1374,7 @@ public class Unit extends Observable{
                 mobilizedTroups.add(new Array<Unit>());
                 mobilizedTroups.get(0).add(warlord);
                 nonMobTroups.removeValue(warlord, true);
+                warlord.setInitialHPAndMoral();
                 warlord.notifyAllObservers(null);
             }
         }
@@ -1374,12 +1419,17 @@ public class Unit extends Observable{
                             Array<Unit> newSquad = new Array<Unit>();
                             newSquad.add(unit);
                             if (0 < squadIndex && squadIndex < mobilizedTroups.size) {
+
+                                //replace an older squad
                                 if (mobilizedTroups.get(squadIndex).size > 0)
                                     disengage(mobilizedTroups.get(squadIndex).get(0));
                                 mobilizedTroups.insert(squadIndex, newSquad);
                             } else {
+
+                                //add a new squad
                                 mobilizedTroups.add(newSquad);
                             }
+                            unit.setInitialHPAndMoral();
                             unit.notifyAllObservers(null);
 
                         } else {
@@ -1402,7 +1452,7 @@ public class Unit extends Observable{
 
         /**
          *  PREMICE:
-         *  1) check if unit is not NULL
+         *  1) check if unit is not null AND if the army has a warlord
          *  2) add the unit into the army if not yet done.
          *
          * if :
@@ -1446,6 +1496,7 @@ public class Unit extends Observable{
                                     } else {
                                         mobilizedTroups.get(squadIndex).add(unit);
                                     }
+                                    unit.setInitialHPAndMoral();
                                     unit.notifyAllObservers(null);
 
                                 } else {
@@ -1483,9 +1534,27 @@ public class Unit extends Observable{
             return false;
         }
 
+        /**
+         * disengagement consist in removing a unit form the mobilized army
+         * 1) FIRST we check that the given unit is:
+         *  - not null
+         *  - mobilized
+         *  - not a warlord
+         *
+         * 2) Then the method fetch the squad's unit and the unit indexes
+         *
+         * 3) then IF those indexes have been founded, 2 cases could rise:
+         *      IF the unit is a war chief THEN the whole squad is demobilized
+         *      ELSE the unit is demobilized
+         *
+         *
+         * @param unit
+         * @return
+         */
         @Override
         public boolean disengage(Unit unit) {
-            if(unit != null && contains(unit) && !unit.isWarlord()) {
+            if(unit != null && isUnitMobilized(unit) && !unit.isWarlord()) {
+
                 int squadId = -1;
                 int unitId = -1;
                 for (int i = 0; i < mobilizedTroups.size; i++) {
@@ -1496,6 +1565,7 @@ public class Unit extends Observable{
                         }
                     }
                 }
+
                 if (squadId != -1 && unitId != -1) {
                     if (unit.isWarChief()) {
                         Array<Unit> squad = getSquad(unit);
@@ -1518,13 +1588,16 @@ public class Unit extends Observable{
          */
         @Override
         public void resetComposition() {
+            Unit unit;
             for(int i = 0 ; i <  mobilizedTroups.size; i++){
                 for(int j = 0; j <  mobilizedTroups.get(i).size; j++){
-                    nonMobTroups.add(mobilizedTroups.get(i).get(j));
-                    mobilizedTroups.get(i).get(j).notifyAllObservers(null);
+                    unit = mobilizedTroups.get(i).removeIndex(j);
+                    unit.setInitialHPAndMoral();
+                    nonMobTroups.add(unit);
+                    unit.notifyAllObservers(null);
+                    j--;
                 }
             }
-            mobilizedTroups.clear();
         }
 
         @Override

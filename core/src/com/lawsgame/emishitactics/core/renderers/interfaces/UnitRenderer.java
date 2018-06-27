@@ -19,8 +19,6 @@ public abstract class UnitRenderer extends Renderer<Unit> implements GameElement
         this.model.getArmy().attach(this);
     }
 
-    public abstract void resumeStance();
-
     public abstract boolean isProceeding();
     public abstract void setTargeted(boolean targeted);
 
@@ -30,4 +28,11 @@ public abstract class UnitRenderer extends Renderer<Unit> implements GameElement
     public abstract void triggerHealedAnimation(int[] oldHtpsAndMoral);
 
     public abstract void triggerAnimation(Data.AnimationId id);
+
+    @Override
+    public void dispose(){
+        super.dispose();
+        this.model.getBanner().detach(this);
+        this.model.getArmy().detach(this);
+    }
 }

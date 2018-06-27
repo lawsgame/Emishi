@@ -1,7 +1,16 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data.*;
+import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.constants.Data.ActionChoice;
+import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
+import com.lawsgame.emishitactics.core.constants.Data.DamageType;
+import com.lawsgame.emishitactics.core.constants.Data.Item;
+import com.lawsgame.emishitactics.core.constants.Data.OffensiveAbility;
+import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
+import com.lawsgame.emishitactics.core.constants.Data.R;
+import com.lawsgame.emishitactics.core.constants.Data.TargetType;
+import com.lawsgame.emishitactics.core.constants.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
@@ -16,7 +25,7 @@ import java.util.HashMap;
  *
  *
  *
- * battle field tiles coordinate system
+ * battlefield field tiles coordinate system
  * ^
  * |
  * |
@@ -30,8 +39,6 @@ public class Battlefield extends Observable {
     private Unit[][] units;
     private boolean[][] looted;
     private Array<int[]> deploymentArea;
-
-    private CheckMap checkmap;
 
     private HashMap<Integer, Unit> recruits;
     private HashMap<Integer, Item> tombItems;
@@ -437,79 +444,216 @@ public class Battlefield extends Observable {
     }
 
 
-    static class CheckMap{
-        /**
-         *
-         * (ROW , COL):
-         *
-         * 0: EFFICIENCY = move requiredRange + attack requiredRange
-         * 1: ACTION = { attack = 2 OU move = 1 }
-         * 2: PREVIOUS ROW,
-         * 3: PREVIOUS COL;
-         *
-         */
 
-        float[][][] map;
-        int rowCM;
-        int colCM;
+    //------------------- PATH & AREA FETCHING METHODS -----------------------
 
-        public CheckMap(int nbrows, int nbcols, int rowCM, int colCM) {
-            super();
-            this.map = new float[nbrows][nbcols][4];
-            this.rowCM = rowCM;
-            this.colCM = colCM;
 
-            for(int r = getNbRows()-1; r> -1; r--){
-                for(int c = 0; c<getNbCols(); c++){
-                    map[r][c][1] = 10;
 
+    private static final CheckMoveMap checkmap = new CheckMoveMap();
+
+    static class CheckMoveMap{
+        int rowOrigin;
+        int colOrigin;
+        int rowRelActor;
+        int colRelActor;
+
+        Battlefield battlefield;
+        CheckTile[][] checkTiles;
+        int moveRange;
+        boolean pathfinder;
+        Allegeance allegeance;
+
+        CheckMoveMap(){ }
+
+        public Array<int[]> getMoveArea(Battlefield bf, int rowActor, int colActor){
+            set(bf, rowActor, colActor);
+            setTilesMRP();
+            //condemnTiles();
+            return getMoveArea();
+        }
+
+        private void set( Battlefield bf, int rowActor, int colActor){
+            if(bf.isTileOccupied(rowActor, colActor)) {
+                // get actor relevant pieces of information
+                Unit actor = bf.getUnit(rowActor, colActor);
+                this.pathfinder = actor.has(PassiveAbility.PATHFINDER);
+                this.moveRange = actor.hasMoved() ? 0 : actor.getCurrentMob();
+                this.allegeance = actor.getAllegeance();
+                this.battlefield = bf;
+
+                // set the check map dimensions and origin point
+                this.rowOrigin = rowActor - moveRange;
+                this.colOrigin = colActor - moveRange;
+                this.rowRelActor = moveRange;
+                this.colRelActor = moveRange;
+                int rows = 2 * moveRange + 1;
+                int colunms = 2 * moveRange + 1;
+
+                if (rowOrigin < 0) {
+                    rowRelActor += rowOrigin;
+                    rows += rowOrigin;
+                    rowOrigin = 0;
+                }
+                if (colOrigin < 0) {
+                    colRelActor += colOrigin;
+                    colunms += colOrigin;
+                    colOrigin = 0;
+                }
+
+                if (rowOrigin + rows > bf.getNbRows()) {
+                    rows = bf.getNbRows() - rowOrigin;
+                }
+                if (colOrigin + colunms > bf.getNbColumns()) {
+                    colunms = bf.getNbColumns() - colOrigin;
+                }
+                checkTiles = new CheckTile[rows][colunms];
+                for (int r = 0; r < checkTiles.length; r++) {
+                    for (int c = 0; c < checkTiles[0].length; c++) {
+                        checkTiles[r][c] = new CheckTile(0);
+                    }
                 }
             }
         }
 
-        public int getNbRows(){
-            return map.length;
+        private boolean checkIndexes(int r, int c){
+            return 0 < checkTiles.length && 0 <= r && r < checkTiles.length && 0 <= c && c < checkTiles[0].length;
         }
 
-        public int getNbCols(){
-            return map[0].length;
-        }
-
-        /**
-         * compare the value of efficient previously attributed to this tile with the new one.
-         * @param row
-         * @param col
-         * @param efficiency; the higher the more efficient. Based on the number of required tiles to pass by to get at the targets tile.
-         * @return Whether or the new 'paht'/option is more efficient.
-         */
-        public boolean checkEfficiency(int row, int col, int efficiency) {
-
-            boolean moreEfficient = (map[row - rowCM][col - colCM][0] < efficiency);
-            if (moreEfficient) map[row - rowCM][col - colCM][0] = efficiency;
-            return moreEfficient;
-        }
-
-        public void resetEfficiencies() {
-            for(int r = getNbRows()-1; r> -1; r--){
-                for(int c = 0; c<getNbCols(); c++){
-                    map[r][c][0] = 0;
-                }
+        // MRP = mobility remaining points
+        private void setTilesMRP(){
+            CheckTile tile = checkTiles[rowRelActor][colRelActor];
+            tile.remainingMovePoints = moveRange;
+            if(moveRange > 0){
+                if(checkIndexes(rowRelActor + 1, colRelActor) && updateTilesMRP(rowRelActor + 1, colRelActor, moveRange  , Data.Orientation.SOUTH))
+                    tile.setKinship(checkTiles[rowRelActor + 1][colRelActor]);
+                if(checkIndexes(rowRelActor - 1, colRelActor) && updateTilesMRP(rowRelActor - 1, colRelActor, moveRange , Data.Orientation.NORTH))
+                    tile.setKinship(checkTiles[rowRelActor - 1][colRelActor]);
+                if(checkIndexes(rowRelActor, colRelActor + 1) && updateTilesMRP(rowRelActor , colRelActor + 1, moveRange , Data.Orientation.WEST))
+                    tile.setKinship(checkTiles[rowRelActor][colRelActor + 1]);
+                if(checkIndexes(rowRelActor , colRelActor - 1) && updateTilesMRP(rowRelActor , colRelActor - 1, moveRange , Data.Orientation.EAST))
+                    tile.setKinship(checkTiles[rowRelActor][colRelActor - 1]);
             }
 
         }
 
+        private boolean updateTilesMRP(int row, int col, int remainingMovePoints, Data.Orientation from) {
+            if(remainingMovePoints > checkTiles[row][col].remainingMovePoints) {
+                if (remainingMovePoints == 1) {
+                    if (battlefield.isTileAvailable(rowOrigin + row, colOrigin + col, pathfinder)) {
+                        checkTiles[row][col].remainingMovePoints = remainingMovePoints;
+                        return true;
+                    }
+                } else if (remainingMovePoints > 1) {
+                    if(battlefield.isTileReachable(rowOrigin+row, colOrigin+col, pathfinder) && !battlefield.isTileOccupiedByFoe(rowOrigin+row, colOrigin+col, allegeance)){
+                        CheckTile tile = checkTiles[row][col];
+                        tile.remainingMovePoints = remainingMovePoints;
+                        if(from != Data.Orientation.NORTH && checkIndexes(row + 1, col) && updateTilesMRP(row + 1, col, remainingMovePoints - 1  , Data.Orientation.SOUTH))
+                            tile.setKinship(checkTiles[row + 1][col]);
+                        if(from != Data.Orientation.SOUTH && checkIndexes(row - 1, colRelActor) && updateTilesMRP(row - 1, col, remainingMovePoints - 1 , Data.Orientation.NORTH))
+                            tile.setKinship(checkTiles[row - 1][col]);
+                        if(from != Data.Orientation.EAST && checkIndexes(row, col + 1) && updateTilesMRP(row , col + 1, remainingMovePoints - 1 , Data.Orientation.WEST))
+                            tile.setKinship(checkTiles[row][col + 1]);
+                        if(from != Data.Orientation.WEST && checkIndexes(row , col - 1) && updateTilesMRP(row , col - 1, remainingMovePoints - 1 , Data.Orientation.EAST))
+                            tile.setKinship(checkTiles[row][col - 1]);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void condemnTiles(){
+            int oldMoveAreaSize = 0;
+            int moveAreaSize = getMoveAreaSize();
+            while(oldMoveAreaSize != moveAreaSize){
+                oldMoveAreaSize = moveAreaSize;
+
+                CheckTile tile;
+                boolean outMoveArea = false;
+                for(int r = 0; r < checkTiles.length; r++){
+                    for(int c = 0; c < checkTiles[0].length; c++){
+                        tile = checkTiles[r][c];
+                        if (tile.remainingMovePoints > 1) {
+                            for(int i = 0; i < tile.getChildren().size; i++){
+                                if(tile.getChildren().get(i).remainingMovePoints > 0){
+                                    outMoveArea = true;
+                                }
+                            }
+                            if(outMoveArea){
+                                tile.remainingMovePoints = 0;
+                            }
+                            outMoveArea = false;
+                        }
+                    }
+                }
+
+                moveAreaSize = getMoveAreaSize();
+            }
+        }
+
+        private int getMoveAreaSize(){
+            int size = 0;
+            for(int r = 0; r < checkTiles.length; r++){
+                for(int c = 0; c < checkTiles[0].length; c++){
+                    if (checkTiles[r][c].remainingMovePoints > 0) {
+                        size++;
+                    }
+                }
+            }
+            return size;
+        }
+
+        private Array<int[]> getMoveArea(){
+            Array<int[]> area = new Array<int[]>();
+            for(int r = 0; r < checkTiles.length; r++){
+                for(int c = 0; c < checkTiles[0].length; c++){
+                    if (checkTiles[r][c].remainingMovePoints > 0) {
+                        area.add(new int[]{r + rowOrigin, c + colOrigin});
+                    }
+                }
+            }
+            System.out.println(toString());
+            return area;
+        }
+
+
+        @Override
         public String toString(){
-            String res = "";
-            for(int r = getNbRows()-1; r> -1; r--){
-                for(int c = 0; c<getNbCols(); c++){
-                    if(map[r][c][1] == 10) res +=" .";
-                    else if(map[r][c][1] == 1) res +=" _";
-                    else res += " "+(int)(map[r][c][1] -1 );
-
+            String str ="\nOrigin :"+rowOrigin+" "+colOrigin+"\n\n";
+            for(int r = checkTiles.length - 1 ; r > -1 ; r--){
+                for(int c = 0; c < checkTiles[0].length; c++){
+                    str += " "+checkTiles[r][c].remainingMovePoints;
                 }
-                res +="\n";
+                str+="\n";
             }
-            return res;
+            return str;
+        }
+
+        static class CheckTile{
+            int remainingMovePoints;
+            private Array<CheckTile > children;
+            private CheckTile parent = null;
+
+            public CheckTile(int remainingMovePoints) {
+                this.remainingMovePoints = remainingMovePoints;
+                children = new Array<CheckTile>();
+            }
+
+            public void setKinship(CheckTile child) {
+                if(child.parent != null){
+                    child.parent.children.removeValue(child, true);
+                }
+                child.parent = this;
+                this.children.add(child);
+            }
+
+            public Array<CheckTile> getChildren() {
+                return children;
+            }
+
+            public CheckTile getParent() {
+                return parent;
+            }
         }
     }
 
@@ -517,126 +661,13 @@ public class Battlefield extends Observable {
      *
      * @param rowActor
      * @param colActor
-     * @return
+     * @return fetch all tiles where the given unit can moved on
      */
     public Array<int[]> getMoveArea(int rowActor, int colActor){
-        Array<int[]> moveArea = new Array<int[]>();
-        if(isTileOccupied(rowActor, colActor)){
-            Unit actor = getUnit(rowActor, colActor);
-            TileType actorTile = getTile(rowActor,colActor);
-            int moveRange = actor.hasMoved()? 0 : actor.getCurrentMob(actorTile);
-
-        }
-        return moveArea;
-    }
-    /**
-     *
-     * @return the area where the action can be performed by the unit at (row, col)
-     */
-    /*
-    public Array<float[]> getActionArea(int row, int col){
-        Array<float[]> area = new Array<float[]>();
-
-        if(isTileOccupied(row, col)){
-            TileType tileType = getTile(row,col);
-            Unit unit = getUnit(row, col);
-            int moveRange = unit.hasMoved()? 0 : unit.getCurrentMob(tileType);
-
-            int theoricAttMaxRange = Data.THEORICAL_MAX_RANGE;
-            int rowCM = (row - moveRange - theoricAttMaxRange - 1< 0)? 0: row - moveRange - theoricAttMaxRange - 1;
-            int colCM = (col - moveRange - theoricAttMaxRange - 1< 0)? 0: col - moveRange - theoricAttMaxRange - 1;
-            int rowCMf = (row + moveRange + theoricAttMaxRange + 1> getNbRows()-1)? getNbRows()-1: row + moveRange + theoricAttMaxRange + 1;
-            int colCMf = (col + moveRange + theoricAttMaxRange + 1> getNbColumns()-1)? getNbColumns()-1: col + moveRange + theoricAttMaxRange + 1;
-
-            checkmap = new CheckMap(rowCMf - rowCM + 1, colCMf - colCM +1, rowCM, colCM);
-
-            //int currentMaxRange = unit.getCurrentRangeMax(getTile(row, col).type);
-            int currentMaxRange = unit.getCurrentRangeMax(tileType, isStandardBearerAtRange(row, col));
-
-            _updateMoveMap(row, col, row, col, row, col+1, moveRange, unit) ;
-            _updateMoveMap(row, col, row, col, row, col-1, moveRange, unit) ;
-            _updateMoveMap(row, col, row, col, row+1, col, moveRange, unit) ;
-            _updateMoveMap(row, col, row, col, row-1, col, moveRange, unit) ;
-
-            checkmap.resetEfficiencies();
-            _updateAttackMap(row, col, row, col, row, col+1, unit.getCurrentMob(tileType), currentMaxRange, unit) ;
-            _updateAttackMap(row, col, row, col, row, col-1, unit.getCurrentMob(tileType), currentMaxRange, unit) ;
-            _updateAttackMap(row, col, row, col, row+1, col, unit.getCurrentMob(tileType), currentMaxRange, unit) ;
-            _updateAttackMap(row, col, row, col, row-1, col, unit.getCurrentMob(tileType), currentMaxRange, unit) ;
-
-            for(int r = 0; r < checkmap.getNbRows(); r++){
-                for(int c = 0; c < checkmap.getNbCols(); c++){
-                    if(checkmap.map[r][c][1] != 10 && !((checkmap.map[r][c][1] == 2) && Utils.dist(row, col, r+rowCM, c + colCM) < unit.getCurrentRangeMin())){
-                        area.add(new float[]{r + rowCM, c + colCM,  checkmap.map[r][c][1]-1});
-                    }
-                }
-            }
-            checkmap = null;
-        }
-
-        return area;
+        return checkmap.getMoveArea(this, rowActor, colActor);
     }
 
-    private void _updateAttackMap(int initRow, int initCol, int previousRow, int previousCol, int row, int col, int moveRange, int attackrange, Unit unit) {
-        if(isTileExisted(row,col) && (row != initRow || col != initCol) && checkmap.checkEfficiency(row, col, moveRange + attackrange)){
-            if(moveRange > 0 && checkmap.map[row-checkmap.rowCM][col - checkmap.colCM][1] == 1 ){
 
-                int attackRangeMax = unit.getCurrentRangeMax(getTile(row, col), isStandardBearerAtRange(row, col));
-                if(previousRow != row+1 || previousCol != col) _updateAttackMap(initRow, initCol, row, col, row + 1, col, moveRange - 1, attackRangeMax, unit);
-                if(previousRow != row-1 || previousCol != col) _updateAttackMap(initRow, initCol, row, col, row - 1, col, moveRange - 1, attackRangeMax, unit);
-                if(previousRow != row || previousCol != col-1) _updateAttackMap(initRow, initCol, row, col, row, col - 1, moveRange - 1, attackRangeMax, unit);
-                if(previousRow != row || previousCol != col+1) _updateAttackMap(initRow, initCol, row, col, row, col + 1, moveRange - 1, attackRangeMax, unit);
-
-
-            }else if(attackrange > 0 && checkmap.map[row-checkmap.rowCM][col - checkmap.colCM][1] > 1){
-
-                checkmap.map[row-checkmap.rowCM][col - checkmap.colCM][1] = 2;
-
-                if(previousRow != row+1 || previousCol != col) _updateAttackMap(initRow, initCol, row, col, row + 1, col, 0, attackrange - 1, unit);
-                if(previousRow != row-1 || previousCol != col) _updateAttackMap(initRow, initCol, row, col, row - 1, col, 0, attackrange - 1, unit);
-                if(previousRow != row || previousCol != col-1) _updateAttackMap(initRow, initCol, row, col, row, col - 1, 0, attackrange - 1, unit);
-                if(previousRow != row || previousCol != col+1) _updateAttackMap(initRow, initCol, row, col, row, col + 1, 0, attackrange - 1, unit);
-
-            }
-        }
-    }
-
-    private void _updateMoveMap(int initRow, int initCol, int previousRow, int previousCol, int row, int col, int movePointLeft, Unit unit) {
-        if (isTileReachable(row, col, unit.has(PassiveAbility.PATHFINDER))
-                && checkmap.checkEfficiency(row, col, movePointLeft)
-                && (initRow != row || initCol != col)
-                && !isTileOccupiedByFoe(row, col, unit.getAllegeance())) {
-
-            //set previous tile
-            checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][2] = previousRow;
-            checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][3] = previousCol;
-
-            //set action value
-            if(!isTileOccupied(row, col)){
-                checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][1] = 1;
-                _cancelTrackBackValues(initRow , initCol, previousRow, previousCol);
-            }else{
-                checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][1] = 2;
-            }
-
-            if(movePointLeft > 1){
-                if(previousRow != row+1 || previousCol != col) _updateMoveMap(initRow, initCol, row, col, row + 1, col, movePointLeft - 1, unit);
-                if(previousRow != row-1 || previousCol != col) _updateMoveMap(initRow, initCol, row, col, row - 1, col, movePointLeft - 1, unit);
-                if(previousRow != row || previousCol != col-1) _updateMoveMap(initRow, initCol, row, col, row, col - 1, movePointLeft - 1, unit);
-                if(previousRow != row || previousCol != col+1) _updateMoveMap(initRow, initCol, row, col, row, col + 1, movePointLeft - 1, unit);
-            }
-
-        }
-    }
-
-    private void _cancelTrackBackValues(int initRow, int initCol, int row, int col) {
-        if(checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][1] == 2 && (initRow != row || initCol != col)) {
-            checkmap.map[row- checkmap.rowCM][col - checkmap.colCM][1] = 1;
-            _cancelTrackBackValues(initRow, initCol, (int) checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][2], (int) checkmap.map[row - checkmap.rowCM][col - checkmap.colCM][3]);
-        }
-    }
-
-    */
 
     /**
      * there is 3 types of requirements for an action to be performable by an actor
@@ -649,7 +680,8 @@ public class Battlefield extends Observable {
     public boolean canActionbePerformed(Unit actor, int row, int col, ActionChoice choice){
         boolean performable = false;
 
-        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER))){
+        // if the tile is available or the actor currently occupied this tile
+        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER)) || (isTileOccupied(row, col) && getUnit(row, col) == actor)){
 
             // check ABILITY REQUIREMENTS
             switch (choice){
@@ -688,7 +720,6 @@ public class Battlefield extends Observable {
 
             // check TARGET REQUIREMENTS
             performable = atActionRange(actor, row, col, choice);
-
         }
         return performable;
     }
@@ -704,7 +735,7 @@ public class Battlefield extends Observable {
      */
     public boolean atActionRange(Unit actor, int row, int col, ActionChoice choice){
         boolean atRange = false;
-        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER))){
+        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER)) || (isTileOccupied(row, col) && getUnit(row, col) == actor)){
             if (choice.getTargetType() == TargetType.SPECIFIC) {
                 if (choice == ActionChoice.BUILD) {
                     if(!actor.isBuildingResourcesConsumed()) {
@@ -812,88 +843,90 @@ public class Battlefield extends Observable {
     /**
      * get the shortest path of a target tile using the A* algorithm
      *
-     * @return an array like that {[row, col]} witch is the path from one tile to another
+     * @return an array like that {[row, col]} representing the shortest path from one tile to another
      */
     public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance){
         Array<int[]> res = new Array<int[]>();
 
-        Array<Node> path = new Array<Node>();
-        Array<Node> opened = new Array<Node>();
-        Array<Node> closed = new Array<Node>();
-        opened.add(new Node(rowI, colI, rowf, colf, null, this));
-        Node current = opened.get(0);
-        Array<Node> neighbours;
-        while (true) {
+        if(isTileAvailable(rowf, colf, pathfinder)) {
+            Array<PathNode> path = new Array<PathNode>();
+            Array<PathNode> opened = new Array<PathNode>();
+            Array<PathNode> closed = new Array<PathNode>();
+            opened.add(new PathNode(rowI, colI, rowf, colf, null, this));
+            PathNode current = opened.get(0);
+            Array<PathNode> neighbours;
+            while (true) {
 
-            //no solution
-            if (opened.size == 0) break;
+                //no solution
+                if (opened.size == 0) break;
 
-            current = opened.get(0);
-            for (int i = 0; i < opened.size; i++) {
-                if (opened.get(i).better(current)) {
-                    current = opened.get(i);
-                }
-            }
-            opened.removeValue(current, true);
-            closed.add(current);
-
-            // path found
-            if (current.getRow() == rowf && current.getCol() == colf) break;
-
-            // get available neighbor nodes which are not yet in the closed list
-            Node node;
-            neighbours = new Array<Node>();
-            if (isTileReachable(current.row + 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)) {
-                node = new Node(current.row + 1, current.col, rowf, colf, current, this);
-                if (!closed.contains(node, false)) {
-                    neighbours.add(node);
-                }
-            }
-            if (isTileReachable(current.row, current.col + 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)) {
-                node = new Node(current.row, current.col + 1, rowf, colf, current, this);
-                if (!closed.contains(node, false)) {
-                    neighbours.add(node);
-                }
-            }
-            if (isTileReachable(current.row - 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)) {
-                node = new Node(current.row - 1, current.col, rowf, colf, current, this);
-                if (!closed.contains(node, false)) {
-                    neighbours.add(node);
-                }
-            }
-            if (isTileReachable(current.row, current.col - 1, pathfinder ) && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)) {
-                node = new Node(current.row, current.col - 1, rowf, colf, current, this);
-                if (!closed.contains(node, false)) {
-                    neighbours.add(node);
-                }
-            }
-
-            boolean isNotInOpened = true;
-            for (int i = 0; i < neighbours.size; i++) {
-                node = neighbours.get(i);
-                for (int j = 0; j < opened.size; j++) {
-                    if (opened.get(j).equals(node)) {
-                        isNotInOpened = false;
-                        if (node.better(opened.get(j))) {
-                            opened.removeIndex(j);
-                            opened.add(node);
-                        }
+                current = opened.get(0);
+                for (int i = 0; i < opened.size; i++) {
+                    if (opened.get(i).better(current)) {
+                        current = opened.get(i);
                     }
                 }
-                if (isNotInOpened) {
-                    opened.add(node);
+                opened.removeValue(current, true);
+                closed.add(current);
+
+                // path found
+                if (current.getRow() == rowf && current.getCol() == colf) break;
+
+                // get available neighbor nodes which are not yet in the closed list
+                PathNode node;
+                neighbours = new Array<PathNode>();
+                if (isTileReachable(current.row + 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)) {
+                    node = new PathNode(current.row + 1, current.col, rowf, colf, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
                 }
-                isNotInOpened = true;
+                if (isTileReachable(current.row, current.col + 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)) {
+                    node = new PathNode(current.row, current.col + 1, rowf, colf, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
+                }
+                if (isTileReachable(current.row - 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)) {
+                    node = new PathNode(current.row - 1, current.col, rowf, colf, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
+                }
+                if (isTileReachable(current.row, current.col - 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)) {
+                    node = new PathNode(current.row, current.col - 1, rowf, colf, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
+                }
 
+                boolean isNotInOpened = true;
+                for (int i = 0; i < neighbours.size; i++) {
+                    node = neighbours.get(i);
+                    for (int j = 0; j < opened.size; j++) {
+                        if (opened.get(j).equals(node)) {
+                            isNotInOpened = false;
+                            if (node.better(opened.get(j))) {
+                                opened.removeIndex(j);
+                                opened.add(node);
+                            }
+                        }
+                    }
+                    if (isNotInOpened) {
+                        opened.add(node);
+                    }
+                    isNotInOpened = true;
+
+                }
             }
-        }
 
-        if (closed.get(closed.size - 1).getRow() == rowf && closed.get(closed.size - 1).getCol() == colf) {
-            path = closed.get(closed.size - 1).getPath();
-        }
+            if (closed.get(closed.size - 1).getRow() == rowf && closed.get(closed.size - 1).getCol() == colf) {
+                path = closed.get(closed.size - 1).getPath();
+            }
 
-        for (int i = 0; i < path.size; i++) {
-            res.add(new int[]{path.get(i).getRow(), path.get(i).getCol()});
+            for (int i = 0; i < path.size; i++) {
+                res.add(new int[]{path.get(i).getRow(), path.get(i).getCol()});
+            }
         }
 
         return res;
@@ -919,7 +952,7 @@ public class Battlefield extends Observable {
             boolean atAttackRange;
 
 
-            Array<Node> path = new Array<Node>();
+            Array<PathNode> path = new Array<PathNode>();
             Array<StateNode> opened = new Array<StateNode>();
             Array<StateNode> closed = new Array<StateNode>();
             opened.add(new StateNode(rowf, colf, rowActor, colActor, null, this, true));
@@ -1028,8 +1061,6 @@ public class Battlefield extends Observable {
 
 
 
-
-
     //-------------------GETTERS & SETTERS -------------------------
 
 
@@ -1063,46 +1094,26 @@ public class Battlefield extends Observable {
 
 
 
-    //----------------- NODE CLASSES -------------------
+    //----------------- NODE HELPER CLASSES -------------------
 
 
 
-
-    public static class Node{
+    public static abstract class Node<N extends Node>{
         protected int row;
         protected int col;
-        protected float distTarget;
-        protected float distSource;
-        protected Node parent;
+        protected int distSource;
         protected Battlefield bf;
 
-        public Node(int row, int col, int rowf, int colf, Node parent, Battlefield bf) {
+        public Node(int row, int col, Battlefield bf) {
             super();
             this.row = row;
             this.col = col;
-            this.parent = parent;
             this.bf = bf;
-            this.distSource = (parent != null) ? this.parent.distSource + 1 : 0;
-            this.distTarget = Utils.dist(row, col, rowf, colf);
+            this.distSource = 0;
         }
 
-        boolean better(Node node){
-            return distSource + distTarget < node.distSource + node.distTarget
-                    || ((distSource + distTarget == node.distSource + node.distTarget) && distTarget < node.distTarget);
-        }
 
-        public Array<Node> getPath(){
-            Array<Node> bestpath;
-            if(this.parent == null){
-                bestpath = new Array<Node>();
-                bestpath.add(this);
-                return bestpath;
-            }
-            bestpath = parent.getPath();
-            bestpath.add(this);
-            return bestpath;
-
-        }
+        abstract boolean better(N node);
 
         @Override
         public boolean equals(Object obj){
@@ -1121,6 +1132,44 @@ public class Battlefield extends Observable {
             return col;
         }
 
+        @Override
+        public String toString(){
+            return row+" "+col+" "+" range: "+ distSource;
+        }
+
+    }
+
+    public static class PathNode extends Node<PathNode>{
+        protected int distTarget;
+        protected PathNode parent;
+
+        public PathNode(int row, int col, int rowf, int colf, PathNode parent, Battlefield bf) {
+            super(row, col, bf);
+            this.parent = parent;
+            this.distSource = (parent != null) ? this.parent.distSource + 1 : 0;
+            this.distTarget = Utils.dist(row, col, rowf, colf);
+        }
+
+        @Override
+        boolean better(PathNode node){
+            return distSource + distTarget < node.distSource + node.distTarget
+                    || ((distSource + distTarget == node.distSource + node.distTarget) && distTarget < node.distTarget);
+        }
+
+        public Array<PathNode> getPath(){
+            Array<PathNode> bestpath;
+            if(this.parent == null){
+                bestpath = new Array<PathNode>();
+                bestpath.add(this);
+                return bestpath;
+            }
+            bestpath = parent.getPath();
+            bestpath.add(this);
+            return bestpath;
+
+        }
+
+
         public String toString(){
             return row+" "+col+" "+" cost: "+ (distSource + distTarget);
         }
@@ -1129,10 +1178,10 @@ public class Battlefield extends Observable {
     }
 
 
-    public static class StateNode extends Node{
+    public static class StateNode extends PathNode{
         protected boolean atAttackRange;
 
-        public StateNode(int row, int col, int rowf, int colf, Node parent, Battlefield bf, boolean atAttackRange) {
+        public StateNode(int row, int col, int rowf, int colf, PathNode parent, Battlefield bf, boolean atAttackRange) {
             super(row, col, rowf, colf, parent, bf);
             this.atAttackRange = atAttackRange;
             if(atAttackRange) this.distSource = 0;
@@ -1143,10 +1192,10 @@ public class Battlefield extends Observable {
           */
 
         @Override
-        public Array<Node> getPath(){
-            Array<Node> bestpath;
+        public Array<PathNode> getPath(){
+            Array<PathNode> bestpath;
             if(atAttackRange){
-                bestpath = new Array<Node>();
+                bestpath = new Array<PathNode>();
                 bestpath.add(this);
                 return bestpath;
 

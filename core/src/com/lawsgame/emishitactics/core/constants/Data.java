@@ -14,7 +14,7 @@ public class Data {
     public static final float MAX_UNITS_UNDER_WARLORD = 5f; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 4f; // including the war chief himself / herself
     public static final float SPEED_WALK = 1.5f;  //tile/s
-    public static final int THEORICAL_MAX_RANGE = 5;
+    public static final float COUNTER_ATTACK_DAMAGE_MODIFIER = 1f;
 
     // item bonus
     public static final int DEF_BONUS_YAYOI_SHIELD = 2;
@@ -63,8 +63,7 @@ public class Data {
     }
 
     public enum Ethnicity{
-        JAPANESE,
-        AINU;
+        JAPANESE, AINU;
 
         public static Ethnicity getStandard(){
             return JAPANESE;
@@ -116,7 +115,7 @@ public class Data {
         SECONDARY_WEAPON_RANGE_MIN,
         SECONDARY_WEAPON_RANGE_MAX,
         CURRENT_WEAPON_RANGE_MIN,
-        CURRENT_WEAPON_RANGE_MAX;
+        CURRENT_WEAPON_RANGE_MAX
 
     }
 
@@ -128,14 +127,14 @@ public class Data {
         ALREADY_PART_OF_THIS_SQUAD,
         SELECTED_SQUAD_DOES_NOT_EXIST,
         NO_SLOT_AVAILABLE,
-        NULL_ARG;
+        NULL_ARG
     }
 
     public enum EquipMsg{
         SUCCESSFULLY_EQUIPED,
         TYPE_ALREADY_EQUIPED,
         JOB_DOES_NOT_ALLOW_SHIELD_BEARING,
-        STANDARD_BEARER_CANNOT_EQUIP_SHIELD;
+        STANDARD_BEARER_CANNOT_EQUIP_SHIELD
     }
 
 
@@ -162,10 +161,6 @@ public class Data {
 
         public int getMax() {
             return maxSignByBanner;
-        }
-
-        public static BannerSign getStandard(){
-            return NONE;
         }
     }
 
@@ -352,16 +347,15 @@ public class Data {
 
     public enum PassiveAbility{
         NONE,
-        PRAYER,
-        HEALER,
+        PRAYER,             // OK
+        HEALER,             // OK
         PATHFINDER,         // OK
-        THIEF,
+        THIEF,              // OK
         BEAST,
         SHADOW,
         VIGILANT,
         GUARDIAN,
-        ENGINEER
-
+        ENGINEER            // OK
     }
 
     /**
@@ -379,7 +373,7 @@ public class Data {
         STEAL,
         BUILD,
         GUARD,
-        LEVEL_UP,           //automatized
+        LEVEL_UP,           //automatized, partially at least, the chosen secondary and level-up panels are displayed separately to distinguish between player and AI's units
         HEALED,
         REST,
         ATTACK,

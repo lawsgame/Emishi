@@ -24,7 +24,7 @@ public class TempoUnitRenderer extends UnitRenderer {
     private TextureRegion offabbTexture = null;
 
     private boolean targeted = false;
-    private boolean walkProceeding = false;
+    private boolean proceeding = false;
     private CountDown countDown = new CountDown(2f);
 
     //walk attributes
@@ -32,11 +32,14 @@ public class TempoUnitRenderer extends UnitRenderer {
     private boolean updatePoint = false;
     private Array<int[]> remainingPath = new Array<int[]>();
 
+    // hit attributes
+    boolean hitTaken = false;
+
     public TempoUnitRenderer(int row, int col, Unit model) {
         super(model);
         this.x = col;
         this.y = row;
-        resumeStance();
+        triggerAnimation(Data.AnimationId.REST);
         getNotification(null);
     }
 
@@ -48,9 +51,25 @@ public class TempoUnitRenderer extends UnitRenderer {
 
         // go back to rest animation after performing animation
         if (countDown.isFinished()) {
-            resumeStance();
-            offabbTexture = null;
             countDown.reset();
+
+            // trigger the die/flee anination after the take_hit one if required
+            if(hitTaken && model.isOutOfCombat()){
+                hitTaken = false;
+                if(model.isDead()){
+                    triggerAnimation(Data.AnimationId.DIE);
+                }else{
+                    triggerAnimation(Data.AnimationId.FLEE);
+                }
+            } else {
+                proceeding = false;
+
+                //if the model died or fled, do not restore rest animation
+                if(!model.isOutOfCombat()) {
+                    triggerAnimation(Data.AnimationId.REST);
+                    offabbTexture = null;
+                }
+            }
         }
 
         // handle walk animation
@@ -83,7 +102,7 @@ public class TempoUnitRenderer extends UnitRenderer {
                 remainingPath.removeIndex(0);
 
                 if (remainingPath.size == 0) {
-                    walkProceeding = false;
+                    proceeding = false;
                 } else {
                     model.setOrientation(Utils.getOrientationFromCoords(y, x, remainingPath.get(0)[0], remainingPath.get(0)[1]));
 
@@ -110,10 +129,8 @@ public class TempoUnitRenderer extends UnitRenderer {
     // ---------------- TRIGGER ANIMATION METHODS ---------------------------------------
 
 
-    @Override
-    public void resumeStance() {
-        triggerAnimation(Data.AnimationId.REST);
-    }
+
+
 
     @Override
     public void triggerMoveAnimation(Array<int[]> path) {
@@ -156,7 +173,7 @@ public class TempoUnitRenderer extends UnitRenderer {
             }
 
 
-            walkProceeding = true;
+            proceeding = true;
         }
 
 
@@ -166,6 +183,8 @@ public class TempoUnitRenderer extends UnitRenderer {
     @Override
     public void triggerTakeHitAnimation(int damageTaken) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
+        hitTaken = true;
+        proceeding = true;
         countDown.run();
     }
 
@@ -173,6 +192,7 @@ public class TempoUnitRenderer extends UnitRenderer {
     @Override
     public void triggerLevelUpAnimation(int[] gainlvl) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.HEAL, model.getArmy().isAlly());
+        proceeding = true;
         countDown.run();
     }
 
@@ -205,8 +225,10 @@ public class TempoUnitRenderer extends UnitRenderer {
             case BLOCK:
             case PARRY:
             case PRAY:
+            case DIE:
             case BACKSTABBED:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
+                proceeding = true;
                 countDown.run();
                 break;
             case SWITCH_WEAPON:
@@ -217,11 +239,13 @@ public class TempoUnitRenderer extends UnitRenderer {
                 break;
             case PARRIED_ATTACK:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly());
+                proceeding = true;
                 countDown.run();
                 break;
             case FLEE:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
                 orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation().getOpposite());
+                proceeding = true;
                 countDown.run();
                 break;
             case FOCUSED_BLOW:
@@ -240,9 +264,10 @@ public class TempoUnitRenderer extends UnitRenderer {
                     if(ability.name().equals(id.name()))
                         offabbTexture = TempoSprite2DPool.get().getOffensiveAbbSprite(ability);
                 }
+                proceeding = true;
                 countDown.run();
                 break;
-                default:;
+                default:
         }
     }
 
@@ -253,7 +278,7 @@ public class TempoUnitRenderer extends UnitRenderer {
 
     @Override
     public boolean isProceeding() {
-        return countDown.isRunning() || walkProceeding;
+        return proceeding;
     }
 
     @Override
@@ -265,22 +290,26 @@ public class TempoUnitRenderer extends UnitRenderer {
     @Override
     public void getNotification(Object data){
 
-        // update weapon
-        weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
-        if(weapontTexture == null){
-            System.out.println(model.getName());
-            System.out.println(model.getCurrentWeapon());
-        }
+        if(data == null) {
 
-        // update orientation
-        orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation());
-        if(model.isUsingShield()){
-            // update shield wielding rendering
-            shieldTexture = TempoSprite2DPool.get().getShieldSprite();
-        }
-        if(model.isHorseman()){
-            // update soldier mount rendering
-            mountedTexture = TempoSprite2DPool.get().getMountedSprite();
+            // update weapon
+            weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
+
+            // update orientation
+            orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation());
+            if (model.isUsingShield()) {
+                // update shield wielding rendering
+                shieldTexture = TempoSprite2DPool.get().getShieldSprite();
+            }
+            if (model.isHorseman()) {
+                // update soldier mount rendering
+                mountedTexture = TempoSprite2DPool.get().getMountedSprite();
+            }
+        }else if (data instanceof Integer){
+            int damageTaken = (Integer)data;
+            triggerTakeHitAnimation(damageTaken);
+        }else if(data instanceof int[]){
+            int[] gainLvl = (int[])data;
         }
     }
 

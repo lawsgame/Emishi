@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class BattlefieldTest {
@@ -10,6 +11,11 @@ public class BattlefieldTest {
     public void before(){
         battlefield = new Battlefield(9,9);
         battlefield.setAsPlain();
+    }
+
+    @BeforeClass
+    public static void beforeAll(){
+        System.out.println("\n---+++$$$ Battlefield TEST $$$+++---\n");
     }
 
     /**

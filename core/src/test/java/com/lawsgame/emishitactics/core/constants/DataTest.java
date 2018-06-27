@@ -10,9 +10,7 @@ public class DataTest {
 
     @BeforeClass
     public static void beforeAll(){
-
         System.out.println("\n---+++$$$ Data TEST $$$+++---\n");
-
     }
 
     @Test

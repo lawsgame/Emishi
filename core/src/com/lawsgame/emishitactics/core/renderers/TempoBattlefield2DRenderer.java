@@ -110,8 +110,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         if(unit != null) {
             for(int i = 0; i< unitRenderers.size; i++){
                 if(unitRenderers.get(i).getModel() == unit){
-                    unitRenderers.removeValue(unitRenderers.get(i), true);
-                    return true;
+                    return unitRenderers.removeValue(unitRenderers.get(i), true);
                 }
             }
         }

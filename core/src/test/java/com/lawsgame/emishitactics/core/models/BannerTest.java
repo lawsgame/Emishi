@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.lawsgame.emishitactics.core.constants.Data.*;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -13,6 +14,10 @@ public class BannerTest {
 
     public BannerTest(){}
 
+    @BeforeClass
+    public static void beforeAll(){
+        System.out.println("\n---+++$$$ Banner TEST $$$+++---\n");
+    }
 
     @Before
     public void beforeTest(){

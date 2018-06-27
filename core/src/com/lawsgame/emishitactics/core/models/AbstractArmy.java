@@ -28,8 +28,8 @@ public abstract class AbstractArmy extends Observable{
     public abstract Data.UnitAppointmentErrorMsg appointSoldier(Unit unit, int squadId);
     public abstract boolean disengage(Unit unit);
     public abstract void resetComposition();
-
     public abstract boolean isUnitMobilized(Unit unit);
+
     public abstract boolean contains(Unit unit);
     public abstract boolean add(Unit unit);
     public abstract void remove(Unit unit);
