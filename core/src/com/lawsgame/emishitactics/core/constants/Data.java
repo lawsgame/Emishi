@@ -13,7 +13,7 @@ public class Data {
     public static final int HEAL_BASE_POWER = 5;
     public static final float MAX_UNITS_UNDER_WARLORD = 5f; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 4f; // including the war chief himself / herself
-    public static final float SPEED_WALK = 1.5f;  //tile/s
+    public static final float SPEED_WALK = 3f;  //tile/s
     public static final float COUNTER_ATTACK_DAMAGE_MODIFIER = 1f;
 
     // item bonus

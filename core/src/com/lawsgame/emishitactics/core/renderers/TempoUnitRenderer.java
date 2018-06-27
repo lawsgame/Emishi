@@ -155,7 +155,7 @@ public class TempoUnitRenderer extends UnitRenderer {
             CLEAN PATH
             remove unnecesary entries for the walk position algorithm use in  UnitRenderer.update(dt)
              */
-            if(path.size > 1) {
+            if(path.size > 0) {
                 int[] pPreviousEntry;
                 int[] previousEntry;
                 int[] entry;
@@ -170,6 +170,9 @@ public class TempoUnitRenderer extends UnitRenderer {
                     }
 
                 }
+                Data.Orientation or = Utils.getOrientationFromCoords(y,x,path.get(0)[0], path.get(0)[1]);
+                model.setOrientation(or);
+
             }
 
 

@@ -458,7 +458,7 @@ public class Battlefield extends Observable {
         int colRelActor;
 
         Battlefield battlefield;
-        CheckTile[][] checkTiles;
+        int[][] checkTiles;
         int moveRange;
         boolean pathfinder;
         Allegeance allegeance;
@@ -468,7 +468,7 @@ public class Battlefield extends Observable {
         public Array<int[]> getMoveArea(Battlefield bf, int rowActor, int colActor){
             set(bf, rowActor, colActor);
             setTilesMRP();
-            //condemnTiles();
+            condemnTiles();
             return getMoveArea();
         }
 
@@ -506,12 +506,7 @@ public class Battlefield extends Observable {
                 if (colOrigin + colunms > bf.getNbColumns()) {
                     colunms = bf.getNbColumns() - colOrigin;
                 }
-                checkTiles = new CheckTile[rows][colunms];
-                for (int r = 0; r < checkTiles.length; r++) {
-                    for (int c = 0; c < checkTiles[0].length; c++) {
-                        checkTiles[r][c] = new CheckTile(0);
-                    }
-                }
+                checkTiles = new int[rows][colunms];
             }
         }
 
@@ -521,45 +516,40 @@ public class Battlefield extends Observable {
 
         // MRP = mobility remaining points
         private void setTilesMRP(){
-            CheckTile tile = checkTiles[rowRelActor][colRelActor];
-            tile.remainingMovePoints = moveRange;
+            checkTiles[rowRelActor][colRelActor] = moveRange;
             if(moveRange > 0){
-                if(checkIndexes(rowRelActor + 1, colRelActor) && updateTilesMRP(rowRelActor + 1, colRelActor, moveRange  , Data.Orientation.SOUTH))
-                    tile.setKinship(checkTiles[rowRelActor + 1][colRelActor]);
-                if(checkIndexes(rowRelActor - 1, colRelActor) && updateTilesMRP(rowRelActor - 1, colRelActor, moveRange , Data.Orientation.NORTH))
-                    tile.setKinship(checkTiles[rowRelActor - 1][colRelActor]);
-                if(checkIndexes(rowRelActor, colRelActor + 1) && updateTilesMRP(rowRelActor , colRelActor + 1, moveRange , Data.Orientation.WEST))
-                    tile.setKinship(checkTiles[rowRelActor][colRelActor + 1]);
-                if(checkIndexes(rowRelActor , colRelActor - 1) && updateTilesMRP(rowRelActor , colRelActor - 1, moveRange , Data.Orientation.EAST))
-                    tile.setKinship(checkTiles[rowRelActor][colRelActor - 1]);
+                if(checkIndexes(rowRelActor + 1, colRelActor))
+                    updateTilesMRP(rowRelActor + 1, colRelActor, moveRange  , Data.Orientation.SOUTH);
+                if(checkIndexes(rowRelActor - 1, colRelActor))
+                    updateTilesMRP(rowRelActor - 1, colRelActor, moveRange , Data.Orientation.NORTH);
+                if(checkIndexes(rowRelActor, colRelActor + 1))
+                    updateTilesMRP(rowRelActor , colRelActor + 1, moveRange , Data.Orientation.WEST);
+                if(checkIndexes(rowRelActor , colRelActor - 1))
+                    updateTilesMRP(rowRelActor , colRelActor - 1, moveRange , Data.Orientation.EAST);
             }
 
         }
 
-        private boolean updateTilesMRP(int row, int col, int remainingMovePoints, Data.Orientation from) {
-            if(remainingMovePoints > checkTiles[row][col].remainingMovePoints) {
+        private void updateTilesMRP(int row, int col, int remainingMovePoints, Data.Orientation from) {
+            if(remainingMovePoints > checkTiles[row][col]) {
                 if (remainingMovePoints == 1) {
                     if (battlefield.isTileAvailable(rowOrigin + row, colOrigin + col, pathfinder)) {
-                        checkTiles[row][col].remainingMovePoints = remainingMovePoints;
-                        return true;
+                        checkTiles[row][col] = remainingMovePoints;
                     }
                 } else if (remainingMovePoints > 1) {
                     if(battlefield.isTileReachable(rowOrigin+row, colOrigin+col, pathfinder) && !battlefield.isTileOccupiedByFoe(rowOrigin+row, colOrigin+col, allegeance)){
-                        CheckTile tile = checkTiles[row][col];
-                        tile.remainingMovePoints = remainingMovePoints;
-                        if(from != Data.Orientation.NORTH && checkIndexes(row + 1, col) && updateTilesMRP(row + 1, col, remainingMovePoints - 1  , Data.Orientation.SOUTH))
-                            tile.setKinship(checkTiles[row + 1][col]);
-                        if(from != Data.Orientation.SOUTH && checkIndexes(row - 1, colRelActor) && updateTilesMRP(row - 1, col, remainingMovePoints - 1 , Data.Orientation.NORTH))
-                            tile.setKinship(checkTiles[row - 1][col]);
-                        if(from != Data.Orientation.EAST && checkIndexes(row, col + 1) && updateTilesMRP(row , col + 1, remainingMovePoints - 1 , Data.Orientation.WEST))
-                            tile.setKinship(checkTiles[row][col + 1]);
-                        if(from != Data.Orientation.WEST && checkIndexes(row , col - 1) && updateTilesMRP(row , col - 1, remainingMovePoints - 1 , Data.Orientation.EAST))
-                            tile.setKinship(checkTiles[row][col - 1]);
-                        return true;
+                        checkTiles[row][col] = remainingMovePoints;
+                        if(from != Data.Orientation.NORTH && checkIndexes(row + 1, col))
+                            updateTilesMRP(row + 1, col, remainingMovePoints - 1  , Data.Orientation.SOUTH);
+                        if(from != Data.Orientation.SOUTH && checkIndexes(row - 1, colRelActor))
+                            updateTilesMRP(row - 1, col, remainingMovePoints - 1 , Data.Orientation.NORTH);
+                        if(from != Data.Orientation.EAST && checkIndexes(row, col + 1))
+                            updateTilesMRP(row , col + 1, remainingMovePoints - 1 , Data.Orientation.WEST);
+                        if(from != Data.Orientation.WEST && checkIndexes(row , col - 1))
+                            updateTilesMRP(row , col - 1, remainingMovePoints - 1 , Data.Orientation.EAST);
                     }
                 }
             }
-            return false;
         }
 
         private void condemnTiles(){
@@ -568,24 +558,20 @@ public class Battlefield extends Observable {
             while(oldMoveAreaSize != moveAreaSize){
                 oldMoveAreaSize = moveAreaSize;
 
-                CheckTile tile;
-                boolean outMoveArea = false;
                 for(int r = 0; r < checkTiles.length; r++){
                     for(int c = 0; c < checkTiles[0].length; c++){
-                        tile = checkTiles[r][c];
-                        if (tile.remainingMovePoints > 1) {
-                            for(int i = 0; i < tile.getChildren().size; i++){
-                                if(tile.getChildren().get(i).remainingMovePoints > 0){
-                                    outMoveArea = true;
-                                }
-                            }
-                            if(outMoveArea){
-                                tile.remainingMovePoints = 0;
-                            }
-                            outMoveArea = false;
+                        if (checkTiles[r][c] > 1) {
+                            if(checkIndexes(r + 1, c) && checkTiles[r+1][c] > 0 && checkTiles[r+1][c] < checkTiles[r][c]) continue;
+                            if(checkIndexes(r - 1, c) && checkTiles[r-1][c] > 0 && checkTiles[r-1][c] < checkTiles[r][c]) continue;
+                            if(checkIndexes(r, c + 1) && checkTiles[r][c+1] > 0 && checkTiles[r][c+1] < checkTiles[r][c]) continue;
+                            if(checkIndexes(r, c - 1) && checkTiles[r][c-1] > 0 && checkTiles[r][c-1] < checkTiles[r][c]) continue;
+                            if(battlefield.isTileOccupied(r + rowOrigin, c + colOrigin)) checkTiles[r][c] = 0;
                         }
                     }
                 }
+
+                //TODO:
+
 
                 moveAreaSize = getMoveAreaSize();
             }
@@ -595,7 +581,7 @@ public class Battlefield extends Observable {
             int size = 0;
             for(int r = 0; r < checkTiles.length; r++){
                 for(int c = 0; c < checkTiles[0].length; c++){
-                    if (checkTiles[r][c].remainingMovePoints > 0) {
+                    if (checkTiles[r][c] > 0) {
                         size++;
                     }
                 }
@@ -607,12 +593,12 @@ public class Battlefield extends Observable {
             Array<int[]> area = new Array<int[]>();
             for(int r = 0; r < checkTiles.length; r++){
                 for(int c = 0; c < checkTiles[0].length; c++){
-                    if (checkTiles[r][c].remainingMovePoints > 0) {
+                    if (checkTiles[r][c] > 0) {
                         area.add(new int[]{r + rowOrigin, c + colOrigin});
                     }
                 }
             }
-            System.out.println(toString());
+            //System.out.println(toString());
             return area;
         }
 
@@ -622,38 +608,11 @@ public class Battlefield extends Observable {
             String str ="\nOrigin :"+rowOrigin+" "+colOrigin+"\n\n";
             for(int r = checkTiles.length - 1 ; r > -1 ; r--){
                 for(int c = 0; c < checkTiles[0].length; c++){
-                    str += " "+checkTiles[r][c].remainingMovePoints;
+                    str += " "+checkTiles[r][c];
                 }
                 str+="\n";
             }
             return str;
-        }
-
-        static class CheckTile{
-            int remainingMovePoints;
-            private Array<CheckTile > children;
-            private CheckTile parent = null;
-
-            public CheckTile(int remainingMovePoints) {
-                this.remainingMovePoints = remainingMovePoints;
-                children = new Array<CheckTile>();
-            }
-
-            public void setKinship(CheckTile child) {
-                if(child.parent != null){
-                    child.parent.children.removeValue(child, true);
-                }
-                child.parent = this;
-                this.children.add(child);
-            }
-
-            public Array<CheckTile> getChildren() {
-                return children;
-            }
-
-            public CheckTile getParent() {
-                return parent;
-            }
         }
     }
 
