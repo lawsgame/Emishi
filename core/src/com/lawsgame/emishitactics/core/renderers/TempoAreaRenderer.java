@@ -16,10 +16,10 @@ import java.util.HashMap;
 public class TempoAreaRenderer implements AreaRenderer {
     protected Battlefield battlefield;
 
-    protected Array<int[]> tiles;
-    private Assets.TileHighligthingAssetsId id;
-    protected Array<float[]> spriteCoords;
-    protected Array<Sprite> spriteRefs;
+    protected Array<int[]> tiles;                   // coordinates of the highlighted tiles
+    private Assets.TileHighligthingAssetsId id;     // the id of type of sprite to use
+    protected Array<float[]> spriteCoords;          // coordinates to where render the used sprites => 4 sprites = 1 tile
+    protected Array<Sprite> spriteRefs;             // sprites to render associated with the coordinates above
 
 
     public TempoAreaRenderer(AssetManager asm, Battlefield bf,  Assets.TileHighligthingAssetsId id){
@@ -208,19 +208,19 @@ public class TempoAreaRenderer implements AreaRenderer {
 
             for(int r = 0; r < buildmap.length ; r++){
                 for(int c = 0; c < buildmap[0].length ; c++){
-                    //for each tile
+                    //for each tile to highlight
                     if(buildmap[r][c]){
-                        spriteCoords.add(new float[]{c  + 0.25f, r + 0.25f});
-                        spriteCoords.add(new float[]{c  + 0.25f, r + 0.75f});
-                        spriteCoords.add(new float[]{c  + 0.75f, r + 0.25f});
-                        spriteCoords.add(new float[]{c  + 0.75f, r + 0.75f});
+
+
+                        boolean utc, rtc, otc, ltc, dtc;
 
                         // bottom left
 
+                        spriteCoords.add(new float[]{c  + 0.25f, r + 0.25f});
 
-                        boolean otc = battlefield.checkIndexes(r-1, c-1) && buildmap[r-1][c-1];   // opposite tile covered
-                        boolean ltc = battlefield.checkIndexes(r, c-1) && buildmap[r][c-1];          // left ...
-                        boolean dtc = battlefield.checkIndexes(r-1, c) && buildmap[r-1][c];          // down ...
+                        otc = battlefield.checkIndexes(r-1, c-1) && buildmap[r-1][c-1];   // opposite tile covered
+                        ltc = battlefield.checkIndexes(r, c-1) && buildmap[r][c-1];          // left ...
+                        dtc = battlefield.checkIndexes(r-1, c) && buildmap[r-1][c];          // down ...
 
                         if(!ltc && !dtc){
                             spriteRefs.add(BOTTOM_LEFT_CORNER.get(id));
@@ -242,9 +242,13 @@ public class TempoAreaRenderer implements AreaRenderer {
 
                         // top left
 
+
+
+                        spriteCoords.add(new float[]{c  + 0.25f, r + 0.75f});
+
                         otc = battlefield.checkIndexes(r+1, c-1) && buildmap[r+1][c-1];
                         ltc = battlefield.checkIndexes(r, c-1) && buildmap[r][c-1];
-                        boolean utc = battlefield.checkIndexes(r+1, c-1) && buildmap[r+1][c]; // up ...
+                        utc = battlefield.checkIndexes(r+1, c) && buildmap[r+1][c]; // up ...
 
                         if(!ltc && !utc){
                             spriteRefs.add(TOP_LEFT_CORNER.get(id));
@@ -263,10 +267,14 @@ public class TempoAreaRenderer implements AreaRenderer {
                         }
 
 
+
                         // bottom right
 
+
+                        spriteCoords.add(new float[]{c  + 0.75f, r + 0.25f});
+
                         otc = battlefield.checkIndexes(r-1, c+1) && buildmap[r-1][c+1]; // opposite tile covered
-                        boolean rtc = battlefield.checkIndexes(r, c+1) && buildmap[r][c+1]; // right ...
+                        rtc = battlefield.checkIndexes(r, c+1) && buildmap[r][c+1]; // right ...
                         dtc = battlefield.checkIndexes(r-1, c) && buildmap[r-1][c]; // down ...
 
                         if(!rtc && !dtc){
@@ -286,6 +294,9 @@ public class TempoAreaRenderer implements AreaRenderer {
                         }
 
                         // top right
+
+
+                        spriteCoords.add(new float[]{c  + 0.75f, r + 0.75f});
 
                         otc = battlefield.checkIndexes(r+1, c+1) && buildmap[r+1][c+1]; // opposite tile covered
                         rtc = battlefield.checkIndexes(r, c+1) && buildmap[r][c+1]; // right ...
