@@ -4,9 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
-import com.lawsgame.emishitactics.core.constants.Data.DamageType;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
-import com.lawsgame.emishitactics.core.constants.Data.OffensiveAbility;
 import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
 import com.lawsgame.emishitactics.core.constants.Data.R;
 import com.lawsgame.emishitactics.core.constants.Data.TargetType;
@@ -79,7 +77,6 @@ public class Battlefield extends Observable {
 
     TILE METHODS HIERARCHY
 
-     resetTile
      > setTile
      -> setTileAs
      -> plunderTile
@@ -89,21 +86,17 @@ public class Battlefield extends Observable {
 
     public boolean setTile(int r, int c, TileType type){
         if(checkIndexes(r,c) && type != null){
-            _resetTile(r,c);
-            getTiles()[r][c] = type;
+            //reset tile
+            recruits.remove(_getLootId(r, c));
+            tombItems.remove(_getLootId(r, c));
+            looted[r][c] = false;
+
+            //set tile
+            tiles[r][c] = type;
             notifyAllObservers(new int[]{r, c});
             return true;
         }
         return false;
-    }
-
-    private void _resetTile(int r, int c){
-        if(checkIndexes(r,c)) {
-            tiles[r][c] = null;
-            looted[r][c] = false;
-            recruits.remove(_getLootId(r, c));
-            tombItems.remove(_getLootId(r, c));
-        }
     }
 
     public void setTileAs(int r, int c, TileType type, Object obj){
@@ -119,8 +112,6 @@ public class Battlefield extends Observable {
         }
     }
 
-
-
     public TileType getTile(int r, int c) {
         if(checkIndexes(r,c)){
             return getTiles()[r][c];
@@ -128,7 +119,14 @@ public class Battlefield extends Observable {
         return null;
     }
 
-
+    public Array<int[]> getNeighbourTiles(int row, int col) {
+        Array<int[]> tiles = new Array<int[]>();
+        if(isTileExisted(row + 1 , col)) tiles.add(new int[]{row + 1 , col});
+        if(isTileExisted(row , col + 1)) tiles.add(new int[]{row , col + 1});
+        if(isTileExisted(row - 1 , col)) tiles.add(new int[]{row - 1 , col});
+        if(isTileExisted(row , col - 1)) tiles.add(new int[]{row , col - 1});
+        return tiles;
+    }
 
     public boolean plunderTile(int r, int c){
         if(isTilePlunderable(r,c)){
@@ -166,9 +164,10 @@ public class Battlefield extends Observable {
     checkIndexes
     > isTileLooted
     > isTileExisted
+    -> isTileType
     -> isTilePlunderable
     -> isTileReachable
-    |-> isTileAvaible
+    |-> isTileAvailable
     -> isTileOccupied
     --> isTileOccupiedByX
 
@@ -196,6 +195,9 @@ public class Battlefield extends Observable {
     public boolean isTileExisted(int r, int c){
         return checkIndexes(r,c) && getTile(r,c) != null;
     }
+
+    public boolean isTileType(int r, int c, TileType type) {
+        return isTileExisted(r, c) && getTile(r , c) == type;}
 
     public boolean isTilePlunderable(int r, int c){
         return isTileExisted(r,c) && getTile(r,c).isPlunderable();
@@ -268,14 +270,11 @@ public class Battlefield extends Observable {
         }
     }
 
-    public boolean deployUnit(int row, int col, Unit unit){
-        if(isTileAvailable(row, col, unit.has(PassiveAbility.PATHFINDER)) && !isUnitAlreadydeployed(unit)){
+    public void deployUnit(int row, int col, Unit unit){
+        if(isTileAvailable(row, col, unit.has(PassiveAbility.PATHFINDER)) &&  !isUnitAlreadydeployed(unit) && unit.getArmy() != null){
             this.units[row][col] = unit;
             notifyAllObservers(new int[]{row, col});
-            return true;
         }
-
-        return false;
     }
 
     public boolean switchUnitsPosition(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
@@ -293,7 +292,7 @@ public class Battlefield extends Observable {
     }
 
     public Array<int[]> moveUnit(int rowI, int colI, int rowf, int colf){
-    Array<int[]> path  = new Array<int[]>();
+        Array<int[]> path  = new Array<int[]>();
         if(isTileOccupied(rowI, colI)) {
             Unit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
@@ -341,6 +340,65 @@ public class Battlefield extends Observable {
         return unit;
     }
 
+    public void build(int rowActor, int colActor, int rowTarget, int colTarget, boolean bridge){
+        boolean contructable = false;
+        if(isTileExisted(rowTarget, colTarget) && !isTileOccupied(rowTarget, colTarget)){
+
+            TileType tile = getTile(rowTarget, colTarget);
+            if(bridge && tile == TileType.SHALLOWS){
+                if (isTileExisted(rowTarget + 1, colTarget) && isTileExisted(rowTarget - 1, colTarget) && getTile(rowTarget + 1, colTarget) == TileType.PLAIN && getTile(rowTarget - 1, colTarget) == TileType.PLAIN) {
+                    contructable = true;
+                } else if (isTileExisted(rowTarget, colTarget + 1) && isTileExisted(rowTarget, colTarget - 1) && getTile(rowTarget, colTarget+1) == TileType.PLAIN && getTile(rowTarget, colTarget-1) == TileType.PLAIN) {
+                    contructable = true;
+                }
+            }else if (!bridge && tile == TileType.PLAIN){
+                contructable = true;
+            }
+
+            if(contructable && isTileOccupied(rowActor, colActor)){
+                Unit actor = getUnit(rowActor, colActor);
+                actor.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+                actor.notifyAllObservers(Data.AnimationId.BUILD);
+                getTiles()[rowTarget][colTarget] = (bridge) ? TileType.BRIDGE : TileType.WATCH_TOWER;
+                notifyAllObservers(BuildMessage.get(rowTarget, colTarget, tiles[rowTarget][colTarget]));
+            }
+
+        }
+    }
+
+    public void push(int rowActor, int colActor, int rowTarget, int colTarget){
+
+        if(isTileOccupied(rowActor, colActor) && isTileOccupied(rowTarget,colActor) && Utils.dist(rowActor, colActor, rowTarget, colTarget) == 1){
+            Unit actor = getUnit(rowActor, colActor);
+            Unit target = getUnit(rowTarget, colTarget);
+            boolean pathfinder = target.has(PassiveAbility.PATHFINDER);
+
+            if(!target.isHorseman()){
+                if(rowActor < rowTarget && isTileAvailable(rowTarget + 1, colTarget, pathfinder)){
+                    this.units[rowTarget][rowTarget] = null;
+                    this.units[rowTarget + 1][rowTarget] = target;
+                    actor.notifyAllObservers(Data.AnimationId.PUSH);
+                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+                }else if(rowActor > rowTarget && isTileAvailable(rowTarget - 1, colTarget, pathfinder)){
+                    this.units[rowTarget][rowTarget] = null;
+                    this.units[rowTarget + 1][rowTarget] = target;
+                    actor.notifyAllObservers(Data.AnimationId.PUSH);
+                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+                }else if(colActor < colTarget && isTileAvailable(rowTarget, colTarget + 1, pathfinder)){
+                    this.units[rowTarget][rowTarget] = null;
+                    this.units[rowTarget + 1][rowTarget] = target;
+                    actor.notifyAllObservers(Data.AnimationId.PUSH);
+                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+                }else if(colActor > colTarget && isTileAvailable(rowTarget, colTarget - 1, pathfinder)){
+                    this.units[rowTarget][rowTarget] = null;
+                    this.units[rowTarget + 1][rowTarget] = target;
+                    actor.notifyAllObservers(Data.AnimationId.PUSH);
+                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+                }
+            }
+        }
+    }
+
     public Unit getUnitByName(String name) {
         Unit target = null;
         for(int r = getNbRows()-1; r > -1 ; r--){
@@ -365,17 +423,26 @@ public class Battlefield extends Observable {
         return pos;
     }
 
+    /**
+     *
+     * @param unit
+     * @param row
+     * @param col
+     * @return whether or not there is a standard bearer at range if the given unit is standing on the given tile = {row, col}
+     */
     public boolean  isStandardBearerAtRange(Unit unit, int row, int col){
-        if(isTileExisted(row, col)) {
-            if(unit.isMobilized()) {
-                int bannerRange = unit.getArmy().getBannerRange();
-                for (int r = row - bannerRange; r < row + bannerRange + 1; r++) {
-                    for (int c = col - bannerRange; c < col + bannerRange + 1; c++) {
-                        if (isTileOccupiedBySameSquad(r, c, getUnit(r, c))
-                                && Utils.dist(row, col, r, c) > 0
-                                && getUnit(r, c).isStandardBearer()) {
-                            return true;
-                        }
+        int dist;
+        if(isTileExisted(row, col)&& unit.isMobilized()) {
+            int bannerRange = unit.getArmy().getBannerRange();
+            for (int r = row - bannerRange; r <= row + bannerRange; r++) {
+                for (int c = col - bannerRange; c <= col + bannerRange; c++) {
+                    dist = Utils.dist(row, col, r, c);
+                    if (checkIndexes(r, c )
+                            && dist > 0
+                            && dist <= bannerRange
+                            && isTileOccupiedBySameSquad(r, c, getUnit(r, c))
+                            && getUnit(r, c).isStandardBearer()) {
+                        return true;
                     }
                 }
             }
@@ -383,22 +450,7 @@ public class Battlefield extends Observable {
         return false;
     }
 
-    /**
-     *
-     * @param row
-     * @param col
-     * @return (r,c)
-     */
-    public Array<int[]> getAvailableNeighbourTiles(int row, int col, Unit recruit){
-        Array<int[]> availableNeighbourTiles = new Array<int[]>();
-        if (isTileAvailable(row+1, col, recruit.has(PassiveAbility.PATHFINDER))) availableNeighbourTiles.add(new int[]{row+1, col});
-        if (isTileAvailable(row-1, col, recruit.has(PassiveAbility.PATHFINDER))) availableNeighbourTiles.add(new int[]{row-1, col});
-        if (isTileAvailable( row,col+1, recruit.has(PassiveAbility.PATHFINDER))) availableNeighbourTiles.add(new int[]{row, col+1});
-        if (isTileAvailable( row,col-1, recruit.has(PassiveAbility.PATHFINDER))) availableNeighbourTiles.add(new int[]{row, col-1});
-        return availableNeighbourTiles;
-    }
-
-    public boolean isUnitNearGardien(int row, int  col){
+     public boolean isGuardianAtRange(int row, int  col){
         if(isTileOccupied(row, col)) {
             Unit unit = getUnit(row, col);
             for (int r = row - 1; r < row + 2; r++) {
@@ -406,7 +458,7 @@ public class Battlefield extends Observable {
                     if (isTileOccupied(r, c)
                             && Utils.dist(row, col, r, c) > 0
                             && getUnit(r, c).sameSquadAs(unit)
-                            && getUnit(r, c).has(PassiveAbility.GUARDIAN)) {
+                            && getUnit(r, c).isGuarding()) {
                         return true;
                     }
                 }
@@ -424,7 +476,7 @@ public class Battlefield extends Observable {
                     if (isTileOccupied(r, c)
                             && Utils.dist(row, col, r, c) > 0
                             && getUnit(r, c).sameSquadAs(unit)
-                            && getUnit(r, c).has(PassiveAbility.GUARDIAN)) {
+                            && getUnit(r, c).isGuarding()) {
                         units.add(getUnit(r, c));
                     }
                 }
@@ -569,10 +621,6 @@ public class Battlefield extends Observable {
                         }
                     }
                 }
-
-                //TODO:
-
-
                 moveAreaSize = getMoveAreaSize();
             }
         }
@@ -627,78 +675,23 @@ public class Battlefield extends Observable {
     }
 
 
-
-    /**
-     * there is 3 types of requirements for an action to be performable by an actor
-     *  - abiility type
-     *  - equipement type (weapon mainly)
-     *  - target type
-     *
-     * @return whether or not an action can be physically performed by the actor if one's is standing the tile (row, col) to perform the given action while ignoring the actor's history.
-     */
-    public boolean canActionbePerformed(Unit actor, int row, int col, ActionChoice choice){
-        boolean performable = false;
-
-        // if the tile is available or the actor currently occupied this tile
-        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER)) || (isTileOccupied(row, col) && getUnit(row, col) == actor)){
-
-            // check ABILITY REQUIREMENTS
-            switch (choice){
-                case WALK:                  break;
-                case SWITCH_WEAPON:         if(!actor.isPromoted()) return false; break;
-                case SWITCH_POSITION:       break;
-                case PUSH:                  if(actor.isHorseman()) return false; break;
-                case PRAY:                  if(!actor.has(PassiveAbility.PRAYER)) return false; break;
-                case HEAL:                  if(!actor.has(PassiveAbility.HEALER)) return false; break;
-                case STEAL:                 if(!actor.has(PassiveAbility.THIEF)) return false; break;
-                case BUILD:                 if(!actor.has(PassiveAbility.ENGINEER)) return false; break;
-                case ATTACK:                break;
-                case CHOOSE_ORIENTATION:    break;
-                case CHOOSE_STANCE:         break;
-                case USE_FOCUSED_BLOW:      if(!actor.has(OffensiveAbility.FOCUSED_BLOW)) return false; break;
-                case USE_CRIPPLING_BLOW:    if(!actor.has(OffensiveAbility.CRIPPLING_BLOW)) return false; break;
-                case USE_SWIRLING_BLOW:     if(!actor.has(OffensiveAbility.SWIRLING_BLOW)) return false; break;
-                case USE_SWIFT_BLOW:        if(!actor.has(OffensiveAbility.SWIFT_BLOW)) return false; break;
-                case USE_HEAVY_BLOW:        if(!actor.has(OffensiveAbility.HEAVY_BLOW)) return false; break;
-                case USE_CRUNCHING_BLOW:    if(!actor.has(OffensiveAbility.CRUNCHING_BLOW)) return false; break;
-                case USE_WAR_CRY:           if(!actor.has(OffensiveAbility.WAR_CRY)) return false; break;
-                case USE_POISONOUS_ATTACK:  if(!actor.has(OffensiveAbility.POISONOUS_ATTACK)) return false; break;
-                case USE_GUARD_BREAK:       if(!actor.has(OffensiveAbility.GUARD_BREAK)) return false; break;
-                case USE_LINIENT_BLOW:      if(!actor.has(OffensiveAbility.LINIENT_BLOW)) return false; break;
-                case USE_FURY:              if(!actor.has(OffensiveAbility.FURY)) return false; break;
-                default:
-
-                    return false;
-            }
-
-            // check WEAPON REQUIREMENTS
-            if((choice.getDamageTypeRequired() != DamageType.NONE  && actor.getCurrentWeapon().getType() != choice.getDamageTypeRequired())
-                    || (actor.getCurrentWeapon().isRangedW() &&  choice.isMeleeWeaponEquipedRequired())) {
-                return false;
-            }
-
-            // check TARGET REQUIREMENTS
-            performable = atActionRange(actor, row, col, choice);
-        }
-        return performable;
-    }
-
     /**
      *
-     * @param actor
-     * @param row
-     * @param col
+     * @param rowActor
+     * @param colActor
      * @param choice
-     * @return whether or not a target is at range by the actor performing the given action if one's is standing the tile (row, col)
-     * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon and ability requirements.
+     * @return fetch all tiles where the given unit can act upon without checking if the action can be performed
      */
-    public boolean atActionRange(Unit actor, int row, int col, ActionChoice choice){
-        boolean atRange = false;
-        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER)) || (isTileOccupied(row, col) && getUnit(row, col) == actor)){
+    public Array<int[]> getActionArea(int rowActor, int colActor, ActionChoice choice){
+        Array<int[]>  actionArea = new Array<int[]>();
+        if(isTileOccupied(rowActor, colActor)){
+            Unit actor = getUnit(rowActor, colActor);
+
+
             if (choice.getTargetType() == TargetType.SPECIFIC) {
                 if (choice == ActionChoice.BUILD) {
                     if(!actor.isBuildingResourcesConsumed()) {
-                        int[][] neighborTiles = new int[][]{{row + 1, col}, {row - 1, col}, {row, col + 1}, {row, col - 1}};
+                        int[][] neighborTiles = new int[][]{{rowActor + 1, colActor}, {rowActor - 1, colActor}, {rowActor, colActor + 1}, {rowActor, colActor - 1}};
                         int r;
                         int c;
                         for (int i = 0; i < neighborTiles.length; i++) {
@@ -707,31 +700,155 @@ public class Battlefield extends Observable {
                             if (isTileExisted(r, c)) {
                                 if (getTile(r, c) == TileType.PLAIN) {
 
-                                    atRange =  true;
+                                    actionArea.add(new int[]{r, c});
 
                                 } else if (getTile(r, c) == TileType.SHALLOWS) {
                                     if (isTileExisted(r + 1, c) && isTileExisted(r - 1, c) && getTile(r + 1, c) == TileType.PLAIN && getTile(r - 1, c) == TileType.PLAIN) {
 
-                                        atRange = true;
+                                        actionArea.add(new int[]{r, c});
 
-                                    } else if (isTileExisted(r, c + 1) && isTileExisted(r, c - 1) && getTile(r + 1, c) == TileType.PLAIN && getTile(r - 1, c) == TileType.PLAIN) {
+                                    } else if (isTileExisted(r, c + 1) && isTileExisted(r, c - 1) && getTile(r , c + 1) == TileType.PLAIN && getTile(r, c - 1) == TileType.PLAIN) {
 
-                                        atRange =  true;
+                                        actionArea.add(new int[]{r, c});
                                     }
                                 }
                             }
                         }
                     }
                 } else if (choice == ActionChoice.WALK) {
-                    //TODO: if relevant check if there is at least one tile available at move range.
 
-                    atRange = true;
+                    actionArea.addAll(getMoveArea(rowActor, colActor));
+
+                } else if( choice == ActionChoice.PUSH){
+
+                    if(!actor.isHorseman()){
+                        Unit target;
+                        if (isTileOccupiedByAlly(rowActor + 1, colActor, actor.getAllegeance())) {
+                            target = getUnit(rowActor + 1, colActor);
+                            if (!target.isHorseman() && isTileAvailable(rowActor + 2, colActor, target.has(PassiveAbility.PATHFINDER))) {
+                                actionArea.add(new int[]{rowActor + 1, colActor});
+                            }
+                        }
+                        if (isTileOccupiedByAlly(rowActor - 1, colActor, actor.getAllegeance())) {
+                            target = getUnit(rowActor - 1, colActor);
+                            if (!target.isHorseman() && isTileAvailable(rowActor - 2, colActor, target.has(PassiveAbility.PATHFINDER))) {
+                                actionArea.add(new int[]{rowActor - 1, colActor});
+                            }
+                        }
+                        if (isTileOccupiedByAlly(rowActor, colActor+1, actor.getAllegeance())) {
+                            target = getUnit(rowActor, colActor+1);
+                            if (!target.isHorseman() && isTileAvailable(rowActor, colActor-2, target.has(PassiveAbility.PATHFINDER))) {
+                                actionArea.add(new int[]{rowActor, colActor-2});
+                            }
+                        }
+                        if (isTileOccupiedByAlly(rowActor, colActor-1, actor.getAllegeance())) {
+                            target = getUnit(rowActor, colActor-1);
+                            if (!target.isHorseman() && isTileAvailable(rowActor, colActor-2, target.has(PassiveAbility.PATHFINDER))) {
+                                actionArea.add(new int[]{rowActor, colActor-1});
+                            }
+                        }
+
+                    }
+                }
+            } else {
+                if (choice.getTargetType() == TargetType.ONE_SELF) {
+
+                    actionArea.add(new int[]{rowActor, colActor});
+
+                } else {
+                    //generic algorithm
+                    int rangeMin = getActionRangeMin(actor, rowActor, colActor, choice);
+                    int rangeMax = getActionRangeMax(actor, rowActor, colActor, choice);
+
+                    actionArea.addAll(Utils.getEreaFromRange(this, rowActor, colActor, rangeMin, rangeMax));
+
+                }
+            }
+        }
+        return actionArea;
+    }
+
+    /**
+     * AI ORIENTED METHOD
+     *
+     * check the third requirements to perform an action
+     * - target availability requirements
+     *
+     * @param actor
+     * @param row
+     * @param col
+     * @param choice
+     * @return whether or not ANY TARGET is at range by the actor performing the given action if one's is standing the tile (row, col)
+     * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
+     */
+    public boolean atActionRange(Unit actor, int row, int col, ActionChoice choice){
+        boolean validate = false;
+        if(isTileAvailable(row, col, actor.has(PassiveAbility.PATHFINDER)) || (isTileOccupied(row, col) && getUnit(row, col) == actor)){
+            if (choice.getTargetType() == TargetType.SPECIFIC) {
+                if (choice == ActionChoice.BUILD) {
+                    int[][] neighborTiles = new int[][]{{row + 1, col}, {row - 1, col}, {row, col + 1}, {row, col - 1}};
+                    int r;
+                    int c;
+                    for (int i = 0; i < neighborTiles.length; i++) {
+                        r = neighborTiles[i][0];
+                        c = neighborTiles[i][1];
+                        if (isTileExisted(r, c)) {
+                            if (getTile(r, c) == TileType.PLAIN) {
+
+                                validate =  true;
+                                break;
+
+                            } else if (getTile(r, c) == TileType.SHALLOWS) {
+                                if (isTileExisted(r + 1, c) && isTileExisted(r - 1, c) && getTile(r + 1, c) == TileType.PLAIN && getTile(r - 1, c) == TileType.PLAIN) {
+
+                                    validate = true;
+                                    break;
+
+                                } else if (isTileExisted(r, c + 1) && isTileExisted(r, c - 1) && getTile(r + 1, c) == TileType.PLAIN && getTile(r - 1, c) == TileType.PLAIN) {
+
+                                    validate =  true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else if (choice == ActionChoice.WALK) {
+
+                    validate = getMoveArea(row, col).size > 0;
+
+                } else if (choice == ActionChoice.PUSH){
+
+                    Unit target;
+                    if(isTileOccupiedByAlly(row + 1, col, actor.getAllegeance())){
+                        target = getUnit(row + 1, col);
+                        if(!target.isHorseman() && isTileAvailable(row + 2, col, getUnit(row + 1, col).has(PassiveAbility.PATHFINDER))){
+                            validate = true;
+                        }
+                    }
+                    if(!validate && isTileOccupiedByAlly(row - 1, col, actor.getAllegeance())){
+                        target = getUnit(row - 1, col);
+                        if(!target.isHorseman() && isTileAvailable(row - 2, col, getUnit(row - 1, col).has(PassiveAbility.PATHFINDER))){
+                            validate = true;
+                        }
+                    }
+                    if(!validate && isTileOccupiedByAlly(row, col + 1, actor.getAllegeance())){
+                        target = getUnit(row, col + 1);
+                        if(!target.isHorseman() && isTileAvailable(row, col + 2, getUnit(row, col + 1).has(PassiveAbility.PATHFINDER))){
+                            validate = true;
+                        }
+                    }
+                    if(!validate && isTileOccupiedByAlly(row, col - 1, actor.getAllegeance())){
+                        target = getUnit(row, col - 1);
+                        if(!target.isHorseman() && isTileAvailable(row, col - 2, getUnit(row, col - 1).has(PassiveAbility.PATHFINDER))){
+                            validate = true;
+                        }
+                    }
 
                 }
             } else {
                 if (choice.getTargetType() == TargetType.ONE_SELF || choice.getImpactAreaSize() > 1) {
 
-                    atRange = true;
+                    validate = true;
 
                 } else {
                     //generic algorithm
@@ -744,16 +861,19 @@ public class Battlefield extends Observable {
                         for (int c = col - rangeMax; c <= col + rangeMax; c++) {
                             dist = Utils.dist(row, col, r, c);
                             if (rangeMin <= dist && dist <= rangeMax) {
+
                                 if (isTileOccupiedByAlly(r, c, actor.getAllegeance())
                                         && (choice.getTargetType() == TargetType.ALLY
                                         || (choice.getTargetType() == TargetType.WOUNDED_ALLY && getUnit(r, c).isWounded())
                                         || (choice.getTargetType() == TargetType.FOOTMAN_ALLY && !getUnit(r, c).isHorseman()))) {
 
-                                    atRange = true;
+                                    validate = true;
+                                    break;
 
                                 } else if (isTileOccupiedByFoe(r, c, actor.getAllegeance()) && choice.getTargetType() == TargetType.ENEMY) {
 
-                                    atRange = true;
+                                    validate = true;
+                                    break;
 
                                 }
                             }
@@ -762,8 +882,111 @@ public class Battlefield extends Observable {
                 }
             }
         }
-        return atRange;
+        return validate;
     }
+
+    /**
+     * TARGET CHECKING
+     * @param actor
+     * @param choice
+     * @return whether or not THIS SPECIFIC TARGET is at range by the actor performing the given action if one's is standing the tile (rowActor, colActor)
+     * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
+     */
+    public boolean isTargetValid(Unit actor, int rowActor, int colActor, int rowTarget, int colTarget, ActionChoice choice) {
+        boolean validate = false;
+        if (isTileExisted(rowTarget, colTarget)
+                && (isTileAvailable(rowActor, colActor, actor.has(PassiveAbility.PATHFINDER)) || (isTileOccupied(rowActor, colActor) && actor == getUnit(rowActor, colActor)))){
+
+
+            if (choice.getTargetType() == TargetType.SPECIFIC) {
+                if(choice == ActionChoice.PUSH){
+                    if(isTileOccupiedByAlly(rowTarget, colTarget, actor.getAllegeance())
+                            && !getUnit(rowTarget, colTarget).isHorseman()
+                            && Utils.dist(rowActor, colActor, rowTarget, colTarget) == 1){
+                        Unit target = getUnit(rowTarget, colTarget);
+                        if(rowActor < rowTarget && isTileAvailable(rowTarget + 1, colTarget, target.has(PassiveAbility.PATHFINDER)))
+                            validate = true;
+                        else if(rowActor > rowTarget && isTileAvailable(rowTarget - 1, colTarget, target.has(PassiveAbility.PATHFINDER)))
+                            validate = true;
+                        else if(rowActor < rowTarget && isTileAvailable(rowTarget + 1, colTarget, target.has(PassiveAbility.PATHFINDER)))
+                            validate = true;
+                        else if(rowActor < rowTarget && isTileAvailable(rowTarget + 1, colTarget, target.has(PassiveAbility.PATHFINDER)))
+                            validate = true;
+
+                    }
+                }else if(choice == ActionChoice.WALK){
+                    if(Utils.dist(rowActor, colActor, rowTarget, colTarget) > 0){
+                        Array<int[]> path = getShortestPath(rowActor, colActor, rowTarget, colTarget, actor.has(PassiveAbility.PATHFINDER), actor.getAllegeance());
+                        if(path.size > 0 && path.size <= actor.getCurrentMob()){
+                            validate = true;
+                        }
+                    }
+                }else if(choice == ActionChoice.BUILD){
+                    if(Utils.dist(rowActor, colActor, rowTarget, colTarget) == 1) {
+                        if(isTileType(rowTarget, colTarget, TileType.PLAIN)){
+                            validate = true;
+                        }else if(isTileType(rowTarget, colTarget, TileType.SHALLOWS) ){
+                            if(isTileType(rowTarget + 1, colTarget, TileType.PLAIN) && isTileType(rowTarget - 1, colTarget, TileType.PLAIN)){
+                                validate = true;
+                            }else if(isTileType(rowTarget, colTarget + 1, TileType.PLAIN) && isTileType(rowTarget, colTarget - 1, TileType.PLAIN)){
+                                validate = true;
+                            }
+                        }
+                    }
+                }
+            }else if(choice.getTargetType() == TargetType.ONE_SELF)
+                validate = rowActor == rowTarget && colActor == colTarget;
+            else{
+                int rangeMin = getActionRangeMin(actor, rowActor, colActor, choice);
+                int rangeMax = getActionRangeMax(actor, rowActor, colActor, choice);
+                int dist = Utils.dist(rowActor, colActor, rowTarget, colTarget);
+                boolean atRange = rangeMin <= dist && dist <= rangeMax;
+
+                if(!atRange && choice.getImpactAreaSize() > 1){
+                    Array<int[]> impactArea = getTargetFromCollateral(choice, rowActor, colActor, rowTarget, colTarget);
+                    for(int i =0; i < impactArea.size; i++){
+                        dist = Utils.dist(rowActor, colActor, impactArea.get(i)[0], impactArea.get(i)[1]);
+                        atRange = atRange || (rangeMin <= dist && dist <= rangeMax);
+                    }
+                }
+
+                if (atRange) {
+                    if (isTileOccupiedByAlly(rowTarget, colTarget, actor.getAllegeance())) {
+                        Unit target = getUnit(rowTarget, colTarget);
+                        if(choice.getTargetType() == TargetType.ALLY){
+                            validate = true;
+                        }else if(choice.getTargetType() == TargetType.FOOTMAN_ALLY && !target.isHorseman()){
+                            validate = true;
+                        }else if(choice.getTargetType() == TargetType.WOUNDED_ALLY && target.isWounded()){
+                            validate = true;
+                        }
+                    } else if (isTileOccupiedByFoe(rowTarget, colTarget, actor.getAllegeance()) && choice.getTargetType() == TargetType.ENEMY){
+                        validate = true;
+                    }
+                }
+            }
+        }
+        return validate;
+    }
+
+    public Array<int[]> getTargetFromCollateral(ActionChoice choice, int rowActor, int colActor, int rowImpactTile, int colImpactTile) {
+        Array<int[]> possibleTargetTiles = new Array<int[]>();
+        Array<int[]> impactArea;
+        int row;
+        int col;
+        for(Data.Orientation or: Data.Orientation.values()){
+            impactArea = choice.getOrientedImpactArea(or);
+            for(int i = 0; i < impactArea.size; i++){
+                row =rowImpactTile - impactArea.get(i)[0];
+                col =colImpactTile - impactArea.get(i)[1];
+                if(isTileExisted(row, col) && or == Utils.getOrientationFromCoords(rowActor, colActor, row, col)){
+                    possibleTargetTiles.add(new int[]{row, col});
+                }
+            }
+        }
+        return possibleTargetTiles;
+    }
+
 
     /**
      *
@@ -898,123 +1121,36 @@ public class Battlefield extends Observable {
      *
      * the initial tile is the one of the target.
      *
-     * @return shortest path to attack the given target
+     * @return shortest path to perform the given action upon the given target
      */
-    public Array<int[]>  getShortestPath(int rowActor, int colActor, int rowf, int colf, ActionChoice choice){
-        Array<int[]> res = new Array<int[]>();
+    public Array<int[]>  getShortestPath(int rowActor, int colActor, int rowTarget, int colTarget, ActionChoice choice){
+        //TODO:
+        return null;
+    }
 
-        if(isTileOccupied(rowActor, colActor)) {
-            Unit actor = getUnit(rowActor, colActor);
-            StateNode node;
-            int rowNeigh;
-            int colNeigh;
-            boolean atAttackRange;
-
-
-            Array<PathNode> path = new Array<PathNode>();
-            Array<StateNode> opened = new Array<StateNode>();
-            Array<StateNode> closed = new Array<StateNode>();
-            opened.add(new StateNode(rowf, colf, rowActor, colActor, null, this, true));
-            StateNode current;
-            Array<StateNode> neighbours;
-
-
-            while (true) {
-
-                //no solution
-                if (opened.size == 0) break;
-
-                current = opened.get(0);
-                for (int i = 0; i < opened.size; i++) {
-                    if (opened.get(i).better(current)) {
-                        current = opened.get(i);
-                    }
-                }
-                opened.removeValue(current, true);
-                closed.add(current);
-
-                // path found
-                if (current.getRow() == rowf && current.getCol() == colf){
-                    //TODO: handle the case where the unit is under the minimal requiredRange of one's weapon and therefore can not attack as one's is both too far and too close to the target.
-
-
-
-
-                    break;
-                }
-
-                // get available neighbor nodes which are not yet in the closed list
-                neighbours = new Array<StateNode>();
-
-
-                rowNeigh = current.row + 1;
-                colNeigh = current.col;
-                atAttackRange = atActionRange(actor, rowNeigh, colNeigh, choice);
-                node = null;
-                if(atAttackRange){
-                    /*TODO:
-                    1) think about the case where the unit is precisely at the maximum range but the tile is occupied by an ally
-                    2) implements Node.arrayContains(Node node) to replace this line : "!closed.contains(node, false)"
-                     */
-                    node = new StateNode(rowNeigh, colNeigh, rowf, colf, current, this, true);
-                }else if (isTileReachable(rowNeigh, colNeigh, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(rowNeigh, colNeigh, actor.getAllegeance())) {
-                    node = new StateNode(rowNeigh, colNeigh, rowf, colf, current, this, false);
-                }
-                if (!closed.contains(node, false)) {
-                    neighbours.add(node);
-                }
-
-
-                /*
-                if (isTileReachable(current.row, current.col + 1, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row, current.col + 1, actor.getAllegeance())) {
-                    node = new StateNode(current.row, current.col + 1, rowf, colf, current, this, false);
-                    if (!closed.contains(node, false)) {
-                        neighbours.add(node);
-                    }
-                }
-                if (isTileReachable(current.row - 1, current.col, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row - 1, current.col, actor.getAllegeance())) {
-                    node = new StateNode(current.row - 1, current.col, rowf, colf, current, this, false);
-                    if (!closed.contains(node, false)) {
-                        neighbours.add(node);
-                    }
-                }
-                if (isTileReachable(current.row, current.col - 1, actor.has(PassiveAbility.PATHFINDER)) && !isTileOccupiedByFoe(current.row, current.col - 1, actor.getAllegeance())) {
-                    node = new StateNode(current.row, current.col - 1, rowf, colf, current, this, false);
-                    if (!closed.contains(node, false)) {
-                        neighbours.add(node);
-                    }
-                }*/
-
-                boolean isNotInOpened = true;
-                for (int i = 0; i < neighbours.size; i++) {
-                    node = neighbours.get(i);
-                    for (int j = 0; j < opened.size; j++) {
-                        if (opened.get(j).equals(node)) {
-                            isNotInOpened = false;
-                            if (node.better(opened.get(j))) {
-                                opened.removeIndex(j);
-                                opened.add(node);
-                            }
-                        }
-                    }
-                    if (isNotInOpened) {
-                        opened.add(node);
-                    }
-                    isNotInOpened = true;
-
+    /**
+     *
+     * @param choice
+     * @param rowActor
+     * @param colActor
+     * @param rowTarget
+     * @param colTarget
+     * @return the relevantly oriented impact area of an action performed by an actor while targeting the tile {rowTarget, colTarget}
+     */
+    public Array<int[]> getImpactArea(ActionChoice choice, int rowActor, int colActor, int rowTarget, int colTarget){
+        Array<int[]> orientedArea = choice.getOrientedImpactArea(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+        if(isTileExisted(rowTarget, colTarget)) {
+            for (int i = 0; i < orientedArea.size; i++) {
+                orientedArea.get(i)[0] += rowTarget;
+                orientedArea.get(i)[1] += colTarget;
+                if (!isTileExisted(orientedArea.get(i)[0], orientedArea.get(i)[1])) {
+                    orientedArea.removeIndex(i);
+                    i--;
                 }
             }
-
-            if (closed.get(closed.size - 1).getRow() == rowf && closed.get(closed.size - 1).getCol() == colf) {
-                path = closed.get(closed.size - 1).getPath();
-            }
-
-            for (int i = path.size - 2; i > -1; i--) {
-                res.add(new int[]{path.get(i).getRow(), path.get(i).getCol()});
-            }
+            orientedArea.add(new int[]{rowTarget, colTarget});
         }
-
-        return res;
+        return orientedArea;
     }
 
 
@@ -1037,10 +1173,6 @@ public class Battlefield extends Observable {
         return getNbRows();
     }
 
-    public Unit[][] getUnits() {
-        return units;
-    }
-
     public Array<int[]> getDeploymentArea() {
         return deploymentArea;
     }
@@ -1050,6 +1182,8 @@ public class Battlefield extends Observable {
             this.deploymentArea.add(new int[]{row, col});
         }
     }
+
+
 
 
 
@@ -1173,5 +1307,23 @@ public class Battlefield extends Observable {
 
     }
 
+    // --------------- BUILD NOTIFICATION -------------------------------------
 
+    public static class BuildMessage {
+        public int row;
+        public int col;
+        public TileType tile;
+
+        private static BuildMessage msg = new BuildMessage();
+
+        private BuildMessage(){ }
+
+        public static BuildMessage get(int row, int col, TileType tile){
+            msg.row = row;
+            msg.col = col;
+            msg.tile = tile;
+            return msg;
+        }
+
+    }
 }

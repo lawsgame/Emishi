@@ -7,30 +7,26 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.renderers.interfaces.UnitRenderer;
-import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 /*
  * TODO: clipping
  */
 
 public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
-    protected Array<UnitRenderer> unitRenderers;
+    protected Array<BattleUnitRenderer> unitRenderers;
     protected TextureRegion[][] tileRenderers;
     protected TempoSprite2DPool sprite2DPool;
 
-    // for building animation
-    private int rBuild;
-    private int cBuild;
-    private TextureRegion buildingInContructionTR;
-    private CountDown constructionCountDown = new CountDown(2f);
 
 
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
-        this.unitRenderers = new Array<UnitRenderer>();
+        this.unitRenderers = new Array<BattleUnitRenderer>();
         this.sprite2DPool = TempoSprite2DPool.get();
         this.sprite2DPool.set(asm);
 
@@ -54,11 +50,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 }
             }
         }
-        if(constructionCountDown.isRunning()){
-            batch.draw(buildingInContructionTR, cBuild, rBuild, 1, 1);
-        }
-
-
     }
 
     @Override
@@ -70,10 +61,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
-        constructionCountDown.update(dt);
-        if(constructionCountDown.isFinished()){
-            constructionCountDown.reset();
-        }
         for(int i = 0; i < unitRenderers.size; i++){
             unitRenderers.get(i).update(dt);
         }
@@ -128,24 +115,12 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
 
     @Override
-    public UnitRenderer getUnitRenderer(Unit model) {
+    public BattleUnitRenderer getUnitRenderer(Unit model) {
         for(int i = 0; i < unitRenderers.size; i++){
             if(unitRenderers.get(i).getModel() == model)
                 return unitRenderers.get(i);
         }
         return null;
-    }
-
-    @Override
-    public void triggerBuildAnimation(int row, int col, Data.TileType buildingType, Unit builder){
-        if(model.checkIndexes(row, col) && (buildingType == Data.TileType.BRIDGE || buildingType == Data.TileType.WATCH_TOWER) ){
-            rBuild = row;
-            cBuild = col;
-            getUnitRenderer(builder).triggerAnimation(Data.AnimationId.BUILD);
-            constructionCountDown.run();
-            buildingInContructionTR = (buildingType == Data.TileType.BRIDGE) ? TempoSprite2DPool.get().getBridgeInConstruction() : TempoSprite2DPool.get().getTowerInConstruction();
-
-        }
     }
 
     @Override
@@ -186,27 +161,29 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 //switch units position
                 Array<int[]> path = new Array<int[]>();
                 if (model.isTileOccupied(coords[0], coords[1]) && model.isTileOccupied(coords[2], coords[3])) {
-                    UnitRenderer ur1 = getUnitRenderer(model.getUnit(coords[0], coords[1]));
-                    UnitRenderer ur2 = getUnitRenderer(model.getUnit(coords[2], coords[3]));
+                    BattleUnitRenderer ur1 = getUnitRenderer(model.getUnit(coords[0], coords[1]));
+                    BattleUnitRenderer ur2 = getUnitRenderer(model.getUnit(coords[2], coords[3]));
                     path.add(new int[]{coords[2], coords[3]});
-                    ur1.triggerMoveAnimation(path);
+                    ur1.displayWalk(path);
+                    path.clear();
                     path.add(new int[]{coords[0], coords[1]});
-                    ur2.triggerMoveAnimation(path);
+                    ur2.displayWalk(path);
                 }
             }
+
         }else if(data instanceof Array){
             if(((Array)data).size > 0 && ((Array)data).get(0) instanceof int[]){
                 Array<int[]> path = (Array<int[]>) data;
-                //TODO: trigger walk animation!!
-
                 int[] unitCoords = path.removeIndex(0);
                 if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
                     Unit unit = model.getUnit(unitCoords[0], unitCoords[1]);
-                    getUnitRenderer(unit).triggerMoveAnimation(path);
+                    getUnitRenderer(unit).displayWalk(path);
                 }
 
-
             }
+        }else if(data instanceof BuildMessage){
+            BuildMessage msg = (BuildMessage)data;
+            addTileRenderer(msg.row , msg.col);
         }
     }
 

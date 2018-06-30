@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.constants;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 
 import java.util.Random;
 
@@ -14,6 +15,7 @@ public class Data {
     public static final float MAX_UNITS_UNDER_WARLORD = 5f; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 4f; // including the war chief himself / herself
     public static final float SPEED_WALK = 3f;  //tile/s
+    public static final float SPEED_PUSHED = 8f;
     public static final float COUNTER_ATTACK_DAMAGE_MODIFIER = 1f;
 
     // item bonus
@@ -367,24 +369,32 @@ public class Data {
         WALK,               //automatized
         SWITCH_WEAPON,      //automatized
         SWITCH_POSITION,    //automatized
-        PUSH,
+        PUSH,               //automatized
         HEAL,
-        PRAY,               //use HEAL animation
-        STEAL,
-        BUILD,
+        PRAY,
+        STEAL,              //automatized
+        BUILD,              //automatized
         GUARD,
-        LEVEL_UP,           //automatized, partially at least, the chosen secondary and level-up panels are displayed separately to distinguish between player and AI's units
-        HEALED,
-        REST,
+        LEVELUP,            //automatized, partially at least, the chosen secondary and level-up panels are displayed separately to distinguish between player and AI's units
+        REST,               //automatized, standard animation
         ATTACK,
         PARRIED_ATTACK,
+
+        // REACTION ANIMATION
+
         DODGE,
         BLOCK,
         PARRY,
+        PUSHED,             //automatized
+        TREATED,            //automatized
         BACKSTABBED,
         TAKE_HIT,           //automatized
-        FLEE,               //automatized, use WALK animation
+        FLEE,               //automatized
         DIE,                //automatized
+        GUARDED,            //automatized
+
+        //ABILITY ANIMATINO
+
         FOCUSED_BLOW,
         CRIPPLING_BLOW,
         SWIRLING_BLOW,
@@ -420,28 +430,29 @@ public class Data {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                            (0, 0, false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
-        SWITCH_WEAPON                   (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
-        SWITCH_POSITION                 (1, 1, false, false, DamageType.NONE, TargetType.ALLY, new int[][]{{}}),
-        PUSH                            (1, 1, false, false, DamageType.NONE, TargetType.FOOTMAN_ALLY, new int[][]{{}}),
-        PRAY                            (1, 1, false, false, DamageType.NONE, TargetType.WOUNDED_ALLY, new int[][]{{}}),
-        HEAL                            (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        STEAL                           (1, 1, false, false, DamageType.NONE, TargetType.ENEMY,new int[][]{{}}),
-        BUILD                           (1, 1, false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
-        ATTACK                          (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        CHOOSE_ORIENTATION              (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
-        CHOOSE_STANCE                   (0, 0, false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
-        USE_FOCUSED_BLOW                (0, 0, true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
-        USE_CRIPPLING_BLOW              (0, 0, true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
-        USE_SWIRLING_BLOW               (1, 1, false, true, DamageType.EDGED, TargetType.ENEMY, new int[][]{{-1,1}, {-1,-1}}),
-        USE_SWIFT_BLOW                  (0, 0, true, false, DamageType.EDGED, TargetType.ENEMY, new int[][]{}),
-        USE_HEAVY_BLOW                  (0, 0, true, false, DamageType.BLUNT, TargetType.ENEMY, new int[][]{}),
-        USE_CRUNCHING_BLOW              (1, 1, false, true, DamageType.BLUNT, TargetType.ENEMY, new int[][]{{1, 0}, {-1, 0}}),
-        USE_WAR_CRY                     (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_POISONOUS_ATTACK            (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_GUARD_BREAK                 (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_LINIENT_BLOW                (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_FURY                        (0, 0, true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}});
+        WALK                (-1, -1,false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
+        SWITCH_WEAPON       (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
+        SWITCH_POSITION     (1, 1,  false, false, DamageType.NONE, TargetType.ALLY, new int[][]{{}}),
+        PUSH                (-1, -1,false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
+        PRAY                (1, 1,  false, false, DamageType.NONE, TargetType.WOUNDED_ALLY, new int[][]{{}}),
+        HEAL                (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        GUARD               (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        STEAL               (1, 1,  false, false, DamageType.NONE, TargetType.ENEMY,new int[][]{{}}),
+        BUILD               (-1, -1,false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
+        ATTACK              (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        CHOOSE_ORIENTATION  (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
+        CHOOSE_STANCE       (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
+        USE_FOCUSED_BLOW    (-1, -1,true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
+        USE_CRIPPLING_BLOW  (-1, -1,true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
+        USE_SWIRLING_BLOW   (-1, -1,false, true, DamageType.EDGED, TargetType.ENEMY, new int[][]{{-1,1}, {-1,-1}}),
+        USE_SWIFT_BLOW      (-1, -1,true, false, DamageType.EDGED, TargetType.ENEMY, new int[][]{}),
+        USE_HEAVY_BLOW      (-1, -1,true, false, DamageType.BLUNT, TargetType.ENEMY, new int[][]{}),
+        USE_CRUNCHING_BLOW  (-1, -1,false, true, DamageType.BLUNT, TargetType.ENEMY, new int[][]{{1, 0}, {-1, 0}}),
+        USE_WAR_CRY         (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_POISONOUS_ATTACK(-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_GUARD_BREAK     (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_LINIENT_BLOW    (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
+        USE_FURY            (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}});
 
         private int rangeMax;
         private int rangeMin;
@@ -512,17 +523,19 @@ public class Data {
                                                     ( 2, 0)
 
 
-                                         */
-        public Array<int[]> getOrientedArea(Data.Orientation orientation) {
+        //VALIDATED                     */
+        public Array<int[]> getOrientedImpactArea(Data.Orientation orientation) {
             Array<int[]> orientedArea = new Array<int[]>();
             switch (orientation){
                 case WEST:
                     for(int i = 0; i < impactArea.size; i++){
-                        orientedArea.add(new int[]{-impactArea.get(i)[1], -impactArea.get(i)[0]});
+                        orientedArea.add(new int[]{impactArea.get(i)[1], -impactArea.get(i)[0]});
                     }
                     break;
                 case NORTH:
-                    orientedArea.addAll(impactArea);
+                    for(int i = 0; i < impactArea.size; i++) {
+                        orientedArea.addAll(new int[]{impactArea.get(i)[0], impactArea.get(i)[1]});
+                    }
                     break;
                 case SOUTH:
                     for(int i = 0; i < impactArea.size; i++){
@@ -535,11 +548,13 @@ public class Data {
                     }
                     break;
             }
+
+
             return orientedArea;
         }
 
         public int getImpactAreaSize(){
-            return impactArea.size;
+            return impactArea.size + 1;
         }
 
     }
@@ -643,25 +658,12 @@ public class Data {
             return art;
         }
 
-        private static float highAverageParry = 0;
-
-        public static float getHighAverageParryVulnerabilty(){
-            if(highAverageParry == 0){
-                for(Weapon wpn: Weapon.values()){
-                    if(wpn != NONE) {
-                        highAverageParry += wpn.parryVulnerability;
-                    }
-                }
-                highAverageParry /= Weapon.values().length;
-            }
-            return highAverageParry;
-        }
     }
 
 
     public enum JobTemplate {
-        CONSCRIPT("conscript", "bushi",  4,             false, true, false, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA}, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA, Weapon.NODACHI, Weapon.NAGINATA}),
-        EMISHI( "emishi warrior", "emishi warrior", 4,  false, true, false, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI}, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI, Weapon.KANABO});
+        CONSCRIPT("conscript", "bushi",             4,  true, true, true, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA}, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA, Weapon.NODACHI, Weapon.NAGINATA}),
+        EMISHI( "emishi warrior", "emishi warrior", 4,  true, true, true, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI}, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI, Weapon.KANABO});
 
         private String recruitName;
         private String promotionName;
@@ -966,7 +968,8 @@ public class Data {
     public enum DefensiveStance {
         PARRY,
         DODGE,
-        BLOCK
+        BLOCK,
+        COVERING_AREA
     }
 
     public static class R {

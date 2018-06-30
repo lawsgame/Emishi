@@ -15,24 +15,6 @@ public abstract class UnitRenderer extends Renderer<Unit> implements GameElement
 
     public UnitRenderer(Unit model) {
         super(model);
-        this.model.getBanner().attach(this);
-        this.model.getArmy().attach(this);
     }
 
-    public abstract boolean isProceeding();
-    public abstract void setTargeted(boolean targeted);
-
-    public abstract void triggerMoveAnimation(Array<int[]> path);
-    public abstract void triggerTakeHitAnimation(int damageTaken);
-    public abstract void triggerLevelUpAnimation(int[] gainlvl);
-    public abstract void triggerHealedAnimation(int[] oldHtpsAndMoral);
-
-    public abstract void triggerAnimation(Data.AnimationId id);
-
-    @Override
-    public void dispose(){
-        super.dispose();
-        this.model.getBanner().detach(this);
-        this.model.getArmy().detach(this);
-    }
 }

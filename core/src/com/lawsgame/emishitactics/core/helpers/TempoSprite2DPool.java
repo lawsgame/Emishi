@@ -86,8 +86,11 @@ public class TempoSprite2DPool {
                 TextureRegion[][] offabbRegions = region.split(32,8);
 
                 unitSprites.put(Data.AnimationId.ATTACK, unitRegions[3][0]);
+                unitSprites.put(Data.AnimationId.PARRIED_ATTACK, unitRegions[3][0]);
                 unitSprites.put(Data.AnimationId.PUSH, unitRegions[4][0]);
                 unitSprites.put(Data.AnimationId.HEAL, unitRegions[5][0]);
+                unitSprites.put(Data.AnimationId.LEVELUP, unitRegions[5][0]);
+                unitSprites.put(Data.AnimationId.TREATED, unitRegions[5][0]);
                 unitSprites.put(Data.AnimationId.STEAL, unitRegions[6][0]);
                 unitSprites.put(Data.AnimationId.BUILD, unitRegions[7][0]);
                 unitSprites.put(Data.AnimationId.WALK, unitRegions[8][0]);
@@ -95,6 +98,7 @@ public class TempoSprite2DPool {
                 unitSprites.put(Data.AnimationId.BLOCK, unitRegions[10][0]);
                 unitSprites.put(Data.AnimationId.PARRY, unitRegions[11][0]);
                 unitSprites.put(Data.AnimationId.BACKSTABBED, unitRegions[12][0]);
+                unitSprites.put(Data.AnimationId.PUSHED, unitRegions[12][0]);
                 unitSprites.put(Data.AnimationId.TAKE_HIT, unitRegions[13][0]);
                 unitSprites.put(Data.AnimationId.DIE, unitRegions[14][0]);
                 unitSprites.put(Data.AnimationId.GUARD, unitRegions[15][0]);
@@ -103,8 +107,11 @@ public class TempoSprite2DPool {
                 unitStanceSprites.put(Data.DefensiveStance.PARRY, unitRegions[2][0]);
 
                 foeSprites.put(Data.AnimationId.ATTACK, unitRegions[3][4]);
+                foeSprites.put(Data.AnimationId.PARRIED_ATTACK, unitRegions[3][4]);
                 foeSprites.put(Data.AnimationId.PUSH, unitRegions[4][4]);
                 foeSprites.put(Data.AnimationId.HEAL, unitRegions[5][4]);
+                foeSprites.put(Data.AnimationId.LEVELUP, unitRegions[5][4]);
+                foeSprites.put(Data.AnimationId.TREATED, unitRegions[5][4]);
                 foeSprites.put(Data.AnimationId.STEAL, unitRegions[6][4]);
                 foeSprites.put(Data.AnimationId.BUILD, unitRegions[7][4]);
                 foeSprites.put(Data.AnimationId.WALK, unitRegions[8][4]);
@@ -112,6 +119,7 @@ public class TempoSprite2DPool {
                 foeSprites.put(Data.AnimationId.BLOCK, unitRegions[10][4]);
                 foeSprites.put(Data.AnimationId.PARRY, unitRegions[11][4]);
                 foeSprites.put(Data.AnimationId.BACKSTABBED, unitRegions[12][4]);
+                foeSprites.put(Data.AnimationId.PUSHED, unitRegions[12][4]);
                 foeSprites.put(Data.AnimationId.TAKE_HIT, unitRegions[13][4]);
                 foeSprites.put(Data.AnimationId.DIE, unitRegions[14][4]);
                 foeSprites.put(Data.AnimationId.GUARD, unitRegions[15][4]);

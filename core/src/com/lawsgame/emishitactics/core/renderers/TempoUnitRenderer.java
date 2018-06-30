@@ -7,12 +7,13 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.renderers.interfaces.UnitRenderer;
+import com.lawsgame.emishitactics.core.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
+import static com.lawsgame.emishitactics.core.constants.Data.SPEED_PUSHED;
 import static com.lawsgame.emishitactics.core.constants.Data.SPEED_WALK;
 
-public class TempoUnitRenderer extends UnitRenderer {
+public class TempoUnitRenderer extends BattleUnitRenderer {
     protected float x;
     protected float y;
 
@@ -27,10 +28,11 @@ public class TempoUnitRenderer extends UnitRenderer {
     private boolean proceeding = false;
     private CountDown countDown = new CountDown(2f);
 
-    //walk attributes
+    //walk (& switch position / pushed) attributes
     private float dl;
     private boolean updatePoint = false;
-    private Array<int[]> remainingPath = new Array<int[]>();
+    private boolean pushed = false;
+    private Array<int[]> remainingPath = new Array<int[]>(); // array of (r, c) <=> (y, x)
 
     // hit attributes
     boolean hitTaken = false;
@@ -74,7 +76,7 @@ public class TempoUnitRenderer extends UnitRenderer {
 
         // handle walk animation
         if (remainingPath.size > 0) {
-            dl = dt * SPEED_WALK;
+            dl = dt * ((pushed) ? SPEED_PUSHED: SPEED_WALK);
             if (x == remainingPath.get(0)[1]) {
                 if ((y < remainingPath.get(0)[0] && y + dl >= remainingPath.get(0)[0])
                         || (y > remainingPath.get(0)[0] && y + dl <= remainingPath.get(0)[0])) {
@@ -103,6 +105,8 @@ public class TempoUnitRenderer extends UnitRenderer {
 
                 if (remainingPath.size == 0) {
                     proceeding = false;
+                    pushed = false;
+                    triggerAnimation(Data.AnimationId.REST);
                 } else {
                     model.setOrientation(Utils.getOrientationFromCoords(y, x, remainingPath.get(0)[0], remainingPath.get(0)[1]));
 
@@ -133,7 +137,7 @@ public class TempoUnitRenderer extends UnitRenderer {
 
 
     @Override
-    public void triggerMoveAnimation(Array<int[]> path) {
+    public void displayWalk(Array<int[]> path) {
         boolean validPath = true;
         int[] oldCoords = new int[]{(int)y, (int)x};
 
@@ -170,13 +174,13 @@ public class TempoUnitRenderer extends UnitRenderer {
                     }
 
                 }
+
                 Data.Orientation or = Utils.getOrientationFromCoords(y,x,path.get(0)[0], path.get(0)[1]);
                 model.setOrientation(or);
+                unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
+                proceeding = true;
 
             }
-
-
-            proceeding = true;
         }
 
 
@@ -184,7 +188,7 @@ public class TempoUnitRenderer extends UnitRenderer {
     }
 
     @Override
-    public void triggerTakeHitAnimation(int damageTaken) {
+    public void displayTakeHit(int damageTaken) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
         hitTaken = true;
         proceeding = true;
@@ -193,15 +197,32 @@ public class TempoUnitRenderer extends UnitRenderer {
 
 
     @Override
-    public void triggerLevelUpAnimation(int[] gainlvl) {
-        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.HEAL, model.getArmy().isAlly());
+    public void displayLevelup(int[] gainlvl) {
+        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.LEVELUP, model.getArmy().isAlly());
         proceeding = true;
         countDown.run();
     }
 
     @Override
-    public void triggerHealedAnimation(int[] oldHtpsAndMoral) {
-        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.HEAL, model.getArmy().isAlly());
+    public void displayTreated(int[] oldHtpsAndMoral) {
+        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().isAlly());
+        proceeding = true;
+        countDown.run();
+    }
+
+    @Override
+    public void displayPushed(Data.Orientation pushedTowards){
+        model.setOrientation(pushedTowards);
+        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().isAlly());
+        pushed = true;
+        proceeding = true;
+        switch (pushedTowards){
+            case WEST: remainingPath.add(new int[]{(int)y, (int)x - 1}); break;
+            case NORTH: remainingPath.add(new int[]{(int)y + 1, (int)x}); break;
+            case SOUTH: remainingPath.add(new int[]{(int)y - 1, (int)x}); break;
+            case EAST: remainingPath.add(new int[]{(int)y, (int)x + 1}); break;
+        }
+
     }
 
     @Override
@@ -209,9 +230,10 @@ public class TempoUnitRenderer extends UnitRenderer {
         switch (id){
             case WALK:
             case SWITCH_POSITION:
-            case LEVEL_UP:
-            case HEALED:
+            case LEVELUP:
+            case TREATED:
             case TAKE_HIT:
+            case PUSHED:
                 try{
                     throw new IllegalArgumentException("the following animation order "+id.name()+" required calling a specific method as it demands extra parameters to be conducted successfully");
                 }catch (IllegalArgumentException e){
@@ -230,6 +252,7 @@ public class TempoUnitRenderer extends UnitRenderer {
             case PRAY:
             case DIE:
             case BACKSTABBED:
+            case PARRIED_ATTACK:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
                 proceeding = true;
                 countDown.run();
@@ -240,16 +263,14 @@ public class TempoUnitRenderer extends UnitRenderer {
             case REST:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(model.getStance(), model.getArmy().isAlly(), model.isDone());
                 break;
-            case PARRIED_ATTACK:
-                unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly());
-                proceeding = true;
-                countDown.run();
-                break;
             case FLEE:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
                 orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation().getOpposite());
                 proceeding = true;
                 countDown.run();
+                break;
+            case GUARDED:
+                //TODO:
                 break;
             case FOCUSED_BLOW:
             case CRIPPLING_BLOW:
@@ -294,10 +315,8 @@ public class TempoUnitRenderer extends UnitRenderer {
     public void getNotification(Object data){
 
         if(data == null) {
-
             // update weapon
             weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
-
             // update orientation
             orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation());
             if (model.isUsingShield()) {
@@ -308,11 +327,27 @@ public class TempoUnitRenderer extends UnitRenderer {
                 // update soldier mount rendering
                 mountedTexture = TempoSprite2DPool.get().getMountedSprite();
             }
+
         }else if (data instanceof Integer){
             int damageTaken = (Integer)data;
-            triggerTakeHitAnimation(damageTaken);
+            displayTakeHit(damageTaken);
+
         }else if(data instanceof int[]){
-            int[] gainLvl = (int[])data;
+            int[] array = (int[])data;
+            if(array.length == 2){
+                int[] oldHpts = (int[])data;
+                displayTreated(oldHpts);
+            }else if(array.length == 10){
+                int[] gainLvl = (int[])data;
+                displayLevelup(gainLvl);
+            }
+
+        }else if(data instanceof Data.AnimationId){
+            triggerAnimation((Data.AnimationId)data);
+
+        }else if(data instanceof Data.Orientation){
+            displayPushed((Data.Orientation)data);
+
         }
     }
 

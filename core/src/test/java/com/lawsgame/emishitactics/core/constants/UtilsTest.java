@@ -14,8 +14,15 @@ public class UtilsTest {
 
     @BeforeClass
     public static void beforeAll(){
+
         System.out.println("\n---+++$$$ Utils TEST $$$+++---\n");
     }
+
+    @BeforeClass
+    public static void testOnfly(){
+
+    }
+
     @Before
     public void before(){
         bf = new Battlefield(9,9);

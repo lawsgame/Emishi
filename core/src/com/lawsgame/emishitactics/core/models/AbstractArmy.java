@@ -6,6 +6,8 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public abstract class AbstractArmy extends Observable{
 
+
+
     public enum ArmyType{
         PLAYER,
         ALLY,
@@ -27,13 +29,14 @@ public abstract class AbstractArmy extends Observable{
     public abstract Data.UnitAppointmentErrorMsg appointWarChief(Unit unit);
     public abstract Data.UnitAppointmentErrorMsg appointSoldier(Unit unit, int squadId);
     public abstract boolean disengage(Unit unit);
-    public abstract void resetComposition();
+    public abstract void disbandAllSquads();
     public abstract boolean isUnitMobilized(Unit unit);
 
     public abstract boolean contains(Unit unit);
     public abstract boolean add(Unit unit);
     public abstract void remove(Unit unit);
 
+    public abstract void checkComposition();
     public abstract Banner getSquadBanner(Unit unit);
     public abstract int getBannerRange();
 }
