@@ -20,7 +20,6 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import static com.lawsgame.emishitactics.core.constants.Data.*;
 import static com.lawsgame.emishitactics.core.constants.Data.DamageType.NONE;
-import static com.lawsgame.emishitactics.core.constants.Data.DamageType.PIERCING;
 
 
 /**
@@ -561,7 +560,7 @@ public class Unit extends Observable{
                 if (currentMoral > 0) {
                     currentMoral += healPower;
                 } else {
-                    currentMoral = getInitialMoral() + currentHitPoints - getAppHitPoints();
+                    currentMoral = getAppMoral() + currentHitPoints - getAppHitPoints();
                     if (currentMoral < 0) {
                         currentMoral = 0;
                     }
@@ -908,11 +907,11 @@ public class Unit extends Observable{
 
     public void setInitialHPAndMoral(){
         currentHitPoints = hitPoints;
-        currentMoral = getInitialMoral();
+        currentMoral = getAppMoral();
         notifyAllObservers(null);
     }
 
-    public int getInitialMoral(){
+    public int getAppMoral(){
         int moral = getAppBravery() + getChaChiefsBonus();
         if(moral >= currentHitPoints) moral = currentHitPoints - 1;
         return moral;

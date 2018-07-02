@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.states;
+package com.lawsgame.emishitactics.core.phases.battle;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -7,9 +7,7 @@ import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.renderers.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.core.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.states.interactions.BattleInteractionState;
-import com.lawsgame.emishitactics.core.states.interactions.BattleInteractionSystem;
-import com.lawsgame.emishitactics.core.states.interactions.TestBIS;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.TestBIS;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
 
@@ -66,7 +64,7 @@ public class BattlePhase extends GamePhase {
     @Override
     public void update60(float dt) {
         bis.getCurrentState().update(dt);
-        bis.getBattlefieldRenderer().update(dt);
+        bis.getBFRenderer().update(dt);
 
 
     }
@@ -78,9 +76,9 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void renderWorld(SpriteBatch batch) {
-        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.getBattlefieldRenderer().renderTiles(batch);
+        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.getBFRenderer().renderTiles(batch);
         bis.getCurrentState().renderBetween(batch);
-        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.getBattlefieldRenderer().renderUnits(batch);
+        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.getBFRenderer().renderUnits(batch);
         bis.getCurrentState().renderAhead(batch);
     }
 

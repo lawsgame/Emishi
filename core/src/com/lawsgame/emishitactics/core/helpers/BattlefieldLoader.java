@@ -13,7 +13,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.AbstractArmy;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.states.BattlePhase;
+import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 
 import java.io.IOException;
 import java.util.HashMap;

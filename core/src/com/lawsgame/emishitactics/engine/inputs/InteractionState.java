@@ -19,13 +19,6 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
         this.gameCam = gameCam;
     }
 
-    @Override
-    public void init() {
-        Gdx.input.setInputProcessor(new GestureDetector(this));
-        initiate();
-    }
-
-    public abstract void initiate();
     public abstract void onLongTouch(float gameX, float gameY);
     public abstract void onTouch(float gameX, float gameY);
     public abstract void pan(float gameDX, float gameDY);
@@ -49,7 +42,7 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
             vector3 = gameCam.unproject(vector3);
             onTouch(vector3.x, vector3.y);
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -60,7 +53,7 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
         vector3 = gameCam.unproject(vector3);
         onLongTouch(vector3.x, vector3.y);
         longPressed = true;
-        return false;
+        return true;
     }
 
 
@@ -85,7 +78,7 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
         pan(-vector3.x + oldVector3.x, - vector3.y + oldVector3.y);
 
         //System.out.println(xCenter + " "+ yCenter+" <= +" + deltaX + " & +"+deltaY);
-        return false;
+        return true;
     }
 
     @Override
@@ -99,13 +92,9 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
     }
 
     @Override
-    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-        return false;
-    }
+    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) { return false;    }
 
     @Override
-    public void pinchStop() {
-
-    }
+    public void pinchStop() {    }
 }
 

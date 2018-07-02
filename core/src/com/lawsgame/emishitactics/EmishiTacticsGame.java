@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.PerformanceCounter;
 
-import com.lawsgame.emishitactics.core.states.BattlePhase;
+import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.engine.GPM;
 
 public class EmishiTacticsGame extends ApplicationAdapter {
