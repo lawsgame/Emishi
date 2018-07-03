@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.renderers;
+package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -9,9 +9,9 @@ import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.renderers.interfaces.BattleUnitRenderer;
-import com.lawsgame.emishitactics.core.renderers.interfaces.UnitRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.core.renderers.UnitRenderer;
 
 /*
  * TODO: clipping

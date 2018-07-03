@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.renderers.interfaces;
+package com.lawsgame.emishitactics.core.renderers;
 
 import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.engine.GameElement;

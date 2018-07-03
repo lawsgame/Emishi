@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.renderers;
+package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 import static com.lawsgame.emishitactics.core.constants.Data.SPEED_PUSHED;

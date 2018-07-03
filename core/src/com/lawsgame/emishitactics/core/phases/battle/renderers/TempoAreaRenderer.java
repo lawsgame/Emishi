@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.renderers;
+package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 
 import java.util.HashMap;
 

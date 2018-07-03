@@ -1,12 +1,14 @@
-package com.lawsgame.emishitactics.core.phases.battle;
+package com.lawsgame.emishitactics.core.phases;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.renderers.TempoBattlefield2DRenderer;
-import com.lawsgame.emishitactics.core.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoBattlefield2DRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.TestBIS;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
@@ -84,7 +86,7 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void renderUI(SpriteBatch batch) {
-        bis.getCurrentState().renderUI();
+        bis.getCurrentState().renderUI(batch);
     }
 
     @Override

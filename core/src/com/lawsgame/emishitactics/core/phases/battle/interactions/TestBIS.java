@@ -10,10 +10,10 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.AbstractArmy;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
-import com.lawsgame.emishitactics.core.renderers.TempoAreaRenderer;
-import com.lawsgame.emishitactics.core.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoAreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 
 public class TestBIS extends BattleInteractionState {
     AreaRenderer ar;

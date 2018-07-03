@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle;
+package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
@@ -23,7 +23,6 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
     public abstract boolean isFree();                                  // does not set Unit.acted as true
     public abstract boolean isEndTurnCommand();                        // is only callable when the unit turn is ending
     public abstract void display(SpriteBatch batch);                   // render the infos regarding the action to perform
-    public abstract Array<int[]> getAvailableTargets();
     public abstract void setTarget(int rowTarget, int colTarget);
     public abstract boolean isExecuting();
     public abstract boolean isExecutionCompleted();

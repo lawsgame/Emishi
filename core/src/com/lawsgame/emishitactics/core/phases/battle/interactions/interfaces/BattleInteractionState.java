@@ -1,6 +1,7 @@
-package com.lawsgame.emishitactics.core.phases.battle;
+package com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
 
 public abstract class BattleInteractionState extends InteractionState {
@@ -11,7 +12,7 @@ public abstract class BattleInteractionState extends InteractionState {
     protected boolean mapSlidable = true;
 
     public BattleInteractionState(BattleInteractionSystem BISys) {
-        super(BISys.gameCM.getCamera());
+        super(BISys.getGCM().getCamera());
         this.BISys = BISys;
     }
 
@@ -34,7 +35,7 @@ public abstract class BattleInteractionState extends InteractionState {
     @Override
     public void pan(float gameDX, float gameDY) {
         if(mapSlidable) {
-            BISys.gameCM.translateGameCam(gameDX, gameDY);
+            BISys.getGCM().translateGameCam(gameDX, gameDY);
         }
     }
 
