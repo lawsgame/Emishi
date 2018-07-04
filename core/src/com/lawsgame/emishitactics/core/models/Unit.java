@@ -678,16 +678,13 @@ public class Unit extends Observable{
         return item1;
     }
 
-
     public Item getItem2() {
         return item2;
     }
 
-
     public int getNbItemsEquiped(){
         return ((item1 !=  Item.NONE) ? 1 : 0) + ((item2 !=  Item.NONE) ? 1 : 0);
     }
-
 
     public boolean equip(Item item, boolean firstSlot) {
         int currentLd = getAppLaedership();
@@ -735,11 +732,9 @@ public class Unit extends Observable{
         return armyRecomposed;
     }
 
-
     public void unequip(boolean firstSlot){
         equip(Item.NONE, firstSlot);
     }
-
 
     public boolean isUsing(Item eq){
         boolean used = item1 == eq || item2 == eq;
@@ -748,7 +743,6 @@ public class Unit extends Observable{
         }
         return used;
     }
-
 
     public boolean isUsingShield(){
         return  (item1.getItemType() == ItemType.SHIELD && isUsing(item1)) || (item2.getItemType() == ItemType.SHIELD && isUsing(item2));

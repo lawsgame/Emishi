@@ -36,7 +36,7 @@ public class BattlePhase extends GamePhase {
         Battlefield battlefield = BattlefieldLoader.load(this, battlefieldId);
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
-        this.bis = new BattleInteractionSystem(battlefield, battlefieldRenderer, getGameCM(), asm);
+        this.bis = new BattleInteractionSystem(battlefield, battlefieldRenderer, gameCM, asm, stageUI);
 
         BattleInteractionState initBIS = new TestBIS(bis);
         bis.push(initBIS);
@@ -84,10 +84,6 @@ public class BattlePhase extends GamePhase {
         bis.getCurrentState().renderAhead(batch);
     }
 
-    @Override
-    public void renderUI(SpriteBatch batch) {
-        bis.getCurrentState().renderUI(batch);
-    }
 
     @Override
     public void dispose() {

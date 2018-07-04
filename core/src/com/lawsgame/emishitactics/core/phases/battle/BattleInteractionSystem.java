@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle;
 
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -11,17 +12,16 @@ import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionSystem extends StateMachine<BattleInteractionState> {
-    Battlefield battlefield;
-    BattlefieldRenderer BFdRenderer;
-    BattleCommandManager bcm;
-    CameraManager gameCM;
-    AssetManager asm;
+    private Battlefield battlefield;
+    private BattlefieldRenderer BFdRenderer;
+    private BattleCommandManager bcm;
+    private CameraManager gameCM;
+    private AssetManager asm;
+    private InputMultiplexer multiplexer;
+    private Stage UIStage;
 
-    InputMultiplexer multiplexer;
-    Stage UIStage;
 
-
-    public BattleInteractionSystem(Battlefield battlefield, BattlefieldRenderer BFdRenderer, CameraManager gameCM, AssetManager asm) {
+    public BattleInteractionSystem(Battlefield battlefield, BattlefieldRenderer BFdRenderer, CameraManager gameCM, AssetManager asm, Stage UIStage) {
         this.battlefield = battlefield;
         this.BFdRenderer = BFdRenderer;
         this.gameCM = gameCM;
@@ -29,7 +29,7 @@ public class BattleInteractionSystem extends StateMachine<BattleInteractionState
         this.bcm = new BattleCommandManager(battlefield);
 
         this.multiplexer = new InputMultiplexer();
-        this.UIStage = new Stage();
+        this.UIStage = UIStage;
     }
 
     @Override

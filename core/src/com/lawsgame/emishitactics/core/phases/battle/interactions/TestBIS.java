@@ -14,6 +14,7 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.Bat
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoAreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TileShortPanel;
 
 public class TestBIS extends BattleInteractionState {
     AreaRenderer ar;
@@ -145,6 +146,8 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("Johnny moral :"+ soldier2.getCurrentMoral() +"/"+soldier2.getAppMoral());
         System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
 
+        //WIDGETS
+
     }
 
 
@@ -177,11 +180,6 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderUI(SpriteBatch batch) {
 
     }
 

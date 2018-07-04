@@ -4,8 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
-import com.badlogic.gdx.utils.Disposable;
+import com.lawsgame.emishitactics.EmishiTacticsGame;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
 
 
@@ -13,22 +14,21 @@ import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
  *
  */
 public abstract class GamePhase implements State, GameElement {
-	protected GPM gpm;                      // allow to switch to another phase
-	protected AssetManager asm;             // allow to have access to all the required assets: xml, sounds, textures.
 
-
-	private Rectangle scissors;
-
-	private CameraManager gameCM;
-	private CameraManager uiCM;
+	protected GPM gpm;                  // allow to switch to another phase
+	protected AssetManager asm;         // allow to have access to all the required assets: xml, sounds, textures, shaders etc...
+	protected CameraManager gameCM; 	    // level camera manager
+    private CameraManager uiCM;         // UI camera manager
+	protected Stage stageUI;			// handle UI layer over the level
 
 	private float acc1 = 0;
 	private float acc3 = 0;
 	private float acc12 = 0;
 
 	private static float aspectRatio = 0;
+    private Rectangle scissors;
 
-	/**
+    /**
 	 * world GAME coordinate system (gdx.SpriteBatch)
 	 * yCenter
 	 * ^
@@ -49,30 +49,27 @@ public abstract class GamePhase implements State, GameElement {
 	 *	the GamePhase.class is the root to all update/render loops
 	 *	futhermore, it aggregates two différent cameras:
 	 *		- the game one : focus on the level
-	 *		- the UI one : focus on the UI
+	 *		- the UI one : focus on the UI through stageUI
 	 *	Finally, it also aggregates an AssetManager
 	 */
-	public GamePhase (GPM gpm, AssetManager asm, float gamePortWidth, float uiPortWidth, float gameWorldWidth, float gameWorldHeight){
+	public GamePhase (GPM gpm, AssetManager asm, float gamePortWidth, float gameWorldWidth, float gameWorldHeight){
 		this.gpm = gpm;
 		this.asm = asm;
 		this.gameCM = new CameraManager(gameWorldWidth, gameWorldHeight, gamePortWidth);
-		this.uiCM = new CameraManager(uiPortWidth);
-	}
-
-	public GamePhase (GPM gsm, AssetManager asm, float gamePortWidth, float worldWidth, float worldHeight){
-		this(gsm, asm, gamePortWidth, 1, worldWidth, worldHeight);
+		this.uiCM = new CameraManager(EmishiTacticsGame.SCREEN_PIXEL_WIDTH);
+		this.stageUI = new Stage(uiCM.getPort());
 	}
 
 	public GamePhase (GPM gsm, float gamePortWidth, float worldWidth, float worldHeight){
-		this(gsm, new AssetManager(), gamePortWidth, 1, worldWidth, worldHeight);
+		this(gsm, new AssetManager(), gamePortWidth, worldWidth, worldHeight);
 	}
 
 	public GamePhase (GPM gsm, AssetManager asm, float gamePortWidth){
-		this(gsm, asm, gamePortWidth, 1, gamePortWidth, gamePortWidth*getAspRatio());
+		this(gsm, asm, gamePortWidth, gamePortWidth, gamePortWidth*getAspRatio());
 	}
 
 	public GamePhase (GPM gsm, float gamePortWidth){
-		this(gsm, new AssetManager(), gamePortWidth, 1, gamePortWidth, gamePortWidth*getAspRatio());
+		this(gsm, new AssetManager(), gamePortWidth, gamePortWidth, gamePortWidth*getAspRatio());
 	}
 
 	public void update(float dt){
@@ -81,6 +78,7 @@ public abstract class GamePhase implements State, GameElement {
 		acc12 +=dt;
 		
 		update60(dt);
+		stageUI.act(dt);
 		
 		if(acc12  > 0.08){
 			update12(acc12);
@@ -130,21 +128,14 @@ public abstract class GamePhase implements State, GameElement {
 
 
         /**
-         * others stuff to renderUnderlyingMapPart without using the SpriteBatch instance
+         * UI rendering
          */
-		batch.begin();
-		batch.setProjectionMatrix(uiCM.getCamera().combined);
-
-		renderUI(batch);
-
-		batch.end();
-
+		stageUI.draw();
 	}
 
 
 	public abstract void preRender(SpriteBatch batch);
 	public abstract void renderWorld(SpriteBatch batch);
-	public abstract void renderUI(SpriteBatch batch);
 	
 
 	//-------- SETTERS & GETTERS ---------
@@ -165,4 +156,7 @@ public abstract class GamePhase implements State, GameElement {
     public CameraManager getGameCM() {
         return gameCM;
     }
+
+    public Stage getStageUI(){ return stageUI; }
+
 }

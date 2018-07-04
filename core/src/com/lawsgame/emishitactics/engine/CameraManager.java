@@ -32,8 +32,11 @@ public class CameraManager extends Observable {
 
     }
 
-    public CameraManager(float portWidth){
-        this(1, 1, portWidth);
+    /**
+     * create a viewport that match the dimension of the world and the screen aspect ratio, of which both 's width equals 1.
+     */
+    public CameraManager(int portWidth){
+        this(portWidth, portWidth*getAspRatio(), portWidth);
     }
 
     public void setCameraBoundaries(float w, float h) {

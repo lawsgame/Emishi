@@ -22,7 +22,6 @@ public abstract class BattleInteractionState extends InteractionState {
     public abstract void prerender(SpriteBatch batch);
     public abstract void renderBetween(SpriteBatch batch);
     public abstract void renderAhead(SpriteBatch batch);
-    public abstract void renderUI(SpriteBatch batch);
 
     @Override
     public void onLongTouch(float gameX, float gameY) {
