@@ -22,7 +22,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     protected TextureRegion[][] tileRenderers;
     protected TempoSprite2DPool sprite2DPool;
 
-
+    protected boolean proceeding = false;
+    protected boolean unitRenderersProceedding = false;
 
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
@@ -39,6 +40,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             }
         }
 
+    }
+
+    @Override
+    public boolean isProceeding() {
+        return proceeding || unitRenderersProceedding;
     }
 
     @Override
@@ -61,8 +67,10 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
+        unitRenderersProceedding = false;
         for(int i = 0; i < unitRenderers.size; i++){
             unitRenderers.get(i).update(dt);
+            unitRenderersProceedding = unitRenderersProceedding || unitRenderers.get(i).isProceeding();
         }
 
     }
@@ -97,6 +105,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         if(unit != null) {
             for(int i = 0; i< unitRenderers.size; i++){
                 if(unitRenderers.get(i).getModel() == unit){
+                    unit.detach(unitRenderers.get(i));
                     return unitRenderers.removeValue(unitRenderers.get(i), true);
                 }
             }

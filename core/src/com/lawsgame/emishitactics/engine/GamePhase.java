@@ -15,11 +15,11 @@ import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
  */
 public abstract class GamePhase implements State, GameElement {
 
-	protected GPM gpm;                  // allow to switch to another phase
-	protected AssetManager asm;         // allow to have access to all the required assets: xml, sounds, textures, shaders etc...
-	protected CameraManager gameCM; 	    // level camera manager
+	protected GPM gpm;                  // Allow to switch to another phase
+	protected AssetManager asm;         // Allow to have access to all the required assets: xml, sounds, textures, shaders etc...
+	protected CameraManager gameCM; 	// Level camera manager
     private CameraManager uiCM;         // UI camera manager
-	protected Stage stageUI;			// handle UI layer over the level
+	protected Stage stageUI;			// Handle UI layer over the level
 
 	private float acc1 = 0;
 	private float acc3 = 0;
@@ -76,10 +76,7 @@ public abstract class GamePhase implements State, GameElement {
 		acc1 +=dt;
 		acc3 +=dt;
 		acc12 +=dt;
-		
-		update60(dt);
-		stageUI.act(dt);
-		
+
 		if(acc12  > 0.08){
 			update12(acc12);
 			acc12 = 0;
@@ -94,9 +91,12 @@ public abstract class GamePhase implements State, GameElement {
 			update1(acc1);
 			acc1 = 0;
 		}
+
+		update60(dt);
+		stageUI.act(dt);
+		uiCM.update(dt);
+		gameCM.update(dt);
 	}
-
-
 	
 	public abstract void update1(float dt);
 	public abstract void update3(float dt);

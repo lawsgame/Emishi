@@ -4,17 +4,29 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import static com.lawsgame.emishitactics.engine.GamePhase.getAspRatio;
 
-public class CameraManager extends Observable {
+public class CameraManager extends Observable implements GameUpdatableEntity {
+    private static final float CAM_VELOCITY = 15;
+    private static final float CAM_SLOPE_FACTOR = 0.1f; 	// increase it raise the transition period
+
     protected OrthographicCamera camera;     // level camera
     protected float worldWidth;               // defines the rectangle within the camera is allowed to move.
     protected float worldHeight;              // defines the rectangle within the camera is allowed to move.
     private Viewport viewport;              // defines the dimension of the frame through the player see the level
-
     private Rectangle clipBounds;           // specific
+
+    private Vector vTarget;
+    private Vector vFrom;
+    private Vector gamma; // velocity factor
+    private  float alpha; // slope or transition time factor
+    private  Vector dl;
+    private boolean cameraMoving;
+    private boolean reachWorldBoundaries;
+    private float time;
 
     public CameraManager(float worldWidth, float worldHeight, float portWidth){
         this.worldHeight = worldHeight;
@@ -30,6 +42,14 @@ public class CameraManager extends Observable {
         this.camera.setToOrtho(false, portWidth, gamePortHeight);
         this.camera.update();
 
+        this.vTarget = new Vector(0,0);
+        this.vFrom = new Vector(0,0);
+        this.gamma = new Vector(0,0);
+        this.dl = new Vector(0,0);
+        this.cameraMoving = false;
+        this.reachWorldBoundaries = false;
+        this.time = 0;
+
     }
 
     /**
@@ -39,11 +59,75 @@ public class CameraManager extends Observable {
         this(portWidth, portWidth*getAspRatio(), portWidth);
     }
 
+
     public void setCameraBoundaries(float w, float h) {
         if( w < clipBounds.width) w =  clipBounds.width;
         if( h < clipBounds.height) h = clipBounds.height;
         this.worldWidth = w;
         this.worldHeight = h;
+    }
+
+    public void focusOn(float xTargetTile, float yTargetTile, boolean smoothly) {
+        if(xTargetTile != camera.position.x || yTargetTile != camera.position.y){
+            if(smoothly){
+                set(xTargetTile + 0.5f, yTargetTile+ 0.5f);
+            }else{
+                setCamPos(xTargetTile  + 0.5f, yTargetTile + 0.5f);
+            }
+        }
+    }
+
+    public boolean isCameraMoving(){
+        return cameraMoving;
+    }
+
+    private void set(float xTarget, float yTarget){
+        if(!cameraMoving){
+            vTarget.x = xTarget;
+            vTarget.y = yTarget;
+            vFrom.x = camera.position.x;
+            vFrom.y = camera.position.y;
+            gamma.x = (vTarget.x - vFrom.x);
+            gamma.y = (vTarget.y - vFrom.y);
+            alpha = CAM_SLOPE_FACTOR*gamma.length();
+            gamma.multiply(CAM_VELOCITY);
+            cameraMoving = true;
+            reachWorldBoundaries = false;
+            time = 0;
+        }
+    }
+
+    @Override
+    public void update(float dt) {
+        if(cameraMoving){
+            if( (vTarget.x == camera.position.x && vTarget.y == camera.position.y) || this.reachWorldBoundaries){
+                cameraMoving = false;
+            }else{
+                if(Math.abs(vTarget.x - camera.position.x) < Math.abs(vFrom.x - camera.position.x)){
+                    time += dt;
+                }else{
+                    time -=dt;
+                }
+
+                float f = (float) ((1 - 2*Math.exp(time/(2*alpha))) + Math.exp(time/alpha));
+                dl.x = gamma.x*f*dt;
+                dl.y = gamma.y*f*dt;
+
+                if(0 < dl.x && vTarget.x < dl.x + camera.position.x){
+                    dl.x = vTarget.x - camera.position.x;
+                }
+                if(dl.x < 0 && vTarget.x > dl.x + camera.position.x){
+                    dl.x = vTarget.x - camera.position.x;
+                }
+                if(0 < dl.y && vTarget.y < dl.y + camera.position.y){
+                    dl.y = vTarget.y - camera.position.y;
+                }
+                if(dl.y < 0 && vTarget.y > dl.y + camera.position.y){
+                    dl.y = vTarget.y - camera.position.y;
+                }
+                reachWorldBoundaries = !translateCam(dl.x, dl.y);
+            }
+        }
     }
 
 
@@ -53,9 +137,9 @@ public class CameraManager extends Observable {
      * 3) update the camera to take the changes into account
      * 4) update the clip bounds and the components instances to follow the camera accordingly
      *
-     * @return  whether or not the camera has moved
+     * @return  if the camera has been moved
      */
-    public boolean translateGameCam(float dx, float dy){
+    public boolean translateCam(float dx, float dy){
         float oldCamPosX = camera.position.x;
         float oldCamPosY = camera.position.y;
 
@@ -86,7 +170,7 @@ public class CameraManager extends Observable {
 
     }
 
-    public boolean setGameCamPos(float x, float y){
+    private boolean setCamPos(float x, float y){
         boolean changed = false;
         if(x < clipBounds.width/2f) x = clipBounds.width/2;
         if(x > worldWidth - clipBounds.width/2f) x = worldWidth - clipBounds.width/2;
@@ -101,6 +185,7 @@ public class CameraManager extends Observable {
             clipBounds.y = y - clipBounds.height / 2f;
             camera.update();
         }
+        notifyAllObservers(null);
         return changed;
     }
 
@@ -127,4 +212,5 @@ public class CameraManager extends Observable {
     public Rectangle getClipBounds() {
         return clipBounds;
     }
+
 }

@@ -33,8 +33,8 @@ public class SceneBIS extends BattleInteractionState {
     }
 
     @Override
-    public void onTouch(float gameX, float gameY) {
-        BISys.set(new DeploymentBIS(BISys));
+    public void handleTouchInput(float gameX, float gameY) {
+        bis.set(new DeploymentBIS(bis, true, null));
     }
 
     @Override

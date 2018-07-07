@@ -5,21 +5,23 @@ import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
 
 public abstract class BattleInteractionState extends InteractionState {
-    protected BattleInteractionSystem BISys;
+    protected BattleInteractionSystem bis;
 
     protected boolean battlefieldDisplayed;
     protected boolean infoDisplayable;
     protected boolean mapSlidable;
+    protected boolean animationsProceeding;
 
-    public BattleInteractionState(BattleInteractionSystem BISys, boolean BFDisplayed, boolean infoDisplayed, boolean mapSlidable ) {
-        super(BISys.getGCM().getCamera());
-        this.BISys = BISys;
+    public BattleInteractionState(BattleInteractionSystem bis, boolean BFDisplayed, boolean infoDisplayed, boolean mapSlidable ) {
+        super(bis.gcm.getCamera());
+        this.bis = bis;
 
         this.battlefieldDisplayed = true;
         this.infoDisplayable = true;
         this.mapSlidable = true;
     }
 
+    public abstract void handleTouchInput(float gameX, float gameY);
     public void update1(float dt) {}
     public void update3(float dt) {}
     public void update12(float dt) {}
@@ -28,8 +30,15 @@ public abstract class BattleInteractionState extends InteractionState {
     public abstract void renderAhead(SpriteBatch batch);
 
     @Override
+    public void onTouch(float gameX, float gameY) {
+        if(!bis.gcm.isCameraMoving() || bis.bfr.isProceeding()){
+            handleTouchInput(gameX, gameY);
+        }
+    }
+
+    @Override
     public void onLongTouch(float gameX, float gameY) {
-        if(infoDisplayable){
+        if(infoDisplayable && !bis.gcm.isCameraMoving() || bis.bfr.isProceeding()){
             //TODO:
             System.out.println("display info of ("+(int)gameY+","+(int)gameX+")");
         }
@@ -37,42 +46,19 @@ public abstract class BattleInteractionState extends InteractionState {
 
     @Override
     public void pan(float gameDX, float gameDY) {
-        if(mapSlidable) {
-            BISys.getGCM().translateGameCam(gameDX, gameDY);
+        if(mapSlidable && !bis.gcm.isCameraMoving()) {
+            bis.gcm.translateCam(gameDX, gameDY);
         }
     }
-
-
-
-    //--------------------SHARED METHODS ------------------------------
-
 
 
     // ------------------- SETTERS & GETTERS ---------------------------
 
 
 
-    public void setBattlefieldDisplayed(boolean battlefieldDisplayed) {
-        this.battlefieldDisplayed = battlefieldDisplayed;
-    }
-
-    public void setInfoDisplayable(boolean infoDisplayable) {
-        this.infoDisplayable = infoDisplayable;
-    }
-
-    public void setMapSlidable(boolean mapSlidable) {
-        this.mapSlidable = mapSlidable;
-    }
-
     public boolean isBattlefieldDisplayed() {
         return battlefieldDisplayed;
     }
 
-    public boolean isInfoDisplayable() {
-        return infoDisplayable;
-    }
 
-    public boolean isMapSlidable() {
-        return mapSlidable;
-    }
 }

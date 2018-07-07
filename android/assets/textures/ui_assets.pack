@@ -3,56 +3,56 @@ ui_assets.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-selected_area_ally
+covering_fire
   rotate: false
   xy: 0, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_attack_range
+action_range
   rotate: false
   xy: 64, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_deployment
+deployment
   rotate: false
   xy: 128, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_foe
+foe_action_area
   rotate: false
   xy: 192, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_move_range
+move_range
   rotate: false
   xy: 256, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_same_army
+banner_range
   rotate: false
   xy: 320, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_same_squad
+same_squad
   rotate: false
   xy: 384, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_area_seleced_unit
+selected_unit
   rotate: false
   xy: 448, 0
   size: 64, 64

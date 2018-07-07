@@ -5,6 +5,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.lawsgame.emishitactics.core.helpers.AnimationTask;
+import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -17,44 +19,48 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AUnitPan
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
+import java.util.LinkedList;
 
 public class BattleInteractionSystem extends StateMachine<BattleInteractionState> {
-    private Battlefield battlefield;
-    private BattlefieldRenderer BFdRenderer;
-    private BattleCommandManager bcm;
-    private CameraManager gameCM;
-    private AssetManager asm;
-    private InputMultiplexer multiplexer;
+    public Battlefield battlefield;
+    public BattlefieldRenderer bfr;
+    public BattleCommandManager bcm;
+    public CameraManager gcm;
+    public AssetManager asm;
+    public InputMultiplexer multiplexer;
+    public Army playerArmy;
 
+    private LinkedList<AnimationTask> animationTaskQueue;
 
-    private Stage UIStage;
+    public Stage UIStage;
     public ATilePanel shortTilePanel;
     public ATilePanel longTilePanel;
     public AUnitPanel shortUnitPanel;
     public AUnitPanel longUnitPanel;
 
-    public BattleInteractionSystem(Battlefield battlefield, BattlefieldRenderer BFdRenderer, CameraManager gameCM, AssetManager asm, Stage UIStage) {
-        this.battlefield = battlefield;
-        this.BFdRenderer = BFdRenderer;
-        this.gameCM = gameCM;
-        this.asm =asm;
-        this.bcm = new BattleCommandManager(battlefield);
-        this.multiplexer = new InputMultiplexer();
 
+    public BattleInteractionSystem(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Army playerArmy) {
+        this.battlefield = battlefield;
+        this.bfr = bfr;
+        this.gcm = gcm;
+        this.asm = asm;
+        this.bcm = new BattleCommandManager(battlefield);
+        this.playerArmy = playerArmy;
+        this.multiplexer = new InputMultiplexer();
+        this.animationTaskQueue = new LinkedList<AnimationTask>();
 
         // UI
-        this.UIStage = UIStage;
+        this.UIStage = stageUI;
 
-        this.shortTilePanel = new ShortTilePanel(UIStage.getViewport());
-        this.shortUnitPanel = new ShortUnitPanel(UIStage.getViewport());
-        this.longUnitPanel = new LongUnitPanel(UIStage.getViewport());
-        this.longTilePanel = new LongTilePanel(UIStage.getViewport());
+        this.shortTilePanel = new ShortTilePanel(stageUI.getViewport());
+        this.shortUnitPanel = new ShortUnitPanel(stageUI.getViewport());
+        this.longUnitPanel = new LongUnitPanel(stageUI.getViewport());
+        this.longTilePanel = new LongTilePanel(stageUI.getViewport());
 
-        UIStage.addActor(shortTilePanel);
-        UIStage.addActor(shortUnitPanel);
-        UIStage.addActor(longUnitPanel);
-        UIStage.addActor(longTilePanel);
+        stageUI.addActor(shortTilePanel);
+        stageUI.addActor(shortUnitPanel);
+        stageUI.addActor(longUnitPanel);
+        stageUI.addActor(longTilePanel);
 
     }
 
@@ -67,26 +73,19 @@ public class BattleInteractionSystem extends StateMachine<BattleInteractionState
         super.push(bis);
     }
 
+    public void addTask(AnimationTask task){
+        animationTaskQueue.offer(task);
+    }
+
+    public boolean isAnimationTaskQueueEmpty(){
+        return animationTaskQueue.size() == 0;
+    }
+
+    public AnimationTask getNextTask(){
+        return animationTaskQueue.pop();
+    }
+
 
     // --------------------- GETTES & SETTERS ----------------------------
 
-
-
-    public Battlefield getBattlefield() {
-        return battlefield;
-    }
-
-    public BattlefieldRenderer getBFRenderer() {
-        return BFdRenderer;
-    }
-
-    public CameraManager getGCM() {
-        return gameCM;
-    }
-
-    public AssetManager getASM() { return asm; }
-
-    public BattleCommandManager getBCM() { return bcm; }
-
-    public Stage getUIStage(){ return UIStage; }
 }

@@ -627,17 +627,17 @@ public class Unit extends Observable{
         return  dealtDamage;
     }
 
-    public void receiveDamage(int damageTaken, boolean moralDamageOnly){
-        if(this.currentMoral > damageTaken){
+    public int receiveDamage(int attackMight, boolean moralDamageOnly){
+        if(this.currentMoral > attackMight){
             // the unit survive
-            this.currentMoral -= damageTaken;
-            if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
+            this.currentMoral -= attackMight;
+            if(!moralDamageOnly) this.currentHitPoints -= attackMight;
 
         }else{
             // the unit dies or flies
-            if(this.currentHitPoints > damageTaken){
+            if(this.currentHitPoints > attackMight){
                 this.currentMoral = 0;
-                if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
+                if(!moralDamageOnly) this.currentHitPoints -= attackMight;
             }else{
                 this.currentMoral = 0;
                 if(!moralDamageOnly) this.currentHitPoints =0;
@@ -661,10 +661,8 @@ public class Unit extends Observable{
                     }
                 }
             }
-
         }
-
-        notifyAllObservers(damageTaken);
+        return attackMight;
     }
 
 

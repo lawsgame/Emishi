@@ -24,7 +24,7 @@ public class TempoSprite2DPool {
     }
 
     private HashMap<Data.TileType, TextureRegion> tileSprites;
-    private HashMap<Assets.TileHighligthingAssetsId, TextureRegion> uiSprites;
+    private HashMap<Assets.HighlightedTile, TextureRegion> uiSprites;
     private TextureRegion blackBGSprite;
     private HashMap<Data.AnimationId, TextureRegion> unitSprites;
     private HashMap<Data.AnimationId, TextureRegion> foeSprites;
@@ -42,7 +42,7 @@ public class TempoSprite2DPool {
 
     private TempoSprite2DPool(){
         this.tileSprites = new HashMap<Data.TileType, TextureRegion>();
-        this.uiSprites = new HashMap<Assets.TileHighligthingAssetsId, TextureRegion>();
+        this.uiSprites = new HashMap<Assets.HighlightedTile, TextureRegion>();
         this.unitSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.foeSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.unitStanceSprites = new HashMap<Data.DefensiveStance, TextureRegion>();
@@ -164,8 +164,8 @@ public class TempoSprite2DPool {
 
             if(asm.isLoaded(Assets.ATLAS_UI)) {
                 atlas = asm.get(Assets.ATLAS_UI);
-                for(Assets.TileHighligthingAssetsId id : Assets.TileHighligthingAssetsId.values()){
-                    region = atlas.findRegion(Assets.getTileHighlightingAsset(id));
+                for(Assets.HighlightedTile id : Assets.HighlightedTile.values()){
+                    region = atlas.findRegion(Assets.getTileHighlighted(id));
                     if(region != null )
                         uiSprites.put(id, region);
                 }
@@ -182,7 +182,7 @@ public class TempoSprite2DPool {
     }
 
 
-    public TextureRegion getUISprite(Assets.TileHighligthingAssetsId id) {
+    public TextureRegion getUISprite(Assets.HighlightedTile id) {
         return uiSprites.get(id);
     }
 

@@ -4,8 +4,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoBattlefield2DRenderer;
@@ -17,7 +20,6 @@ import com.lawsgame.emishitactics.engine.GamePhase;
 
 
 public class BattlePhase extends GamePhase {
-    private static final float GAME_PORT_WIDTH = 19f;
 
     public static BitmapFont testFont = new BitmapFont();
 
@@ -33,14 +35,35 @@ public class BattlePhase extends GamePhase {
     }
 
     public BattlePhase(GPM gsm, int battlefieldId ){
-        super(gsm, GAME_PORT_WIDTH);
+        super(gsm, Data.GAME_PORT_WIDTH);
         loadRequiredAssets();
 
+        // load and setup the battlefield and its renderer
         Battlefield battlefield = BattlefieldLoader.load(this, battlefieldId);
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
-        this.bis = new BattleInteractionSystem(battlefield, battlefieldRenderer, gameCM, asm, stageUI);
 
+        // set the player army
+
+        Unit warlord = new Unit(true,
+                Data.UnitTemplate.EMISHI_TRIBESMAN,19,
+                Data.Ethnicity.JAPANESE,
+                Data.Orientation.SOUTH,
+                Data.Behaviour.CONTROLLED_BY_PLAYER, Data.Weapon.YUMI, Data.Weapon.WARABITE, true);
+        warlord.setPasAb1(Data.PassiveAbility.PRAYER);
+        warlord.setPasAb2(Data.PassiveAbility.NONE);
+        warlord.setOffensiveAbility(Data.OffensiveAbility.CRUNCHING_BLOW);
+        warlord.equip(Data.Item.NONE, true);
+        warlord.equip(Data.Item.NONE, false);
+        warlord.setItemStealable(false);
+        warlord.setName("Aterui");
+        warlord.setLeadership(15);
+
+        Army playerArmy = new Army(Data.ArmyType.PLAYER);
+        playerArmy.appointWarLord(warlord);
+
+        // set the initial BattleInteractionState
+        this.bis = new BattleInteractionSystem(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
         BattleInteractionState initBIS = new TestBIS(bis);
         bis.push(initBIS);
 
@@ -61,16 +84,16 @@ public class BattlePhase extends GamePhase {
     }
 
     @Override
-    public void update12(float dt) {
-        bis.getCurrentState().update12(dt);
-    }
+    public void update12(float dt) { bis.getCurrentState().update12(dt); }
 
 
     @Override
     public void update60(float dt) {
+        if(!bis.bfr.isProceeding() && !bis.isAnimationTaskQueueEmpty()){
+            bis.getNextTask().dispatch();
+        }
         bis.getCurrentState().update(dt);
-        bis.getBFRenderer().update(dt);
-
+        bis.bfr.update(dt);
     }
 
     @Override
@@ -80,9 +103,9 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void renderWorld(SpriteBatch batch) {
-        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.getBFRenderer().renderTiles(batch);
+        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.bfr.renderTiles(batch);
         bis.getCurrentState().renderBetween(batch);
-        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.getBFRenderer().renderUnits(batch);
+        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.bfr.renderUnits(batch);
         bis.getCurrentState().renderAhead(batch);
     }
 

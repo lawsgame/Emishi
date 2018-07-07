@@ -26,19 +26,19 @@ public class Assets {
         return tileType.name().toLowerCase();
     }
 
-    public enum TileHighligthingAssetsId {
-        SELECTED_AREA_SELECTED_UNIT,
-        SELECTED_AREA_MOVE_RANGE,
-        SELECTED_AREA_ATTACK_RANGE,
-        SELECTED_AREA_SAME_SQUAD,
-        SELECTED_AREA_SAME_ARMY,
-        SELECTED_AREA_ALLY,
-        SELECTED_AREA_FOE,
-        SELECTED_AREA_DEPLOYMENT
+    public enum HighlightedTile {
+        SELECTED_UNIT,
+        MOVE_RANGE,
+        ACTION_RANGE,
+        SAME_SQUAD,
+        BANNER_RANGE,
+        COVERING_FIRE,
+        FOE_ACTION_AREA,
+        DEPLOYMENT
 
     }
 
-    public static String getTileHighlightingAsset(TileHighligthingAssetsId id){
+    public static String getTileHighlighted(HighlightedTile id){
         return id.name().toLowerCase();
     }
     public static String UI_BLACK_BACKGROUND = "black_background";

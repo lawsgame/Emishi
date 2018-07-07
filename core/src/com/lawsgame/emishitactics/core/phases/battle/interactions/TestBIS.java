@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.AArmy;
+import com.lawsgame.emishitactics.core.helpers.AnimationTask;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
@@ -27,9 +27,9 @@ public class TestBIS extends BattleInteractionState {
 
     public TestBIS(BattleInteractionSystem bis) {
         super(bis, true, true, true);
-        ar = new TempoAreaRenderer(bis.getASM(), bis.getBattlefield(), Assets.TileHighligthingAssetsId.SELECTED_AREA_ATTACK_RANGE);
-        //ar =  new TempoAreaRenderer(BISys.asm, BISys.battlefield, Assets.TileHighligthingAssetsId.SELECTED_AREA_ATTACK_RANGE, path);
-        guineapig = bis.getBattlefield().getUnit(9,8);
+        ar = new TempoAreaRenderer(bis.asm, bis.battlefield, Assets.HighlightedTile.ACTION_RANGE);
+        //ar =  new TempoAreaRenderer(bis.asm, bis.battlefield, Assets.HighlightedTile.ACTION_RANGE, path);
+        guineapig = bis.battlefield.getUnit(9,8);
         path = new Array<int[]>();
 
         //compose test player army
@@ -122,16 +122,16 @@ public class TestBIS extends BattleInteractionState {
 
 
         System.out.println(army.toString());
-        bis.getBattlefield().deployUnit(6,6,warlord);
-        bis.getBattlefield().deployUnit(6,7,warchief1);
-        bis.getBattlefield().deployUnit(7,7,soldier2);
-        bis.getBattlefield().deployUnit(6,8,soldier3);
-        bis.getBattlefield().deployUnit(8,8,soldier1);
+        bis.battlefield.deployUnit(6,6,warlord);
+        bis.battlefield.deployUnit(6,7,warchief1);
+        bis.battlefield.deployUnit(7,7,soldier2);
+        bis.battlefield.deployUnit(6,8,soldier3);
+        bis.battlefield.deployUnit(8,8,soldier1);
 
-        //BANNER TEST
-        bannerArea =  new TempoAreaRenderer(bis.getASM(),bis.getBattlefield(), Assets.TileHighligthingAssetsId.SELECTED_AREA_ALLY);
-        bannerArea.addTiles(Utils.getEreaFromRange(bis.getBattlefield(),6,8,1,army.getBannerRange()));
-        System.out.println("BANNER TEST");
+        //BANNER_RANGE TEST
+        bannerArea =  new TempoAreaRenderer(bis.asm, bis.battlefield, Assets.HighlightedTile.COVERING_FIRE);
+        bannerArea.addTiles(Utils.getEreaFromRange(bis.battlefield,6,8,1,army.getBannerRange()));
+        System.out.println("BANNER_RANGE TEST");
         System.out.println("warlord   : "+warlord.isStandardBearer());
         System.out.println("warchief1 : "+warchief1.isStandardBearer());
         System.out.println("soldier1  : "+soldier1.isStandardBearer());
@@ -183,37 +183,37 @@ public class TestBIS extends BattleInteractionState {
     public void init() {    }
 
     @Override
-    public void onTouch(float gameX, float gameY) {
+    public void handleTouchInput(float gameX, float gameY) {
         int r = (int)gameY;
         int c = (int)gameX;
         System.out.println("");
         System.out.println("row : "+r);
         System.out.println("col : "+c);
-        int[] unitPos = BISys.getBattlefield().getUnitPos(soldier1);
+        int[] unitPos = bis.battlefield.getUnitPos(soldier1);
 
         // MOVE TEST
-        /*
+
         if(unitPos != null) {
             ar.reset();
-            path = BISys.getBattlefield().moveUnit(unitPos[0], unitPos[1], r, c);
-            unitPos = BISys.getBattlefield().getUnitPos(soldier1);
-            ar.addTiles(BISys.getBattlefield().getActionArea(unitPos[0], unitPos[1], Data.ActionChoice.WALK));
-        }*/
+            path = bis.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
+            unitPos = bis.battlefield.getUnitPos(soldier1);
+            ar.addTiles(bis.battlefield.getActionArea(unitPos[0], unitPos[1], Data.ActionChoice.WALK));
+        }
 
 
         //IMPACT AREA TEST
         /*
         if(unitPos != null) {
             ar.reset();
-            unitPos = BISys.getBattlefield().getUnitPos(soldier1);
-            //path = BISys.battlefield.getImpactArea(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
-            path = BISys.getBattlefield().getTargetFromCollateral(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
+            unitPos = bis.getBattlefield().getUnitPos(soldier1);
+            //path = bis.battlefield.getImpactArea(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
+            path = bis.getBattlefield().getTargetFromCollateral(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
             ar.addTiles(path);
         }
         */
 
         //BUILD TEST
-        //BISys.getBattlefield().build(unitPos[0], unitPos[1], r, c, true);
+        //bis.getBattlefield().build(unitPos[0], unitPos[1], r, c, true);
 
         //GUARD TEST
 
@@ -223,22 +223,27 @@ public class TestBIS extends BattleInteractionState {
 
         //PANEL TEST
 
-        BISys.shortUnitPanel.hide();
-        BISys.longUnitPanel.hide();
-        BISys.longTilePanel.hide();
-        if(BISys.getBattlefield().isTileOccupied(r,c)) {
-            BISys.shortUnitPanel.set(BISys.getBattlefield(),r , c);
-            BISys.shortUnitPanel.show();
-            BISys.longUnitPanel.set(BISys.getBattlefield(), r, c);
-            BISys.longUnitPanel.show();
+        /*
+        bis.shortUnitPanel.hide();
+        bis.longUnitPanel.hide();
+        bis.longTilePanel.hide();
+        if(bis.battlefield.isTileOccupied(r,c)) {
+            bis.shortUnitPanel.set(bis.battlefield,r , c);
+            bis.shortUnitPanel.show();
+            bis.longUnitPanel.set(bis.battlefield, r, c);
+            bis.longUnitPanel.show();
         }else{
-            BISys.longTilePanel.set(BISys.getBattlefield().getTile(r, c));
-            BISys.longTilePanel.show();
+            bis.longTilePanel.set(bis.battlefield.getTile(r, c));
+            bis.longTilePanel.show();
         }
 
-        BISys.shortTilePanel.hide();
-        BISys.shortTilePanel.set(BISys.getBattlefield().getTile(r, c));
-        BISys.shortTilePanel.show();
+        bis.shortTilePanel.hide();
+        bis.shortTilePanel.set(bis.battlefield.getTile(r, c));
+        bis.shortTilePanel.show();
+        */
+
+        //CAMERA TEST
+        //bis.gcm.focusOn(c, r, true);
 
     }
 
@@ -254,16 +259,17 @@ public class TestBIS extends BattleInteractionState {
 
         // CHOICES TEST
         if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
-            int[] coords = BISys.getBattlefield().getUnitPos(warlord);
+            int[] coords = bis.battlefield.getUnitPos(warlord);
             System.out.println("\nChoices\n");
             for(Data.ActionChoice choice : Data.ActionChoice.values()){
-                System.out.println(choice.name()+" : "+ BISys.getBCM().canActionbePerformedBy(BISys.getBattlefield().getUnit(coords[0], coords[1]) , choice));
+                System.out.println(choice.name()+" : "+ bis.bcm.canActionbePerformedBy(bis.battlefield.getUnit(coords[0], coords[1]) , choice));
             }
         }
 
         // DAMAGE DEALING TEST
         if(Gdx.input.isKeyJustPressed(Input.Keys.A)) {
             warlord.receiveDamage(3, false);
+            bis.addTask(new AnimationTask(warlord, 3));
             System.out.println("hit points : "+warlord.getCurrentHitpoints()+" & moral : "+warlord.getCurrentMoral());
             System.out.println("hit points : "+warchief1.getCurrentHitpoints()+" & moral : "+warchief1.getCurrentMoral());
             System.out.println("hit points : "+soldier1.getCurrentHitpoints()+" & moral : "+soldier1.getCurrentMoral());
@@ -272,23 +278,24 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.K)) {
             warlord.receiveDamage(300, false);
         }
-        if(warlord.isOutOfCombat() && BISys.getBFRenderer().getUnitRenderer(warlord) != null && !BISys.getBFRenderer().getUnitRenderer(warlord).isProceeding()){
-            int[] coords = BISys.getBattlefield().getUnitPos(warlord);
-            BISys.getBattlefield().removeUnit(coords[0], coords[1]);
+        if(warlord.isOutOfCombat() && bis.bfr.getUnitRenderer(warlord) != null && !bis.bfr.getUnitRenderer(warlord).isProceeding()){
+            int[] coords = bis.battlefield.getUnitPos(warlord);
+            bis.battlefield.removeUnit(coords[0], coords[1]);
         }
 
         //TEST SWITCH POSITION
         if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
-            int[] coords = BISys.getBattlefield().getUnitPos(warlord);
-            int[] coords0 = BISys.getBattlefield().getUnitPos(warchief1);
-            BISys.getBattlefield().switchUnitsPosition(coords[0], coords[1], coords0[0], coords0[1]);
+            int[] coords = bis.battlefield.getUnitPos(warlord);
+            int[] coords0 = bis.battlefield.getUnitPos(warchief1);
+            bis.battlefield.switchUnitsPosition(coords[0], coords[1], coords0[0], coords0[1]);
+
         }
 
         //TEST PUSH
         if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
-            int[] coords0 = BISys.getBattlefield().getUnitPos(soldier2);
-            int[] coords = BISys.getBattlefield().getUnitPos(warchief1);
-            BISys.getBattlefield().push(coords[0], coords[1], coords0[0], coords0[1]);
+            int[] coords0 = bis.battlefield.getUnitPos(soldier2);
+            int[] coords = bis.battlefield.getUnitPos(warchief1);
+            bis.battlefield.push(coords[0], coords[1], coords0[0], coords0[1]);
         }
 
         //TEST HEAL

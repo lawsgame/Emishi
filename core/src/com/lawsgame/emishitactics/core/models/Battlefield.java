@@ -497,7 +497,9 @@ public class Battlefield extends Observable {
 
 
 
+
     //------------------- PATH & AREA FETCHING METHODS -----------------------
+
 
 
 
@@ -518,13 +520,13 @@ public class Battlefield extends Observable {
         CheckMoveMap(){ }
 
         public Array<int[]> getMoveArea(Battlefield bf, int rowActor, int colActor){
-            set(bf, rowActor, colActor);
+            set(bf, rowActor, colActor, true);
             setTilesMRP();
             condemnTiles();
-            return getMoveArea();
+            return getArea(true);
         }
 
-        private void set( Battlefield bf, int rowActor, int colActor){
+        private void set( Battlefield bf, int rowActor, int colActor, boolean moveAreaOnly){
             if(bf.isTileOccupied(rowActor, colActor)) {
                 // get actor relevant pieces of information
                 Unit actor = bf.getUnit(rowActor, colActor);
@@ -534,12 +536,23 @@ public class Battlefield extends Observable {
                 this.battlefield = bf;
 
                 // set the check map dimensions and origin point
-                this.rowOrigin = rowActor - moveRange;
-                this.colOrigin = colActor - moveRange;
-                this.rowRelActor = moveRange;
-                this.colRelActor = moveRange;
-                int rows = 2 * moveRange + 1;
-                int colunms = 2 * moveRange + 1;
+                int rows;
+                int colunms;
+                if(moveAreaOnly) {
+                    this.rowOrigin = rowActor - moveRange;
+                    this.colOrigin = colActor - moveRange;
+                    this.rowRelActor = moveRange;
+                    this.colRelActor = moveRange;
+                    rows = 2 * moveRange + 1;
+                    colunms = 2 * moveRange + 1;
+                }else{
+                    this.rowOrigin = 0;
+                    this.colOrigin = 0;
+                    this.rowRelActor = rowActor;
+                    this.colRelActor = colActor;
+                    rows = bf.getNbRows();
+                    colunms = bf.getNbColumns();
+                }
 
                 if (rowOrigin < 0) {
                     rowRelActor += rowOrigin;
@@ -604,6 +617,9 @@ public class Battlefield extends Observable {
             }
         }
 
+        /**
+         * condemn tiles occupied by allies and therefore unreachable.
+         */
         private void condemnTiles(){
             int oldMoveAreaSize = 0;
             int moveAreaSize = getMoveAreaSize();
@@ -637,7 +653,7 @@ public class Battlefield extends Observable {
             return size;
         }
 
-        private Array<int[]> getMoveArea(){
+        private Array<int[]> getArea(boolean moveArea){
             Array<int[]> area = new Array<int[]>();
             for(int r = 0; r < checkTiles.length; r++){
                 for(int c = 0; c < checkTiles[0].length; c++){
@@ -1012,6 +1028,45 @@ public class Battlefield extends Observable {
         }
         return rangeMin;
     }
+
+    /**
+     *
+     * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
+     *
+     * the initial tile is the one of the target.
+     *
+     * @return shortest path to perform the given action upon the given target
+     */
+    public Array<int[]>  getShortestPath(int rowActor, int colActor, int rowTarget, int colTarget, ActionChoice choice){
+        //TODO:
+        return null;
+    }
+
+    /**
+     *
+     * @param choice
+     * @param rowActor
+     * @param colActor
+     * @param rowTarget
+     * @param colTarget
+     * @return the relevantly oriented impact area of an action performed by an actor while targeting the tile {rowTarget, colTarget}
+     */
+    public Array<int[]> getImpactArea(ActionChoice choice, int rowActor, int colActor, int rowTarget, int colTarget){
+        Array<int[]> orientedArea = choice.getOrientedImpactArea(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+        if(isTileExisted(rowTarget, colTarget)) {
+            for (int i = 0; i < orientedArea.size; i++) {
+                orientedArea.get(i)[0] += rowTarget;
+                orientedArea.get(i)[1] += colTarget;
+                if (!isTileExisted(orientedArea.get(i)[0], orientedArea.get(i)[1])) {
+                    orientedArea.removeIndex(i);
+                    i--;
+                }
+            }
+            orientedArea.add(new int[]{rowTarget, colTarget});
+        }
+        return orientedArea;
+    }
+
     /**
      *
      * @param actor
@@ -1121,45 +1176,6 @@ public class Battlefield extends Observable {
         }
 
         return res;
-    }
-
-
-    /**
-     *
-     * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
-     *
-     * the initial tile is the one of the target.
-     *
-     * @return shortest path to perform the given action upon the given target
-     */
-    public Array<int[]>  getShortestPath(int rowActor, int colActor, int rowTarget, int colTarget, ActionChoice choice){
-        //TODO:
-        return null;
-    }
-
-    /**
-     *
-     * @param choice
-     * @param rowActor
-     * @param colActor
-     * @param rowTarget
-     * @param colTarget
-     * @return the relevantly oriented impact area of an action performed by an actor while targeting the tile {rowTarget, colTarget}
-     */
-    public Array<int[]> getImpactArea(ActionChoice choice, int rowActor, int colActor, int rowTarget, int colTarget){
-        Array<int[]> orientedArea = choice.getOrientedImpactArea(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-        if(isTileExisted(rowTarget, colTarget)) {
-            for (int i = 0; i < orientedArea.size; i++) {
-                orientedArea.get(i)[0] += rowTarget;
-                orientedArea.get(i)[1] += colTarget;
-                if (!isTileExisted(orientedArea.get(i)[0], orientedArea.get(i)[1])) {
-                    orientedArea.removeIndex(i);
-                    i--;
-                }
-            }
-            orientedArea.add(new int[]{rowTarget, colTarget});
-        }
-        return orientedArea;
     }
 
 

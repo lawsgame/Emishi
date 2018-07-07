@@ -17,12 +17,12 @@ public class TempoAreaRenderer implements AreaRenderer {
     protected Battlefield battlefield;
 
     protected Array<int[]> tiles;                   // coordinates of the highlighted tiles
-    private Assets.TileHighligthingAssetsId id;     // the id of type of sprite to use
+    private Assets.HighlightedTile id;     // the id of type of sprite to use
     protected Array<float[]> spriteCoords;          // coordinates to where render the used sprites => 4 sprites = 1 tile
     protected Array<Sprite> spriteRefs;             // sprites to render associated with the coordinates above
 
 
-    public TempoAreaRenderer(AssetManager asm, Battlefield bf,  Assets.TileHighligthingAssetsId id){
+    public TempoAreaRenderer(AssetManager asm, Battlefield bf,  Assets.HighlightedTile id){
         this.battlefield = bf;
         this.id = id;
         this.spriteCoords = new Array<float[]>();
@@ -32,7 +32,7 @@ public class TempoAreaRenderer implements AreaRenderer {
 
     }
 
-    public TempoAreaRenderer(AssetManager asm, Battlefield bf, Assets.TileHighligthingAssetsId id, Array<int[]> tiles){
+    public TempoAreaRenderer(AssetManager asm, Battlefield bf, Assets.HighlightedTile id, Array<int[]> tiles){
         this(asm, bf, id);
         for(int i = 0; i < tiles.size; i++){
             if(tiles.get(i).length >= 2){
@@ -45,7 +45,7 @@ public class TempoAreaRenderer implements AreaRenderer {
 
     }
 
-    public TempoAreaRenderer(AssetManager asm, Assets.TileHighligthingAssetsId id, Battlefield bf, int rCenter, int cCenter, int rangeMin, int rangeMax){
+    public TempoAreaRenderer(AssetManager asm, Battlefield bf, Assets.HighlightedTile id, int rCenter, int cCenter, int rangeMin, int rangeMax){
         this(asm, bf, id, Utils.getEreaFromRange(bf, rCenter, cCenter, rangeMin, rangeMax));
     }
 
@@ -100,19 +100,19 @@ public class TempoAreaRenderer implements AreaRenderer {
     //-------------- BUILD METHOD AND TOOLS ------------------------
 
 
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> TOP_LEFT_CORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> TOP_RIGHT_CORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> BOTTOM_LEFT_CORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> BOTTOM_RIGHT_CORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> MIDDLE = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> WEST_STRAIGHT = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> NORTH_STRAIGHT = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> SOUTH_STRAIGHT = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> EAST_STRAIGHT = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> TOP_LEFT_ANTICORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> TOP_RIGHT_ANTICORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> BOTTOM_LEFT_ANTICORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
-    protected static HashMap<Assets.TileHighligthingAssetsId,Sprite> BOTTOM_RIGHT_ANTICORNER = new HashMap<Assets.TileHighligthingAssetsId, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> TOP_LEFT_CORNER = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> TOP_RIGHT_CORNER = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> BOTTOM_LEFT_CORNER = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> BOTTOM_RIGHT_CORNER = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> MIDDLE = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> WEST_STRAIGHT = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> NORTH_STRAIGHT = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> SOUTH_STRAIGHT = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> EAST_STRAIGHT = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> TOP_LEFT_ANTICORNER = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> TOP_RIGHT_ANTICORNER = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> BOTTOM_LEFT_ANTICORNER = new HashMap<Assets.HighlightedTile, Sprite>();
+    protected static HashMap<Assets.HighlightedTile,Sprite> BOTTOM_RIGHT_ANTICORNER = new HashMap<Assets.HighlightedTile, Sprite>();
 
 
     private void build(AssetManager asm){
@@ -120,7 +120,7 @@ public class TempoAreaRenderer implements AreaRenderer {
         if(!TOP_LEFT_CORNER.containsKey(id)) {
             Sprite sprite;
             TextureAtlas atlas = asm.get(Assets.ATLAS_UI);
-            TextureRegion region = atlas.findRegion(Assets.getTileHighlightingAsset(id));
+            TextureRegion region = atlas.findRegion(Assets.getTileHighlighted(id));
             TextureRegion[][] assets = region.split(region.getRegionWidth()/2, region.getRegionHeight()/2);
 
             sprite = new Sprite(assets[0][0]);

@@ -6,6 +6,8 @@ import java.util.Random;
 
 public class Data {
 
+
+    public static final float GAME_PORT_WIDTH = 13f;
     public static final int MOBILITY_BONUS_PROMOTED = 1;
     public static final int MOBILITY_BONUS_HORSEMAN = 2;
     public static final int PROMOTION_LEVEL = 15;
