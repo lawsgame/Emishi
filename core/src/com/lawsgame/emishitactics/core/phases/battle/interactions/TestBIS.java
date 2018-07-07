@@ -26,7 +26,7 @@ public class TestBIS extends BattleInteractionState {
     AreaRenderer bannerArea;
 
     public TestBIS(BattleInteractionSystem bis) {
-        super(bis);
+        super(bis, true, true, true);
         ar = new TempoAreaRenderer(bis.getASM(), bis.getBattlefield(), Assets.TileHighligthingAssetsId.SELECTED_AREA_ATTACK_RANGE);
         //ar =  new TempoAreaRenderer(BISys.asm, BISys.battlefield, Assets.TileHighligthingAssetsId.SELECTED_AREA_ATTACK_RANGE, path);
         guineapig = bis.getBattlefield().getUnit(9,8);
@@ -201,7 +201,7 @@ public class TestBIS extends BattleInteractionState {
         }*/
 
 
-        //Impact area TEST
+        //IMPACT AREA TEST
         /*
         if(unitPos != null) {
             ar.reset();
@@ -216,6 +216,7 @@ public class TestBIS extends BattleInteractionState {
         //BISys.getBattlefield().build(unitPos[0], unitPos[1], r, c, true);
 
         //GUARD TEST
+
 
         //TARGET TILE VALIDITY TEST
 
@@ -301,20 +302,6 @@ public class TestBIS extends BattleInteractionState {
             System.out.println("Johnny moral :"+ soldier2.getCurrentMoral()+"/"+soldier2.getAppMoral());
             System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
         }
-
-        //TEST PANEL
-        /*
-        if(Gdx.input.isKeyJustPressed(Input.Keys.L)){
-            BISys.shortTilePanel.set(Data.TileType.PLAIN);
-            BISys.shortTilePanel.show();
-            BISys.shortUnitPanel.set(warlord);
-            BISys.shortUnitPanel.show();
-
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.M)){
-            BISys.shortTilePanel.hide();
-            BISys.shortUnitPanel.hide();
-        }*/
 
     }
 }

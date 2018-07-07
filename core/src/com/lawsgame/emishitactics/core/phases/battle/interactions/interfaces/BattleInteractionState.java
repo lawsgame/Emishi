@@ -7,18 +7,22 @@ import com.lawsgame.emishitactics.engine.inputs.InteractionState;
 public abstract class BattleInteractionState extends InteractionState {
     protected BattleInteractionSystem BISys;
 
-    protected boolean battlefieldDisplayed = true;
-    protected boolean infoDisplayable = true;
-    protected boolean mapSlidable = true;
+    protected boolean battlefieldDisplayed;
+    protected boolean infoDisplayable;
+    protected boolean mapSlidable;
 
-    public BattleInteractionState(BattleInteractionSystem BISys) {
+    public BattleInteractionState(BattleInteractionSystem BISys, boolean BFDisplayed, boolean infoDisplayed, boolean mapSlidable ) {
         super(BISys.getGCM().getCamera());
         this.BISys = BISys;
+
+        this.battlefieldDisplayed = true;
+        this.infoDisplayable = true;
+        this.mapSlidable = true;
     }
 
-    public abstract void update1(float dt);
-    public abstract void update3(float dt);
-    public abstract void update12(float dt);
+    public void update1(float dt) {}
+    public void update3(float dt) {}
+    public void update12(float dt) {}
     public abstract void prerender(SpriteBatch batch);
     public abstract void renderBetween(SpriteBatch batch);
     public abstract void renderAhead(SpriteBatch batch);

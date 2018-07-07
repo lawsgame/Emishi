@@ -29,13 +29,13 @@ public class LongTilePanel extends ATilePanel{
     @Override
     public void set(Data.TileType tileType) {
         builder = new StringBuilder();
-        builder.append("\nName : "+tileType.name());
+        builder.append(tileType.name());
 
         builder.append("\n\n");
         if(tileType.isUrbanArea()) builder.append("urban ");
         if(tileType.isPlunderable()) builder.append("plunderable ");
         if(tileType.isLootable()) builder.append("lootable ");
-        if(tileType.isReachable()) builder.append("reachable ");
+        if(tileType.isReachable()) builder.append("reachable "); else builder.append("unreachable ");
         builder.append("tile");
 
         builder.append("\n\nHeal / turn : "+tileType.getHealPower());

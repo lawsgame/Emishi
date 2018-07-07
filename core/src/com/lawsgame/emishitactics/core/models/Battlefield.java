@@ -978,7 +978,7 @@ public class Battlefield extends Observable {
      * @param colImpactTile
      * @return get all possible target tile knowing thtat the given tile is within the impact area
      */
-    public Array<int[]> getTargetFromCollateral(ActionChoice choice, int rowActor, int colActor, int rowImpactTile, int colImpactTile) {
+    private Array<int[]> getTargetFromCollateral(ActionChoice choice, int rowActor, int colActor, int rowImpactTile, int colImpactTile) {
         Array<int[]> possibleTargetTiles = new Array<int[]>();
         Array<int[]> impactArea;
         int row;
