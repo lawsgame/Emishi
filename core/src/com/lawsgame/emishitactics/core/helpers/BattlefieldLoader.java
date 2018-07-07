@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.AbstractArmy;
+import com.lawsgame.emishitactics.core.models.AArmy;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
 
@@ -113,7 +113,7 @@ public class BattlefieldLoader {
             XmlReader.Element squadElt;
             XmlReader.Element unitElt;
             Unit unit;
-            AbstractArmy army;
+            AArmy army;
             boolean ally;
             for (int i = 0; i < battlesElt.getChildCount(); i++) {
 
@@ -123,7 +123,7 @@ public class BattlefieldLoader {
 
                         armyElt = battleElt.getChild(i);
                         ally = armyElt.getBoolean("ally");
-                        army = new Unit.Army((ally) ? AbstractArmy.ArmyType.ALLY: AbstractArmy.ArmyType.FOE);
+                        army = new Unit.Army((ally) ? Data.ArmyType.ALLY: Data.ArmyType.FOE);
 
                         // IF: an amry with the relevant battlefield ID
 

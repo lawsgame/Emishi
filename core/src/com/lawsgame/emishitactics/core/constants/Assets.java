@@ -45,4 +45,7 @@ public class Assets {
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
 
+    //FONT
+
+
 }

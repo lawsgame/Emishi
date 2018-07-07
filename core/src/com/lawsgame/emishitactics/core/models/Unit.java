@@ -43,7 +43,7 @@ public class Unit extends Observable{
     protected boolean primaryWeaponEquipped = true;
     protected boolean horseman;
 
-    private AbstractArmy army = null;
+    private AArmy army = null;
 
     protected int mobility;
     protected int charisma;
@@ -66,7 +66,6 @@ public class Unit extends Observable{
     protected PassiveAbility pasAb1 = PassiveAbility.NONE;
     protected PassiveAbility pasAb2 = PassiveAbility.NONE;
     protected OffensiveAbility offAb = OffensiveAbility.NONE;
-    protected int numberOfOAUses = 0;
     protected final Banner banner = new Banner();
 
     /**
@@ -75,6 +74,8 @@ public class Unit extends Observable{
     protected boolean guarduing;
     protected Orientation orientation;
     protected Behaviour behaviour;
+    protected int numberOfOAUses = 0;
+    protected int OAChargingBar = 0;
     protected boolean moved = false;
     protected boolean acted = false;
     protected boolean buildingResourcesConsumed = false;
@@ -138,6 +139,7 @@ public class Unit extends Observable{
             }
         }
         setInitialHPAndMoral();
+        setHorsemanValue();
     }
 
     /**
@@ -167,17 +169,16 @@ public class Unit extends Observable{
     }
 
     public int[] promote(Weapon secondaryWeapon){
-        int mob = 0;
+        boolean becomeHorsman = !isHorseman();
 
         this.job = template.getJob().getPromotionName();
-        mob += MOBILITY_BONUS_PROMOTED;
-        if (!this.primaryWeapon.isFootmanOnly() && !secondaryWeapon.isFootmanOnly() && template.getJob().isAllowadToBePromotedHorseman()) {
-            this.horseman = true;
-            mob += MOBILITY_BONUS_HORSEMAN;
-        }
-        this.secondaryWeapon = secondaryWeapon;
+        if(setWeapon(secondaryWeapon, false))
+            this.secondaryWeapon = pickWeapon(false);
+        this.setHorsemanValue();
 
+        becomeHorsman = becomeHorsman && isHorseman();
 
+        int mob = MOBILITY_BONUS_PROMOTED + ((becomeHorsman) ? MOBILITY_BONUS_HORSEMAN: 0);
         int cha = template.getProBoCha();
         int ld = template.getProBoLd();
         int hpt = template.getProBoHP();
@@ -282,15 +283,15 @@ public class Unit extends Observable{
             this.level++;
 
             if (PROMOTION_LEVEL != level) {
-                cha += (getAppGrowthRate(Stat.CHARISMA) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                ld += (getAppGrowthRate(Stat.LEADERSHIP) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                hpt += (getAppGrowthRate(Stat.HIT_POINTS) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                str += (getAppGrowthRate(Stat.STRENGTH) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                def += (getAppGrowthRate(Stat.DEFENSE) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                dex += (getAppGrowthRate(Stat.DEXTERITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                agi += (getAppGrowthRate(Stat.AGILITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                ski += (getAppGrowthRate(Stat.SKILL) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                bra += (getAppGrowthRate(Stat.BRAVERY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                cha += (getAppGrowthRate(GrowthStat.CHARISMA) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                ld += (getAppGrowthRate(GrowthStat.LEADERSHIP) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                hpt += (getAppGrowthRate(GrowthStat.HIT_POINTS) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                str += (getAppGrowthRate(GrowthStat.STRENGTH) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                def += (getAppGrowthRate(GrowthStat.DEFENSE) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                dex += (getAppGrowthRate(GrowthStat.DEXTERITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                agi += (getAppGrowthRate(GrowthStat.AGILITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                ski += (getAppGrowthRate(GrowthStat.SKILL) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                bra += (getAppGrowthRate(GrowthStat.BRAVERY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
             }
 
             this.charisma += cha;
@@ -454,7 +455,7 @@ public class Unit extends Observable{
 
     public boolean addBannerSign(BannerSign sign) {
         boolean res = false;
-        if(template.getJob().couldBeStandardBearerJob()){
+        if(template.getJob().isPossiblyStandardBearerJob()){
            res = banner.addSign(sign);
            if(isMobilized())
                army.checkComposition();
@@ -489,16 +490,20 @@ public class Unit extends Observable{
         return str*factor;
     }
 
-    public int getParryingSkill(Weapon parriedWeapon){
+    public int getAppParryingAbility(Weapon parriedWeapon){
         float parryingMatchUp = (float) Math.sqrt(getCurrentWeapon().getParryCapacity() * parriedWeapon.getParryVulnerability());
         return  (int) (DEX_PARRY_FACTOR* getAppDexterity()*parryingMatchUp);
+    }
+
+    public int getAppDodgingAbility(DamageType damageType){
+        return AGI_DODGE_FACTOR* getAppAgility(damageType);
     }
 
     public int getCurrentAvoidance(TileType defenderTile, Weapon opponentWeapon, boolean bannerAtRange){
         int avoidance = 0;
         switch(stance){
             case DODGE:
-                avoidance = AGI_DODGE_FACTOR* getCurrentAg(opponentWeapon);
+                avoidance = AGI_DODGE_FACTOR* getCurrentAg(opponentWeapon) + defenderTile.getAvoidBonus();
                 break;
             case PARRY:
                 float parryAbility = (float) Math.sqrt(getCurrentWeapon().getParryCapacity() * opponentWeapon.getParryVulnerability());
@@ -506,7 +511,7 @@ public class Unit extends Observable{
                 break;
             default: break;
         }
-        return avoidance + defenderTile.getAvoidBonus();
+        return avoidance;
     }
 
     public int getAttackAccuracy(){
@@ -588,7 +593,7 @@ public class Unit extends Observable{
             }
 
             //calculate the base exp gained
-            exp = 100f * getAppGrowthRate(Stat.LEADERSHIP) * ((float)(nbOfTurnMax - nbTurns)) / ((float)(nbOfTurnMax - nbOfTurnMin));
+            exp = 100f * getAppGrowthRate(GrowthStat.LEADERSHIP) * ((float)(nbOfTurnMax - nbTurns)) / ((float)(nbOfTurnMax - nbOfTurnMin));
 
             //factorize the size of the squad in the equation
             exp *= 1f + (float)(getSquad().size - 1) / ((isWarlord())? MAX_UNITS_UNDER_WARLORD - 1: MAX_UNITS_UNDER_WAR_CHIEF - 1) ;
@@ -859,7 +864,7 @@ public class Unit extends Observable{
         return level;
     }
 
-    public String getJob() {
+    public String getJobName() {
         return job;
     }
 
@@ -883,6 +888,14 @@ public class Unit extends Observable{
         return horseman;
     }
 
+    public void setHorsemanValue(){
+        boolean canbehorseman = (isPromoted()) ? template.getJob().isPossiblyHorsemanUnponPromotion() : template.getJob().isPossiblyHorseman();
+        if(!primaryWeapon.isFootmanOnly() && !secondaryWeapon.isFootmanOnly() && canbehorseman){
+            horseman = true;
+        }else{
+            horseman = false;
+        }
+    }
 
     /*
 
@@ -906,33 +919,23 @@ public class Unit extends Observable{
     }
 
     public int getAppMoral(){
-        int moral = getAppBravery() + getChaChiefsBonus();
+        int moral = Data.BRAVERY_MORAL_FACTOR*getAppBravery() + getChaChiefsBonus();
         if(moral >= currentHitPoints) moral = currentHitPoints - 1;
         return moral;
     }
 
-    public int getBaseStat(Stat stat){
-        int statValue = 0;
-        switch(stat){
-            case CHARISMA: statValue = charisma; break;
-            case LEADERSHIP: statValue = leadership; break;
-            case MOBILITY: statValue = mobility; break;
-            case HIT_POINTS: statValue = hitPoints; break;
-            case STRENGTH:  statValue = strength; break;
-            case DEFENSE:  statValue = defense; break;
-            case DEXTERITY: statValue = dexterity; break;
-            case AGILITY:  statValue = agility; break;
-            case SKILL:  statValue = skill; break;
-            case BRAVERY:  statValue = bravery; break;
-            case PRIMARY_WEAPON_RANGE_MIN: statValue = primaryWeapon.getRangeMin(); break;
-            case PRIMARY_WEAPON_RANGE_MAX: statValue = primaryWeapon.getRangeMax(); break;
-            case SECONDARY_WEAPON_RANGE_MIN: statValue = secondaryWeapon.getRangeMin(); break;
-            case SECONDARY_WEAPON_RANGE_MAX: statValue = secondaryWeapon.getRangeMax(); break;
-            case CURRENT_WEAPON_RANGE_MIN: statValue = getCurrentWeapon().getRangeMin(); break;
-            case CURRENT_WEAPON_RANGE_MAX: statValue = getCurrentWeapon().getRangeMax(); break;
-        }
-        return statValue;
-    }
+    public int getBaseCharisma(){ return charisma;}
+    public int getBaseLeadership() { return leadership; }
+    public int getBaseMobility(){ return mobility + ((isHorseman()) ? Data.MOBILITY_BONUS_HORSEMAN : 0);}
+    public int getBaseHitPoints() { return hitPoints; }
+    public int getBaseStrength() { return  strength; }
+    public int getBaseDefense(){ return defense; }
+    public int getBaseDexterity() { return  dexterity; }
+    public int getBaseAgility() { return agility; }
+    public int getBaseSkill() { return skill; }
+    public int getBaseBravery() { return bravery; }
+    public int getCurrentWeaponRangeMin() { return getCurrentWeapon().getRangeMin(); }
+    public int getCurrentWeaponRangeMax() { return getCurrentWeapon().getRangeMax(); }
 
     public int getAppCharisma(){ return charisma + (isUsing(Item.KABUTO)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0);}
     public int getAppLaedership(){ return leadership + (isUsing(Item.WAR_CHIEF_CLOAK)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); }
@@ -991,6 +994,10 @@ public class Unit extends Observable{
     public int getAppSecondaryWeaponRangeMex(){ return (secondaryWeapon != Weapon.NONE) ?  secondaryWeapon.getRangeMax() + ((isUsing(Item.EMISHI_RING) && secondaryWeapon.isRangedW())? 1: 0) : 0; }
     public int getAppCurrentWeaponRangeMin(){ return (primaryWeaponEquipped) ? getAppPrimaryWeaponRangeMin() : getAppSecondaryWeaponRangeMin(); }
     public int getAppCurrentWeaponRangeMax(){ return (primaryWeaponEquipped) ? getAppPrimaryWeaponRangeMax() : getAppSecondaryWeaponRangeMex(); }
+
+    public int getAppAbilityTriggerRate() {
+        return AB_TRIGGER_RATE_SKILL_FACTOR * getCurrentSk() + getChaChiefsBonus();
+    }
 
     public int getCurrentMob(){ return getAppMobility(); }
     public int getCurrentHitpoints() {
@@ -1075,9 +1082,9 @@ public class Unit extends Observable{
         return  rangeMax;
     }
 
-    public float getBaseGrowthRate(Stat stat){
+    public float getBaseGrowthRate(GrowthStat growthStat){
         float gr = 0.0f;
-        switch (stat){
+        switch (growthStat){
             case CHARISMA: gr = isPromoted()? template.getProGrowthCha() : template.getGrowthCha(); break;
             case LEADERSHIP: gr = isPromoted()? template.getProGrowthLd() : template.getGrowthLd(); break;
             case MOBILITY: gr = 0; break;
@@ -1092,19 +1099,19 @@ public class Unit extends Observable{
         return  gr;
     }
 
-    public float getAppGrowthRate(Stat stat){
+    public float getAppGrowthRate(GrowthStat growthStat){
         float gr = 0.0f;
-        switch (stat){
-            case CHARISMA: gr = getBaseGrowthRate(Stat.CHARISMA) + (isUsing(Item.KABUTO)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
-            case LEADERSHIP: gr = getBaseGrowthRate(Stat.LEADERSHIP); break;
-            case MOBILITY: gr = getBaseGrowthRate(Stat.MOBILITY); break;
-            case HIT_POINTS: gr = getBaseGrowthRate(Stat.HIT_POINTS); break;
-            case STRENGTH: gr = getBaseGrowthRate(Stat.STRENGTH) + (isUsing(Item.GAUNLET)? UNIQUE_EQUIPMENT_LOW_GROWTH_BONUS :0); break;
-            case DEFENSE: gr = getBaseGrowthRate(Stat.DEFENSE); break;
-            case DEXTERITY: gr = getBaseGrowthRate(Stat.DEXTERITY) + (isUsing(Item.ARMBAND)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
-            case AGILITY: gr = getBaseGrowthRate(Stat.AGILITY); break;
-            case SKILL: gr = getBaseGrowthRate(Stat.SKILL) + (isUsing(Item.MASTER_BELT)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
-            case BRAVERY: gr = getBaseGrowthRate(Stat.BRAVERY); break;
+        switch (growthStat){
+            case CHARISMA: gr = getBaseGrowthRate(GrowthStat.CHARISMA) + (isUsing(Item.KABUTO)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
+            case LEADERSHIP: gr = getBaseGrowthRate(GrowthStat.LEADERSHIP); break;
+            case MOBILITY: gr = getBaseGrowthRate(GrowthStat.MOBILITY); break;
+            case HIT_POINTS: gr = getBaseGrowthRate(GrowthStat.HIT_POINTS); break;
+            case STRENGTH: gr = getBaseGrowthRate(GrowthStat.STRENGTH) + (isUsing(Item.GAUNLET)? UNIQUE_EQUIPMENT_LOW_GROWTH_BONUS :0); break;
+            case DEFENSE: gr = getBaseGrowthRate(GrowthStat.DEFENSE); break;
+            case DEXTERITY: gr = getBaseGrowthRate(GrowthStat.DEXTERITY) + (isUsing(Item.ARMBAND)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
+            case AGILITY: gr = getBaseGrowthRate(GrowthStat.AGILITY); break;
+            case SKILL: gr = getBaseGrowthRate(GrowthStat.SKILL) + (isUsing(Item.MASTER_BELT)? UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS :0); break;
+            case BRAVERY: gr = getBaseGrowthRate(GrowthStat.BRAVERY); break;
         }
         return  gr;
     }
@@ -1148,7 +1155,7 @@ public class Unit extends Observable{
         return moved && acted;
     }
 
-    public AbstractArmy getArmy() {
+    public AArmy getArmy() {
         return army;
     }
 
@@ -1213,6 +1220,19 @@ public class Unit extends Observable{
 
     public void setGuarding(boolean guarding){ this.guarduing = guarding; }
 
+    public int getOAChargingBar() {
+        return OAChargingBar;
+    }
+
+    public void addPointsToOAChargingBar(int points){
+        if(points + OAChargingBar < Data.OA_CHARGING_BAR_MAW_VALUE ){
+            this.OAChargingBar +=points;
+        }else{
+            this.OAChargingBar = points + OAChargingBar - OA_CHARGING_BAR_MAW_VALUE;
+            this.numberOfOAUses++;
+        }
+    }
+
     @Override
     public String toString() {
         return "UNIT\n" +
@@ -1275,11 +1295,13 @@ public class Unit extends Observable{
                 "\ncurrentHitPoints = " + currentHitPoints;
     }
 
+
+
     //---------------------- ARMY CLASS --------------------------------
 
 
 
-    public static class Army extends AbstractArmy {
+    public static class Army extends AArmy {
 
         /**
          *  mob troups =
@@ -1290,7 +1312,6 @@ public class Unit extends Observable{
          *
          */
 
-        private static final Banner EMPTY_BANNER = new Banner();
         private static int ids = 0;
 
         private int id;
@@ -1324,6 +1345,21 @@ public class Unit extends Observable{
         @Override
         public Unit getWarlord() {
             return this.mobilizedTroups.get(0).get(0);
+        }
+
+        @Override
+        public Unit getWarchief(Unit unit) {
+            if(unit.isMobilized()){
+                Array<Array<Unit>> squads = getAllSquads();
+                for(int i = 0; i < squads.size; i++){
+                    for(int j = 0; j < squads.get(i).size; j++){
+                        if(unit == squads.get(i).get(j)){
+                            return squads.get(i).get(0);
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         @Override
@@ -1648,7 +1684,7 @@ public class Unit extends Observable{
             boolean successfullytAdded = false;
             if( unit != null && !contains(unit) ){
                 if (unit.army != null) {
-                    AbstractArmy army = unit.army;
+                    AArmy army = unit.army;
                     army.remove(unit);
                 }
                 unit.army = this;
@@ -1668,6 +1704,9 @@ public class Unit extends Observable{
             }
         }
 
+        /**
+         * update composition if one of members sees changes in critical stat, notably leadership
+         */
         @Override
         public void checkComposition() {
             Array<Array<Unit>> squads = getAllSquads();
@@ -1714,7 +1753,7 @@ public class Unit extends Observable{
                     }
                 }
             }
-            return EMPTY_BANNER;
+            return null;
         }
 
         @Override

@@ -240,7 +240,7 @@ public class Battlefield extends Observable {
 
 
 
-    public void randomlyDeployArmy(AbstractArmy army){
+    public void randomlyDeployArmy(AArmy army){
         if(army != null) {
             Array<Unit> mobilizedTroops = army.getMobilizedUnits();
             Array<int[]> deploymentsTile = getDeploymentArea();

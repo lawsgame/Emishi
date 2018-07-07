@@ -28,7 +28,7 @@ public class BattleCommandManager {
     public Array<Data.ActionChoice> getPossibleActionChoices(Unit actor, Array<BattleCommand> history){
         Array<Data.ActionChoice> choices = new Array<Data.ActionChoice>();
         for (Data.ActionChoice choice : commandPool.keySet()) {
-            if (!commandPool.get(choice).isEndTurnCommand() && !history.contains(commandPool.get(choice), true) && canActionbePerformedBy(actor, choice)) {
+            if (!commandPool.get(choice).isEndTurnCommandOnly() && !history.contains(commandPool.get(choice), true) && canActionbePerformedBy(actor, choice)) {
                 choices.add(choice);
             }
         }

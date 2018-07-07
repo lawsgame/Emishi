@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.constants;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 
 import java.util.Random;
 
@@ -17,6 +16,8 @@ public class Data {
     public static final float SPEED_WALK = 3f;  //tile/s
     public static final float SPEED_PUSHED = 8f;
     public static final float COUNTER_ATTACK_DAMAGE_MODIFIER = 1f;
+    public static final int OA_CHARGING_BAR_MAW_VALUE = 100;
+    public static final int BRAVERY_MORAL_FACTOR = 2;
 
     // item bonus
     public static final int DEF_BONUS_YAYOI_SHIELD = 2;
@@ -54,6 +55,9 @@ public class Data {
     public static final int EXP_BASE_MODIFIER = 50;
     public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
 
+    //UI parameters
+    public static final float PANEL_SLIDE_SPEED = 600;
+
 
     public enum Behaviour {
         CONTROLLED_BY_PLAYER,
@@ -65,7 +69,8 @@ public class Data {
     }
 
     public enum Ethnicity{
-        JAPANESE, AINU;
+        JAPANESE,
+        AINU;
 
         public static Ethnicity getStandard(){
             return JAPANESE;
@@ -98,27 +103,28 @@ public class Data {
     }
 
     public enum Allegeance {
-        ALLY, ENEMY, NEUTRAL
+        ALLY,
+        ENEMY,
+        NEUTRAL
     }
 
-    public enum Stat {
+    public enum ArmyType{
+        PLAYER,
+        ALLY,
+        FOE
+    }
+
+    public enum GrowthStat {
         CHARISMA,
         LEADERSHIP,
-        HIT_POINTS,
         MOBILITY,
+        HIT_POINTS,
         STRENGTH,
         DEFENSE,
         DEXTERITY,
         AGILITY,
         SKILL,
-        BRAVERY,
-        PRIMARY_WEAPON_RANGE_MIN,
-        PRIMARY_WEAPON_RANGE_MAX,
-        SECONDARY_WEAPON_RANGE_MIN,
-        SECONDARY_WEAPON_RANGE_MAX,
-        CURRENT_WEAPON_RANGE_MIN,
-        CURRENT_WEAPON_RANGE_MAX
-
+        BRAVERY
     }
 
     public enum UnitAppointmentErrorMsg{
@@ -271,6 +277,7 @@ public class Data {
             this.avoidBonus = avoidBonus;
             this.attackAccBonus = attackAccBonus;
             this.rangeBonus = rangeBonus;
+
         }
 
         public int getR() {
@@ -618,6 +625,8 @@ public class Data {
             return getRangeMax() > 1;
         }
 
+        public boolean isMeleeW() { return  getRangeMin() == 1; }
+
         public boolean isDualWieldingRequired() {
             return dualWieldingRequired;
         }
@@ -662,25 +671,27 @@ public class Data {
 
 
     public enum JobTemplate {
-        CONSCRIPT("conscript", "bushi",             4,  true, true, true, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA}, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA, Weapon.NODACHI, Weapon.NAGINATA}),
-        EMISHI( "emishi warrior", "emishi warrior", 4,  true, true, true, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI}, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI, Weapon.KANABO});
+        CONSCRIPT("conscript", "bushi",             4,  false, true, true, true, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA}, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA, Weapon.NODACHI, Weapon.NAGINATA}),
+        EMISHI( "emishi warrior", "emishi warrior", 4,  false, true, true, true, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI}, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI, Weapon.KANABO});
 
         private String recruitName;
         private String promotionName;
         private int mobility;
-        private boolean allowadToBePromotedHorseman;
+        private boolean possiblyHorseman;
+        private boolean possiblyHorsemanUnponPromotion;
         private boolean allowedWieldShield;
-        private boolean standardBearerJob;
+        private boolean possiblyStandardBearer;
         private Weapon[] availableWeapons;
         private Weapon[] availableWeaponsAfterPromotion;
 
-        JobTemplate(String recruitName, String promotionName, int mobility, boolean allowadToBePromotedHorseman, boolean allowedWieldShield, boolean standardBearer, Weapon[] availableWeapons, Weapon[] availableWeaponsAfterPromotion) {
+        JobTemplate(String recruitName, String promotionName, int mobility, boolean possiblyHorseman, boolean possiblyHorsemanUnponPromotion, boolean allowedWieldShield, boolean standardBearer, Weapon[] availableWeapons, Weapon[] availableWeaponsAfterPromotion) {
             this.recruitName = recruitName;
             this.promotionName = promotionName;
             this.mobility = mobility;
-            this.allowadToBePromotedHorseman = allowadToBePromotedHorseman;
+            this.possiblyHorseman = possiblyHorseman;
+            this.possiblyHorsemanUnponPromotion = possiblyHorsemanUnponPromotion;
             this.allowedWieldShield = allowedWieldShield;
-            this.standardBearerJob = standardBearer;
+            this.possiblyStandardBearer = standardBearer;
             this.availableWeapons = availableWeapons;
             this.availableWeaponsAfterPromotion = availableWeaponsAfterPromotion;
         }
@@ -697,8 +708,12 @@ public class Data {
             return mobility;
         }
 
-        public boolean isAllowadToBePromotedHorseman() {
-            return allowadToBePromotedHorseman;
+        public boolean isPossiblyHorseman() {
+            return possiblyHorseman;
+        }
+
+        public boolean isPossiblyHorsemanUnponPromotion() {
+            return possiblyHorsemanUnponPromotion;
         }
 
         public boolean isAllowedWieldShield() {return allowedWieldShield;}
@@ -711,8 +726,8 @@ public class Data {
             return availableWeaponsAfterPromotion;
         }
 
-        public boolean couldBeStandardBearerJob() {
-            return standardBearerJob;
+        public boolean isPossiblyStandardBearerJob() {
+            return possiblyStandardBearer;
         }
     }
 

@@ -1,7 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -21,8 +19,7 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
 
     public abstract boolean isUndoable();                              // can be deleted afterwards
     public abstract boolean isFree();                                  // does not set Unit.acted as true
-    public abstract boolean isEndTurnCommand();                        // is only callable when the unit turn is ending
-    public abstract void display(SpriteBatch batch);                   // render the infos regarding the action to perform
+    public abstract boolean isEndTurnCommandOnly();                    // is only callable when the unit turn is ending
     public abstract void setTarget(int rowTarget, int colTarget);
     public abstract boolean isExecuting();
     public abstract boolean isExecutionCompleted();

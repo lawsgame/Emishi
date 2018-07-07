@@ -116,6 +116,10 @@ public class CameraManager extends Observable {
 
     public Viewport getPort(){ return viewport; }
 
+    public float getPortWidth(){ return  viewport.getWorldWidth(); }
+
+    public float getPortHeight(){ return  viewport.getWorldHeight(); }
+
     public OrthographicCamera getCamera() {
         return camera;
     }

@@ -7,6 +7,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.LinkedList;
+
 import static org.junit.Assert.assertTrue;
 
 public class UtilsTest {
@@ -20,7 +22,6 @@ public class UtilsTest {
 
     @BeforeClass
     public static void testOnfly(){
-
     }
 
     @Before

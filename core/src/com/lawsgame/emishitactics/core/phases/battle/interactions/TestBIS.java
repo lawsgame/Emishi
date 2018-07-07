@@ -3,18 +3,16 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.AbstractArmy;
+import com.lawsgame.emishitactics.core.models.AArmy;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoAreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.TileShortPanel;
 
 public class TestBIS extends BattleInteractionState {
     AreaRenderer ar;
@@ -112,7 +110,7 @@ public class TestBIS extends BattleInteractionState {
 
 
 
-        Unit.Army army = new Unit.Army(AbstractArmy.ArmyType.PLAYER);
+        Unit.Army army = new Unit.Army(Data.ArmyType.PLAYER);
         System.out.println("maximum of units under the warlord autority : "+warlord.getNbMaxUnits(true));
         army.appointWarLord(warlord);
         army.appointWarChief(warchief1);
@@ -179,14 +177,10 @@ public class TestBIS extends BattleInteractionState {
     }
 
     @Override
-    public void renderAhead(SpriteBatch batch) {
-
-    }
+    public void renderAhead(SpriteBatch batch) { }
 
     @Override
-    public void init() {
-        Gdx.input.setInputProcessor(new GestureDetector(this));
-    }
+    public void init() {    }
 
     @Override
     public void onTouch(float gameX, float gameY) {
@@ -198,13 +192,13 @@ public class TestBIS extends BattleInteractionState {
         int[] unitPos = BISys.getBattlefield().getUnitPos(soldier1);
 
         // MOVE TEST
-
+        /*
         if(unitPos != null) {
             ar.reset();
             path = BISys.getBattlefield().moveUnit(unitPos[0], unitPos[1], r, c);
             unitPos = BISys.getBattlefield().getUnitPos(soldier1);
             ar.addTiles(BISys.getBattlefield().getActionArea(unitPos[0], unitPos[1], Data.ActionChoice.WALK));
-        }
+        }*/
 
 
         //Impact area TEST
@@ -224,6 +218,26 @@ public class TestBIS extends BattleInteractionState {
         //GUARD TEST
 
         //TARGET TILE VALIDITY TEST
+
+
+        //PANEL TEST
+
+        BISys.shortUnitPanel.hide();
+        BISys.longUnitPanel.hide();
+        BISys.longTilePanel.hide();
+        if(BISys.getBattlefield().isTileOccupied(r,c)) {
+            BISys.shortUnitPanel.set(BISys.getBattlefield(),r , c);
+            BISys.shortUnitPanel.show();
+            BISys.longUnitPanel.set(BISys.getBattlefield(), r, c);
+            BISys.longUnitPanel.show();
+        }else{
+            BISys.longTilePanel.set(BISys.getBattlefield().getTile(r, c));
+            BISys.longTilePanel.show();
+        }
+
+        BISys.shortTilePanel.hide();
+        BISys.shortTilePanel.set(BISys.getBattlefield().getTile(r, c));
+        BISys.shortTilePanel.show();
 
     }
 
@@ -287,6 +301,20 @@ public class TestBIS extends BattleInteractionState {
             System.out.println("Johnny moral :"+ soldier2.getCurrentMoral()+"/"+soldier2.getAppMoral());
             System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
         }
+
+        //TEST PANEL
+        /*
+        if(Gdx.input.isKeyJustPressed(Input.Keys.L)){
+            BISys.shortTilePanel.set(Data.TileType.PLAIN);
+            BISys.shortTilePanel.show();
+            BISys.shortUnitPanel.set(warlord);
+            BISys.shortUnitPanel.show();
+
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.M)){
+            BISys.shortTilePanel.hide();
+            BISys.shortUnitPanel.hide();
+        }*/
 
     }
 }

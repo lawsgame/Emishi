@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
@@ -17,6 +18,8 @@ import com.lawsgame.emishitactics.engine.GamePhase;
 
 public class BattlePhase extends GamePhase {
     private static final float GAME_PORT_WIDTH = 19f;
+
+    public static BitmapFont testFont = new BitmapFont();
 
     private BattleInteractionSystem bis;
 
@@ -67,7 +70,6 @@ public class BattlePhase extends GamePhase {
     public void update60(float dt) {
         bis.getCurrentState().update(dt);
         bis.getBFRenderer().update(dt);
-
 
     }
 

@@ -55,13 +55,26 @@ public class Banner extends Observable{
         return numberSigns;
     }
 
-
     public int getBonusRelativeTo(BannerSign sign){
         int numberSigns = 0;
         if(sign == sign1) numberSigns += sign.getGain();
         if(sign == sign2) numberSigns += sign.getGain();
         if(sign == sign3) numberSigns += sign.getGain();
         return numberSigns;
+    }
+
+    // --------------------- GETTERS & SETTERS -------------------------------
+
+    public BannerSign getSign1() {
+        return sign1;
+    }
+
+    public BannerSign getSign2() {
+        return sign2;
+    }
+
+    public BannerSign getSign3() {
+        return sign3;
     }
 
     public String toString(){

@@ -4,19 +4,13 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-public abstract class AbstractArmy extends Observable{
+public abstract class AArmy extends Observable{
 
-
-
-    public enum ArmyType{
-        PLAYER,
-        ALLY,
-        FOE
-    }
 
     public abstract int getId();
-    public abstract void setArmyType(ArmyType type);
+    public abstract void setArmyType(Data.ArmyType type);
     public abstract Unit getWarlord();
+    public abstract Unit getWarchief(Unit unit);
     public abstract Array<Unit> getWarChiefs();
     public abstract Array<Unit> getSquad(Unit unit);
     public abstract Array<Array<Unit>> getAllSquads();
