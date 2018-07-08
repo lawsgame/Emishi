@@ -665,6 +665,7 @@ public class Unit extends Observable{
                 }
             }
         }
+        notifyAllObservers(attackMight);
     }
 
 

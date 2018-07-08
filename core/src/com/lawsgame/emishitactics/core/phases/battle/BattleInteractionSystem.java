@@ -5,7 +5,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -24,7 +23,6 @@ public class BattleInteractionSystem extends StateMachine<BattleInteractionState
     public Battlefield battlefield;
 
     public BattlefieldRenderer bfr;
-    public AnimationScheduler as;
     public BattleCommandManager bcm;
     public CameraManager gcm;
     public AssetManager asm;
@@ -37,10 +35,9 @@ public class BattleInteractionSystem extends StateMachine<BattleInteractionState
     public AUnitPanel longUnitPanel;
 
 
-    public BattleInteractionSystem(Battlefield battlefield, BattlefieldRenderer bfr, AnimationScheduler as, CameraManager gcm, AssetManager asm, Stage stageUI, Army playerArmy) {
+    public BattleInteractionSystem(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Army playerArmy) {
         this.battlefield = battlefield;
         this.bfr = bfr;
-        this.as = as;
         this.gcm = gcm;
         this.asm = asm;
         this.bcm = new BattleCommandManager(battlefield);

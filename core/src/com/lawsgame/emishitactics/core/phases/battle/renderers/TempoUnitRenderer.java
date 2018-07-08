@@ -6,9 +6,9 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 import static com.lawsgame.emishitactics.core.constants.Data.SPEED_PUSHED;
@@ -17,7 +17,7 @@ import static com.lawsgame.emishitactics.core.constants.Data.SPEED_WALK;
 public class TempoUnitRenderer extends BattleUnitRenderer {
     protected float x;
     protected float y;
-    protected BattlefieldRenderer br;
+    protected Battlefield battlefield;
 
     private TextureRegion unitTexture;
     private TextureRegion weapontTexture;
@@ -27,21 +27,36 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private TextureRegion offabbTexture = null;
 
     private boolean targeted = false;
-    private CountDown countDown = new CountDown(2f);
+    private boolean executing = false;
+    private CountDown countDown = new CountDown(2f){
+      @Override
+      public void run(){
+          super.run();
+          executing = true;
+      }
+
+      @Override
+      public void reset(){
+          super.reset();
+          executing = false;
+      }
+    };
 
     //walk (& switch position / pushed) attributes
     private float dl;
     private boolean updatePoint = false;
     private boolean pushed = false;
     private Array<int[]> remainingPath = new Array<int[]>(); // array of (r, c) <=> (y, x)
+    private boolean hitTaken = false;
+    private boolean handleOSUnit = false;
 
 
-    public TempoUnitRenderer(int row, int col, Unit model, BattlefieldRenderer br) {
+    public TempoUnitRenderer(int row, int col, Unit model, Battlefield battlefield) {
         super(model);
         this.x = col;
         this.y = row;
-        this.br = br;
-        triggerAnimation(Data.AnimationId.REST);
+        this.battlefield = battlefield;
+        display(Data.AnimationId.REST);
         getNotification(null);
     }
 
@@ -50,18 +65,35 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void update(float dt) {
         countDown.update(dt);
+        handleCountDownBasedCompletedAnimation();
+        handleWalkAnimation(dt);
+    }
 
+    private void handleCountDownBasedCompletedAnimation(){
         // go back to rest animation after performing animation
         if (countDown.isFinished()) {
-            countDown.reset();
             offabbTexture = null;
+            countDown.reset();
 
             //if the model died or fled, do not restore rest animation
-            if(!model.isOutOfCombat()) {
-                triggerAnimation(Data.AnimationId.REST);
+            if(hitTaken && model.isOutOfCombat()){
+                hitTaken = false;
+                handleOSUnit = true;
+                if (model.isDead()) {
+                    display(Data.AnimationId.DIE);
+                } else  {
+                    display(Data.AnimationId.FLEE);
+                }
+            }else if(handleOSUnit) {
+                handleOSUnit = false;
+                battlefield.removeUnit((int)y,(int)x);
+            }else{
+                display(Data.AnimationId.REST);
             }
         }
+    }
 
+    private void handleWalkAnimation(float dt){
         // handle walk animation
         if (remainingPath.size > 0) {
             dl = dt * ((pushed) ? SPEED_PUSHED: SPEED_WALK);
@@ -93,16 +125,14 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
                 if (remainingPath.size == 0) {
                     pushed = false;
-                    br.setExecuting(false);
-                    triggerAnimation(Data.AnimationId.REST);
+                    executing = false;
+                    display(Data.AnimationId.REST);
                 } else {
                     model.setOrientation(Utils.getOrientationFromCoords(y, x, remainingPath.get(0)[0], remainingPath.get(0)[1]));
 
                 }
             }
         }
-
-
     }
 
 
@@ -166,7 +196,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 Data.Orientation or = Utils.getOrientationFromCoords(y,x,path.get(0)[0], path.get(0)[1]);
                 model.setOrientation(or);
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
-                br.setExecuting(true);
+                executing = true;
 
             }
         }
@@ -179,6 +209,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public void displayTakeHit(int damageTaken) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
         countDown.run();
+        hitTaken = true;
     }
 
 
@@ -209,7 +240,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public void triggerAnimation(Data.AnimationId id) {
+    public void display(Data.AnimationId id) {
         switch (id){
             case WALK:
             case SWITCH_POSITION:
@@ -322,7 +353,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             }
 
         }else if(data instanceof Data.AnimationId){
-            triggerAnimation((Data.AnimationId)data);
+            display((Data.AnimationId)data);
 
         }else if(data instanceof Data.Orientation){
             displayPushed((Data.Orientation)data);

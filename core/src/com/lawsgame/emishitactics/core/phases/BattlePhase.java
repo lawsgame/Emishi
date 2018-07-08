@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -43,7 +42,6 @@ public class BattlePhase extends GamePhase {
         Battlefield battlefield = BattlefieldLoader.load(this, battlefieldId);
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
-        AnimationScheduler as  = new AnimationScheduler(battlefieldRenderer);
 
         // set the player army
 
@@ -65,7 +63,7 @@ public class BattlePhase extends GamePhase {
         playerArmy.appointWarLord(warlord);
 
         // set the initial BattleInteractionState
-        this.bis = new BattleInteractionSystem(battlefield, battlefieldRenderer, as, gameCM, asm, stageUI, playerArmy);
+        this.bis = new BattleInteractionSystem(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
         BattleInteractionState initBIS = new TestBIS(bis);
         bis.push(initBIS);
 
@@ -88,7 +86,6 @@ public class BattlePhase extends GamePhase {
     @Override
     public void update20(float dt) {
         bis.getCurrentState().update12(dt);
-        bis.as.update(dt);
     }
 
 

@@ -31,7 +31,7 @@ public abstract class BattleInteractionState extends InteractionState {
 
     @Override
     public void onTouch(float gameX, float gameY) {
-        if(!bis.gcm.isCameraMoving()){ // TODO: animationManager.isExecuting()
+        if(!bis.gcm.isCameraMoving()){
             handleTouchInput(gameX, gameY);
         }
     }

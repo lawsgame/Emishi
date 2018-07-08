@@ -60,8 +60,10 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
+        executing = false;
         for(int i = 0; i < unitRenderers.size; i++){
             unitRenderers.get(i).update(dt);
+            executing = executing || unitRenderers.get(i).isExecuting();
         }
 
     }
@@ -87,7 +89,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         if(model.isTileOccupied(r,c)) {
             Unit unit = model.getUnit(r, c);
             if(!isUnitRendererCreated(unit)) {
-                unitRenderers.add(new TempoUnitRenderer(r, c, unit, this));
+                unitRenderers.add(new TempoUnitRenderer(r, c, unit, this.model));
             }
         }
     }
@@ -113,7 +115,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return false;
     }
 
-    @Override
     public BattleUnitRenderer getUnitRenderer(Unit model) {
         for(int i = 0; i < unitRenderers.size; i++){
             if(unitRenderers.get(i).getModel() == model)
@@ -125,11 +126,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     @Override
     public boolean isExecuting() {
         return executing;
-    }
-
-    @Override
-    public void setExecuting(boolean executing){
-        this.executing = executing;
     }
 
     @Override

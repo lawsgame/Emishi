@@ -20,5 +20,5 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
     public abstract void displayTreated(int[] oldHtpsAndMoral);
     public abstract void displayPushed(Data.Orientation pushedTowards);
 
-    public abstract void triggerAnimation(Data.AnimationId id);
+    public abstract void display(Data.AnimationId id);
 }
