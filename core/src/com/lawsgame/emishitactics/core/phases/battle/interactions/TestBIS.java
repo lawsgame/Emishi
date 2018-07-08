@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.helpers.AnimationTask;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
@@ -269,18 +268,15 @@ public class TestBIS extends BattleInteractionState {
         // DAMAGE DEALING TEST
         if(Gdx.input.isKeyJustPressed(Input.Keys.A)) {
             warlord.receiveDamage(3, false);
-            bis.addTask(new AnimationTask(warlord, 3));
             System.out.println("hit points : "+warlord.getCurrentHitpoints()+" & moral : "+warlord.getCurrentMoral());
             System.out.println("hit points : "+warchief1.getCurrentHitpoints()+" & moral : "+warchief1.getCurrentMoral());
             System.out.println("hit points : "+soldier1.getCurrentHitpoints()+" & moral : "+soldier1.getCurrentMoral());
+            System.out.println("hit points : "+soldier2.getCurrentHitpoints()+" & moral : "+soldier1.getCurrentMoral());
+            System.out.println("hit points : "+soldier3.getCurrentHitpoints()+" & moral : "+soldier1.getCurrentMoral());
             System.out.println("");
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.K)) {
             warlord.receiveDamage(300, false);
-        }
-        if(warlord.isOutOfCombat() && bis.bfr.getUnitRenderer(warlord) != null && !bis.bfr.getUnitRenderer(warlord).isProceeding()){
-            int[] coords = bis.battlefield.getUnitPos(warlord);
-            bis.battlefield.removeUnit(coords[0], coords[1]);
         }
 
         //TEST SWITCH POSITION

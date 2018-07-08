@@ -23,7 +23,7 @@ public abstract class GamePhase implements State, GameElement {
 
 	private float acc1 = 0;
 	private float acc3 = 0;
-	private float acc12 = 0;
+	private float acc20 = 0;
 
 	private static float aspectRatio = 0;
     private Rectangle scissors;
@@ -75,11 +75,11 @@ public abstract class GamePhase implements State, GameElement {
 	public void update(float dt){
 		acc1 +=dt;
 		acc3 +=dt;
-		acc12 +=dt;
+		acc20 +=dt;
 
-		if(acc12  > 0.08){
-			update12(acc12);
-			acc12 = 0;
+		if(acc20 > 0.05){
+			update20(acc20);
+			acc20 = 0;
 		}
 		
 		if(acc3  > 0.32){
@@ -100,7 +100,7 @@ public abstract class GamePhase implements State, GameElement {
 	
 	public abstract void update1(float dt);
 	public abstract void update3(float dt);
-	public abstract void update12(float dt);
+	public abstract void update20(float dt);
 	public abstract void update60(float dt);
 
 	@Override

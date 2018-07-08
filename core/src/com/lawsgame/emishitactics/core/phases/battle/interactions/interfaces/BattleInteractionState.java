@@ -31,14 +31,14 @@ public abstract class BattleInteractionState extends InteractionState {
 
     @Override
     public void onTouch(float gameX, float gameY) {
-        if(!bis.gcm.isCameraMoving() || bis.bfr.isProceeding()){
+        if(!bis.gcm.isCameraMoving()){ // TODO: animationManager.isExecuting()
             handleTouchInput(gameX, gameY);
         }
     }
 
     @Override
     public void onLongTouch(float gameX, float gameY) {
-        if(infoDisplayable && !bis.gcm.isCameraMoving() || bis.bfr.isProceeding()){
+        if(infoDisplayable && !bis.gcm.isCameraMoving()){
             //TODO:
             System.out.println("display info of ("+(int)gameY+","+(int)gameX+")");
         }

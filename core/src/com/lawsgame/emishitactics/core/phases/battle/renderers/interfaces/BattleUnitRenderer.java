@@ -3,15 +3,15 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.renderers.UnitRenderer;
+import com.lawsgame.emishitactics.engine.renderers.Renderer;
+import com.lawsgame.emishitactics.engine.GameElement;
 
-public abstract class BattleUnitRenderer extends UnitRenderer {
+public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameElement {
 
     public BattleUnitRenderer(Unit model) {
         super(model);
     }
 
-    public abstract boolean isProceeding();
     public abstract void setTargeted(boolean targeted);
 
     public abstract void displayWalk(Array<int[]> path);

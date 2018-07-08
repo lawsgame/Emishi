@@ -627,7 +627,7 @@ public class Unit extends Observable{
         return  dealtDamage;
     }
 
-    public int receiveDamage(int attackMight, boolean moralDamageOnly){
+    public void receiveDamage(int attackMight, boolean moralDamageOnly){
         if(this.currentMoral > attackMight){
             // the unit survive
             this.currentMoral -= attackMight;
@@ -650,19 +650,21 @@ public class Unit extends Observable{
                     Array<Array<Unit>> army = getArmy().getAllSquads();
                     for(int i = 0; i < army.size; i++) {
                         for(int j = 0; j < army.get(i).size; j++){
-                            if( i + j > 0)
-                                army.get(i).get(j).receiveDamage((i == 0)? moralDamage*2 : moralDamage, true);
+                            if( i + j > 0) {
+                                army.get(i).get(j).receiveDamage((i == 0) ? moralDamage * 2 : moralDamage, true);
+
+                            }
                         }
                     }
                 }else{
                     Array<Unit> squad = getArmy().getSquad(this);
                     for(int i = 1; i < squad.size; i++){
                         squad.get(i).receiveDamage(moralDamage, true);
+
                     }
                 }
             }
         }
-        return attackMight;
     }
 
 

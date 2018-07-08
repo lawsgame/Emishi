@@ -11,7 +11,6 @@ import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
-import com.lawsgame.emishitactics.core.renderers.UnitRenderer;
 
 /*
  * TODO: clipping
@@ -21,9 +20,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     protected Array<BattleUnitRenderer> unitRenderers;
     protected TextureRegion[][] tileRenderers;
     protected TempoSprite2DPool sprite2DPool;
-
-    protected boolean proceeding = false;
-    protected boolean unitRenderersProceedding = false;
+    protected boolean executing;
 
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
@@ -42,10 +39,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     }
 
-    @Override
-    public boolean isProceeding() {
-        return proceeding || unitRenderersProceedding;
-    }
 
     @Override
     public void renderTiles(SpriteBatch batch) {
@@ -67,10 +60,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
-        unitRenderersProceedding = false;
         for(int i = 0; i < unitRenderers.size; i++){
             unitRenderers.get(i).update(dt);
-            unitRenderersProceedding = unitRenderersProceedding || unitRenderers.get(i).isProceeding();
         }
 
     }
@@ -96,7 +87,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         if(model.isTileOccupied(r,c)) {
             Unit unit = model.getUnit(r, c);
             if(!isUnitRendererCreated(unit)) {
-                unitRenderers.add(new TempoUnitRenderer(r, c, unit));
+                unitRenderers.add(new TempoUnitRenderer(r, c, unit, this));
             }
         }
     }
@@ -114,14 +105,13 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     public boolean isUnitRendererCreated(Unit unit) {
-        for(UnitRenderer ur : unitRenderers){
+        for(BattleUnitRenderer ur : unitRenderers){
             if(ur.getModel() == unit){
                 return true;
             }
         }
         return false;
     }
-
 
     @Override
     public BattleUnitRenderer getUnitRenderer(Unit model) {
@@ -130,6 +120,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 return unitRenderers.get(i);
         }
         return null;
+    }
+
+    @Override
+    public boolean isExecuting() {
+        return executing;
+    }
+
+    @Override
+    public void setExecuting(boolean executing){
+        this.executing = executing;
     }
 
     @Override

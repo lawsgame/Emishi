@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 import static com.lawsgame.emishitactics.core.constants.Data.SPEED_PUSHED;
@@ -16,6 +17,7 @@ import static com.lawsgame.emishitactics.core.constants.Data.SPEED_WALK;
 public class TempoUnitRenderer extends BattleUnitRenderer {
     protected float x;
     protected float y;
+    protected BattlefieldRenderer br;
 
     private TextureRegion unitTexture;
     private TextureRegion weapontTexture;
@@ -25,7 +27,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private TextureRegion offabbTexture = null;
 
     private boolean targeted = false;
-    private boolean proceeding = false;
     private CountDown countDown = new CountDown(2f);
 
     //walk (& switch position / pushed) attributes
@@ -34,13 +35,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private boolean pushed = false;
     private Array<int[]> remainingPath = new Array<int[]>(); // array of (r, c) <=> (y, x)
 
-    // hit attributes
-    boolean hitTaken = false;
 
-    public TempoUnitRenderer(int row, int col, Unit model) {
+    public TempoUnitRenderer(int row, int col, Unit model, BattlefieldRenderer br) {
         super(model);
         this.x = col;
         this.y = row;
+        this.br = br;
         triggerAnimation(Data.AnimationId.REST);
         getNotification(null);
     }
@@ -54,23 +54,11 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         // go back to rest animation after performing animation
         if (countDown.isFinished()) {
             countDown.reset();
+            offabbTexture = null;
 
-            // trigger the die/flee anination after the take_hit one if required
-            if(hitTaken && model.isOutOfCombat()){
-                hitTaken = false;
-                if(model.isDead()){
-                    triggerAnimation(Data.AnimationId.DIE);
-                }else{
-                    triggerAnimation(Data.AnimationId.FLEE);
-                }
-            } else {
-                proceeding = false;
-
-                //if the model died or fled, do not restore rest animation
-                if(!model.isOutOfCombat()) {
-                    triggerAnimation(Data.AnimationId.REST);
-                    offabbTexture = null;
-                }
+            //if the model died or fled, do not restore rest animation
+            if(!model.isOutOfCombat()) {
+                triggerAnimation(Data.AnimationId.REST);
             }
         }
 
@@ -104,8 +92,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 remainingPath.removeIndex(0);
 
                 if (remainingPath.size == 0) {
-                    proceeding = false;
                     pushed = false;
+                    br.setExecuting(false);
                     triggerAnimation(Data.AnimationId.REST);
                 } else {
                     model.setOrientation(Utils.getOrientationFromCoords(y, x, remainingPath.get(0)[0], remainingPath.get(0)[1]));
@@ -178,7 +166,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 Data.Orientation or = Utils.getOrientationFromCoords(y,x,path.get(0)[0], path.get(0)[1]);
                 model.setOrientation(or);
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
-                proceeding = true;
+                br.setExecuting(true);
 
             }
         }
@@ -190,8 +178,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTakeHit(int damageTaken) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
-        hitTaken = true;
-        proceeding = true;
         countDown.run();
     }
 
@@ -199,14 +185,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayLevelup(int[] gainlvl) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.LEVELUP, model.getArmy().isAlly());
-        proceeding = true;
         countDown.run();
     }
 
     @Override
     public void displayTreated(int[] oldHtpsAndMoral) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().isAlly());
-        proceeding = true;
         countDown.run();
     }
 
@@ -215,7 +199,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         model.setOrientation(pushedTowards);
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().isAlly());
         pushed = true;
-        proceeding = true;
         switch (pushedTowards){
             case WEST: remainingPath.add(new int[]{(int)y, (int)x - 1}); break;
             case NORTH: remainingPath.add(new int[]{(int)y + 1, (int)x}); break;
@@ -254,7 +237,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case BACKSTABBED:
             case PARRIED_ATTACK:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
-                proceeding = true;
                 countDown.run();
                 break;
             case SWITCH_WEAPON:
@@ -266,7 +248,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case FLEE:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
                 orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation().getOpposite());
-                proceeding = true;
                 countDown.run();
                 break;
             case GUARDED:
@@ -288,7 +269,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     if(ability.name().equals(id.name()))
                         offabbTexture = TempoSprite2DPool.get().getOffensiveAbbSprite(ability);
                 }
-                proceeding = true;
                 countDown.run();
                 break;
                 default:
@@ -301,8 +281,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
 
     @Override
-    public boolean isProceeding() {
-        return proceeding;
+    public boolean isExecuting() {
+        return countDown.isRunning();
     }
 
     @Override
@@ -313,7 +293,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void getNotification(Object data){
-
         if(data == null) {
             // update weapon
             weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
