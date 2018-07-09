@@ -24,11 +24,11 @@ import java.util.LinkedList;
  *
  */
 
-public abstract class APanel extends Actor {
+public abstract class Panel extends Actor {
     protected LinkedList<Action> awaitingActions = new LinkedList<Action>();
     protected Viewport stageViewport;
 
-    public APanel(Viewport stageViewport){
+    public Panel(Viewport stageViewport){
         this.stageViewport = stageViewport;
     }
 

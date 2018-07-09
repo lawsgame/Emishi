@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.renderers;
+package com.lawsgame.emishitactics.core.phases.battle.widgets;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -9,11 +9,11 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Area;
 
 import java.util.HashMap;
 
-public class TempoAreaRenderer implements AreaRenderer {
+public class TempoArea extends Area {
     protected Battlefield battlefield;
 
     protected Array<int[]> tiles;                   // coordinates of the highlighted tiles
@@ -22,7 +22,7 @@ public class TempoAreaRenderer implements AreaRenderer {
     protected Array<Sprite> spriteRefs;             // sprites to render associated with the coordinates above
 
 
-    public TempoAreaRenderer(AssetManager asm, Battlefield bf,  Assets.HighlightedTile id){
+    public TempoArea(AssetManager asm, Battlefield bf, Assets.HighlightedTile id){
         this.battlefield = bf;
         this.id = id;
         this.spriteCoords = new Array<float[]>();
@@ -32,7 +32,7 @@ public class TempoAreaRenderer implements AreaRenderer {
 
     }
 
-    public TempoAreaRenderer(AssetManager asm, Battlefield bf, Assets.HighlightedTile id, Array<int[]> tiles){
+    public TempoArea(AssetManager asm, Battlefield bf, Assets.HighlightedTile id, Array<int[]> tiles){
         this(asm, bf, id);
         for(int i = 0; i < tiles.size; i++){
             if(tiles.get(i).length >= 2){
@@ -42,19 +42,26 @@ public class TempoAreaRenderer implements AreaRenderer {
             }
         }
         build(asm);
-
     }
 
-    public TempoAreaRenderer(AssetManager asm, Battlefield bf, Assets.HighlightedTile id, int rCenter, int cCenter, int rangeMin, int rangeMax){
-        this(asm, bf, id, Utils.getEreaFromRange(bf, rCenter, cCenter, rangeMin, rangeMax));
+    public TempoArea(AssetManager asm, Battlefield bf, Assets.HighlightedTile id, int row, int col){
+        this(asm, bf, id);
+        if(battlefield.isTileExisted(row, col)){
+            this.tiles.add(new int[]{row, col});
+        }
+        build(asm);
     }
 
     @Override
     public void reset(){
-
         tiles.clear();
         spriteCoords.clear();
         spriteRefs.clear();
+    }
+
+    @Override
+    public boolean contains(int r, int c) {
+       return Utils.arrayContains(tiles, r, c);
     }
 
     @Override
@@ -84,7 +91,7 @@ public class TempoAreaRenderer implements AreaRenderer {
 
 
     @Override
-    public void render(SpriteBatch batch) {
+    public void renderTiles(SpriteBatch batch) {
 
         for (int i = 0; i < spriteCoords.size; i++) {
             spriteRefs.get(i).setCenterX(spriteCoords.get(i)[0]);
@@ -93,9 +100,6 @@ public class TempoAreaRenderer implements AreaRenderer {
         }
 
     }
-
-    @Override
-    public void update(float dt) {    }
 
     //-------------- BUILD METHOD AND TOOLS ------------------------
 

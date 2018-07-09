@@ -1,19 +1,18 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
 public class SceneBIS extends BattleInteractionState {
 
 
-    public SceneBIS(BattleInteractionSystem BISys) {
+    public SceneBIS(BattleInteractionMachine BISys) {
         super(BISys, true, false, false);
-        System.out.println("SceneBIS");
     }
 
     @Override
-    public void update(float dt) {
+    public void update60(float dt) {
 
     }
 
@@ -33,8 +32,8 @@ public class SceneBIS extends BattleInteractionState {
     }
 
     @Override
-    public void handleTouchInput(float gameX, float gameY) {
-        bis.set(new DeploymentBIS(bis, true, null));
+    public void handleTouchInput(int row, int col) {
+        bim.set(new DeploymentBIS(bim));
     }
 
     @Override
@@ -43,7 +42,7 @@ public class SceneBIS extends BattleInteractionState {
     }
 
     @Override
-    public void dispose() {
+    public void end() {
 
     }
 }

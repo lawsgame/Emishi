@@ -155,7 +155,14 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
                 if(model.isTileOccupied(coords[0], coords[1])){
                     // add a unit renderer to a newly deployed unit
-                    addUnitRenderer(coords[0], coords[1]);
+                    Unit unit = model.getUnit(coords[0], coords[1]);
+                    if(isUnitRendererCreated(unit)){
+                        BattleUnitRenderer bur = getUnitRenderer(unit);
+                        bur.setX(coords[1]);
+                        bur.setY(coords[0]);
+                    }else {
+                        addUnitRenderer(coords[0], coords[1]);
+                    }
                 }else {
 
                     // change tile renderer

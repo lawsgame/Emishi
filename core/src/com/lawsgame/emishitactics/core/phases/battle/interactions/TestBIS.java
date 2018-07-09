@@ -9,12 +9,12 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoAreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoArea;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Area;
 
 public class TestBIS extends BattleInteractionState {
-    AreaRenderer ar;
+    Area ar;
     Array<int[]> path;
     Unit guineapig;
     Unit warlord;
@@ -22,12 +22,12 @@ public class TestBIS extends BattleInteractionState {
     Unit soldier1;
     Unit soldier2;
     Unit soldier3;
-    AreaRenderer bannerArea;
+    Area bannerArea;
 
-    public TestBIS(BattleInteractionSystem bis) {
+    public TestBIS(BattleInteractionMachine bis) {
         super(bis, true, true, true);
-        ar = new TempoAreaRenderer(bis.asm, bis.battlefield, Assets.HighlightedTile.ACTION_RANGE);
-        //ar =  new TempoAreaRenderer(bis.asm, bis.battlefield, Assets.HighlightedTile.ACTION_RANGE, path);
+        ar = new TempoArea(bis.asm, bis.battlefield, Assets.HighlightedTile.ACTION_RANGE);
+        //ar =  new TempoArea(bim.asm, bim.battlefield, Assets.HighlightedTile.ACTION_RANGE, path);
         guineapig = bis.battlefield.getUnit(9,8);
         path = new Array<int[]>();
 
@@ -128,7 +128,7 @@ public class TestBIS extends BattleInteractionState {
         bis.battlefield.deployUnit(8,8,soldier1);
 
         //BANNER_RANGE TEST
-        bannerArea =  new TempoAreaRenderer(bis.asm, bis.battlefield, Assets.HighlightedTile.COVERING_FIRE);
+        bannerArea =  new TempoArea(bis.asm, bis.battlefield, Assets.HighlightedTile.COVERING_FIRE);
         bannerArea.addTiles(Utils.getEreaFromRange(bis.battlefield,6,8,1,army.getBannerRange()));
         System.out.println("BANNER_RANGE TEST");
         System.out.println("warlord   : "+warlord.isStandardBearer());
@@ -182,21 +182,19 @@ public class TestBIS extends BattleInteractionState {
     public void init() {    }
 
     @Override
-    public void handleTouchInput(float gameX, float gameY) {
-        int r = (int)gameY;
-        int c = (int)gameX;
+    public void handleTouchInput(int r, int c) {
         System.out.println("");
         System.out.println("row : "+r);
         System.out.println("col : "+c);
-        int[] unitPos = bis.battlefield.getUnitPos(soldier1);
+        int[] unitPos = bim.battlefield.getUnitPos(soldier1);
 
         // MOVE TEST
 
         if(unitPos != null) {
             ar.reset();
-            path = bis.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
-            unitPos = bis.battlefield.getUnitPos(soldier1);
-            ar.addTiles(bis.battlefield.getActionArea(unitPos[0], unitPos[1], Data.ActionChoice.WALK));
+            path = bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c, true);
+            unitPos = bim.battlefield.getUnitPos(soldier1);
+            ar.addTiles(bim.battlefield.getActionArea(unitPos[0], unitPos[1], Data.ActionChoice.WALK));
         }
 
 
@@ -204,15 +202,15 @@ public class TestBIS extends BattleInteractionState {
         /*
         if(unitPos != null) {
             ar.reset();
-            unitPos = bis.getBattlefield().getUnitPos(soldier1);
-            //path = bis.battlefield.getImpactArea(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
-            path = bis.getBattlefield().getTargetFromCollateral(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
+            unitPos = bim.getBattlefield().getUnitPos(soldier1);
+            //path = bim.battlefield.getImpactArea(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
+            path = bim.getBattlefield().getTargetFromCollateral(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
             ar.addTiles(path);
         }
         */
 
         //BUILD TEST
-        //bis.getBattlefield().build(unitPos[0], unitPos[1], r, c, true);
+        //bim.getBattlefield().build(unitPos[0], unitPos[1], r, c, true);
 
         //GUARD TEST
 
@@ -223,45 +221,43 @@ public class TestBIS extends BattleInteractionState {
         //PANEL TEST
 
         /*
-        bis.shortUnitPanel.hide();
-        bis.longUnitPanel.hide();
-        bis.longTilePanel.hide();
-        if(bis.battlefield.isTileOccupied(r,c)) {
-            bis.shortUnitPanel.set(bis.battlefield,r , c);
-            bis.shortUnitPanel.show();
-            bis.longUnitPanel.set(bis.battlefield, r, c);
-            bis.longUnitPanel.show();
+        bim.shortUnitPanel.hide();
+        bim.longUnitPanel.hide();
+        bim.longTilePanel.hide();
+        if(bim.battlefield.isTileOccupied(r,c)) {
+            bim.shortUnitPanel.set(bim.battlefield,r , c);
+            bim.shortUnitPanel.show();
+            bim.longUnitPanel.set(bim.battlefield, r, c);
+            bim.longUnitPanel.show();
         }else{
-            bis.longTilePanel.set(bis.battlefield.getTile(r, c));
-            bis.longTilePanel.show();
+            bim.longTilePanel.set(bim.battlefield.getTile(r, c));
+            bim.longTilePanel.show();
         }
 
-        bis.shortTilePanel.hide();
-        bis.shortTilePanel.set(bis.battlefield.getTile(r, c));
-        bis.shortTilePanel.show();
+        bim.shortTilePanel.hide();
+        bim.shortTilePanel.set(bim.battlefield.getTile(r, c));
+        bim.shortTilePanel.show();
         */
 
         //CAMERA TEST
-        //bis.gcm.focusOn(c, r, true);
+        //bim.gcm.focusOn(c, r, true);
 
     }
 
     @Override
-    public void dispose() {
+    public void end() {
 
     }
 
     @Override
-    public void update(float dt) {
-        ar.update(dt);
-        bannerArea.update(dt);
+    public void update60(float dt) {
 
         // CHOICES TEST
         if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
-            int[] coords = bis.battlefield.getUnitPos(warlord);
+            int[] coords = bim.battlefield.getUnitPos(warlord);
             System.out.println("\nChoices\n");
             for(Data.ActionChoice choice : Data.ActionChoice.values()){
-                System.out.println(choice.name()+" : "+ bis.bcm.canActionbePerformedBy(bis.battlefield.getUnit(coords[0], coords[1]) , choice));
+                System.out.println(choice.name()+" : "+ bim.bcm.canActionbePerformedBy(bim.battlefield.getUnit(coords[0], coords[1]) , choice));
             }
         }
 
@@ -281,17 +277,17 @@ public class TestBIS extends BattleInteractionState {
 
         //TEST SWITCH POSITION
         if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
-            int[] coords = bis.battlefield.getUnitPos(warlord);
-            int[] coords0 = bis.battlefield.getUnitPos(warchief1);
-            bis.battlefield.switchUnitsPosition(coords[0], coords[1], coords0[0], coords0[1]);
+            int[] coords = bim.battlefield.getUnitPos(warlord);
+            int[] coords0 = bim.battlefield.getUnitPos(warchief1);
+            bim.battlefield.switchUnitsPosition(coords[0], coords[1], coords0[0], coords0[1]);
 
         }
 
         //TEST PUSH
         if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
-            int[] coords0 = bis.battlefield.getUnitPos(soldier2);
-            int[] coords = bis.battlefield.getUnitPos(warchief1);
-            bis.battlefield.push(coords[0], coords[1], coords0[0], coords0[1]);
+            int[] coords0 = bim.battlefield.getUnitPos(soldier2);
+            int[] coords = bim.battlefield.getUnitPos(warchief1);
+            bim.battlefield.push(coords[0], coords[1], coords0[0], coords0[1]);
         }
 
         //TEST HEAL

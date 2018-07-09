@@ -34,7 +34,7 @@ public class Utils {
     }
 
     public static boolean arrayContains(Array<int[]> intArray, int[] coords){
-        if(intArray != null && coords != null && coords.length >= 2){
+        if(coords.length >= 2){
             for(int i =0; i < intArray.size; i++){
                 if(intArray.get(i).length >=2 && intArray.get(i)[0] == coords[0] && intArray.get(i)[0] == coords[0]){
                     return true;
@@ -45,14 +45,10 @@ public class Utils {
     }
 
     public static boolean arrayContains(Array<int[]> intArray, int r, int c){
-        boolean coordsFound;
         if(intArray != null) {
             for (int i = 0; i < intArray.size; i++) {
                 if(intArray.get(i).length >= 2) {
-                    coordsFound = true;
-                    coordsFound = coordsFound && r == intArray.get(i)[0];
-                    coordsFound = coordsFound && c == intArray.get(i)[1];
-                    if (coordsFound) {
+                    if (r == intArray.get(i)[0] && c == intArray.get(i)[1]) {
                         return true;
                     }
                 }

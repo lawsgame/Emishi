@@ -12,6 +12,8 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
         super(model);
     }
 
+    public abstract void setX(float x);
+    public abstract void setY(float y);
     public abstract void setTargeted(boolean targeted);
 
     public abstract void displayWalk(Array<int[]> path);

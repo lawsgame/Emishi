@@ -9,11 +9,11 @@ import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Unit.Army;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.TestBIS;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
 
@@ -23,7 +23,7 @@ public class BattlePhase extends GamePhase {
 
     public static BitmapFont testFont = new BitmapFont();
 
-    private BattleInteractionSystem bis;
+    private BattleInteractionMachine bim;
 
     public void loadRequiredAssets() {
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
@@ -63,9 +63,9 @@ public class BattlePhase extends GamePhase {
         playerArmy.appointWarLord(warlord);
 
         // set the initial BattleInteractionState
-        this.bis = new BattleInteractionSystem(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
-        BattleInteractionState initBIS = new TestBIS(bis);
-        bis.push(initBIS);
+        this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
+        BattleInteractionState initBIS = new SceneBIS(bim);
+        bim.push(initBIS);
 
 
     }
@@ -75,24 +75,24 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void update1(float dt) {
-        bis.getCurrentState().update1(dt);
+        bim.getCurrentState().update1(dt);
     }
 
     @Override
     public void update3(float dt) {
-        bis.getCurrentState().update3(dt);
+        bim.getCurrentState().update3(dt);
     }
 
     @Override
     public void update20(float dt) {
-        bis.getCurrentState().update12(dt);
+        bim.getCurrentState().update12(dt);
     }
 
 
     @Override
     public void update60(float dt) {
-        bis.getCurrentState().update(dt);
-        bis.bfr.update(dt);
+        bim.getCurrentState().update(dt);
+        bim.bfr.update(dt);
     }
 
     @Override
@@ -102,10 +102,12 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void renderWorld(SpriteBatch batch) {
-        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.bfr.renderTiles(batch);
-        bis.getCurrentState().renderBetween(batch);
-        if(bis.getCurrentState().isBattlefieldDisplayed()) bis.bfr.renderUnits(batch);
-        bis.getCurrentState().renderAhead(batch);
+        if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderTiles(batch);
+        bim.deploymentArea.render(batch);
+        bim.getCurrentState().renderBetween(batch);
+        bim.sltdTile.render(batch);
+        if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderUnits(batch);
+        bim.getCurrentState().renderAhead(batch);
     }
 
 

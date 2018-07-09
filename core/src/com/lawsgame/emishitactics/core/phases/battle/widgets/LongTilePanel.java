@@ -5,9 +5,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ATilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
 
-public class LongTilePanel extends ATilePanel{
+public class LongTilePanel extends TilePanel {
 
     private static float X_TEXT_OFFSET = 8f;
     private static float Y_TEXT_OFFSET = 8f;

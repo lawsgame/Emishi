@@ -393,6 +393,9 @@ public class Unit extends Observable{
 
     //-------------- ARMY RELATED METHODS --------------
 
+    public boolean isPlayerControlled(){
+        return army != null && army.isPlayerControlled();
+    }
 
     public boolean isMobilized(){
         if(army != null)
@@ -940,7 +943,7 @@ public class Unit extends Observable{
 
     public int getAppCharisma(){ return charisma + (isUsing(Item.KABUTO)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0);}
     public int getAppLaedership(){ return leadership + (isUsing(Item.WAR_CHIEF_CLOAK)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); }
-    public int getAppMobility() { return mobility + (isUsing(Item.WEI_BOOTS)? 1: 0); }
+    public int getAppMobility() { return mobility + (isUsing(Item.WEI_BOOTS)? 1: 0) + ((horseman) ? MOBILITY_BONUS_HORSEMAN: 0); }
     public int getAppHitPoints(){ return hitPoints; }
     public int getAppStrength(){ return strength + (isUsing(Item.GAUNLET)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); }
     public int getAppDexterity(){ return dexterity + (isUsing(Item.ARMBAND)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); }
@@ -1476,7 +1479,7 @@ public class Unit extends Observable{
                             newSquad.add(unit);
                             if (0 < squadIndex && squadIndex < mobilizedTroups.size) {
 
-                                //replace an older squad
+                                //set an older squad
                                 if (mobilizedTroups.get(squadIndex).size > 0)
                                     disengage(mobilizedTroups.get(squadIndex).get(0));
                                 mobilizedTroups.insert(squadIndex, newSquad);

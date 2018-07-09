@@ -7,11 +7,11 @@ import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 
-public class ShortUnitPanel extends AUnitPanel {
+public class ShortUnitPanel extends UnitPanel {
 
     private static float X_OFFSET = 15f;
     private static float Y_OFFSET = 15f;

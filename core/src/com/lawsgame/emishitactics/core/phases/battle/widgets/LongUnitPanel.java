@@ -9,9 +9,9 @@ import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 
-public class LongUnitPanel extends AUnitPanel {
+public class LongUnitPanel extends UnitPanel {
 
     private static float X_TEXT_OFFSET_1_COL = 8f;
     private static float X_TEXT_OFFSET_2_COL = 208f;

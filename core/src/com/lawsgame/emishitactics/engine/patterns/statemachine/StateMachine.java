@@ -15,13 +15,14 @@ public abstract class StateMachine <S extends State> {
     }
 
     public void pop(){
-        State s = states.pop();
-        s.dispose();
-
+        if(states.size() > 0) {
+            State s = states.pop();
+            s.dispose();
+        }
     }
 
     public void set(S s){
-        pop();
+        states.pop();
         push(s);
     }
 

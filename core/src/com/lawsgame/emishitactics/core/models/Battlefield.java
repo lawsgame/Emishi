@@ -291,16 +291,20 @@ public class Battlefield extends Observable {
         return false;
     }
 
-    public Array<int[]> moveUnit(int rowI, int colI, int rowf, int colf){
+    public Array<int[]> moveUnit(int rowI, int colI, int rowf, int colf, boolean walking){
         Array<int[]> path  = new Array<int[]>();
         if(isTileOccupied(rowI, colI)) {
             Unit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
-                path  = getShortestPath(rowI, colI, rowf, colf, unit.has(PassiveAbility.PATHFINDER), unit.getAllegeance());
-                notifyAllObservers(path);
+                if(walking) {
+                    path = getShortestPath(rowI, colI, rowf, colf, unit.has(PassiveAbility.PATHFINDER), unit.getAllegeance());
+                    notifyAllObservers(path);
+                }
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
-                return path;
+                if(!walking){
+                    notifyAllObservers(new int[]{rowf, colf});
+                }
             }
         }
         return path;

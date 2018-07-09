@@ -3,63 +3,51 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionSystem;
+import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoAreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoArea;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Area;
 
 public class DeploymentBIS extends BattleInteractionState{
-    AreaRenderer deploymentAreaRenderer;
 
-    public DeploymentBIS(BattleInteractionSystem bis, boolean fromSceneIS, AreaRenderer deploymentAreaRenderer) {
+    public DeploymentBIS(BattleInteractionMachine bis) {
         super(bis, true,true,  true);
-        if(fromSceneIS){
-            bis.battlefield.randomlyDeployArmy(bis.playerArmy);
-        }
-        if(deploymentAreaRenderer == null){
-            Array<int[]> deploymentArea = bis.battlefield.getDeploymentArea();
-            this.deploymentAreaRenderer = new TempoAreaRenderer(bis.asm, bis.battlefield, Assets.HighlightedTile.DEPLOYMENT, deploymentArea);
-        }else{
-            this.deploymentAreaRenderer = deploymentAreaRenderer;
-        }
-
-        int[] warlordPos = bis.battlefield.getUnitPos(bis.playerArmy.getWarlord());
-        bis.gcm.focusOn(warlordPos[0], warlordPos[1], true);
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-        deploymentAreaRenderer.render(batch);
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void handleTouchInput(float gameX, float gameY) {
-
+        bis.battlefield.randomlyDeployArmy(bis.playerArmy);
+        init();
     }
 
     @Override
     public void init() {
-
+        int[] warlordPos = bim.battlefield.getUnitPos(bim.playerArmy.getWarlord());
+        focusOn(warlordPos[0], warlordPos[1], true);
+        bim.deploymentArea.setVisible(true);
     }
 
     @Override
-    public void dispose() {
+    public void prerender(SpriteBatch batch) { }
 
+    @Override
+    public void renderBetween(SpriteBatch batch) {
     }
 
     @Override
-    public void update(float dt) {
-        deploymentAreaRenderer.update(dt);
+    public void renderAhead(SpriteBatch batch) { }
+
+    @Override
+    public void handleTouchInput(int row, int col) {
+        if(bim.battlefield.isTileOccupied(row, col)){
+            bim.set(new RedeploymentBIS(bim, row, col));
+        }else{
+            bim.shortTilePanel.hide();
+            bim.shortTilePanel.set(bim.battlefield.getTile(row, col));
+            bim.shortTilePanel.show();
+        }
     }
+
+    @Override
+    public void end() { }
+
+    @Override
+    public void update60(float dt) { }
 }
