@@ -11,7 +11,6 @@ import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
 
 public abstract class InteractionState implements GameUpdatableEntity, State, GestureDetector.GestureListener{
     OrthographicCamera gameCam;
-    private boolean longPressed = false;
     private Vector3 vector3 = new Vector3();
     private Vector3 oldVector3 = new Vector3();
 
@@ -33,15 +32,13 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-        if(longPressed){
-            longPressed = false;
-        }else {
-            vector3.x = x;
-            vector3.y = y;
-            vector3.z = 0;
-            vector3 = gameCam.unproject(vector3);
-            onTouch(vector3.x, vector3.y);
-        }
+
+        vector3.x = x;
+        vector3.y = y;
+        vector3.z = 0;
+        vector3 = gameCam.unproject(vector3);
+        onTouch(vector3.x, vector3.y);
+
         return true;
     }
 
@@ -52,7 +49,6 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
         vector3.z = 0;
         vector3 = gameCam.unproject(vector3);
         onLongTouch(vector3.x, vector3.y);
-        longPressed = true;
         return true;
     }
 

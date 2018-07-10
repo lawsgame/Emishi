@@ -1,12 +1,12 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
 import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
-import com.lawsgame.emishitactics.core.constants.Data.R;
 import com.lawsgame.emishitactics.core.constants.Data.TargetType;
 import com.lawsgame.emishitactics.core.constants.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
@@ -262,8 +262,8 @@ public class Battlefield extends Observable {
             }
 
             while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
-                coords = remainingAvailableTiles.removeIndex(R.getR().nextInt(remainingAvailableTiles.size));
-                unit = remainingUnits.removeIndex(R.getR().nextInt(remainingUnits.size));
+                coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
+                unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
                 deployUnit(coords[0], coords[1], unit);
             }
 
@@ -1080,13 +1080,13 @@ public class Battlefield extends Observable {
      * @return the maximal range of actor performing the given action while standing on the given tile
      */
     public int getActionRangeMax(Unit actor, int row, int col, ActionChoice choice){
-        int rangeMin = 0;
+        int rangeMax = 0;
         if(isTileExisted(row, col)){
             TileType actorTile = getTile(row, col);
             boolean bannerAtRange = isStandardBearerAtRange(actor, row, col);
-            rangeMin = (choice.isWeaponBasedRange()) ? actor.getCurrentRangeMax(actorTile, bannerAtRange) : choice.getRangeMin();
+            rangeMax = (choice.isWeaponBasedRange()) ? actor.getCurrentRangeMax(actorTile, bannerAtRange) : choice.getRangeMin();
         }
-        return rangeMin;
+        return rangeMax;
     }
 
 

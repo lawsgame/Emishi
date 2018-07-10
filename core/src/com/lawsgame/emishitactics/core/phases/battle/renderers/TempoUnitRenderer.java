@@ -260,25 +260,20 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case STEAL:
             case BUILD:
             case GUARD:
-            case DODGE:
-            case BLOCK:
-            case PARRY:
             case PRAY:
             case DIE:
+            case DODGE:
             case BACKSTABBED:
-            case PARRIED_ATTACK:
+            case REST:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
                 countDown.run();
                 break;
             case SWITCH_WEAPON:
                 weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
                 break;
-            case REST:
-                unitTexture = TempoSprite2DPool.get().getUnitSprite(model.getStance(), model.getArmy().isAlly(), model.isDone());
-                break;
             case FLEE:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
-                orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation().getOpposite());
+                orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getOrientation().getOpposite());
                 countDown.run();
                 break;
             case GUARDED:
@@ -292,7 +287,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case CRUNCHING_BLOW:
             case WAR_CRY:
             case POISONOUS_ATTACK:
-            case GUARD_BREAK:
+            case HARASS:
             case LINIENT_BLOW:
             case FURY:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly());
@@ -328,7 +323,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             // update weapon
             weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
             // update orientation
-            orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getCurrentOrientation());
+            orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getOrientation());
             if (model.isUsingShield()) {
                 // update shield wielding rendering
                 shieldTexture = TempoSprite2DPool.get().getShieldSprite();

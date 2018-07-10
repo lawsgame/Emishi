@@ -56,7 +56,6 @@ public class LongUnitPanel extends UnitPanel {
                 }
             }
             builder.append("\nMoral (HP) : " + unit.getCurrentMoral() + "/" + unit.getAppMoral() + " (" + unit.getCurrentHitpoints() + ")");
-            builder.append("\nStance : " + unit.getStance().name().toLowerCase());
             builder.append("\nAO trigger rate : " + unit.getAppAbilityTriggerRate());
 
             if (unit.isMobilized()) {
@@ -84,12 +83,9 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\nOffensive ability : "+unit.getOffAb().name().toLowerCase());
             builder.append("\n\nCURRENT WEAPONS\n");
             builder.append("\nName : "+unit.getCurrentWeapon().name().toLowerCase());
-            builder.append("\nDual wielded required : "+unit.getCurrentWeapon().isDualWieldingRequired());
             builder.append("\nFootman only : "+unit.getCurrentWeapon().isFootmanOnly());
             builder.append("\nBase damage : "+unit.getCurrentWeapon().getDamage());
             builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getAccuracy());
-            builder.append("\nParry ability : "+unit.getCurrentWeapon().getParryCapacity());
-            builder.append("\nParry vulnerability : "+unit.getCurrentWeapon().getParryVulnerability());
             builder.append("\nDamage type : "+unit.getCurrentWeapon().getType().name().toLowerCase());
             builder.append("\nRange : ("+unit.getCurrentWeapon().getRangeMin()+", "+unit.getCurrentWeapon().getRangeMax()+")");
             builder.append("\nSpecial move : "+unit.getCurrentWeapon().getArt().name().toLowerCase());
@@ -119,13 +115,9 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\nAttack accuracy : "+unit.getAttackAccuracy());
             builder.append("\nRange : ("+unit.getAppCurrentWeaponRangeMin()+", "+unit.getAppCurrentWeaponRangeMax()+")");
             builder.append("\nDODGE ABILITY : ");
-            builder.append("\n  against piercing : "+unit.getAppDodgingAbility(Data.DamageType.PIERCING));
-            builder.append("\n  against edged    : "+unit.getAppDodgingAbility(Data.DamageType.EDGED));
-            builder.append("\n  against blunt    : "+unit.getAppDodgingAbility(Data.DamageType.BLUNT));
-            //builder.append("\nPARRY ABILITY : ");
-            for(Data.Weapon weapon : Data.Weapon.values()){
-                //builder.append("\n  against "+weapon.name().toLowerCase()+" : "+unit.getAppParryingAbility(weapon));
-            }
+            builder.append("\n  against piercing : "+unit.getAppAvoidance(Data.DamageType.PIERCING));
+            builder.append("\n  against edged    : "+unit.getAppAvoidance(Data.DamageType.EDGED));
+            builder.append("\n  against blunt    : "+unit.getAppAvoidance(Data.DamageType.BLUNT));
 
 
             statDescription = builder.toString();

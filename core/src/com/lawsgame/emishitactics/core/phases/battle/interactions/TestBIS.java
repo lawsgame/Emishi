@@ -33,11 +33,10 @@ public class TestBIS extends BattleInteractionState {
 
         //compose test player army
 
-        warlord = new Unit(true,
-                Data.UnitTemplate.EMISHI_TRIBESMAN,19,
-                Data.Ethnicity.JAPANESE,
-                Data.Orientation.SOUTH,
-                Data.Behaviour.CONTROLLED_BY_PLAYER, Data.Weapon.YUMI, Data.Weapon.WARABITE, true);
+        warlord = new Unit(Data.UnitTemplate.EMISHI_TRIBESMAN, false, 19, Data.Ethnicity.JAPANESE,Data.Weapon.YUMI, Data.Weapon.WARABITE, true);
+        warlord.setOrientation(Data.Orientation.SOUTH);
+        warlord.setBehaviour(Data.Behaviour.CONTROLLED_BY_PLAYER);
+        warlord.setRightHanded(true);
         warlord.setPasAb1(Data.PassiveAbility.PRAYER);
         warlord.setPasAb2(Data.PassiveAbility.NONE);
         warlord.setOffensiveAbility(Data.OffensiveAbility.CRUNCHING_BLOW);
@@ -49,11 +48,7 @@ public class TestBIS extends BattleInteractionState {
 
         //unit0.addBannerSign(...)
 
-        warchief1 = new Unit(true,
-                Data.UnitTemplate.CONSCRIPT,9,
-                Data.Ethnicity.JAPANESE,
-                Data.Orientation.SOUTH,
-                Data.Behaviour.CONTROLLED_BY_PLAYER, Data.Weapon.KATANA, Data.Weapon.NAGINATA, true);
+        warchief1 = new Unit(Data.UnitTemplate.EMISHI_TRIBESMAN, false, 15, Data.Ethnicity.JAPANESE,Data.Weapon.WARABITE, Data.Weapon.YARI, true);
         warchief1.setPasAb1(Data.PassiveAbility.NONE);
         warchief1.setPasAb2(Data.PassiveAbility.NONE);
         warchief1.setOffensiveAbility(Data.OffensiveAbility.NONE);
@@ -64,11 +59,7 @@ public class TestBIS extends BattleInteractionState {
         warchief1.setLeadership(11);
         //unit0.addBannerSign(...)
 
-        soldier1 = new Unit(true,
-                Data.UnitTemplate.EMISHI_TRIBESMAN,5,
-                Data.Ethnicity.JAPANESE,
-                Data.Orientation.SOUTH,
-                Data.Behaviour.CONTROLLED_BY_PLAYER, Data.Weapon.YUMI, Data.Weapon.KANABO, true);
+        soldier1 = new Unit(Data.UnitTemplate.CONSCRIPT, false, 12, Data.Ethnicity.JAPANESE,Data.Weapon.KATANA, Data.Weapon.NODACHI, true);
         soldier1.setPasAb1(Data.PassiveAbility.PRAYER);
         soldier1.setPasAb2(Data.PassiveAbility.NONE);
         soldier1.setOffensiveAbility(Data.OffensiveAbility.NONE);
@@ -78,11 +69,7 @@ public class TestBIS extends BattleInteractionState {
         //soldier1.addBannerSign(Data.BannerSign.APEHUCI);
         soldier1.setName("Jim");
 
-        soldier2 = new Unit(true,
-                Data.UnitTemplate.EMISHI_TRIBESMAN,7,
-                Data.Ethnicity.JAPANESE,
-                Data.Orientation.SOUTH,
-                Data.Behaviour.CONTROLLED_BY_PLAYER, Data.Weapon.YARI, Data.Weapon.YUMI, true);
+        soldier2 = new Unit(Data.UnitTemplate.CONSCRIPT, false, 3, Data.Ethnicity.JAPANESE,Data.Weapon.YUMI, Data.Weapon.NODACHI, true);
         soldier2.setPasAb1(Data.PassiveAbility.NONE);
         soldier2.setPasAb2(Data.PassiveAbility.NONE);
         soldier2.setOffensiveAbility(Data.OffensiveAbility.NONE);
@@ -92,11 +79,7 @@ public class TestBIS extends BattleInteractionState {
         soldier2.setName("Johnny");
 
 
-        soldier3 = new Unit(true,
-                Data.UnitTemplate.EMISHI_TRIBESMAN,7,
-                Data.Ethnicity.JAPANESE,
-                Data.Orientation.SOUTH,
-                Data.Behaviour.CONTROLLED_BY_PLAYER, Data.Weapon.WARABITE, Data.Weapon.YUMI, true);
+        soldier3 = new Unit(Data.UnitTemplate.CONSCRIPT, false, 5, Data.Ethnicity.JAPANESE,Data.Weapon.YARI, Data.Weapon.NAGINATA, true);
         soldier3.setPasAb1(Data.PassiveAbility.NONE);
         soldier3.setPasAb2(Data.PassiveAbility.NONE);
         soldier3.setOffensiveAbility(Data.OffensiveAbility.NONE);

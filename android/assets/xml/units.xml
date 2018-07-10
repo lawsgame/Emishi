@@ -3,10 +3,13 @@
     <Battle battlefieldId = "0">
         <Army ally = "false">
             <Squad>
-                <Unit row = "9" col = "8" rightHanded ="true" template = "EMISHI" level ="5" ethinicity = "AINU" orientation = "SOUTH" behaviour = "PASSIVE"  primaryWeapon= "WARABITE" secondaryWeapon = "NONE" homogeneousLevels = "true">
+                <Unit row = "9" col = "8" standardBearer = "false" template = "EMISHI" level ="5" ethinicity = "AINU" primaryWeapon= "WARABITE" secondaryWeapon = "NONE" homogeneousLevels = "true">
+                    <Attribute id = "behaviour" value="PASSIVE"/>
+                    <Attribute id = "orientation" value="SOUTH"/>
+                    <Attribute id = "right handed" value="true"/>
                     <Attribute id = "offensive ability" value ="NONE"/>
-                    <Attribute id = "passive ability 1" value ="NONE"/>
-                    <Attribute id = "passive ability 2" value ="NONE"/>
+                    <Attribute id = "passive ability" value ="NONE"/>
+                    <Attribute id = "passive ability" value ="NONE"/>
                     <Attribute id = "item" value ="NONE"/>
                     <Attribute id = "item" value ="NONE"/>
                     <Attribute id = "stealable" value ="false"/>

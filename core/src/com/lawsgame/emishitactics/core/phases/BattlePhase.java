@@ -45,11 +45,8 @@ public class BattlePhase extends GamePhase {
 
         // set the player army
 
-        Unit warlord = new Unit(true,
-                Data.UnitTemplate.EMISHI_TRIBESMAN,19,
-                Data.Ethnicity.JAPANESE,
-                Data.Orientation.SOUTH,
-                Data.Behaviour.CONTROLLED_BY_PLAYER, Data.Weapon.YUMI, Data.Weapon.WARABITE, true);
+
+        Unit warlord = new Unit(Data.UnitTemplate.CONSCRIPT, false, 15, Data.Ethnicity.JAPANESE, Data.Weapon.YUMI, Data.Weapon.KANABO, true);
         warlord.setPasAb1(Data.PassiveAbility.PRAYER);
         warlord.setPasAb2(Data.PassiveAbility.NONE);
         warlord.setOffensiveAbility(Data.OffensiveAbility.CRUNCHING_BLOW);

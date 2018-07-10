@@ -67,7 +67,6 @@ public class BattleCommandManager {
             case BUILD:                 if(!actor.has(Data.PassiveAbility.ENGINEER) && !actor.isBuildingResourcesConsumed()) return false; break;
             case ATTACK:                break;
             case CHOOSE_ORIENTATION:    break;
-            case CHOOSE_STANCE:         break;
             case USE_FOCUSED_BLOW:      if(!actor.has(Data.OffensiveAbility.FOCUSED_BLOW)) return false; break;
             case USE_CRIPPLING_BLOW:    if(!actor.has(Data.OffensiveAbility.CRIPPLING_BLOW)) return false; break;
             case USE_SWIRLING_BLOW:     if(!actor.has(Data.OffensiveAbility.SWIRLING_BLOW)) return false; break;

@@ -4,8 +4,6 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Data.BannerSign;
 import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
-import com.lawsgame.emishitactics.core.constants.Data.DefensiveStance;
-import com.lawsgame.emishitactics.core.constants.Data.EquipMsg;
 import com.lawsgame.emishitactics.core.constants.Data.Ethnicity;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
 import com.lawsgame.emishitactics.core.constants.Data.ItemType;
@@ -18,31 +16,65 @@ import com.lawsgame.emishitactics.core.constants.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.constants.Data.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-import static com.lawsgame.emishitactics.core.constants.Data.*;
+import static com.lawsgame.emishitactics.core.constants.Data.AB_TRIGGER_RATE_SKILL_FACTOR;
+import static com.lawsgame.emishitactics.core.constants.Data.ACCURACY_BONUS_CRIT;
+import static com.lawsgame.emishitactics.core.constants.Data.AGI_DODGE_FACTOR;
+import static com.lawsgame.emishitactics.core.constants.Data.Allegeance;
+import static com.lawsgame.emishitactics.core.constants.Data.AnimationId;
+import static com.lawsgame.emishitactics.core.constants.Data.ArmyType;
+import static com.lawsgame.emishitactics.core.constants.Data.CHARM_HEAL_BONUS;
+import static com.lawsgame.emishitactics.core.constants.Data.CRITICAL_DAMAGE_MODIFIER;
+import static com.lawsgame.emishitactics.core.constants.Data.CRIT_BONUS_IMP_GAUNLET;
+import static com.lawsgame.emishitactics.core.constants.Data.DEF_BONUS_GREAT_SHIELD;
+import static com.lawsgame.emishitactics.core.constants.Data.DEF_BONUS_KEIKO;
+import static com.lawsgame.emishitactics.core.constants.Data.DEF_BONUS_OYOROI;
+import static com.lawsgame.emishitactics.core.constants.Data.DEF_BONUS_TANKO;
+import static com.lawsgame.emishitactics.core.constants.Data.DEF_BONUS_YAYOI_SHIELD;
+import static com.lawsgame.emishitactics.core.constants.Data.DEX_BONUS_EMISHI_LEGGINS;
+import static com.lawsgame.emishitactics.core.constants.Data.DEX_BONUS_TANKO;
+import static com.lawsgame.emishitactics.core.constants.Data.DEX_BONUS_YAMATO_TROUSERS;
+import static com.lawsgame.emishitactics.core.constants.Data.DEX_BONUS_YAYOI_SHIELD;
+import static com.lawsgame.emishitactics.core.constants.Data.DEX_FAC_DROP_RATE;
+import static com.lawsgame.emishitactics.core.constants.Data.DEX_HIT_FACTOR;
+import static com.lawsgame.emishitactics.core.constants.Data.DamageType;
 import static com.lawsgame.emishitactics.core.constants.Data.DamageType.NONE;
+import static com.lawsgame.emishitactics.core.constants.Data.EXP_BASE_MODIFIER;
+import static com.lawsgame.emishitactics.core.constants.Data.GrowthStat;
+import static com.lawsgame.emishitactics.core.constants.Data.HEAL_BASE_POWER;
+import static com.lawsgame.emishitactics.core.constants.Data.LVL_GAP_FACTOR;
+import static com.lawsgame.emishitactics.core.constants.Data.MAX_LEVEL;
+import static com.lawsgame.emishitactics.core.constants.Data.MAX_UNITS_UNDER_WARLORD;
+import static com.lawsgame.emishitactics.core.constants.Data.MAX_UNITS_UNDER_WAR_CHIEF;
+import static com.lawsgame.emishitactics.core.constants.Data.MOBILITY_BONUS_HORSEMAN;
+import static com.lawsgame.emishitactics.core.constants.Data.MOBILITY_BONUS_PROMOTED;
+import static com.lawsgame.emishitactics.core.constants.Data.OA_CHARGING_BAR_MAW_VALUE;
+import static com.lawsgame.emishitactics.core.constants.Data.PROMOTION_LEVEL;
+import static com.lawsgame.emishitactics.core.constants.Data.STR_FIXE_BONUS_NAGINATA_1;
+import static com.lawsgame.emishitactics.core.constants.Data.STR_FIXE_BONUS_NAGINATE_2;
+import static com.lawsgame.emishitactics.core.constants.Data.STR_FIXE_BONUS_YARI_1;
+import static com.lawsgame.emishitactics.core.constants.Data.STR_FIXE_BONUS_YARI_2;
+import static com.lawsgame.emishitactics.core.constants.Data.UNIQUE_EQUIPMENT_FIXE_STD_BONUS;
+import static com.lawsgame.emishitactics.core.constants.Data.UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS;
+import static com.lawsgame.emishitactics.core.constants.Data.UNIQUE_EQUIPMENT_LOW_GROWTH_BONUS;
 
-
-/**
- *  TODO:
- *  - Abilities?
- */
 
 public class Unit extends Observable{
 
 
     protected String name;
     protected Ethnicity ethnicity;
-
     protected int level;
-    protected int leadershipEXP = 0;
     protected String job;
-    protected boolean rightHanded;
     protected UnitTemplate template;
     protected Weapon primaryWeapon = Weapon.NONE;
     protected Weapon secondaryWeapon = Weapon.NONE;
-    protected boolean primaryWeaponEquipped = true;
     protected boolean horseman;
+    protected boolean standardBearer;
 
+    protected int experience = 0;
+    protected int commandmentExperience = 0;
+    protected boolean primaryWeaponEquipped = true;
+    protected boolean rightHanded = true;
     private AArmy army = null;
 
     protected int mobility;
@@ -62,7 +94,6 @@ public class Unit extends Observable{
     protected Item item1 = Item.NONE;
     protected Item item2 = Item.NONE;
     protected boolean itemStealable = false;
-
     protected PassiveAbility pasAb1 = PassiveAbility.NONE;
     protected PassiveAbility pasAb2 = PassiveAbility.NONE;
     protected OffensiveAbility offAb = OffensiveAbility.NONE;
@@ -71,15 +102,14 @@ public class Unit extends Observable{
     /**
      * battlefield execution related attributes
      */
-    protected boolean guarduing;
-    protected Orientation orientation;
-    protected Behaviour behaviour;
+    protected boolean guarduing = false;
+    protected Orientation orientation = Orientation.SOUTH;
+    protected Behaviour behaviour = Behaviour.PASSIVE;
     protected int numberOfOAUses = 0;
     protected int OAChargingBar = 0;
     protected boolean moved = false;
     protected boolean acted = false;
     protected boolean buildingResourcesConsumed = false;
-    protected DefensiveStance stance = DefensiveStance.DODGE;
 
 
 
@@ -97,18 +127,35 @@ public class Unit extends Observable{
      *  - setItem1
      *  - setItem2
      *  - setStealableItem
+     *  - bahaviour
+     *  - orientatoin
+     *  - favorite hand
      *  - addBannerSign(...) x3 if relevant
      */
-    public Unit(boolean rightHanded, UnitTemplate template, int gainLvl, Ethnicity ethnicity, Orientation or, Behaviour behaviour,  Weapon primaryWeapon, Weapon secondaryWeapon, boolean homogeneousLevelUp){
-        this.level = template.getStartLevel();
-        this.rightHanded = rightHanded;
-        this.template = (template == null) ? UnitTemplate.CONSCRIPT: template;
-        this.job = (PROMOTION_LEVEL <= gainLvl + template.getStartLevel())? template.getJob().getPromotionName() : template.getJob().getRecruitName();
-        this.name = "";
-        this.ethnicity = (ethnicity == null)? Ethnicity.JAPANESE :ethnicity;
-        this.behaviour = (behaviour == null) ? Behaviour.PASSIVE : behaviour;
-        this.orientation = (or == null) ? Orientation.SOUTH :or;
-        this.horseman = false;
+
+
+    public Unit(
+            UnitTemplate template,
+            boolean standardBearer,
+            int lvl,
+            Ethnicity ethnicity,
+            Weapon primaryWeapon,
+            Weapon secondaryWeapon,
+            boolean homogeneousLevelUp){
+
+        if(lvl - template.getStartLevel() < 0){
+            this.level = template.getStartLevel();
+        }else if (lvl + template.getStartLevel() > MAX_LEVEL){
+            this.level = MAX_LEVEL;
+        }else{
+            this.level = lvl + template.getStartLevel();
+        }
+        this.template = template;
+        this.job = (PROMOTION_LEVEL <= level)? template.getJob().getPromotionName() : template.getJob().getRecruitName();
+        this.name = job;
+        this.ethnicity = ethnicity;
+        setHorsemanValue();
+        this.standardBearer = template.getJob().isPossiblyStandardBearerJob() && standardBearer;
 
         this.mobility = template.getJob().getMobility();
         this.charisma = template.getBaseCha();
@@ -129,33 +176,22 @@ public class Unit extends Observable{
 
         // levels up the build
         if(homogeneousLevelUp){
-            growUpHomogeneously(gainLvl, chosenSecondaryW);
+            growUpHomogeneously(chosenSecondaryW);
         }else {
-            for (int lvl = 0; lvl < gainLvl; lvl++) {
+            for (int n = 0; n < getLevel(); n++) {
                 levelUp();
-                if(lvl == PROMOTION_LEVEL){
+                if(n == PROMOTION_LEVEL){
                     promote(chosenSecondaryW);
                 }
             }
         }
         setInitialHPAndMoral();
-        setHorsemanValue();
+
     }
 
-    /**
-     * choose randomly weapons for the unit.
-     *
-     * @param template
-     * @param gainLvl
-     */
-    public Unit(UnitTemplate template, int gainLvl){
-        this(true, template,  gainLvl, Ethnicity.getStandard(), Orientation.getStandard(), Behaviour.getStandard(), Weapon.NONE, Weapon.NONE, true);
+    public Unit(UnitTemplate template, boolean standardBearer, int lvl){
+        this(template, standardBearer, lvl, Ethnicity.getStandard(), Weapon.NONE, Weapon.NONE, true);
     }
-
-    public Unit(boolean rightHanded, UnitTemplate template, int gainLvl, Weapon primaryWeapon, Weapon secondaryWeapon, boolean homogeneous){
-        this(rightHanded, template,  gainLvl, Ethnicity.getStandard(), Orientation.getStandard(), Behaviour.getStandard(), primaryWeapon, secondaryWeapon, homogeneous);
-    }
-
 
 
     // ----------------------------   METHODS --------------------------------
@@ -205,9 +241,8 @@ public class Unit extends Observable{
         return gainlvl;
     }
 
-     public void growUpHomogeneously(int gainLvl, Weapon secondaryWeapon){
-        if(gainLvl < 0) gainLvl = 0;
-        if(gainLvl + getLevel() > MAX_LEVEL)  gainLvl = MAX_LEVEL - getLevel();
+     public void growUpHomogeneously(Weapon secondaryWeapon){
+        int gainlvl = getLevel() - template.getStartLevel();
 
         float cha = 0;
         float ld = 0;
@@ -221,16 +256,16 @@ public class Unit extends Observable{
 
         int prePromotionLvl = 0;
         int postPromotionLvl = 0;
-        if(getLevel() + gainLvl >= PROMOTION_LEVEL){
+        if(template.getStartLevel() >= PROMOTION_LEVEL){
             promote(secondaryWeapon);
             if(getLevel() >= PROMOTION_LEVEL){
-                postPromotionLvl = gainLvl;
+                postPromotionLvl = gainlvl;
             }else{
-                prePromotionLvl = PROMOTION_LEVEL - getLevel() - 1;
-                postPromotionLvl = getLevel() + gainLvl + 1 - PROMOTION_LEVEL;
+                prePromotionLvl = PROMOTION_LEVEL - template.getStartLevel() - 1;
+                postPromotionLvl = getLevel() - PROMOTION_LEVEL;
             }
         }else{
-            prePromotionLvl = gainLvl;
+            prePromotionLvl = gainlvl;
         }
 
         cha += template.getGrowthCha()*prePromotionLvl;
@@ -263,8 +298,6 @@ public class Unit extends Observable{
         this.skill += ski;
         this.bravery += bra;
 
-        level += gainLvl;
-
     }
 
     public int[] levelUp(){
@@ -283,15 +316,15 @@ public class Unit extends Observable{
             this.level++;
 
             if (PROMOTION_LEVEL != level) {
-                cha += (getAppGrowthRate(GrowthStat.CHARISMA) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                ld += (getAppGrowthRate(GrowthStat.LEADERSHIP) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                hpt += (getAppGrowthRate(GrowthStat.HIT_POINTS) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                str += (getAppGrowthRate(GrowthStat.STRENGTH) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                def += (getAppGrowthRate(GrowthStat.DEFENSE) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                dex += (getAppGrowthRate(GrowthStat.DEXTERITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                agi += (getAppGrowthRate(GrowthStat.AGILITY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                ski += (getAppGrowthRate(GrowthStat.SKILL) * 100 > R.getR().nextInt(100)) ? 1 : 0;
-                bra += (getAppGrowthRate(GrowthStat.BRAVERY) * 100 > R.getR().nextInt(100)) ? 1 : 0;
+                cha += (getAppGrowthRate(GrowthStat.CHARISMA) * 100 > Data.rand(100)) ? 1 : 0;
+                ld += (getAppGrowthRate(GrowthStat.LEADERSHIP) * 100 > Data.rand(100)) ? 1 : 0;
+                hpt += (getAppGrowthRate(GrowthStat.HIT_POINTS) * 100 > Data.rand(100)) ? 1 : 0;
+                str += (getAppGrowthRate(GrowthStat.STRENGTH) * 100 > Data.rand(100)) ? 1 : 0;
+                def += (getAppGrowthRate(GrowthStat.DEFENSE) * 100 > Data.rand(100)) ? 1 : 0;
+                dex += (getAppGrowthRate(GrowthStat.DEXTERITY) * 100 > Data.rand(100)) ? 1 : 0;
+                agi += (getAppGrowthRate(GrowthStat.AGILITY) * 100 > Data.rand(100)) ? 1 : 0;
+                ski += (getAppGrowthRate(GrowthStat.SKILL) * 100 > Data.rand(100)) ? 1 : 0;
+                bra += (getAppGrowthRate(GrowthStat.BRAVERY) * 100 > Data.rand(100)) ? 1 : 0;
             }
 
             this.charisma += cha;
@@ -323,14 +356,14 @@ public class Unit extends Observable{
         Weapon chosenW = Weapon.NONE;
         if(primaryWeaponChoice) {
             if (this.template.getJob().getAvailableWeapons().length > 0) {
-                randId = R.getR().nextInt(this.template.getJob().getAvailableWeapons().length);
+                randId = Data.rand(this.template.getJob().getAvailableWeapons().length);
                 chosenW = this.template.getJob().getAvailableWeapons()[randId];
             }
         }else{
             chosenW = this.primaryWeapon;
             if(this.template.getJob().getAvailableWeaponsAfterPromotion().length > 1) {
                 while (chosenW == this.primaryWeapon) {
-                    randId = R.getR().nextInt(this.template.getJob().getAvailableWeaponsAfterPromotion().length);
+                    randId = Data.rand(this.template.getJob().getAvailableWeaponsAfterPromotion().length);
                     chosenW = this.template.getJob().getAvailableWeaponsAfterPromotion()[randId];
                 }
             }
@@ -391,7 +424,11 @@ public class Unit extends Observable{
 
 
 
+
+
     //-------------- ARMY RELATED METHODS --------------
+
+
 
     public boolean isPlayerControlled(){
         return army != null && army.isPlayerControlled();
@@ -454,11 +491,11 @@ public class Unit extends Observable{
         return army.getSquad(this);
     }
 
-    public boolean isStandardBearer(){ return !banner.isEmpty(); }
+    public boolean isStandardBearer(){ return standardBearer; }
 
     public boolean addBannerSign(BannerSign sign) {
         boolean res = false;
-        if(template.getJob().isPossiblyStandardBearerJob()){
+        if(standardBearer){
            res = banner.addSign(sign);
            if(isMobilized())
                army.checkComposition();
@@ -493,28 +530,12 @@ public class Unit extends Observable{
         return str*factor;
     }
 
-    public int getAppParryingAbility(Weapon parriedWeapon){
-        float parryingMatchUp = (float) Math.sqrt(getCurrentWeapon().getParryCapacity() * parriedWeapon.getParryVulnerability());
-        return  (int) (DEX_PARRY_FACTOR* getAppDexterity()*parryingMatchUp);
-    }
-
-    public int getAppDodgingAbility(DamageType damageType){
+    public int getAppAvoidance(DamageType damageType){
         return AGI_DODGE_FACTOR* getAppAgility(damageType);
     }
 
     public int getCurrentAvoidance(TileType defenderTile, Weapon opponentWeapon, boolean bannerAtRange){
-        int avoidance = 0;
-        switch(stance){
-            case DODGE:
-                avoidance = AGI_DODGE_FACTOR* getCurrentAg(opponentWeapon) + defenderTile.getAvoidBonus();
-                break;
-            case PARRY:
-                float parryAbility = (float) Math.sqrt(getCurrentWeapon().getParryCapacity() * opponentWeapon.getParryVulnerability());
-                avoidance = (int) ( DEX_PARRY_FACTOR * getCurrentDex(bannerAtRange) * parryAbility);
-                break;
-            default: break;
-        }
-        return avoidance;
+        return AGI_DODGE_FACTOR* getCurrentAg(opponentWeapon) + defenderTile.getAvoidBonus();
     }
 
     public int getAttackAccuracy(){
@@ -612,10 +633,10 @@ public class Unit extends Observable{
     }
 
     public int addLeadershipEXP(int gainEXP) {
-        this.leadershipEXP += gainEXP;
-        int gainLd = this.leadershipEXP / Data.EXP_REQUIRED_LD_LEVEL_UP;
+        this.commandmentExperience += gainEXP;
+        int gainLd = this.commandmentExperience / Data.EXP_REQUIRED_LD_LEVEL_UP;
         this.setLeadership(this.leadership + gainLd);
-        this.leadershipEXP = this.leadershipEXP % Data.EXP_REQUIRED_LD_LEVEL_UP;
+        this.commandmentExperience = this.commandmentExperience % Data.EXP_REQUIRED_LD_LEVEL_UP;
         return gainLd;
     }
 
@@ -624,10 +645,7 @@ public class Unit extends Observable{
     }
 
     public static int getDealtDamage(Unit attacker, Unit defender, boolean critical, TileType attackerTile, TileType defenderTile, boolean attackBannerAtRange, boolean defenderBannerAtRange, boolean counterattack){
-        int dealtDamage = attacker.getCurrentAttackDamage(attackerTile, defender, critical, counterattack, attackBannerAtRange) - defender.getCurrentDef(defenderTile, attacker.getCurrentWeapon(), attacker.getCurrentSk(), defenderBannerAtRange);
-        dealtDamage *= ((defender.getStance() == DefensiveStance.BLOCK) ? BLOCK_REDUCTION_DAMAGE : 1);
-        dealtDamage -= BLOCK_RAW_REDUCTION_DAMAGE;
-        return  dealtDamage;
+        return attacker.getCurrentAttackDamage(attackerTile, defender, critical, counterattack, attackBannerAtRange) - defender.getCurrentDef(defenderTile, attacker.getCurrentWeapon(), attacker.getCurrentSk(), defenderBannerAtRange);
     }
 
     public void receiveDamage(int attackMight, boolean moralDamageOnly){
@@ -698,46 +716,27 @@ public class Unit extends Observable{
     public boolean equip(Item item, boolean firstSlot) {
         int currentLd = getAppLaedership();
         boolean armyRecomposed = false;
-        EquipMsg msg;
 
-        if(item1.getItemType() == ItemType.SHIELD && !template.getJob().isAllowedWieldShield()){
-            msg = EquipMsg.JOB_DOES_NOT_ALLOW_SHIELD_BEARING;
-        }else{
-            if(item1.getItemType() == ItemType.SHIELD || !isStandardBearer()){
-                msg = EquipMsg.STANDARD_BEARER_CANNOT_EQUIP_SHIELD;
-            }else{
 
-                // check if the unit does not hold yet the item of the same type
-                if (firstSlot) {
-                    if (item2.getItemType() != item.getItemType()) {
-                        this.item1 = item;
-                        msg = EquipMsg.SUCCESSFULLY_EQUIPED;
-                    }else{
-                        msg = EquipMsg.TYPE_ALREADY_EQUIPED;
-                    }
-                } else {
-                    if (item1.getItemType() != item.getItemType()) {
-                        this.item2 = item;
-                        msg = EquipMsg.SUCCESSFULLY_EQUIPED;
-                    }else{
-                        msg = EquipMsg.TYPE_ALREADY_EQUIPED;
-                    }
-                }
+        // check if the unit does not hold yet the item of the same type
+        if (firstSlot) {
+            if (item2.getItemType() != item.getItemType()) this.item1 = item;
+        } else {
+            if (item1.getItemType() != item.getItemType()) this.item2 = item;
+        }
 
-                // update army composition
-                if (getAppLaedership() < currentLd && isWarChief()) {
-                    armyRecomposed = true;
-                    if (isWarlord()) {
-                        army.appointWarLord(this);
-                    } else {
-                        army.disengage(this);
-                        army.appointWarChief(this);
-                    }
-                }
+        // update army composition
+        if (getAppLaedership() < currentLd && isWarChief()) {
+            armyRecomposed = true;
+            if (isWarlord()) {
+                army.appointWarLord(this);
+            } else {
+                army.disengage(this);
+                army.appointWarChief(this);
             }
         }
 
-        notifyAllObservers(msg);
+        notifyAllObservers(null);
         return armyRecomposed;
     }
 
@@ -746,11 +745,7 @@ public class Unit extends Observable{
     }
 
     public boolean isUsing(Item eq){
-        boolean used = item1 == eq || item2 == eq;
-        if(eq.getItemType() == ItemType.SHIELD){
-            used = used && !getCurrentWeapon().isDualWieldingRequired();
-        }
-        return used;
+        return item1 == eq || item2 == eq;
     }
 
     public boolean isUsingShield(){
@@ -874,6 +869,10 @@ public class Unit extends Observable{
 
     public boolean isRightHanded() {
         return rightHanded;
+    }
+
+    public void setRightHanded(boolean rightHanded){
+        this.rightHanded = rightHanded;
     }
 
     public UnitTemplate getTemplate() {
@@ -1171,7 +1170,7 @@ public class Unit extends Observable{
 
     public void setActed(boolean acted) { this.acted = acted; }
 
-    public Orientation getCurrentOrientation() {
+    public Orientation getOrientation() {
         return orientation;
     }
 
@@ -1193,15 +1192,6 @@ public class Unit extends Observable{
         return weapon == primaryWeapon || weapon == secondaryWeapon;
     }
 
-    public DefensiveStance getStance() {
-        return stance;
-    }
-
-    public void setStance(DefensiveStance stance) {
-        this.stance = stance;
-        notifyAllObservers(stance);
-    }
-
     public int getNumberOfOAUses(){
         return  numberOfOAUses;
     }
@@ -1210,8 +1200,8 @@ public class Unit extends Observable{
         numberOfOAUses++;
     }
 
-    public int getLeadershipEXP() {
-        return leadershipEXP;
+    public int getCommandmentExperience() {
+        return commandmentExperience;
     }
 
     public boolean isBuildingResourcesConsumed() { return buildingResourcesConsumed; }
@@ -1236,6 +1226,33 @@ public class Unit extends Observable{
             this.numberOfOAUses++;
         }
     }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public boolean setExperience(int exp) {
+        boolean levelup = false;
+        if(level < MAX_LEVEL) {
+            if (this.experience + exp < 100) {
+                this.experience += (level + 1 == MAX_LEVEL) ? 0 : exp;
+            } else {
+                this.experience = (level + 1 == MAX_LEVEL) ? 0 : this.experience + exp - Data.EXP_REQUIRED_LEVEL_UP;
+                levelup = true;
+            }
+        }
+        return levelup;
+
+    }
+
+    public Behaviour getBehaviour() {
+        return behaviour;
+    }
+
+    public void setBehaviour(Behaviour behaviour){
+        this.behaviour = behaviour;
+    }
+
 
     @Override
     public String toString() {
@@ -1272,7 +1289,6 @@ public class Unit extends Observable{
                 "\nbanner=" + banner +
                 "\n\norientation=" + orientation +
                 "\nbehaviour=" + behaviour +
-                "\nstance=" + stance +
                 '}';
     }
 

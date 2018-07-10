@@ -176,18 +176,16 @@ public class BattlefieldLoader {
     public static Unit instanciateUnit(XmlReader.Element unitElt){
         Unit unit;
 
-        boolean rightHanded;
-        UnitTemplate templateUnit = UnitTemplate.getStandard();
+        boolean standardbearer;
+        UnitTemplate templateUnit = UnitTemplate.CONSCRIPT;
         int gainLvl;
-        Ethnicity ethnicityUnit = Ethnicity.getStandard();
-        String nameUnit = "";
-        Orientation orientationUnit = Orientation.getStandard();
-        Behaviour behaviourUnit = Behaviour.getStandard();
+        Ethnicity ethnicityUnit = Ethnicity.JAPANESE;
+        String nameUnit ="";
         Weapon primaryW = Weapon.NONE;
         Weapon secondaryW = Weapon.NONE;
         boolean homogeousLevels;
 
-        rightHanded = unitElt.getBoolean("rightHanded");
+        standardbearer = unitElt.getBoolean("standardBearer");
         for(UnitTemplate template: UnitTemplate.values()){
             if(template.name().equals(unitElt.get("template"))){
                 templateUnit = template;
@@ -204,16 +202,6 @@ public class BattlefieldLoader {
         if(japaneseNames.size > 0 && ainuNames.size >0) {
             nameUnit = (ethnicityUnit == Data.Ethnicity.JAPANESE) ? japaneseNames.random() : ainuNames.random();
         }
-        for(Orientation orientation: Orientation.values()){
-            if(orientation.name().equals(unitElt.get("orientation"))){
-                orientationUnit = orientation;
-            }
-        }
-        for(Behaviour behaviour: Behaviour.values()){
-            if(behaviour.name().equals(unitElt.get("behaviour"))){
-                behaviourUnit = behaviour;
-            }
-        }
         for(Weapon wpn: Weapon.values()){
             if(wpn.name().equals(unitElt.get("primaryWeapon"))){
                 primaryW = wpn;
@@ -228,12 +216,30 @@ public class BattlefieldLoader {
 
 
 
-        unit = new Unit(rightHanded, templateUnit, gainLvl, ethnicityUnit, orientationUnit, behaviourUnit, primaryW, secondaryW, homogeousLevels);
+        unit = new Unit(templateUnit, standardbearer, gainLvl, ethnicityUnit, primaryW, secondaryW, homogeousLevels);
         unit.setName(nameUnit);
-
         XmlReader.Element attributeElt;
         for(int k = 0; k < unitElt.getChildCount(); k++){
             attributeElt = unitElt.getChild(k);
+
+            if(attributeElt.get("id") == "right handed")
+                unit.setRightHanded(attributeElt.getBoolean("right handed"));
+
+            if(attributeElt.get("id") == "orientation") {
+                for (Orientation orientation : Orientation.values()) {
+                    if (orientation.name().equals(attributeElt.get("orientation"))) {
+                        unit.setOrientation(orientation);
+                        continue;
+                    }
+                }
+            }
+            if(attributeElt.get("id") == "behaviour") {
+                for (Behaviour behaviour : Behaviour.values()) {
+                    if (behaviour.name().equals(unitElt.get("behaviour"))) {
+                        unit.setBehaviour(behaviour);
+                    }
+                }
+            }
             if(attributeElt.get("id") == "offensive ability"){
                 for(OffensiveAbility ability: OffensiveAbility.values()){
                     if(ability.name().equals(attributeElt.get("value"))){

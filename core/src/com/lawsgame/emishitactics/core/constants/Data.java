@@ -44,22 +44,19 @@ public class Data {
     public static final int STR_FIXE_BONUS_NAGINATA_1 = 2;
     public static final int STR_FIXE_BONUS_NAGINATE_2 = 3;
     public static final int AGI_DODGE_FACTOR = 4;
-    public static final float DEX_PARRY_FACTOR = 1f;
     public static final int DEX_HIT_FACTOR = 3;
     public static final int ACCURACY_BONUS_CRIT = 15;
-    public static final float BLOCK_REDUCTION_DAMAGE = 0.5f;
-    public static final int BLOCK_RAW_REDUCTION_DAMAGE = 3;
     public static final int AB_TRIGGER_RATE_SKILL_FACTOR = 2;
     public static final int DEX_FAC_DROP_RATE = 2;
 
     // experience parameter
     public static final double LVL_GAP_FACTOR = 0.35;
     public static final int EXP_BASE_MODIFIER = 50;
+    public static final int EXP_REQUIRED_LEVEL_UP = 100;
     public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
-
 
     public enum Behaviour {
         CONTROLLED_BY_PLAYER,
@@ -139,14 +136,6 @@ public class Data {
         NO_SLOT_AVAILABLE,
         NULL_ARG
     }
-
-    public enum EquipMsg{
-        SUCCESSFULLY_EQUIPED,
-        TYPE_ALREADY_EQUIPED,
-        JOB_DOES_NOT_ALLOW_SHIELD_BEARING,
-        STANDARD_BEARER_CANNOT_EQUIP_SHIELD
-    }
-
 
     public enum BannerSign {
         NONE(0,3),
@@ -387,13 +376,10 @@ public class Data {
         LEVELUP,            //automatized, partially at least, the chosen secondary and level-up panels are displayed separately to distinguish between player and AI's units
         REST,               //automatized, standard animation
         ATTACK,
-        PARRIED_ATTACK,
 
         // REACTION ANIMATION
 
         DODGE,
-        BLOCK,
-        PARRY,
         PUSHED,             //automatized
         TREATED,            //automatized
         BACKSTABBED,
@@ -412,7 +398,7 @@ public class Data {
         CRUNCHING_BLOW,
         WAR_CRY,
         POISONOUS_ATTACK,
-        GUARD_BREAK,
+        HARASS,
         LINIENT_BLOW,
         FURY
     }
@@ -450,7 +436,6 @@ public class Data {
         BUILD               (-1, -1,false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
         ATTACK              (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
         CHOOSE_ORIENTATION  (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
-        CHOOSE_STANCE       (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
         USE_FOCUSED_BLOW    (-1, -1,true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
         USE_CRIPPLING_BLOW  (-1, -1,true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
         USE_SWIRLING_BLOW   (-1, -1,false, true, DamageType.EDGED, TargetType.ENEMY, new int[][]{{-1,1}, {-1,-1}}),
@@ -578,7 +563,7 @@ public class Data {
     public enum WeaponArt{
         NONE,
         KENJUTSU,
-        CRITICAL_PARRY,
+        BACKSTAB,
         ARMOR_SLAYER,
         HORSEMAN_SLAYER,
         COVERING_FIRE,
@@ -588,35 +573,29 @@ public class Data {
     }
 
     public enum Weapon{
-        NONE(false, false,      0, 0, 0, 0, 0, 0, DamageType.EDGED, WeaponArt.NONE),
-        KATANA(false, false,    3, 70, 6, 5, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
-        WARABITE(false, false,  4, 70, 5, 5, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
-        SAI(true, true,         2, 90, 8, 3, 1, 1, DamageType.PIERCING, WeaponArt.CRITICAL_PARRY),
-        NAGINATA(true, false,   4, 65, 4, 4, 1, 1, DamageType.EDGED, WeaponArt.NAGINATA_JUTSU),
-        NODACHI(true, true,     5, 60, 4, 2, 1, 1, DamageType.BLUNT, WeaponArt.NODACHI_JUSTU ),
-        YARI(false, false,      3, 80, 3, 3, 1, 1, DamageType.PIERCING, WeaponArt.HORSEMAN_SLAYER),
-        YUMI(true, false,       4, 60, 0, 1, 2, 2, DamageType.PIERCING, WeaponArt.COVERING_FIRE),
-        BO(true, true,          3, 65, 3, 5, 1, 1, DamageType.BLUNT, WeaponArt.FIRST_STRIKE),
-        KANABO(true, true,      5, 55, 1, 1, 1, 1, DamageType.BLUNT, WeaponArt.ARMOR_SLAYER);
+        NONE(false,      0, 0, 1, 1, DamageType.BLUNT, WeaponArt.NONE),
+        KATANA(false,    3, 70, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
+        WARABITE(false,  4, 70, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
+        SAI(true,         1, 90, 1, 1, DamageType.PIERCING, WeaponArt.BACKSTAB),
+        NAGINATA(false,   4, 65, 1, 1, DamageType.EDGED, WeaponArt.NAGINATA_JUTSU),
+        NODACHI(true,     5, 60, 1, 1, DamageType.BLUNT, WeaponArt.NODACHI_JUSTU ),
+        YARI(false,      3, 80, 1, 1, DamageType.PIERCING, WeaponArt.HORSEMAN_SLAYER),
+        YUMI(false,       4, 60, 2, 2, DamageType.PIERCING, WeaponArt.COVERING_FIRE),
+        BO(true,          3, 65, 1, 1, DamageType.BLUNT, WeaponArt.FIRST_STRIKE),
+        KANABO(true,      5, 55, 1, 1, DamageType.BLUNT, WeaponArt.ARMOR_SLAYER);
 
-        private boolean dualWieldingRequired;
         private boolean footmanOnly;
         private int damage;
         private int accuracy;
-        private int parryCapacity;
-        private int parryVulnerability;
         private int rangeMin;
         private int rangeMax;
         private DamageType type;
         private WeaponArt art;
 
-        Weapon(boolean dualWieldingRequired, boolean footmanOnly, int damage, int accuracy, int parryCapacity, int parryVulnerability, int rangeMin, int rangeMax, DamageType type, WeaponArt art) {
-            this.dualWieldingRequired = dualWieldingRequired;
-            this.footmanOnly = footmanOnly;
+        Weapon(boolean footmanOnly, int damage, int accuracy, int rangeMin, int rangeMax, DamageType type, WeaponArt art) {
+           this.footmanOnly = footmanOnly;
             this.damage = damage;
             this.accuracy = accuracy;
-            this.parryCapacity = parryCapacity;
-            this.parryVulnerability = parryVulnerability;
             this.rangeMin = rangeMin;
             this.rangeMax = rangeMax;
             this.type = type;
@@ -629,10 +608,6 @@ public class Data {
 
         public boolean isMeleeW() { return  getRangeMin() == 1; }
 
-        public boolean isDualWieldingRequired() {
-            return dualWieldingRequired;
-        }
-
         public boolean isFootmanOnly() {
             return footmanOnly;
         }
@@ -643,14 +618,6 @@ public class Data {
 
         public int getAccuracy() {
             return accuracy;
-        }
-
-        public int getParryCapacity() {
-            return parryCapacity;
-        }
-
-        public int getParryVulnerability() {
-            return parryVulnerability;
         }
 
         public int getRangeMin() {
@@ -681,7 +648,6 @@ public class Data {
         private int mobility;
         private boolean possiblyHorseman;
         private boolean possiblyHorsemanUnponPromotion;
-        private boolean allowedWieldShield;
         private boolean possiblyStandardBearer;
         private Weapon[] availableWeapons;
         private Weapon[] availableWeaponsAfterPromotion;
@@ -692,7 +658,6 @@ public class Data {
             this.mobility = mobility;
             this.possiblyHorseman = possiblyHorseman;
             this.possiblyHorsemanUnponPromotion = possiblyHorsemanUnponPromotion;
-            this.allowedWieldShield = allowedWieldShield;
             this.possiblyStandardBearer = standardBearer;
             this.availableWeapons = availableWeapons;
             this.availableWeaponsAfterPromotion = availableWeaponsAfterPromotion;
@@ -717,8 +682,6 @@ public class Data {
         public boolean isPossiblyHorsemanUnponPromotion() {
             return possiblyHorsemanUnponPromotion;
         }
-
-        public boolean isAllowedWieldShield() {return allowedWieldShield;}
 
         public Weapon[] getAvailableWeapons() {
             return availableWeapons;
@@ -982,24 +945,8 @@ public class Data {
         }
     }
 
-    public enum DefensiveStance {
-        PARRY,
-        DODGE,
-        BLOCK,
-        COVERING_AREA
-    }
-
-    public static class R {
-        private static R r;
-        private Random rand;
-
-        private R(){
-            rand = new Random();
-        }
-
-        public static Random getR() {
-            if (r == null) r = new R();
-            return r.rand;
-        }
+    static Random r = new Random();
+    public static int rand(int n){
+        return r.nextInt(n);
     }
 }

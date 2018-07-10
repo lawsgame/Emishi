@@ -33,11 +33,16 @@ public class Utils {
         return area;
     }
 
-    public static boolean arrayContains(Array<int[]> intArray, int[] coords){
-        if(coords.length >= 2){
-            for(int i =0; i < intArray.size; i++){
-                if(intArray.get(i).length >=2 && intArray.get(i)[0] == coords[0] && intArray.get(i)[0] == coords[0]){
-                    return true;
+    public static boolean arrayContains(Array<int[]> intArray, int[] value){
+        boolean tempo;
+        if(value != null) {
+            for (int i = 0; i < intArray.size; i++) {
+                if (intArray.get(i).length == value.length) {
+                    tempo = true;
+                    for (int j = 0; j < value.length; j++) {
+                        tempo = tempo && value[j] == intArray.get(i)[j];
+                    }
+                    if (tempo) return true;
                 }
             }
         }

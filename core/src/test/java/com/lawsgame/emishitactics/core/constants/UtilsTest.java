@@ -60,9 +60,9 @@ public class UtilsTest {
         int[] tab4 = new int[]{2,5};
 
         assertTrue(!Utils.arrayContains(array, tab0));
-        assertTrue(!Utils.arrayContains(array, tab1));
-        assertTrue(!Utils.arrayContains(array, tab2));
-        assertTrue(Utils.arrayContains(array, tab3));
+        assertTrue(Utils.arrayContains(array, tab1));
+        assertTrue(Utils.arrayContains(array, tab2));
+        assertTrue(!Utils.arrayContains(array, tab3));
         assertTrue(Utils.arrayContains(array, tab4));
     }
 

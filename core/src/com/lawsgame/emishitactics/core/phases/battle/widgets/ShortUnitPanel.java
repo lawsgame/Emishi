@@ -57,7 +57,6 @@ public class ShortUnitPanel extends UnitPanel {
 
             builder.append("\nMoral (HP) : " + unit.getCurrentMoral() + "/" + unit.getAppMoral() + " (" + unit.getCurrentHitpoints() + ")");
             builder.append("\nAO bar (uses) : " + unit.getOAChargingBar() + " (" + unit.getNumberOfOAUses() + ")");
-            builder.append("\nStance : " + unit.getStance().name().toLowerCase());
             builder.append("\nWeapons : " + unit.getPrimaryWeapon().name().toLowerCase() + " ");
             builder.append(unit.isPromoted() ? " & " + unit.getSecondaryWeapon().name().toLowerCase() : "");
         }

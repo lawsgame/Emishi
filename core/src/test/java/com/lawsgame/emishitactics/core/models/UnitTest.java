@@ -46,28 +46,28 @@ public class UnitTest {
 
     @Before
     public void before(){
-        clovus = new Unit(true, Data.UnitTemplate.CONSCRIPT, 12, Data.Weapon.BO, Data.Weapon.SAI, true);
+        clovus = new Unit( Data.UnitTemplate.CONSCRIPT, false, 12, Data.Ethnicity.AINU, Data.Weapon.BO, Data.Weapon.SAI, true);
         clovus.setName(name1);
         clovus.setLeadership(highLd);
-        merovee = new Unit(false, Data.UnitTemplate.EMISHI_TRIBESMAN, 19, Data.Weapon.WARABITE, Data.Weapon.NONE, true);
+        merovee = new Unit( Data.UnitTemplate.EMISHI_TRIBESMAN, false, 19, Data.Ethnicity.JAPANESE, Data.Weapon.WARABITE, Data.Weapon.NONE, true);
         merovee.setName(name2);
         merovee.setLeadership(lowLd);
-        jean = new Unit(Data.UnitTemplate.CONSCRIPT, 9);
+        jean = new Unit(Data.UnitTemplate.CONSCRIPT, false, 9);
         jean.setName(name3);
         jean.setLeadership(lowLd);
-        phillipe = new Unit(Data.UnitTemplate.CONSCRIPT, 5);
+        phillipe = new Unit(Data.UnitTemplate.CONSCRIPT, false, 5);
         phillipe.setName(name4);
         phillipe.setLeadership(lowLd);
-        alexandre = new Unit(Data.UnitTemplate.CONSCRIPT, 7);
+        alexandre = new Unit(Data.UnitTemplate.CONSCRIPT, false, 7);
         alexandre.setName(name5);
         alexandre.setLeadership(lowLd);
-        pierre = new Unit(Data.UnitTemplate.CONSCRIPT, 14);
+        pierre = new Unit(Data.UnitTemplate.CONSCRIPT, false, 14);
         pierre.setName(name6);
         pierre.setLeadership(highLd);
-        andre = new Unit(Data.UnitTemplate.CONSCRIPT, 13);
+        andre = new Unit(Data.UnitTemplate.CONSCRIPT, false, 13);
         andre.setName(name7);
         andre.setLeadership(lowLd);
-        luc = new Unit(Data.UnitTemplate.CONSCRIPT, 15);
+        luc = new Unit(Data.UnitTemplate.CONSCRIPT, false, 15);
         luc.setName(name8);
         luc.setLeadership(lowLd);
 
@@ -83,8 +83,8 @@ public class UnitTest {
 
 
         if(!armyShown) {
-            //System.out.println(army1.toString());
-            //System.out.println(army2.toString() + "\n");
+            System.out.println(army1.toString());
+            System.out.println(army2.toString() + "\n");
             armyShown = true;
         }
 
