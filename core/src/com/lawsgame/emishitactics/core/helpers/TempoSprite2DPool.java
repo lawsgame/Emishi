@@ -111,7 +111,7 @@ public class TempoSprite2DPool {
                 foeSprites.put(Data.AnimationId.TAKE_HIT, unitRegions[13][4]);
                 foeSprites.put(Data.AnimationId.DIE, unitRegions[14][4]);
                 foeSprites.put(Data.AnimationId.GUARD, unitRegions[15][4]);
-                foeSprites.put(Data.AnimationId.REST, unitRegions[15][0]);
+                foeSprites.put(Data.AnimationId.REST, unitRegions[0][4]);
 
                 unitDoneSprite = unitRegions[0][6];
 

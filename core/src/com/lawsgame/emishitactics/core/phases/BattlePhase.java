@@ -100,7 +100,6 @@ public class BattlePhase extends GamePhase {
     @Override
     public void renderWorld(SpriteBatch batch) {
         if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderTiles(batch);
-        bim.deploymentArea.render(batch);
         bim.getCurrentState().renderBetween(batch);
         bim.sltdTile.render(batch);
         if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderUnits(batch);

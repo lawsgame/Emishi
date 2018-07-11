@@ -38,7 +38,6 @@ public abstract class BattleInteractionState extends InteractionState {
     @Override
     public void dispose() {
         bim.sltdTile.setVisible(false);
-        bim.deploymentArea.setVisible(false);
         end();
 
     }

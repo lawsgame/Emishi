@@ -33,7 +33,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public InputMultiplexer multiplexer;
 
     public Area sltdTile;
-    public Area deploymentArea;
 
     public Stage UIStage;
     public TilePanel shortTilePanel;
@@ -54,8 +53,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         this.sltdTile = new TempoArea(asm, battlefield, Assets.HighlightedTile.SELECTED_UNIT);
         this.sltdTile.setVisible(false);
-        this.deploymentArea = new TempoArea(asm, battlefield, Assets.HighlightedTile.DEPLOYMENT, battlefield.getDeploymentArea());
-        this.deploymentArea.setVisible(false);
 
         // UI
         this.UIStage = stageUI;
