@@ -264,6 +264,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case DIE:
             case DODGE:
             case BACKSTABBED:
+            case COVER:
             case REST:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
                 countDown.run();

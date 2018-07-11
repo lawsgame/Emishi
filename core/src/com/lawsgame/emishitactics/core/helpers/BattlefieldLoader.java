@@ -243,13 +243,19 @@ public class BattlefieldLoader {
             if(attributeElt.get("id") == "offensive ability"){
                 for(OffensiveAbility ability: OffensiveAbility.values()){
                     if(ability.name().equals(attributeElt.get("value"))){
-                        unit.setOffensiveAbility(ability);
+                        unit.setOffensiveActiveAbility(ability);
                     }
                 }
             }else if(attributeElt.get("id") == "passive ability"){
                 for(PassiveAbility ability: PassiveAbility.values()){
                     if(ability.name().equals(attributeElt.get("value"))){
-                        unit.addPassiveAbility(ability);
+                        unit.setPassiveAbility(ability);
+                    }
+                }
+            }else if(attributeElt.get("id") == "support ability"){
+                for(SupportAbility ability: SupportAbility.values()){
+                    if(ability.name().equals(attributeElt.get("value"))){
+                        unit.setSupportActiveAbility(ability);
                     }
                 }
             }else if(attributeElt.get("id") == "item"){

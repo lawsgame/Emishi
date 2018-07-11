@@ -47,9 +47,6 @@ public class BattlePhase extends GamePhase {
 
 
         Unit warlord = new Unit(Data.UnitTemplate.CONSCRIPT, false, 15, Data.Ethnicity.JAPANESE, Data.Weapon.YUMI, Data.Weapon.KANABO, true);
-        warlord.setPasAb1(Data.PassiveAbility.PRAYER);
-        warlord.setPasAb2(Data.PassiveAbility.NONE);
-        warlord.setOffensiveAbility(Data.OffensiveAbility.CRUNCHING_BLOW);
         warlord.equip(Data.Item.NONE, true);
         warlord.equip(Data.Item.NONE, false);
         warlord.setItemStealable(false);

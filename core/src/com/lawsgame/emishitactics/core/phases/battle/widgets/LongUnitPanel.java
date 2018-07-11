@@ -78,9 +78,9 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\nSecondary weapon : "+unit.getSecondaryWeapon().name().toLowerCase());
             builder.append("\nItem : "+unit.getItem1().name().toLowerCase());
             builder.append("\nItem : "+unit.getItem2().name().toLowerCase());
-            builder.append("\nPassive ability : "+unit.getPasAb1().name().toLowerCase());
-            builder.append("\nPassive ability : "+unit.getPasAb2().name().toLowerCase());
-            builder.append("\nOffensive ability : "+unit.getOffAb().name().toLowerCase());
+            builder.append("\nPassive ability : "+unit.getSupportAbility().name().toLowerCase());
+            builder.append("\nPassive ability : "+unit.getPassiveAbility().name().toLowerCase());
+            builder.append("\nOffensive ability : "+unit.getOffensiveAbility().name().toLowerCase());
             builder.append("\n\nCURRENT WEAPONS\n");
             builder.append("\nName : "+unit.getCurrentWeapon().name().toLowerCase());
             builder.append("\nFootman only : "+unit.getCurrentWeapon().isFootmanOnly());

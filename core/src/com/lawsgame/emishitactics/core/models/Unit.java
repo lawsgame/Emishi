@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.constants.Data.Ethnicity;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
 import com.lawsgame.emishitactics.core.constants.Data.ItemType;
 import com.lawsgame.emishitactics.core.constants.Data.OffensiveAbility;
+import com.lawsgame.emishitactics.core.constants.Data.SupportAbility;
 import com.lawsgame.emishitactics.core.constants.Data.Orientation;
 import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
 import com.lawsgame.emishitactics.core.constants.Data.TileType;
@@ -94,22 +95,22 @@ public class Unit extends Observable{
     protected Item item1 = Item.NONE;
     protected Item item2 = Item.NONE;
     protected boolean itemStealable = false;
-    protected PassiveAbility pasAb1 = PassiveAbility.NONE;
-    protected PassiveAbility pasAb2 = PassiveAbility.NONE;
-    protected OffensiveAbility offAb = OffensiveAbility.NONE;
+    protected PassiveAbility passiveAbility = PassiveAbility.NONE;
+    protected SupportAbility supportAbility = SupportAbility.NONE;
+    protected OffensiveAbility offensiveAbility = OffensiveAbility.NONE;
     protected final Banner banner = new Banner();
 
     /**
      * battlefield execution related attributes
      */
-    protected boolean guarduing = false;
+    protected boolean guarding;
     protected Orientation orientation = Orientation.SOUTH;
     protected Behaviour behaviour = Behaviour.PASSIVE;
     protected int numberOfOAUses = 0;
     protected int OAChargingBar = 0;
     protected boolean moved = false;
     protected boolean acted = false;
-    protected boolean buildingResourcesConsumed = false;
+    protected int remainigBuildingResources = Data.NB_BUILDING_MAX;
 
 
 
@@ -762,11 +763,14 @@ public class Unit extends Observable{
     }
 
     public boolean has(PassiveAbility abb) {
-        return abb == pasAb1 || abb == pasAb2;
+        return abb == passiveAbility;
     }
 
+    public boolean has(SupportAbility abb) {
+        return  abb == supportAbility; }
+
     public boolean has(OffensiveAbility abb) {
-        return abb == offAb;
+        return abb == offensiveAbility;
     }
 
     public Banner getBanner() { return banner; }
@@ -831,27 +835,18 @@ public class Unit extends Observable{
         return bonus;
     }
 
-    public void setPasAb1(PassiveAbility pasAb1) {
-        this.pasAb1 = pasAb1;
+    public void setPassiveAbility(PassiveAbility pasAb) {
+        this.passiveAbility = pasAb;
         notifyAllObservers(null);
     }
 
-    public void setPasAb2(PassiveAbility pasAb2) {
-        this.pasAb2 = pasAb2;
+    public void setSupportActiveAbility(SupportAbility supAb) {
+        this.supportAbility = supAb;
         notifyAllObservers(null);
     }
 
-    public void addPassiveAbility(PassiveAbility ability){
-        if(pasAb1 == PassiveAbility.NONE){
-            this.pasAb1 = ability;
-        }else if(pasAb2 == PassiveAbility.NONE){
-            this.pasAb2 = ability;
-        }
-        notifyAllObservers(null);
-    }
-
-    public void setOffensiveAbility(OffensiveAbility offAb) {
-        this.offAb = offAb;
+    public void setOffensiveActiveAbility(OffensiveAbility offAb) {
+        this.offensiveAbility = offAb;
         notifyAllObservers(null);
     }
 
@@ -1126,16 +1121,16 @@ public class Unit extends Observable{
         return  critDamMod;
     }
 
-    public PassiveAbility getPasAb1() {
-        return pasAb1;
+    public PassiveAbility getPassiveAbility() {
+        return passiveAbility;
     }
 
-    public PassiveAbility getPasAb2() {
-        return pasAb2;
+    public SupportAbility getSupportAbility() {
+        return supportAbility;
     }
 
-    public OffensiveAbility getOffAb() {
-        return offAb;
+    public OffensiveAbility getOffensiveAbility() {
+        return offensiveAbility;
     }
 
     public int getSquadBannerBonus(BannerSign sign, boolean bannerAtRange){
@@ -1204,15 +1199,15 @@ public class Unit extends Observable{
         return commandmentExperience;
     }
 
-    public boolean isBuildingResourcesConsumed() { return buildingResourcesConsumed; }
+    public int getRemainigBuildingResources(){
+        return remainigBuildingResources;
+    }
 
-    public void setBuildingResourcesConsumed(boolean buildingResourcesConsumed) { this.buildingResourcesConsumed = buildingResourcesConsumed; }
+    public void consumeBuildingResource(){
+        this.remainigBuildingResources--;
+    }
 
     public boolean isWounded() { return currentHitPoints < getAppHitPoints(); }
-
-    public boolean isGuarding(){ return guarduing && has(PassiveAbility.PATHFINDER); }
-
-    public void setGuarding(boolean guarding){ this.guarduing = guarding; }
 
     public int getOAChargingBar() {
         return OAChargingBar;
@@ -1253,43 +1248,12 @@ public class Unit extends Observable{
         this.behaviour = behaviour;
     }
 
+    public boolean isGuarding() {
+        return guarding;
+    }
 
-    @Override
-    public String toString() {
-        return "UNIT\n" +
-                "\nname='" + name + '\'' +
-                "\nethnicity=" + ethnicity +
-                "\nlevel=" + level +
-                "\njob='" + job + '\'' +
-                "\nrightHanded=" + rightHanded +
-                "\ntemplate=" + template +
-                "\nhorseman=" + horseman +
-                "\narmy=" + army.getId() +
-                "\n\nprimaryWeapon=" + primaryWeapon +
-                "\nsecondaryWeapon=" + secondaryWeapon +
-                "\nprimaryWeaponEquipped=" + primaryWeaponEquipped +
-                "\n\nmobility=" + mobility +
-                "\ncharisma=" + charisma +
-                "\nleadership=" + leadership +
-                "\nhitPoints=" + hitPoints +
-                "\nstrength=" + strength +
-                "\ndefense=" + defense +
-                "\ndexterity=" + dexterity +
-                "\nagility=" + agility +
-                "\nskill=" + skill +
-                "\nbravery=" + bravery +
-                "\n\ncurrentMoral=" + currentMoral +
-                "\ncurrentHitPoints=" + currentHitPoints +
-                "\n\nitem1=" + item1 +
-                "\nitem2=" + item2 +
-                "\nitemStealable=" + itemStealable +
-                "\npasAb1=" + pasAb1 +
-                "\npasAb2=" + pasAb2 +
-                "\noffAb=" + offAb +
-                "\nbanner=" + banner +
-                "\n\norientation=" + orientation +
-                "\nbehaviour=" + behaviour +
-                '}';
+    public void setGuarding(boolean guarding) {
+        this.guarding = guarding;
     }
 
     public String toStringStatOnly() {

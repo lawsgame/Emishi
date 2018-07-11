@@ -37,9 +37,6 @@ public class TestBIS extends BattleInteractionState {
         warlord.setOrientation(Data.Orientation.SOUTH);
         warlord.setBehaviour(Data.Behaviour.CONTROLLED_BY_PLAYER);
         warlord.setRightHanded(true);
-        warlord.setPasAb1(Data.PassiveAbility.PRAYER);
-        warlord.setPasAb2(Data.PassiveAbility.NONE);
-        warlord.setOffensiveAbility(Data.OffensiveAbility.CRUNCHING_BLOW);
         warlord.equip(Data.Item.NONE, true);
         warlord.equip(Data.Item.NONE, false);
         warlord.setItemStealable(false);
@@ -49,9 +46,6 @@ public class TestBIS extends BattleInteractionState {
         //unit0.addBannerSign(...)
 
         warchief1 = new Unit(Data.UnitTemplate.EMISHI_TRIBESMAN, false, 15, Data.Ethnicity.JAPANESE,Data.Weapon.WARABITE, Data.Weapon.YARI, true);
-        warchief1.setPasAb1(Data.PassiveAbility.NONE);
-        warchief1.setPasAb2(Data.PassiveAbility.NONE);
-        warchief1.setOffensiveAbility(Data.OffensiveAbility.NONE);
         warchief1.equip(Data.Item.NONE, true);
         warchief1.equip(Data.Item.NONE, false);
         warchief1.setItemStealable(false);
@@ -60,9 +54,6 @@ public class TestBIS extends BattleInteractionState {
         //unit0.addBannerSign(...)
 
         soldier1 = new Unit(Data.UnitTemplate.CONSCRIPT, false, 12, Data.Ethnicity.JAPANESE,Data.Weapon.KATANA, Data.Weapon.NODACHI, true);
-        soldier1.setPasAb1(Data.PassiveAbility.PRAYER);
-        soldier1.setPasAb2(Data.PassiveAbility.NONE);
-        soldier1.setOffensiveAbility(Data.OffensiveAbility.NONE);
         soldier1.equip(Data.Item.NONE, true);
         soldier1.equip(Data.Item.NONE, false);
         soldier1.setItemStealable(false);
@@ -70,9 +61,6 @@ public class TestBIS extends BattleInteractionState {
         soldier1.setName("Jim");
 
         soldier2 = new Unit(Data.UnitTemplate.CONSCRIPT, false, 3, Data.Ethnicity.JAPANESE,Data.Weapon.YUMI, Data.Weapon.NODACHI, true);
-        soldier2.setPasAb1(Data.PassiveAbility.NONE);
-        soldier2.setPasAb2(Data.PassiveAbility.NONE);
-        soldier2.setOffensiveAbility(Data.OffensiveAbility.NONE);
         soldier2.equip(Data.Item.NONE, true);
         soldier2.equip(Data.Item.NONE, false);
         soldier2.setItemStealable(false);
@@ -80,9 +68,6 @@ public class TestBIS extends BattleInteractionState {
 
 
         soldier3 = new Unit(Data.UnitTemplate.CONSCRIPT, false, 5, Data.Ethnicity.JAPANESE,Data.Weapon.YARI, Data.Weapon.NAGINATA, true);
-        soldier3.setPasAb1(Data.PassiveAbility.NONE);
-        soldier3.setPasAb2(Data.PassiveAbility.NONE);
-        soldier3.setOffensiveAbility(Data.OffensiveAbility.NONE);
         soldier3.equip(Data.Item.NONE, true);
         soldier3.equip(Data.Item.NONE, false);
         soldier3.setItemStealable(false);

@@ -50,7 +50,7 @@ public class BattleCommandManager {
      * there is 3 types of requirements for an action to be performable by an actor
      *  - abiility type
      *  - equipement type (weapon mainly)
-     *  - target / battlefield type (checked by the method: Battlefield.atActionRange() and Battlefield.isTargetValid())
+     *  - target  type (checked by the method: Battlefield.atActionRange() and Battlefield.isTargetValid())
      *
      * @return whether or not an action can be performed by the actor regardless the actor's history or target availability.
      */
@@ -61,10 +61,11 @@ public class BattleCommandManager {
             case SWITCH_WEAPON:         if(!actor.isPromoted()) return false; break;
             case SWITCH_POSITION:       break;
             case PUSH:                  if(actor.isHorseman()) return false; break;
-            case PRAY:                  if(!actor.has(Data.PassiveAbility.PRAYER)) return false; break;
-            case HEAL:                  if(!actor.has(Data.PassiveAbility.HEALER)) return false; break;
-            case STEAL:                 if(!actor.has(Data.PassiveAbility.THIEF)) return false; break;
-            case BUILD:                 if(!actor.has(Data.PassiveAbility.ENGINEER) && !actor.isBuildingResourcesConsumed()) return false; break;
+            case PRAY:                  if(!actor.has(Data.SupportAbility.PRAY)) return false; break;
+            case HEAL:                  if(!actor.has(Data.SupportAbility.HEAL)) return false; break;
+            case GUARD:                 if(!actor.has(Data.SupportAbility.GUARD)) return false; break;
+            case STEAL:                 if(!actor.has(Data.SupportAbility.STEAL)) return false; break;
+            case BUILD:                 if(!actor.has(Data.SupportAbility.BUILD) && !(actor.getRemainigBuildingResources() > 0)) return false; break;
             case ATTACK:                break;
             case CHOOSE_ORIENTATION:    break;
             case USE_FOCUSED_BLOW:      if(!actor.has(Data.OffensiveAbility.FOCUSED_BLOW)) return false; break;
@@ -75,7 +76,7 @@ public class BattleCommandManager {
             case USE_CRUNCHING_BLOW:    if(!actor.has(Data.OffensiveAbility.CRUNCHING_BLOW)) return false; break;
             case USE_WAR_CRY:           if(!actor.has(Data.OffensiveAbility.WAR_CRY)) return false; break;
             case USE_POISONOUS_ATTACK:  if(!actor.has(Data.OffensiveAbility.POISONOUS_ATTACK)) return false; break;
-            case USE_GUARD_BREAK:       if(!actor.has(Data.OffensiveAbility.GUARD_BREAK)) return false; break;
+            case USE_HARASS:            if(!actor.has(Data.OffensiveAbility.HARASS)) return false; break;
             case USE_LINIENT_BLOW:      if(!actor.has(Data.OffensiveAbility.LINIENT_BLOW)) return false; break;
             case USE_FURY:              if(!actor.has(Data.OffensiveAbility.FURY)) return false; break;
             default:
@@ -85,7 +86,8 @@ public class BattleCommandManager {
 
         // check EQUIPEMENT & WEAPON REQUIREMENTS
         if((choice.getDamageTypeRequired() != Data.DamageType.NONE  && actor.getCurrentWeapon().getType() != choice.getDamageTypeRequired())
-                || (actor.getCurrentWeapon().isRangedW() &&  choice.isMeleeWeaponEquipedRequired())) {
+                || (!actor.getCurrentWeapon().isMeleeW() &&  choice.isMeleeOnly())
+                || (!actor.getCurrentWeapon().isRangedW() &&  choice.isRangeOnly())) {
             return false;
         }
 

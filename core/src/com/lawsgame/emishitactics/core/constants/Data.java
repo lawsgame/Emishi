@@ -20,6 +20,7 @@ public class Data {
     public static final float COUNTER_ATTACK_DAMAGE_MODIFIER = 1f;
     public static final int OA_CHARGING_BAR_MAW_VALUE = 100;
     public static final int BRAVERY_MORAL_FACTOR = 2;
+    public static final int NB_BUILDING_MAX = 2;
 
     // item bonus
     public static final int DEF_BONUS_YAYOI_SHIELD = 2;
@@ -57,6 +58,7 @@ public class Data {
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
+
 
     public enum Behaviour {
         CONTROLLED_BY_PLAYER,
@@ -220,7 +222,6 @@ public class Data {
         SANCTUARY(  "sanctuary", 228, 56, 56,                   true, true, true, true,         5, 0, 1, 0, 0, false),
         STOCKADE(   "stockade", 204, 112, 37,                   true, true, false, true,        5, 0, 2, 0, 0, false),
         CASTLE(     "castle", 204, 73 ,37 ,                     true, true, false, true,        5, 0, 3, 20, 0, false),
-        FORGE(      "forge", 176, 104, 104,                     true, true, true, true,         0, 0, 1, 0, 0, false),
         TOMB(       "kofun burial mount", 38 ,67, 47,           true, true, true, true,         0, 1, 0, 0, 0, true),
         RUINS(      "ruins", 152, 152, 152,                     true, false, false, true,       0, 0, 1, 0, 0, false),
         MOUNTAINS(   "mountain", 101, 91, 16,                   false, false, false, false,     0, 0, 0, 0, 0, false),
@@ -339,23 +340,28 @@ public class Data {
         CRUNCHING_BLOW,
         WAR_CRY,
         POISONOUS_ATTACK,
-        GUARD_BREAK,
+        HARASS,
         LINIENT_BLOW,
         FURY,
         NONE
     }
 
+    public enum SupportAbility {
+        COVER,
+        PRAY,
+        HEAL,
+        STEAL,
+        BUILD,
+        GUARD,
+        NONE
+    }
+
     public enum PassiveAbility{
         NONE,
-        PRAYER,             // OK
-        HEALER,             // OK
         PATHFINDER,         // OK
-        THIEF,              // OK
-        BEAST,
+        UNBREAKABLE,
         SHADOW,
-        VIGILANT,
-        GUARDIAN,
-        ENGINEER            // OK
+        VIGILANT
     }
 
     /**
@@ -373,6 +379,7 @@ public class Data {
         STEAL,              //automatized
         BUILD,              //automatized
         GUARD,
+        COVER,
         LEVELUP,            //automatized, partially at least, the chosen secondary and level-up panels are displayed separately to distinguish between player and AI's units
         REST,               //automatized, standard animation
         ATTACK,
@@ -388,7 +395,7 @@ public class Data {
         DIE,                //automatized
         GUARDED,            //automatized
 
-        //ABILITY ANIMATINO
+        //OFFFENSIVE ABILITY ANIMATINO
 
         FOCUSED_BLOW,
         CRIPPLING_BLOW,
@@ -410,8 +417,18 @@ public class Data {
         ALLY,
         FOOTMAN_ALLY,
         WOUNDED_ALLY,
-        ENEMY
+        ENEMY,
+        CONSTRUTIBLE_TILE,
+        AVAILABLE_TILE,
+        PUSH_SPECIFIC
     }
+
+    public enum RangedBasedType{
+        MOVE,
+        WEAPON,
+        ONESELF, SPECIFIC
+    }
+
 
     /**
      *  1) Modelize the choice made by the player foa a unit to perform a given action
@@ -425,43 +442,52 @@ public class Data {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                (-1, -1,false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
-        SWITCH_WEAPON       (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
-        SWITCH_POSITION     (1, 1,  false, false, DamageType.NONE, TargetType.ALLY, new int[][]{{}}),
-        PUSH                (-1, -1,false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
-        PRAY                (1, 1,  false, false, DamageType.NONE, TargetType.WOUNDED_ALLY, new int[][]{{}}),
-        HEAL                (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        GUARD               (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        STEAL               (1, 1,  false, false, DamageType.NONE, TargetType.ENEMY,new int[][]{{}}),
-        BUILD               (-1, -1,false, false, DamageType.NONE, TargetType.SPECIFIC, new int[][]{{}}),
-        ATTACK              (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        CHOOSE_ORIENTATION  (-1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF, new int[][]{{}}),
-        USE_FOCUSED_BLOW    (-1, -1,true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
-        USE_CRIPPLING_BLOW  (-1, -1,true, false, DamageType.PIERCING, TargetType.ENEMY, new int[][]{{}}),
-        USE_SWIRLING_BLOW   (-1, -1,false, true, DamageType.EDGED, TargetType.ENEMY, new int[][]{{-1,1}, {-1,-1}}),
-        USE_SWIFT_BLOW      (-1, -1,true, false, DamageType.EDGED, TargetType.ENEMY, new int[][]{}),
-        USE_HEAVY_BLOW      (-1, -1,true, false, DamageType.BLUNT, TargetType.ENEMY, new int[][]{}),
-        USE_CRUNCHING_BLOW  (-1, -1,false, true, DamageType.BLUNT, TargetType.ENEMY, new int[][]{{1, 0}, {-1, 0}}),
-        USE_WAR_CRY         (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_POISONOUS_ATTACK(-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_GUARD_BREAK     (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_LINIENT_BLOW    (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}}),
-        USE_FURY            (-1, -1,true, false, DamageType.NONE, TargetType.ENEMY, new int[][]{{}});
+        WALK                (RangedBasedType.MOVE, TargetType.AVAILABLE_TILE),
+        SWITCH_WEAPON       (RangedBasedType.ONESELF, TargetType.ONE_SELF),
+        SWITCH_POSITION     (1, 1, TargetType.ALLY),
+        PUSH                (1, 1, TargetType.PUSH_SPECIFIC),
+        PRAY                (1, 1, TargetType.WOUNDED_ALLY),
+        HEAL                (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        GUARD               (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        STEAL               (1, 1,  TargetType.ENEMY),
+        BUILD               (1, 1, TargetType.CONSTRUTIBLE_TILE),
+        COVER               (RangedBasedType.ONESELF, TargetType.ONE_SELF),
+        ATTACK              (RangedBasedType.WEAPON, TargetType.ENEMY),
+        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF, TargetType.ONE_SELF),
+        USE_FOCUSED_BLOW    (false, false, DamageType.PIERCING, new int[][]{{}}),
+        USE_CRIPPLING_BLOW  (false, false, DamageType.PIERCING, new int[][]{{}}),
+        USE_SWIRLING_BLOW   (true, false, DamageType.EDGED, new int[][]{{-1,1}, {-1,-1}}),
+        USE_SWIFT_BLOW      (false, false, DamageType.EDGED, new int[][]{}),
+        USE_HEAVY_BLOW      (false, false, DamageType.BLUNT, new int[][]{}),
+        USE_CRUNCHING_BLOW  (true, false, DamageType.BLUNT, new int[][]{{1, 0}, {-1, 0}}),
+        USE_WAR_CRY         (false, false, DamageType.NONE, new int[][]{{}}),
+        USE_POISONOUS_ATTACK(false, false, DamageType.NONE, new int[][]{{}}),
+        USE_HARASS          (false, false, DamageType.NONE, new int[][]{{}}),
+        USE_LINIENT_BLOW    (false, false, DamageType.NONE, new int[][]{{}}),
+        USE_FURY            (false, false, DamageType.NONE, new int[][]{{}});
 
+
+        // WEAPON REQUIREMENTS
+        private boolean meleeOnly;
+        private boolean rangeOnly;
+        private DamageType damageTypeRequired;
+
+        // RANGE REQUIREMENTS
+        private RangedBasedType rangedBasedType;
         private int rangeMax;
         private int rangeMin;
-        private boolean weaponBasedRange;
-        private boolean meleeWeaponEquipedRequired;
-        private DamageType damageTypeRequired;
-        private TargetType targetType;
         private Array<int[]> impactArea;
 
+        //TARGET REQUIREMENTS
+        private TargetType targetType;
 
-        ActionChoice(int rangeMax, int rangeMin, boolean weaponBasedRange, boolean meleeWeaponEquipedRequired, DamageType damageTypeRequired, TargetType targetType, int[][] impactArea) {
+
+        ActionChoice(RangedBasedType rangedBasedType, int rangeMax, int rangeMin , boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, TargetType targetType, int[][] impactArea) {
+            this.rangedBasedType = rangedBasedType;
             this.rangeMax = rangeMax;
             this.rangeMin = rangeMin;
-            this.weaponBasedRange = weaponBasedRange;
-            this.meleeWeaponEquipedRequired = meleeWeaponEquipedRequired;
+            this.meleeOnly = meleeOnly;
+            this.rangeOnly = rangeOnly;
             this.damageTypeRequired = damageTypeRequired;
             this.targetType = targetType;
             this.impactArea = new Array<int[]>();
@@ -469,6 +495,23 @@ public class Data {
                 this.impactArea.add(relativeTileCoordinates);
             }
 
+        }
+
+        // offensive ability constructor
+        ActionChoice( boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
+            this(RangedBasedType.WEAPON, -1, -1, meleeOnly, rangeOnly, damageTypeRequired, TargetType.ENEMY, impactArea);
+        }
+
+        ActionChoice(int rangeMax, int rangeMin , TargetType targetType) {
+            this(RangedBasedType.SPECIFIC, rangeMax, rangeMin, false , false, DamageType.NONE, targetType, new int[][]{{}});
+        }
+
+        ActionChoice(RangedBasedType type, TargetType targetType){
+            this(type, -1,-1,false, false, DamageType.NONE, targetType, new int[][]{{}});
+        }
+
+        public RangedBasedType getRangedBasedType() {
+            return rangedBasedType;
         }
 
         public int getRangeMax() {
@@ -479,12 +522,12 @@ public class Data {
             return rangeMin;
         }
 
-        public boolean isWeaponBasedRange() {
-            return weaponBasedRange;
+        public boolean isMeleeOnly() {
+            return meleeOnly;
         }
 
-        public boolean isMeleeWeaponEquipedRequired() {
-            return meleeWeaponEquipedRequired;
+        public boolean isRangeOnly() {
+            return rangeOnly;
         }
 
         public DamageType getDamageTypeRequired() { return damageTypeRequired; }
