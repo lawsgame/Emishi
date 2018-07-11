@@ -271,46 +271,25 @@ public class Battlefield extends Observable {
     }
 
     public void deployUnit(int row, int col, Unit unit){
-        if(isTileAvailable(row, col, unit.has(PassiveAbility.PATHFINDER)) &&  !isUnitAlreadydeployed(unit) && unit.getArmy() != null){
+        boolean alreadyDeployed = false;
+        for(int r = 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbRows(); c++){
+                if(this.units[r][c] == unit){
+                    alreadyDeployed = true;
+                    continue;
+                }
+            }
+            if(alreadyDeployed){
+                continue;
+            }
+        }
+        if(isTileAvailable(row, col, unit.has(PassiveAbility.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
             this.units[row][col] = unit;
             notifyAllObservers(new int[]{row, col});
         }
     }
 
-    public boolean switchUnitsPosition(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
-        if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2) && Utils.dist(rowUnit1, colUnit1, rowUnit2, colUnit2) == 1){
-            Unit unit1 = getUnit(rowUnit1, colUnit1);
-            Unit unit2 = getUnit(rowUnit2, colUnit2);
-            if(isTileReachable(rowUnit1, colUnit1, unit2.has(PassiveAbility.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(PassiveAbility.PATHFINDER)))){
-                notifyAllObservers(new int[]{rowUnit1, colUnit1, rowUnit2, colUnit2});
-                this.units[rowUnit2][colUnit2] = unit1;
-                this.units[rowUnit1][colUnit1] = unit2;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Array<int[]> moveUnit(int rowI, int colI, int rowf, int colf, boolean walking){
-        Array<int[]> path  = new Array<int[]>();
-        if(isTileOccupied(rowI, colI)) {
-            Unit unit = getUnit(rowI, colI);
-            if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
-                if(walking) {
-                    path = getShortestPath(rowI, colI, rowf, colf, unit.has(PassiveAbility.PATHFINDER), unit.getAllegeance());
-                    notifyAllObservers(path);
-                }
-                this.units[rowf][colf] = unit;
-                this.units[rowI][colI] = null;
-                if(!walking){
-                    notifyAllObservers(new int[]{rowf, colf});
-                }
-            }
-        }
-        return path;
-    }
-
-    public boolean isUnitAlreadydeployed(Unit unit){
+    private boolean isUnitAlreadydeployed(Unit unit){
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbRows(); c++){
                 if(this.units[r][c] == unit){
@@ -320,6 +299,53 @@ public class Battlefield extends Observable {
         }
         return false;
     }
+
+    public boolean switchUnitsPosition(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
+        if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2)){
+            Unit unit1 = getUnit(rowUnit1, colUnit1);
+            Unit unit2 = getUnit(rowUnit2, colUnit2);
+            if(isTileReachable(rowUnit1, colUnit1, unit2.has(PassiveAbility.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(PassiveAbility.PATHFINDER)))){
+                this.units[rowUnit2][colUnit2] = unit1;
+                this.units[rowUnit1][colUnit1] = unit2;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean moveUnit(int rowI, int colI, int rowf, int colf){
+        if(isTileOccupied(rowI, colI)) {
+            Unit unit = getUnit(rowI, colI);
+            if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
+                this.units[rowf][colf] = unit;
+                this.units[rowI][colI] = null;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+    public Array<int[]> moveUnit(int rowI, int colI, int rowf, int colf, boolean walking){
+        Array<int[]> path  = new Array<int[]>();
+        if(isTileOccupied(rowI, colI)) {
+            Unit unit = getUnit(rowI, colI);
+            if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
+               if(walking) {
+                    path = getShortestPath(rowI, colI, rowf, colf, unit.has(PassiveAbility.PATHFINDER), unit.getAllegeance());
+                    notifyAllObservers(path);
+               }
+               this.units[rowf][colf] = unit;
+               this.units[rowI][colI] = null;
+               if(!walking){
+                    notifyAllObservers(new int[]{rowf, colf});
+                }
+            }
+        }
+        return path;
+    }
+    */
+
 
     public Unit getUnit(int row, int col){
         return this.units[row][col];
@@ -342,65 +368,6 @@ public class Battlefield extends Observable {
         this.units[row][col] = null;
         notifyAllObservers(unit);
         return unit;
-    }
-
-    public void build(int rowActor, int colActor, int rowTarget, int colTarget, boolean bridge){
-        boolean contructable = false;
-        if(isTileExisted(rowTarget, colTarget) && !isTileOccupied(rowTarget, colTarget)){
-
-            TileType tile = getTile(rowTarget, colTarget);
-            if(bridge && tile == TileType.SHALLOWS){
-                if (isTileExisted(rowTarget + 1, colTarget) && isTileExisted(rowTarget - 1, colTarget) && getTile(rowTarget + 1, colTarget) == TileType.PLAIN && getTile(rowTarget - 1, colTarget) == TileType.PLAIN) {
-                    contructable = true;
-                } else if (isTileExisted(rowTarget, colTarget + 1) && isTileExisted(rowTarget, colTarget - 1) && getTile(rowTarget, colTarget+1) == TileType.PLAIN && getTile(rowTarget, colTarget-1) == TileType.PLAIN) {
-                    contructable = true;
-                }
-            }else if (!bridge && tile == TileType.PLAIN){
-                contructable = true;
-            }
-
-            if(contructable && isTileOccupied(rowActor, colActor)){
-                Unit actor = getUnit(rowActor, colActor);
-                actor.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-                actor.notifyAllObservers(Data.AnimationId.BUILD);
-                getTiles()[rowTarget][colTarget] = (bridge) ? TileType.BRIDGE : TileType.WATCH_TOWER;
-                notifyAllObservers(BuildMessage.get(rowTarget, colTarget, tiles[rowTarget][colTarget]));
-            }
-
-        }
-    }
-
-    public void push(int rowActor, int colActor, int rowTarget, int colTarget){
-
-        if(isTileOccupied(rowActor, colActor) && isTileOccupied(rowTarget,colActor) && Utils.dist(rowActor, colActor, rowTarget, colTarget) == 1){
-            Unit actor = getUnit(rowActor, colActor);
-            Unit target = getUnit(rowTarget, colTarget);
-            boolean pathfinder = target.has(PassiveAbility.PATHFINDER);
-
-            if(!target.isHorseman()){
-                if(rowActor < rowTarget && isTileAvailable(rowTarget + 1, colTarget, pathfinder)){
-                    this.units[rowTarget][rowTarget] = null;
-                    this.units[rowTarget + 1][rowTarget] = target;
-                    actor.notifyAllObservers(Data.AnimationId.PUSH);
-                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-                }else if(rowActor > rowTarget && isTileAvailable(rowTarget - 1, colTarget, pathfinder)){
-                    this.units[rowTarget][rowTarget] = null;
-                    this.units[rowTarget + 1][rowTarget] = target;
-                    actor.notifyAllObservers(Data.AnimationId.PUSH);
-                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-                }else if(colActor < colTarget && isTileAvailable(rowTarget, colTarget + 1, pathfinder)){
-                    this.units[rowTarget][rowTarget] = null;
-                    this.units[rowTarget + 1][rowTarget] = target;
-                    actor.notifyAllObservers(Data.AnimationId.PUSH);
-                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-                }else if(colActor > colTarget && isTileAvailable(rowTarget, colTarget - 1, pathfinder)){
-                    this.units[rowTarget][rowTarget] = null;
-                    this.units[rowTarget + 1][rowTarget] = target;
-                    actor.notifyAllObservers(Data.AnimationId.PUSH);
-                    target.notifyAllObservers(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-                }
-            }
-        }
     }
 
     public Unit getUnitByName(String name) {

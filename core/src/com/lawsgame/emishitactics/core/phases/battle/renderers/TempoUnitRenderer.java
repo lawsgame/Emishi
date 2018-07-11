@@ -21,7 +21,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     private TextureRegion unitTexture;
     private TextureRegion weapontTexture;
-    private TextureRegion shieldTexture;
     private TextureRegion mountedTexture;
     private TextureRegion orientationTexture;
     private TextureRegion offabbTexture = null;
@@ -141,8 +140,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         batch.draw(unitTexture, x, y, 1, 1);
         batch.draw(weapontTexture, x, y, 0.25f, 0.25f);
         batch.draw(orientationTexture, x + 0.75f, y + 0.75f, 0.25f, 0.25f);
-        if(shieldTexture != null) batch.draw(shieldTexture, x + 0.75f, y, 0.25f, 0.25f);
-        if(mountedTexture != null) batch.draw(mountedTexture, x + 0.75f, y + 0.25f, 0.25f, 0.25f);
+        if(mountedTexture != null) batch.draw(mountedTexture, x + 0.75f, y + 0f, 0.25f, 0.25f);
         if(offabbTexture != null) batch.draw(offabbTexture, x, y + 1,1, 0.25f);
     }
 
@@ -325,10 +323,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
             // update orientation
             orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getOrientation());
-            if (model.isUsingShield()) {
-                // update shield wielding rendering
-                shieldTexture = TempoSprite2DPool.get().getShieldSprite();
-            }
             if (model.isHorseman()) {
                 // update soldier mount rendering
                 mountedTexture = TempoSprite2DPool.get().getMountedSprite();

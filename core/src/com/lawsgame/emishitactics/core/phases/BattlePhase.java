@@ -10,6 +10,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.TestBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoBattlefield2DRenderer;
@@ -58,6 +59,7 @@ public class BattlePhase extends GamePhase {
 
         // set the initial BattleInteractionState
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
+        //BattleInteractionState initBIS = new TestBIS(bim);
         BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 

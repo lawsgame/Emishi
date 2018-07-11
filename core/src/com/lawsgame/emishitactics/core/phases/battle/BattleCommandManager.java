@@ -65,7 +65,7 @@ public class BattleCommandManager {
             case HEAL:                  if(!actor.has(Data.SupportAbility.HEAL)) return false; break;
             case GUARD:                 if(!actor.has(Data.SupportAbility.GUARD)) return false; break;
             case STEAL:                 if(!actor.has(Data.SupportAbility.STEAL)) return false; break;
-            case BUILD:                 if(!actor.has(Data.SupportAbility.BUILD) && !(actor.getRemainigBuildingResources() > 0)) return false; break;
+            case BUILD:                 if(!actor.has(Data.SupportAbility.BUILD) || !(actor.getRemainigBuildingResources() > 0)) return false; break;
             case ATTACK:                break;
             case CHOOSE_ORIENTATION:    break;
             case USE_FOCUSED_BLOW:      if(!actor.has(Data.OffensiveAbility.FOCUSED_BLOW)) return false; break;

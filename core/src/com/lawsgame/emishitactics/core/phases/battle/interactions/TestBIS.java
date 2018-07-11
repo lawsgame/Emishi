@@ -67,7 +67,7 @@ public class TestBIS extends BattleInteractionState {
         soldier2.setName("Johnny");
 
 
-        soldier3 = new Unit(Data.UnitTemplate.CONSCRIPT, false, 5, Data.Ethnicity.JAPANESE,Data.Weapon.YARI, Data.Weapon.NAGINATA, true);
+        soldier3 = new Unit(Data.UnitTemplate.CONSCRIPT, true, 5, Data.Ethnicity.JAPANESE,Data.Weapon.YARI, Data.Weapon.NAGINATA, true);
         soldier3.equip(Data.Item.NONE, true);
         soldier3.equip(Data.Item.NONE, false);
         soldier3.setItemStealable(false);
@@ -157,14 +157,14 @@ public class TestBIS extends BattleInteractionState {
         int[] unitPos = bim.battlefield.getUnitPos(soldier1);
 
         // MOVE TEST
-
+        /*
         if(unitPos != null) {
             ar.reset();
             path = bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c, true);
             unitPos = bim.battlefield.getUnitPos(soldier1);
-            ar.addTiles(bim.battlefield.getActionArea(unitPos[0], unitPos[1], Data.ActionChoice.WALK));
+            ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
         }
-
+        */
 
         //IMPACT AREA TEST
         /*
@@ -210,6 +210,13 @@ public class TestBIS extends BattleInteractionState {
         //CAMERA TEST
         //bim.gcm.focusOn(c, r, true);
 
+
+
+
+
+
+
+
     }
 
     @Override
@@ -248,22 +255,18 @@ public class TestBIS extends BattleInteractionState {
             int[] coords = bim.battlefield.getUnitPos(warlord);
             int[] coords0 = bim.battlefield.getUnitPos(warchief1);
             bim.battlefield.switchUnitsPosition(coords[0], coords[1], coords0[0], coords0[1]);
+            bim.battlefield.notifyAllObservers(new int[]{coords[0], coords[1], coords0[0], coords0[1]});
 
         }
 
-        //TEST PUSH
-        if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
-            int[] coords0 = bim.battlefield.getUnitPos(soldier2);
-            int[] coords = bim.battlefield.getUnitPos(warchief1);
-            bim.battlefield.push(coords[0], coords[1], coords0[0], coords0[1]);
-        }
 
         //TEST HEAL
         if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
             System.out.println("\nJohnny hitpoints :"+ soldier2.getCurrentHitpoints() +"/"+ soldier2.getAppHitPoints());
             System.out.println("Johnny moral :"+ soldier2.getCurrentMoral()+"/"+soldier2.getAppMoral());
             System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
-            soldier2.treatedBy(warchief1.getCurrentHealPower());
+            soldier2.notifyAllObservers(new int[]{soldier2.getCurrentMoral(), soldier2.getCurrentHitpoints()});
+            soldier2.treated(warchief1.getCurrentHealPower());
             warchief1.notifyAllObservers(Data.AnimationId.HEAL);
             System.out.println("Johnny hitpoints :"+ soldier2.getCurrentHitpoints() +"/"+ soldier2.getAppHitPoints());
             System.out.println("Johnny moral :"+ soldier2.getCurrentMoral()+"/"+soldier2.getAppMoral());

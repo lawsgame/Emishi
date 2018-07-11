@@ -169,8 +169,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                     addTileRenderer(coords[0], coords[1]);
                 }
             } else if (coords.length == 4) {
-
-                //switch units position
+                //switch units position or move unit
                 Array<int[]> path = new Array<int[]>();
                 if (model.isTileOccupied(coords[0], coords[1]) && model.isTileOccupied(coords[2], coords[3])) {
                     BattleUnitRenderer ur1 = getUnitRenderer(model.getUnit(coords[0], coords[1]));

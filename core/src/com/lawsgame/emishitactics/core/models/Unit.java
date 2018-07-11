@@ -238,7 +238,6 @@ public class Unit extends Observable{
         this.bravery += bra;
 
         int[] gainlvl = new int[]{hpt, mob, cha, ld, str, def, dex, agi, ski, bra};
-        notifyAllObservers(gainlvl);
         return gainlvl;
     }
 
@@ -340,7 +339,6 @@ public class Unit extends Observable{
         }
 
         int[] gainlvl = new int[]{hpt, mob, cha, ld, str, def, dex, agi, ski, bra};
-        notifyAllObservers(gainlvl);
         return gainlvl;
     }
 
@@ -486,7 +484,9 @@ public class Unit extends Observable{
         return getAllegeance() == a;
     }
 
-    public boolean fightWith(Allegeance a){ return (a == Allegeance.ENEMY && getAllegeance() == Allegeance.ALLY) || (a == Allegeance.ALLY && getAllegeance() == Allegeance.ENEMY); }
+    public boolean fightWith(Allegeance a){
+        return (a == Allegeance.ENEMY && getAllegeance() == Allegeance.ALLY) || (a == Allegeance.ALLY && getAllegeance() == Allegeance.ENEMY);
+    }
 
     public Array<Unit> getSquad(){
         return army.getSquad(this);
@@ -561,28 +561,15 @@ public class Unit extends Observable{
     }
 
     public int getCurrentDropRate(boolean bannerAtRange){
-        int rate = DEX_FAC_DROP_RATE * getCurrentDex(bannerAtRange) + getChaChiefsBonus();
-        return rate;
-    }
-
-    public void steal(Unit target, Inventory inventory){
-        if(target.isStealable()){
-            if (inventory != null){
-                inventory.storeItem(target.item1);
-            }
-            target.item1 = null;
-            target.notifyAllObservers(AnimationId.TAKE_HIT);
-            notifyAllObservers(AnimationId.STEAL);
-        }
+        return DEX_FAC_DROP_RATE * getCurrentDex(bannerAtRange) + getChaChiefsBonus();
     }
 
     public int getCurrentHealPower(){
         return HEAL_BASE_POWER + level + (isUsing(Item.CHARM) ? CHARM_HEAL_BONUS: 0);
     }
 
-    public void treatedBy(int healPower){
+    public boolean treated(int healPower){
         if(isWounded()) {
-            int[] oldHpts = new int[]{currentHitPoints, currentMoral};
             if (healPower + hitPoints > getAppHitPoints()) {
                 setInitialHPAndMoral();
             } else {
@@ -596,8 +583,9 @@ public class Unit extends Observable{
                     }
                 }
             }
-            notifyAllObservers(oldHpts);
+            return true;
         }
+        return false;
     }
 
     public int getExperiencePoints(int levelKilled){
@@ -932,8 +920,6 @@ public class Unit extends Observable{
     public int getBaseAgility() { return agility; }
     public int getBaseSkill() { return skill; }
     public int getBaseBravery() { return bravery; }
-    public int getCurrentWeaponRangeMin() { return getCurrentWeapon().getRangeMin(); }
-    public int getCurrentWeaponRangeMax() { return getCurrentWeapon().getRangeMax(); }
 
     public int getAppCharisma(){ return charisma + (isUsing(Item.KABUTO)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0);}
     public int getAppLaedership(){ return leadership + (isUsing(Item.WAR_CHIEF_CLOAK)? UNIQUE_EQUIPMENT_FIXE_STD_BONUS : 0); }
@@ -1256,27 +1242,73 @@ public class Unit extends Observable{
         this.guarding = guarding;
     }
 
+    @Override
+    public String toString() {
+        return "Unit{" +
+                "\nname='" + name + '\'' +
+                "\nethnicity=" + ethnicity +
+                "\nlevel=" + level +
+                "\njob='" + job + '\'' +
+                "\ntemplate=" + template +
+                "\nprimaryWeapon=" + primaryWeapon +
+                "\nsecondaryWeapon=" + secondaryWeapon +
+                "\nhorseman=" + horseman +
+                "standardBearer=" + standardBearer +
+                "\nexperience=" + experience +
+                "\ncommandmentExperience=" + commandmentExperience +
+                "\nprimaryWeaponEquipped=" + primaryWeaponEquipped +
+                "\nrightHanded=" + rightHanded +
+                "\nposition =" + ((isWarlord()) ? "warlord" : ((isWarChief()) ? " warchief" : "soldier"))+
+                "\n\n\nmobility=" + mobility +
+                "charisma=" + charisma +
+                "\nleadership=" + leadership +
+                "\nhitPoints=" + hitPoints +
+                "\nstrength=" + strength +
+                "\ndefense=" + defense +
+                "\ndexterity=" + dexterity +
+                "\nagility=" + agility +
+                "\nskill=" + skill +
+                "\nbravery=" + bravery +
+                "\n\ncurrentMoral=" + currentMoral +
+                "\ncurrentHitPoints=" + currentHitPoints +
+                "\n\n\nitem1=" + item1 +
+                "\nitem2=" + item2 +
+                "\nitemStealable=" + itemStealable +
+                "\npassiveAbility=" + passiveAbility +
+                "\nsupportAbility=" + supportAbility +
+                "\noffensiveAbility=" + offensiveAbility +
+                "\nbanner=" + banner +
+                "\n\n\nguarding=" + guarding +
+                "\norientation=" + orientation +
+                "\nbehaviour=" + behaviour +
+                "\nnumberOfOAUses=" + numberOfOAUses +
+                "\nOAChargingBar=" + OAChargingBar +
+                "\nmoved=" + moved +
+                "\nacted=" + acted +
+                "\nremainigBuildingResources=" + remainigBuildingResources +
+                '}';
+    }
+
     public String toStringStatOnly() {
         return "UNIT" +
                 "\n\nlevel = " + level +
-                "\njob = " + job + '\'' +
-                "\nrightHanded = " + rightHanded +
-                "\ntemplate = " + template.name() +
-                "\nprimaryWeapon = " + primaryWeapon.name() +
-                "\nsecondaryWeapon = " + secondaryWeapon.name() +
-                "\nhorseman = " + horseman +
-                "\n\nmobility = " + mobility +
-                "\ncharisma = " + charisma +
-                "\nleadership = " + leadership +
-                "\nhitPoints = " + hitPoints +
-                "\nstrength = " + strength +
-                "\ndefense = " + defense +
-                "\ndexterity = " + dexterity +
-                "\nagility = " + agility +
-                "\nskill = " + skill +
-                "\nbravery = " + bravery +
-                "\n\ncurrentMoral = " + currentMoral +
-                "\ncurrentHitPoints = " + currentHitPoints;
+                "\nJob = " + job + '\'' +
+                "\nTemplate = " + template.name() +
+                "\nPrimaryWeapon = " + primaryWeapon.name() +
+                "\nSecondaryWeapon = " + secondaryWeapon.name() +
+                "\nHorseman = " + horseman +
+                "\n\nMobility = " + mobility +
+                "\nCharisma = " + charisma +
+                "\nLeadership = " + leadership +
+                "\nHitPoints = " + hitPoints +
+                "\nStrength = " + strength +
+                "\nDefense = " + defense +
+                "\nDexterity = " + dexterity +
+                "\nAgility = " + agility +
+                "\nSkill = " + skill +
+                "\nBravery = " + bravery +
+                "\n\nCurrentMoral = " + currentMoral +
+                "\nCurrentHitPoints = " + currentHitPoints;
     }
 
 

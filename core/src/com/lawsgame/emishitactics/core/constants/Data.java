@@ -415,7 +415,6 @@ public class Data {
         SPECIFIC,
         ONE_SELF,
         ALLY,
-        FOOTMAN_ALLY,
         WOUNDED_ALLY,
         ENEMY,
         CONSTRUTIBLE_TILE,
@@ -442,18 +441,18 @@ public class Data {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                (RangedBasedType.MOVE, TargetType.AVAILABLE_TILE),
-        SWITCH_WEAPON       (RangedBasedType.ONESELF, TargetType.ONE_SELF),
-        SWITCH_POSITION     (1, 1, TargetType.ALLY),
-        PUSH                (1, 1, TargetType.PUSH_SPECIFIC),
-        PRAY                (1, 1, TargetType.WOUNDED_ALLY),
-        HEAL                (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        GUARD               (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE, TargetType.ONE_SELF,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        STEAL               (1, 1,  TargetType.ENEMY),
-        BUILD               (1, 1, TargetType.CONSTRUTIBLE_TILE),
-        COVER               (RangedBasedType.ONESELF, TargetType.ONE_SELF),
-        ATTACK              (RangedBasedType.WEAPON, TargetType.ENEMY),
-        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF, TargetType.ONE_SELF),
+        WALK                (RangedBasedType.MOVE),
+        SWITCH_WEAPON       (RangedBasedType.ONESELF),
+        SWITCH_POSITION     (1, 1),
+        PUSH                (1, 1),
+        PRAY                (1, 1),
+        HEAL                (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        GUARD               (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE, new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        STEAL               (1, 1),
+        BUILD               (1, 1),
+        COVER               (RangedBasedType.ONESELF),
+        ATTACK              (RangedBasedType.WEAPON),
+        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF),
         USE_FOCUSED_BLOW    (false, false, DamageType.PIERCING, new int[][]{{}}),
         USE_CRIPPLING_BLOW  (false, false, DamageType.PIERCING, new int[][]{{}}),
         USE_SWIRLING_BLOW   (true, false, DamageType.EDGED, new int[][]{{-1,1}, {-1,-1}}),
@@ -478,18 +477,14 @@ public class Data {
         private int rangeMin;
         private Array<int[]> impactArea;
 
-        //TARGET REQUIREMENTS
-        private TargetType targetType;
 
-
-        ActionChoice(RangedBasedType rangedBasedType, int rangeMax, int rangeMin , boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, TargetType targetType, int[][] impactArea) {
+        ActionChoice(RangedBasedType rangedBasedType, int rangeMax, int rangeMin , boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
             this.rangedBasedType = rangedBasedType;
             this.rangeMax = rangeMax;
             this.rangeMin = rangeMin;
             this.meleeOnly = meleeOnly;
             this.rangeOnly = rangeOnly;
             this.damageTypeRequired = damageTypeRequired;
-            this.targetType = targetType;
             this.impactArea = new Array<int[]>();
             for(int[] relativeTileCoordinates : impactArea){
                 this.impactArea.add(relativeTileCoordinates);
@@ -499,15 +494,15 @@ public class Data {
 
         // offensive ability constructor
         ActionChoice( boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
-            this(RangedBasedType.WEAPON, -1, -1, meleeOnly, rangeOnly, damageTypeRequired, TargetType.ENEMY, impactArea);
+            this(RangedBasedType.WEAPON, -1, -1, meleeOnly, rangeOnly, damageTypeRequired, impactArea);
         }
 
-        ActionChoice(int rangeMax, int rangeMin , TargetType targetType) {
-            this(RangedBasedType.SPECIFIC, rangeMax, rangeMin, false , false, DamageType.NONE, targetType, new int[][]{{}});
+        ActionChoice(int rangeMax, int rangeMin) {
+            this(RangedBasedType.SPECIFIC, rangeMax, rangeMin, false , false, DamageType.NONE, new int[][]{{}});
         }
 
-        ActionChoice(RangedBasedType type, TargetType targetType){
-            this(type, -1,-1,false, false, DamageType.NONE, targetType, new int[][]{{}});
+        ActionChoice(RangedBasedType type){
+            this(type, -1,-1,false, false, DamageType.NONE, new int[][]{{}});
         }
 
         public RangedBasedType getRangedBasedType() {
@@ -531,8 +526,6 @@ public class Data {
         }
 
         public DamageType getDamageTypeRequired() { return damageTypeRequired; }
-
-        public TargetType getTargetType() { return targetType; }
 
         /*
                                         NORTH (standard):
