@@ -1,13 +1,10 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.constants.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
 import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
-import com.lawsgame.emishitactics.core.constants.Data.TargetType;
 import com.lawsgame.emishitactics.core.constants.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;

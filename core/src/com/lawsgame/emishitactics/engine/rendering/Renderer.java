@@ -1,5 +1,6 @@
-package com.lawsgame.emishitactics.engine.renderers;
+package com.lawsgame.emishitactics.engine.rendering;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.engine.GameElement;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
@@ -28,4 +29,5 @@ public abstract class Renderer<M extends Observable> implements Observer, GameUp
     public void dispose(){
         this.model.detach(this);
     }
+
 }

@@ -129,4 +129,12 @@ public class Utils {
         int a = (color32bits>>24)&0xFF;
         return new int[]{a,b,g,r};
     }
+
+    public static int getMean(int nbOfDices, int nbFaces){
+        int result = 0;
+        for(int i = 0; i < nbOfDices; i++){
+            result += Data.rand(nbFaces);
+        }
+        return result /nbOfDices;
+    }
 }

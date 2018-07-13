@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.engine.renderers;
+package com.lawsgame.emishitactics.engine.rendering;
 
 
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;

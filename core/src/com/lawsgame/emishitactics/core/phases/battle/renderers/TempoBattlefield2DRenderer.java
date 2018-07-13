@@ -9,8 +9,8 @@ import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 /*
  * TODO: clipping
@@ -89,7 +89,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         if(model.isTileOccupied(r,c)) {
             Unit unit = model.getUnit(r, c);
             if(!isUnitRendererCreated(unit)) {
-                unitRenderers.add(new TempoUnitRenderer(r, c, unit, this.model));
+                unitRenderers.add(new TempoUnitRenderer(r, c, unit));
             }
         }
     }
@@ -115,6 +115,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return false;
     }
 
+    @Override
     public BattleUnitRenderer getUnitRenderer(Unit model) {
         for(int i = 0; i < unitRenderers.size; i++){
             if(unitRenderers.get(i).getModel() == model)

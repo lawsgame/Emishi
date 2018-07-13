@@ -6,10 +6,11 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
+
+import java.util.LinkedList;
 
 import static com.lawsgame.emishitactics.core.constants.Data.SPEED_PUSHED;
 import static com.lawsgame.emishitactics.core.constants.Data.SPEED_WALK;
@@ -17,7 +18,7 @@ import static com.lawsgame.emishitactics.core.constants.Data.SPEED_WALK;
 public class TempoUnitRenderer extends BattleUnitRenderer {
     protected float x;
     protected float y;
-    protected Battlefield battlefield;
+    protected boolean visible;
 
     private TextureRegion unitTexture;
     private TextureRegion weapontTexture;
@@ -25,8 +26,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private TextureRegion orientationTexture;
     private TextureRegion offabbTexture = null;
 
-    private boolean targeted = false;
-    private boolean executing = false;
+    private boolean targeted;
+    private boolean executing;
+
     private CountDown countDown = new CountDown(2f){
       @Override
       public void run(){
@@ -46,48 +48,75 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private boolean updatePoint = false;
     private boolean pushed = false;
     private Array<int[]> remainingPath = new Array<int[]>(); // array of (r, c) <=> (y, x)
-    private boolean hitTaken = false;
-    private boolean handleOSUnit = false;
+
+    private LinkedList<Object> animationQueue;
 
 
-    public TempoUnitRenderer(int row, int col, Unit model, Battlefield battlefield) {
+    public TempoUnitRenderer(int row, int col, Unit model) {
         super(model);
         this.x = col;
         this.y = row;
-        this.battlefield = battlefield;
+        this.executing = false;
+        this.executing = false;
+        this.visible = true;
+        this.animationQueue = new LinkedList<Object>();
+
         display(Data.AnimationId.REST);
         getNotification(null);
     }
+
 
     //------------------ GAME ELEMENT METHODS -------------------------------------------
 
     @Override
     public void update(float dt) {
-        countDown.update(dt);
-        handleCountDownBasedCompletedAnimation();
-        handleWalkAnimation(dt);
-    }
 
-    private void handleCountDownBasedCompletedAnimation(){
-        // go back to rest animation after performing animation
+        countDown.update(dt);
         if (countDown.isFinished()) {
             offabbTexture = null;
             countDown.reset();
-
-            //if the model died or fled, do not restore rest animation
-            if(hitTaken && model.isOutOfCombat()){
-                hitTaken = false;
-                handleOSUnit = true;
-                if (model.isDead()) {
-                    display(Data.AnimationId.DIE);
-                } else  {
-                    display(Data.AnimationId.FLEE);
-                }
-            }else if(handleOSUnit) {
-                handleOSUnit = false;
-                battlefield.removeUnit((int)y,(int)x);
-            }else{
+            if(animationQueue.isEmpty())
                 display(Data.AnimationId.REST);
+
+        }
+
+        handleWalkAnimation(dt);
+        launchNextAnimation();
+    }
+
+    public void launchNextAnimation(){
+        if(executing == false){
+            if(!animationQueue.isEmpty()) {
+                Object query = animationQueue.pop();
+
+                if (query instanceof Unit.DamageNotification) {
+                    Unit.DamageNotification notification = (Unit.DamageNotification) query;
+                    displayTakeHit(notification.moralOnly, notification.damageTaken);
+                } else if (query instanceof int[]) {
+                    int[] array = (int[]) query;
+                    if (array.length == 2) {
+                        int[] oldHpts = (int[]) query;
+                        displayTreated(oldHpts);
+                    } else if (array.length == 10) {
+                        int[] gainLvl = (int[]) query;
+                        displayLevelup(gainLvl);
+                    }
+
+                } else if (query instanceof Data.AnimationId) {
+                    display((Data.AnimationId) query);
+
+                } else if (query instanceof Data.Orientation) {
+                    displayPushed((Data.Orientation) query);
+
+                } else if (query instanceof Query){
+                    Query customQuery = (Query)query;
+                    customQuery.handle();
+
+                } else {
+                    launchNextAnimation();
+                }
+            }else if(model.isOutOfCombat()){
+                //setVisible(false);
             }
         }
     }
@@ -137,11 +166,13 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void render(SpriteBatch batch) {
-        batch.draw(unitTexture, x, y, 1, 1);
-        batch.draw(weapontTexture, x, y, 0.25f, 0.25f);
-        batch.draw(orientationTexture, x + 0.75f, y + 0.75f, 0.25f, 0.25f);
-        if(mountedTexture != null) batch.draw(mountedTexture, x + 0.75f, y + 0f, 0.25f, 0.25f);
-        if(offabbTexture != null) batch.draw(offabbTexture, x, y + 1,1, 0.25f);
+        if(visible) {
+            batch.draw(unitTexture, x, y, 1, 1);
+            batch.draw(weapontTexture, x, y, 0.25f, 0.25f);
+            batch.draw(orientationTexture, x + 0.75f, y + 0.75f, 0.25f, 0.25f);
+            if (mountedTexture != null) batch.draw(mountedTexture, x + 0.75f, y + 0f, 0.25f, 0.25f);
+            if (offabbTexture != null) batch.draw(offabbTexture, x, y + 1, 1, 0.25f);
+        }
     }
 
 
@@ -204,10 +235,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public void displayTakeHit(int damageTaken) {
+    public void displayTakeHit(boolean moralOnly, int damageTaken) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
         countDown.run();
-        hitTaken = true;
     }
 
 
@@ -263,9 +293,10 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case DODGE:
             case BACKSTABBED:
             case COVER:
-            case REST:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
                 countDown.run();
+            case REST:
+                unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
                 break;
             case SWITCH_WEAPON:
                 weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
@@ -315,7 +346,16 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         this.targeted = targeted;
     }
 
+    @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 
+
+    /**
+     * treat the input data and push animationQueries in the animaition Queue, ready to be rendered
+     * @param data
+     */
     @Override
     public void getNotification(Object data){
         if(data == null) {
@@ -327,27 +367,27 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 // update soldier mount rendering
                 mountedTexture = TempoSprite2DPool.get().getMountedSprite();
             }
-
-        }else if (data instanceof Integer){
-            int damageTaken = (Integer)data;
-            displayTakeHit(damageTaken);
-
-        }else if(data instanceof int[]){
-            int[] array = (int[])data;
-            if(array.length == 2){
-                int[] oldHpts = (int[])data;
-                displayTreated(oldHpts);
-            }else if(array.length == 10){
-                int[] gainLvl = (int[])data;
-                displayLevelup(gainLvl);
+        }else{
+            animationQueue.offer(data);
+            if(data instanceof Unit.DamageNotification){
+                if (model.isDead()) {
+                    animationQueue.offer(Data.AnimationId.DIE);
+                    animationQueue.offer(new Query() {
+                        @Override
+                        public void handle() {
+                            setVisible(false);
+                        }
+                    });
+                } else  if(model.isOutOfCombat()){
+                    animationQueue.offer(Data.AnimationId.FLEE);
+                    animationQueue.offer(new Query() {
+                        @Override
+                        public void handle() {
+                            setVisible(false);
+                        }
+                    });
+                }
             }
-
-        }else if(data instanceof Data.AnimationId){
-            display((Data.AnimationId)data);
-
-        }else if(data instanceof Data.Orientation){
-            displayPushed((Data.Orientation)data);
-
         }
     }
 
@@ -359,5 +399,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void setY(float y) {
         this.y = y;
+    }
+
+    public interface Query{
+        void handle();
     }
 }

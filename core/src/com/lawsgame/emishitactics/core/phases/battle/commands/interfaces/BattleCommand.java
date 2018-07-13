@@ -5,26 +5,31 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 
 public abstract class BattleCommand implements Command, GameUpdatableEntity{
     protected Battlefield battlefield;
+    protected BattlefieldRenderer battlefieldRenderer;
     protected Data.ActionChoice choice;
     protected int rowActor;
     protected int colActor;
     protected int rowTarget;
     protected int colTarget;
 
-    public BattleCommand(Battlefield bf, Data.ActionChoice choice){
-        this.battlefield = bf;
+
+    public BattleCommand(BattlefieldRenderer bfr, Data.ActionChoice choice){
+        this.battlefieldRenderer = bfr;
+        this.battlefield = bfr.getModel();
         this.choice = choice;
     }
 
+
+    public abstract void init();                                       // called when a command is fetched
     public abstract boolean isUndoable();                              // can be deleted afterwards
     public abstract boolean isFree();                                  // does not set Unit.acted as true
     public abstract boolean isEndTurnCommandOnly();                    // is only callable when the unit turn is ending
-    public abstract void setTarget(int rowTarget, int colTarget);
     public abstract boolean isExecuting();
     public abstract boolean isExecutionCompleted();
 
@@ -58,7 +63,7 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
     public Array<int[]> getActionArea() {
         Array<int[]> actionArea = new Array<int[]>();
         if(battlefield.isTileOccupied(rowActor, colActor)) {
-            switch (choice.getRangedBasedType()) {
+            switch (choice.getRangeType()) {
                 case MOVE:
                     actionArea = battlefield.getMoveArea(rowActor, colActor);
                     break;
@@ -133,16 +138,15 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
 
     //------------------ GETTERS & SETTERS ---------------------------
 
+
     public Data.ActionChoice getActionChoice() {
         return choice;
     }
 
-    public void setBattlefield(Battlefield battlefield){
-        setBattlefield(battlefield);
-    }
+    public void setBattlefield(BattlefieldRenderer battlefieldRenderer){
+        this.battlefield = battlefieldRenderer.getModel();
+        this.battlefieldRenderer = battlefieldRenderer;
 
-    public Battlefield getBattlefield() {
-        return battlefield;
     }
 
     public boolean setActor(int rowActor, int colActor) {
@@ -155,9 +159,10 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
         return false;
     }
 
-    private class BCWrongSetCallingException extends Exception {
-        BCWrongSetCallingException(String msg){
-            super(msg);
+    public void setTarget(int rowTarget, int colTarget){
+        if(battlefield.isTileExisted(rowTarget, colTarget)){
+            this.rowTarget = rowTarget;
+            this.colTarget = colTarget;
         }
     }
 }

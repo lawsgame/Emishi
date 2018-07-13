@@ -46,7 +46,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bfr = bfr;
         this.gcm = gcm;
         this.asm = asm;
-        this.bcm = new BattleCommandManager(battlefield);
+        this.bcm = new BattleCommandManager(bfr);
         this.playerArmy = playerArmy;
         this.multiplexer = new InputMultiplexer();
 

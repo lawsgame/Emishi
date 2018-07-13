@@ -60,16 +60,13 @@ public class TempoSprite2DPool {
             TextureAtlas atlas;
             if(asm.isLoaded(Assets.ATLAS_TILES)) {
                 atlas = asm.get(Assets.ATLAS_TILES);
-
                 for (Data.TileType tileType : Data.TileType.values()) {
                     regionName = Assets.getRegionTile(tileType);
                     region = atlas.findRegion(regionName);
                     if (region != null) {
                         this.tileSprites.put(tileType, region);
-
                     }
                 }
-
                 bridgeInConstruction = atlas.findRegion("future_bridge");
                 towerInConstruction = atlas.findRegion("future_watch_tower");
             }
@@ -95,7 +92,7 @@ public class TempoSprite2DPool {
                 unitSprites.put(Data.AnimationId.TAKE_HIT, unitRegions[13][0]);
                 unitSprites.put(Data.AnimationId.DIE, unitRegions[14][0]);
                 unitSprites.put(Data.AnimationId.GUARD, unitRegions[15][0]);
-                unitSprites.put(Data.AnimationId.COVER, unitRegions[1][0]);
+                unitSprites.put(Data.AnimationId.COVER, unitRegions[2][0]);
                 unitSprites.put(Data.AnimationId.REST, unitRegions[0][0]);
 
                 foeSprites.put(Data.AnimationId.ATTACK, unitRegions[3][4]);
@@ -112,7 +109,7 @@ public class TempoSprite2DPool {
                 foeSprites.put(Data.AnimationId.TAKE_HIT, unitRegions[13][4]);
                 foeSprites.put(Data.AnimationId.DIE, unitRegions[14][4]);
                 foeSprites.put(Data.AnimationId.GUARD, unitRegions[15][4]);
-                foeSprites.put(Data.AnimationId.COVER, unitRegions[1][4]);
+                foeSprites.put(Data.AnimationId.COVER, unitRegions[2][4]);
                 foeSprites.put(Data.AnimationId.REST, unitRegions[0][4]);
 
                 unitDoneSprite = unitRegions[0][6];

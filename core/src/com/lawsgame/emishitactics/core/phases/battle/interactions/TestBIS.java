@@ -28,7 +28,7 @@ public class TestBIS extends BattleInteractionState {
         super(bis, true, true, true);
         ar = new TempoArea(bis.asm, bis.battlefield, Assets.HighlightedTile.ACTION_RANGE);
         //ar =  new TempoArea(bim.asm, bim.battlefield, Assets.HighlightedTile.ACTION_RANGE, path);
-        guineapig = bis.battlefield.getUnit(9,8);
+        guineapig = bis.battlefield.getUnit(5,7);
         path = new Array<int[]>();
 
         //compose test player army
@@ -106,7 +106,7 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("soldier3  : "+soldier3.isStandardBearer());
 
 
-        soldier2.receiveDamage(3, false);
+        soldier2.receiveDamage(3, false, false);
         System.out.println("\nJohnny hitpoints :"+ soldier2.getCurrentHitpoints() +"/"+ soldier2.getAppHitPoints());
         System.out.println("Johnny moral :"+ soldier2.getCurrentMoral() +"/"+soldier2.getAppMoral());
         System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
@@ -157,14 +157,15 @@ public class TestBIS extends BattleInteractionState {
         int[] unitPos = bim.battlefield.getUnitPos(soldier1);
 
         // MOVE TEST
-        /*
+
         if(unitPos != null) {
             ar.reset();
-            path = bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c, true);
-            unitPos = bim.battlefield.getUnitPos(soldier1);
+            bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
+            path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.PassiveAbility.PATHFINDER), soldier1.getAllegeance());
+            bim.battlefield.notifyAllObservers(path);
             ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
         }
-        */
+
 
         //IMPACT AREA TEST
         /*
@@ -238,16 +239,12 @@ public class TestBIS extends BattleInteractionState {
 
         // DAMAGE DEALING TEST
         if(Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            warlord.receiveDamage(3, false);
-            System.out.println("hit points : "+warlord.getCurrentHitpoints()+" & moral : "+warlord.getCurrentMoral());
-            System.out.println("hit points : "+warchief1.getCurrentHitpoints()+" & moral : "+warchief1.getCurrentMoral());
-            System.out.println("hit points : "+soldier1.getCurrentHitpoints()+" & moral : "+soldier1.getCurrentMoral());
-            System.out.println("hit points : "+soldier2.getCurrentHitpoints()+" & moral : "+soldier1.getCurrentMoral());
-            System.out.println("hit points : "+soldier3.getCurrentHitpoints()+" & moral : "+soldier1.getCurrentMoral());
-            System.out.println("");
+            System.out.println("Damage received!");
+            warlord.receiveDamage(3, false, true);
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.K)) {
-            warlord.receiveDamage(300, false);
+            System.out.println("Kill!");
+            warlord.receiveDamage(300, false, true);
         }
 
         //TEST SWITCH POSITION
@@ -259,19 +256,14 @@ public class TestBIS extends BattleInteractionState {
 
         }
 
-
         //TEST HEAL
         if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
-            System.out.println("\nJohnny hitpoints :"+ soldier2.getCurrentHitpoints() +"/"+ soldier2.getAppHitPoints());
-            System.out.println("Johnny moral :"+ soldier2.getCurrentMoral()+"/"+soldier2.getAppMoral());
-            System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
-            soldier2.notifyAllObservers(new int[]{soldier2.getCurrentMoral(), soldier2.getCurrentHitpoints()});
-            soldier2.treated(warchief1.getCurrentHealPower());
+            warlord.notifyAllObservers(new int[]{warlord.getCurrentMoral(), warlord.getCurrentHitpoints()});
+            warlord.treated(warchief1.getCurrentHealPower());
             warchief1.notifyAllObservers(Data.AnimationId.HEAL);
-            System.out.println("Johnny hitpoints :"+ soldier2.getCurrentHitpoints() +"/"+ soldier2.getAppHitPoints());
-            System.out.println("Johnny moral :"+ soldier2.getCurrentMoral()+"/"+soldier2.getAppMoral());
-            System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
         }
+
+        //
 
     }
 }

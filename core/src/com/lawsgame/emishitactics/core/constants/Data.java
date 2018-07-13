@@ -17,7 +17,6 @@ public class Data {
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 4f; // including the war chief himself / herself
     public static final float SPEED_WALK = 3f;  //tile/s
     public static final float SPEED_PUSHED = 8f;
-    public static final float COUNTER_ATTACK_DAMAGE_MODIFIER = 1f;
     public static final int OA_CHARGING_BAR_MAW_VALUE = 100;
     public static final int BRAVERY_MORAL_FACTOR = 2;
     public static final int NB_BUILDING_MAX = 2;
@@ -32,8 +31,9 @@ public class Data {
     public static final int DEX_BONUS_TANKO = 3;
     public static final int DEX_BONUS_EMISHI_LEGGINS = 3;
     public static final int DEX_BONUS_YAMATO_TROUSERS = 5;
-    public static final float CRITICAL_DAMAGE_MODIFIER = 1.5f;
-    public static final float CRIT_BONUS_IMP_GAUNLET = 0.5f;
+    public static final float CRITICAL_DAMAGE_MODIFIER = 2f;
+    public static final float CRIT_BONUS_IMP_GAUNLET = 1f;
+    public static final float CRIT_REDUCTION_DAMAGE_IMP_ARMBAND = 3f;
     public static final float UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS = 0.2f;
     public static final float UNIQUE_EQUIPMENT_LOW_GROWTH_BONUS = 0.1f;
     public static final int UNIQUE_EQUIPMENT_FIXE_STD_BONUS = 1;
@@ -46,7 +46,6 @@ public class Data {
     public static final int STR_FIXE_BONUS_NAGINATE_2 = 3;
     public static final int AGI_DODGE_FACTOR = 4;
     public static final int DEX_HIT_FACTOR = 3;
-    public static final int ACCURACY_BONUS_CRIT = 15;
     public static final int AB_TRIGGER_RATE_SKILL_FACTOR = 2;
     public static final int DEX_FAC_DROP_RATE = 2;
 
@@ -407,27 +406,16 @@ public class Data {
         POISONOUS_ATTACK,
         HARASS,
         LINIENT_BLOW,
-        FURY
-    }
+        FURY,
 
-
-    public enum TargetType{
-        SPECIFIC,
-        ONE_SELF,
-        ALLY,
-        WOUNDED_ALLY,
-        ENEMY,
-        CONSTRUTIBLE_TILE,
-        AVAILABLE_TILE,
-        PUSH_SPECIFIC
     }
 
     public enum RangedBasedType{
         MOVE,
         WEAPON,
-        ONESELF, SPECIFIC
+        ONESELF,
+        SPECIFIC
     }
-
 
     /**
      *  1) Modelize the choice made by the player foa a unit to perform a given action
@@ -471,15 +459,15 @@ public class Data {
         private boolean rangeOnly;
         private DamageType damageTypeRequired;
 
-        // RANGE REQUIREMENTS
-        private RangedBasedType rangedBasedType;
+        // RANGE REQUIREMENT
+        private RangedBasedType rangeType;
         private int rangeMax;
         private int rangeMin;
         private Array<int[]> impactArea;
 
 
-        ActionChoice(RangedBasedType rangedBasedType, int rangeMax, int rangeMin , boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
-            this.rangedBasedType = rangedBasedType;
+        ActionChoice(RangedBasedType type, int rangeMax, int rangeMin , boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
+            this.rangeType = type;
             this.rangeMax = rangeMax;
             this.rangeMin = rangeMin;
             this.meleeOnly = meleeOnly;
@@ -493,21 +481,19 @@ public class Data {
         }
 
         // offensive ability constructor
-        ActionChoice( boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
-            this(RangedBasedType.WEAPON, -1, -1, meleeOnly, rangeOnly, damageTypeRequired, impactArea);
+        ActionChoice(boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
+            this(RangedBasedType.WEAPON,-1, -1, meleeOnly, rangeOnly, damageTypeRequired, impactArea);
         }
 
         ActionChoice(int rangeMax, int rangeMin) {
-            this(RangedBasedType.SPECIFIC, rangeMax, rangeMin, false , false, DamageType.NONE, new int[][]{{}});
+            this(RangedBasedType.SPECIFIC,rangeMax, rangeMin, false , false, DamageType.NONE, new int[][]{{}});
         }
 
         ActionChoice(RangedBasedType type){
             this(type, -1,-1,false, false, DamageType.NONE, new int[][]{{}});
         }
 
-        public RangedBasedType getRangedBasedType() {
-            return rangedBasedType;
-        }
+        public RangedBasedType getRangeType() { return rangeType; }
 
         public int getRangeMax() {
             return rangeMax;

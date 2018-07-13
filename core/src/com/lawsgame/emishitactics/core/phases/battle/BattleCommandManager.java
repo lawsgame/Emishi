@@ -5,6 +5,7 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import java.util.HashMap;
 
@@ -14,7 +15,7 @@ import java.util.HashMap;
 public class BattleCommandManager {
     private HashMap<Data.ActionChoice, BattleCommand> commandPool;
 
-    public BattleCommandManager(Battlefield battlefield){
+    public BattleCommandManager(BattlefieldRenderer battlefieldRenderer){
         commandPool = new HashMap<Data.ActionChoice, BattleCommand>();
 
         /*
@@ -22,10 +23,10 @@ public class BattleCommandManager {
           : commandPool.put(command.getActionChoice(), command);
           */
 
-        setBattlefield(battlefield);
+        setBattlefield(battlefieldRenderer);
     }
 
-    public Array<Data.ActionChoice> getPossibleActionChoices(Unit actor, Array<BattleCommand> history){
+    public Array<Data.ActionChoice> getChoices(Unit actor, Array<BattleCommand> history){
         Array<Data.ActionChoice> choices = new Array<Data.ActionChoice>();
         for (Data.ActionChoice choice : commandPool.keySet()) {
             if (!commandPool.get(choice).isEndTurnCommandOnly() && !history.contains(commandPool.get(choice), true) && canActionbePerformedBy(actor, choice)) {
@@ -36,13 +37,18 @@ public class BattleCommandManager {
     }
 
     public BattleCommand get(Data.ActionChoice choice){
-        return commandPool.get(choice);
+        BattleCommand command = commandPool.get(choice);
+        if(command != null) {
+            command.init();
+            return command;
+        }
+        return null;
     }
 
     // optional method
-    public void setBattlefield(Battlefield battlefield){
+    public void setBattlefield(BattlefieldRenderer battlefieldRenderer){
         for(Data.ActionChoice choice : commandPool.keySet()){
-            commandPool.get(choice).setBattlefield(battlefield);
+            commandPool.get(choice).setBattlefield(battlefieldRenderer);
         }
     }
 
