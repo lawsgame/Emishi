@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
+import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -19,13 +19,13 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     protected Array<BattleUnitRenderer> unitRenderers;
     protected TextureRegion[][] tileRenderers;
-    protected TempoSprite2DPool sprite2DPool;
+    protected TempoSpritePool sprite2DPool;
     protected boolean executing;
 
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
         this.unitRenderers = new Array<BattleUnitRenderer>();
-        this.sprite2DPool = TempoSprite2DPool.get();
+        this.sprite2DPool = TempoSpritePool.get();
         this.sprite2DPool.set(asm);
 
         // pre calculate tile coords and texture region to render to prevent extra calculus each game loop.
@@ -145,7 +145,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     @Override
     public void getNotification(Object data) {
         int[] coords;
-
         if (data instanceof Unit) {
             // remove the sent unit
             removeUnitRenderer((Unit) data);
@@ -186,7 +185,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }else if(data instanceof Array){
             if(((Array)data).size > 0 && ((Array)data).get(0) instanceof int[]){
                 Array<int[]> path = (Array<int[]>) data;
-                int[] unitCoords = path.removeIndex(0);
+                path.removeIndex(0);
+                int[] unitCoords = path.get(path.size - 1);
                 if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
                     Unit unit = model.getUnit(unitCoords[0], unitCoords[1]);
                     getUnitRenderer(unit).displayWalk(path);

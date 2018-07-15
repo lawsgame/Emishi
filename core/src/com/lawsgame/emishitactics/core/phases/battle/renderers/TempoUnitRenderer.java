@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
+import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
@@ -226,7 +226,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
                 Data.Orientation or = Utils.getOrientationFromCoords(y,x,path.get(0)[0], path.get(0)[1]);
                 model.setOrientation(or);
-                unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
+                unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
                 executing = true;
 
             }
@@ -238,27 +238,27 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical) {
-        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
+        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
         countDown.run();
     }
 
 
     @Override
     public void displayLevelup(int[] gainlvl) {
-        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.LEVELUP, model.getArmy().isAlly());
+        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.LEVELUP, model.getArmy().isAlly());
         countDown.run();
     }
 
     @Override
     public void displayTreated(int[] oldHtpsAndMoral) {
-        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().isAlly());
+        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().isAlly());
         countDown.run();
     }
 
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
         model.setOrientation(pushedTowards);
-        unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().isAlly());
+        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().isAlly());
         pushed = true;
         switch (pushedTowards){
             case WEST: remainingPath.add(new int[]{(int)y, (int)x - 1}); break;
@@ -295,17 +295,17 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case DODGE:
             case BACKSTABBED:
             case COVER:
-                unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
+                unitTexture = TempoSpritePool.get().getUnitSprite(id, model.getArmy().isAlly());
                 countDown.run();
             case REST:
-                unitTexture = TempoSprite2DPool.get().getUnitSprite(id, model.getArmy().isAlly());
+                unitTexture = TempoSpritePool.get().getUnitSprite(id, model.getArmy().isAlly());
                 break;
             case SWITCH_WEAPON:
-                weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
+                weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon());
                 break;
             case FLEE:
-                unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
-                orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getOrientation().getOpposite());
+                unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
+                orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation().getOpposite());
                 countDown.run();
                 break;
             case GUARDED:
@@ -322,10 +322,10 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case HARASS:
             case LINIENT_BLOW:
             case FURY:
-                unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly());
+                unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly());
                 for(Data.Ability ability : Data.Ability.values()) {
                     if(ability.name().equals(id.name()))
-                        offabbTexture = TempoSprite2DPool.get().getOffensiveAbbSprite(ability);
+                        offabbTexture = TempoSpritePool.get().getOffensiveAbbSprite(ability);
                 }
                 countDown.run();
                 break;
@@ -362,12 +362,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public void getNotification(Object data){
         if(data == null) {
             // update weapon
-            weapontTexture = TempoSprite2DPool.get().getWeaponSprite(model.getCurrentWeapon());
+            weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon());
             // update orientation
-            orientationTexture = TempoSprite2DPool.get().getOrientationSprite(model.getOrientation());
+            orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
             if (model.isHorseman()) {
                 // update soldier mount rendering
-                mountedTexture = TempoSprite2DPool.get().getMountedSprite();
+                mountedTexture = TempoSpritePool.get().getMountedSprite();
             }
         }else{
             animationQueue.offer(data);

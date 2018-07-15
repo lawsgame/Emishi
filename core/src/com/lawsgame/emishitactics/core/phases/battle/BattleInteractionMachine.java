@@ -5,14 +5,12 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoArea;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Area;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoAreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.LongTilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.LongUnitPanel;
@@ -33,7 +31,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public AssetManager asm;
     public InputMultiplexer multiplexer;
 
-    public Area sltdTile;
+    public AreaWidget sltdTile;
 
     public Stage UIStage;
     public TilePanel shortTilePanel;
@@ -52,7 +50,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.multiplexer = new InputMultiplexer();
 
 
-        this.sltdTile = new TempoArea(asm, battlefield, Assets.HighlightedTile.SELECTED_UNIT);
+        this.sltdTile = new TempoAreaWidget(battlefield, Assets.AreaColor.SELECTED_UNIT);
         this.sltdTile.setVisible(false);
 
         // UI

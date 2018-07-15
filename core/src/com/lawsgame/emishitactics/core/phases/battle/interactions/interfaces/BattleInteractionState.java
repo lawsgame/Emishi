@@ -82,8 +82,7 @@ public abstract class BattleInteractionState extends InteractionState {
 
     public void highlight(int row, int col){
         bim.sltdTile.setVisible(true);
-        bim.sltdTile.reset();
-        bim.sltdTile.addTile(row, col);
+        bim.sltdTile.setTile(row, col);
     }
 
 

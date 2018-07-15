@@ -26,11 +26,11 @@ public class Assets {
         return tileType.name().toLowerCase();
     }
 
-    public enum HighlightedTile {
+    public enum AreaColor {
         SELECTED_UNIT,
         MOVE_RANGE,
         ACTION_RANGE,
-        SAME_SQUAD,
+        GUARD_RANGE,
         BANNER_RANGE,
         COVERING_FIRE,
         FOE_ACTION_AREA,
@@ -38,7 +38,7 @@ public class Assets {
 
     }
 
-    public static String getTileHighlighted(HighlightedTile id){
+    public static String getTileHighlighted(AreaColor id){
         return id.name().toLowerCase();
     }
     public static String UI_BLACK_BACKGROUND = "black_background";

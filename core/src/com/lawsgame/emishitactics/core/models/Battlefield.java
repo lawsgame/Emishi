@@ -73,7 +73,7 @@ public class Battlefield extends Observable {
 
     TILE METHODS HIERARCHY
 
-     > setTile
+     > set
      -> setTileAs
      -> plunderTile
      */
@@ -453,10 +453,14 @@ public class Battlefield extends Observable {
         CheckMoveMap(){ }
 
         public Array<int[]> getMoveArea(Battlefield bf, int rowActor, int colActor){
-            set(bf, rowActor, colActor, true);
-            setTilesMRP();
-            condemnTiles();
-            return getArea(true);
+            Array<int[]> moveArea = new Array<int[]>();
+            if(bf.isTileOccupied(rowActor, colActor)) {
+                set(bf, rowActor, colActor, true);
+                setTilesMRP();
+                condemnTiles();
+                moveArea = getArea(true);
+            }
+            return moveArea;
         }
 
         private void set( Battlefield bf, int rowActor, int colActor, boolean moveAreaOnly){
@@ -798,6 +802,7 @@ public class Battlefield extends Observable {
 
     }
 
+
     public static class PathNode extends Node<PathNode>{
         protected int distTarget;
         protected PathNode parent;
@@ -837,42 +842,6 @@ public class Battlefield extends Observable {
     }
 
 
-    public static class StateNode extends PathNode{
-        protected boolean atAttackRange;
-
-        public StateNode(int row, int col, int rowf, int colf, PathNode parent, Battlefield bf, boolean atAttackRange) {
-            super(row, col, rowf, colf, parent, bf);
-            this.atAttackRange = atAttackRange;
-            if(atAttackRange) this.distSource = 0;
-        }
-
-        /**
-         * @return all nodes going through each parent until one parent is at attack requiredRange
-          */
-
-        @Override
-        public Array<PathNode> getPath(){
-            Array<PathNode> bestpath;
-            if(atAttackRange){
-                bestpath = new Array<PathNode>();
-                bestpath.add(this);
-                return bestpath;
-
-            }
-            StateNode parent0 = (StateNode)parent;
-            bestpath = parent0.getPath();
-            bestpath.add(this);
-            return bestpath;
-
-        }
-
-        @Override
-        public String toString(){
-            return super.toString() + " attackrange: "+atAttackRange;
-        }
-
-    }
-
     // --------------- BUILD NOTIFICATION -------------------------------------
 
     public static class BuildMessage {
@@ -892,4 +861,6 @@ public class Battlefield extends Observable {
         }
 
     }
+
+
 }

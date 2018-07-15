@@ -432,7 +432,7 @@ public class Data {
      *  1) Modelize the choice made by the player foa a unit to perform a given action
      *
      *
-     * Area of impact :
+     * AreaWidget of impact :
      * ( 0, 0) = targeted tile
      * ( 1, 0) = in front of targeted tile
      * ( 0, 1) = right of targeted tile

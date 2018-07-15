@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
+import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.AArmy;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -139,7 +139,7 @@ public class LongUnitPanel extends UnitPanel {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(TempoSprite2DPool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
+        batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
         BattlePhase.testFont.draw(batch, mainDescription, getX() + X_TEXT_OFFSET_1_COL, getY() + getHeight() - Y_TEXT_OFFSET);
         BattlePhase.testFont.draw(batch, statDescription, getX() + X_TEXT_OFFSET_2_COL, getY() + getHeight() - Y_TEXT_OFFSET);
         BattlePhase.testFont.draw(batch, equipDescription, getX() + X_TEXT_OFFSET_3_COL, getY() + getHeight() - Y_TEXT_OFFSET);

@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.helpers;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.lawsgame.emishitactics.core.constants.Assets;
@@ -11,20 +12,20 @@ import java.util.HashMap;
 /*
  singleton to easily get access to required texture region for rendering purpose
  */
-public class TempoSprite2DPool {
+public class TempoSpritePool {
 
 
-    private static TempoSprite2DPool sprite2DPool = null;
+    private static TempoSpritePool sprite2DPool = null;
 
-    public static TempoSprite2DPool get(){
+    public static TempoSpritePool get(){
         if(sprite2DPool == null){
-            sprite2DPool = new TempoSprite2DPool();
+            sprite2DPool = new TempoSpritePool();
         }
         return sprite2DPool;
     }
 
     private HashMap<Data.TileType, TextureRegion> tileSprites;
-    private HashMap<Assets.HighlightedTile, TextureRegion> uiSprites;
+    private HashMap<Assets.AreaColor, TextureRegion> uiSprites;
     private TextureRegion blackBGSprite;
     private HashMap<Data.AnimationId, TextureRegion> unitSprites;
     private HashMap<Data.AnimationId, TextureRegion> foeSprites;
@@ -37,10 +38,25 @@ public class TempoSprite2DPool {
     private TextureRegion bridgeInConstruction;
     private TextureRegion towerInConstruction;
 
+    public HashMap<Assets.AreaColor,Sprite> topLeftCorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> topRightCorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> bottomLeftCorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> bottomRightCorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> middle = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> westStraight = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> northStraight = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> southStraight = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> eastStraight = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> topLeftAnticorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> topRightAnticorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> bottomLeftAnticorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Assets.AreaColor,Sprite> bottomRightAnticorner = new HashMap<Assets.AreaColor, Sprite>();
 
-    private TempoSprite2DPool(){
+
+
+    private TempoSpritePool(){
         this.tileSprites = new HashMap<Data.TileType, TextureRegion>();
-        this.uiSprites = new HashMap<Assets.HighlightedTile, TextureRegion>();
+        this.uiSprites = new HashMap<Assets.AreaColor, TextureRegion>();
         this.unitSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.foeSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.weaponSprites = new HashMap<Data.Weapon, TextureRegion>();
@@ -58,6 +74,8 @@ public class TempoSprite2DPool {
             TextureRegion region;
             String regionName;
             TextureAtlas atlas;
+
+
             if(asm.isLoaded(Assets.ATLAS_TILES)) {
                 atlas = asm.get(Assets.ATLAS_TILES);
                 for (Data.TileType tileType : Data.TileType.values()) {
@@ -70,6 +88,7 @@ public class TempoSprite2DPool {
                 bridgeInConstruction = atlas.findRegion("future_bridge");
                 towerInConstruction = atlas.findRegion("future_watch_tower");
             }
+
 
             if(asm.isLoaded(Assets.ATLAS_UNITS)) {
                 atlas = asm.get(Assets.ATLAS_UNITS);
@@ -147,13 +166,77 @@ public class TempoSprite2DPool {
 
             if(asm.isLoaded(Assets.ATLAS_UI)) {
                 atlas = asm.get(Assets.ATLAS_UI);
-                for(Assets.HighlightedTile id : Assets.HighlightedTile.values()){
+                for(Assets.AreaColor id : Assets.AreaColor.values()){
                     region = atlas.findRegion(Assets.getTileHighlighted(id));
                     if(region != null )
                         uiSprites.put(id, region);
                 }
 
                 blackBGSprite = atlas.findRegion(Assets.UI_BLACK_BACKGROUND);
+
+                // SET AREA COLOR SPRITE
+                Sprite sprite;
+                for(Assets.AreaColor id: Assets.AreaColor.values()){
+                    region = atlas.findRegion(Assets.getTileHighlighted(id));
+                    TextureRegion[][] assets = region.split(region.getRegionWidth()/2, region.getRegionHeight()/2);
+
+                    sprite = new Sprite(assets[0][0]);
+                    sprite.setSize(0.5f,0.5f);
+                    topLeftCorner.put(id, sprite);
+                    sprite = new Sprite(assets[0][0]);
+                    sprite.setSize(0.5f,0.5f);
+                    sprite.rotate90(true);
+                    topRightCorner.put(id, sprite);
+                    sprite = new Sprite(assets[0][0]);
+                    sprite.rotate90(false);
+                    sprite.setSize(0.5f,0.5f);
+                    bottomLeftCorner.put(id, sprite);
+                    sprite = new Sprite(assets[0][0]);
+                    sprite.setSize(0.5f,0.5f);
+                    sprite.rotate90(true);
+                    sprite.rotate90(true);
+                    bottomRightCorner.put(id, sprite);
+
+
+
+                    sprite = new Sprite(assets[1][0]);
+                    sprite.setSize(0.5f,0.5f);
+                    middle.put(id, sprite);
+
+                    sprite = new Sprite(assets[0][1]);
+                    sprite.setSize(0.5f,0.5f);
+                    westStraight.put(id, sprite);
+                    sprite = new Sprite(assets[0][1]);
+                    sprite.setSize(0.5f,0.5f);
+                    sprite.rotate90(true);
+                    northStraight.put(id, sprite);
+                    sprite = new Sprite(assets[0][1]);
+                    sprite.rotate90(false);
+                    sprite.setSize(0.5f,0.5f);
+                    southStraight.put(id, sprite);
+                    sprite = new Sprite(assets[0][1]);
+                    sprite.setSize(0.5f,0.5f);
+                    sprite.rotate90(true);
+                    sprite.rotate90(true);
+                    eastStraight.put(id, sprite);
+
+                    sprite = new Sprite(assets[1][1]);
+                    sprite.setSize(0.5f,0.5f);
+                    topLeftAnticorner.put(id, sprite);
+                    sprite = new Sprite(assets[1][1]);
+                    sprite.setSize(0.5f,0.5f);
+                    sprite.rotate90(true);
+                    topRightAnticorner.put(id, sprite);
+                    sprite = new Sprite(assets[1][1]);
+                    sprite.rotate90(false);
+                    sprite.setSize(0.5f,0.5f);
+                    bottomLeftAnticorner.put(id, sprite);
+                    sprite = new Sprite(assets[1][1]);
+                    sprite.setSize(0.5f,0.5f);
+                    sprite.rotate90(true);
+                    sprite.rotate90(true);
+                    bottomRightAnticorner.put(id, sprite);
+                }
             }
 
         }
@@ -164,7 +247,7 @@ public class TempoSprite2DPool {
         return tileSprites.get(tileType);
     }
 
-    public TextureRegion getUISprite(Assets.HighlightedTile id) {
+    public TextureRegion getUISprite(Assets.AreaColor id) {
         return uiSprites.get(id);
     }
 

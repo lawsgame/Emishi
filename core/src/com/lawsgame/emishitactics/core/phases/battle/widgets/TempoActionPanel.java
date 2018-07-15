@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
+import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 
@@ -55,7 +55,7 @@ public abstract class TempoActionPanel extends ActionPanel{
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(TempoSprite2DPool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
+        batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
         BattlePhase.testFont.draw(batch, description, getX() + X_TEXT_OFFSET, getY() + getHeight() - Y_TEXT_OFFSET);
     }
 

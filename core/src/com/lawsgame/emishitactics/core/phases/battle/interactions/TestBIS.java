@@ -12,11 +12,11 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoArea;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Area;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoAreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 
 public class TestBIS extends BattleInteractionState {
-    Area ar;
+    AreaWidget ar;
     Array<int[]> path;
     Unit guineapig;
     Unit warlord;
@@ -24,14 +24,14 @@ public class TestBIS extends BattleInteractionState {
     Unit soldier1;
     Unit soldier2;
     Unit soldier3;
-    Area bannerArea;
+    AreaWidget bannerAreaWidget;
     BattleCommand testCommand;
     boolean commandExecutionMode = false;
 
     public TestBIS(BattleInteractionMachine bis) {
         super(bis, true, true, true);
-        ar = new TempoArea(bis.asm, bis.battlefield, Assets.HighlightedTile.ACTION_RANGE);
-        //ar =  new TempoArea(bim.asm, bim.battlefield, Assets.HighlightedTile.ACTION_RANGE, path);
+        ar = new TempoAreaWidget(bis.battlefield, Assets.AreaColor.ACTION_RANGE);
+        //ar =  new TempoAreaWidget(bim.asm, bim.battlefield, Assets.AreaColor.ACTION_RANGE, path);
         guineapig = bis.battlefield.getUnit(5,7);
         path = new Array<int[]>();
 
@@ -100,8 +100,8 @@ public class TestBIS extends BattleInteractionState {
         bis.battlefield.deployUnit(8,8,soldier1);
 
         //BANNER_RANGE TEST
-        bannerArea =  new TempoArea(bis.asm, bis.battlefield, Assets.HighlightedTile.COVERING_FIRE);
-        bannerArea.addTiles(Utils.getEreaFromRange(bis.battlefield,6,8,1,army.getBannerRange()));
+        bannerAreaWidget =  new TempoAreaWidget(bis.battlefield, Assets.AreaColor.BANNER_RANGE);
+        bannerAreaWidget.setTiles(Utils.getEreaFromRange(bis.battlefield,6,8,1,army.getBannerRange()));
         System.out.println("BANNER_RANGE TEST");
         System.out.println("warlord   : "+warlord.isStandardBearer());
         System.out.println("warchief1 : "+warchief1.isStandardBearer());
@@ -143,7 +143,7 @@ public class TestBIS extends BattleInteractionState {
     @Override
     public void renderBetween(SpriteBatch batch) {
         ar.render(batch);
-        bannerArea.render(batch);
+        bannerAreaWidget.render(batch);
 
     }
 
@@ -156,8 +156,8 @@ public class TestBIS extends BattleInteractionState {
     @Override
     public void handleTouchInput(int r, int c) {
         System.out.println("");
-        System.out.println("row : "+r);
-        System.out.println("col : "+c);
+        System.out.println("row touched : "+r);
+        System.out.println("col touched : "+c);
         int[] unitPos = bim.battlefield.getUnitPos(soldier1);
 
         if(commandExecutionMode){
@@ -175,23 +175,43 @@ public class TestBIS extends BattleInteractionState {
         }else {
 
             // MOVE TEST
-            /*
-            if(unitPos != null) {
-                ar.reset();
-                bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
-                path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.PassiveAbility.PATHFINDER), soldier1.getAllegeance());
-                bim.battlefield.notifyAllObservers(path);
-                ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
-            }
-            */
 
+            if(unitPos != null) {
+                path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.Ability.PATHFINDER), soldier1.getAllegeance());
+                if(path.size > 0) {
+
+
+
+                    bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
+
+                    /*
+                    Array<int[]> moveArea = bim.battlefield.getMoveArea(r, c);
+                    System.out.println(moveArea.size);
+                    for(int i = 0; i < moveArea.size; i++){
+                        System.out.println("MA : "+ moveArea.get(i)[0]+ " "+ moveArea.get(i)[1]);
+                    }*/
+
+
+                    ar.setTiles(bim.battlefield.getMoveArea(r, c));
+
+
+                    //System.out.println(ar.getModel().toString());
+
+
+                    bim.battlefield.notifyAllObservers(path);
+
+                }
+            }
+
+            /*
             if (unitPos != null) {
-                ar.reset();
                 bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
                 path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.Ability.PATHFINDER), soldier1.getAllegeance());
                 bim.battlefield.notifyAllObservers(new int[]{r, c});
-                //ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
+                unitPos = bim.battlefield.getUnitPos(soldier1);
+                ar.setTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
             }
+            */
 
 
                 //IMPACT AREA TEST
@@ -201,7 +221,7 @@ public class TestBIS extends BattleInteractionState {
                 unitPos = bim.getBattlefield().getUnitPos(soldier1);
                 //path = bim.battlefield.getImpactArea(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
                 path = bim.getBattlefield().getTargetFromCollateral(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
-                ar.addTiles(path);
+                ar.set(path);
             }
             */
 
@@ -282,11 +302,9 @@ public class TestBIS extends BattleInteractionState {
 
             // DAMAGE DEALING TEST
             if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-                System.out.println("Damage received!");
                 warlord.applyDamage(3, false, true);
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
-                System.out.println("Kill!");
                 warlord.applyDamage(300, false, true);
             }
 

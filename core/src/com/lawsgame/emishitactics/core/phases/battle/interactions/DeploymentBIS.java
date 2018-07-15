@@ -1,21 +1,20 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoArea;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Area;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoAreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 
 public class DeploymentBIS extends BattleInteractionState {
     int rowUnit;
     int colUnit;
     Unit sltdUnit;
-    Area moveArea;
-    Area deploymentArea;
+    AreaWidget moveAreaWidget;
+    AreaWidget deploymentAreaWidget;
 
     boolean initialized;
 
@@ -28,14 +27,14 @@ public class DeploymentBIS extends BattleInteractionState {
         this.colUnit = warlordPos[1];
         highlight(rowUnit, colUnit);
         focusOn(rowUnit, colUnit, true);
-        this.deploymentArea = new TempoArea(bim.asm, bim.battlefield, Assets.HighlightedTile.DEPLOYMENT, bim.battlefield.getDeploymentArea());
+        this.deploymentAreaWidget = new TempoAreaWidget(bim.battlefield, Assets.AreaColor.DEPLOYMENT, bim.battlefield.getDeploymentArea());
 
     }
 
     @Override
     public void init() {
         if(initialized) {
-            this.moveArea = new TempoArea(bim.asm, bim.battlefield, Assets.HighlightedTile.MOVE_RANGE, bim.battlefield.getMoveArea(rowUnit, colUnit));
+            this.moveAreaWidget = new TempoAreaWidget(bim.battlefield, Assets.AreaColor.MOVE_RANGE, bim.battlefield.getMoveArea(rowUnit, colUnit));
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
             focusOn(rowUnit, colUnit, true);
             highlight(rowUnit, colUnit);
@@ -58,7 +57,7 @@ public class DeploymentBIS extends BattleInteractionState {
                 init();
             }
         }else if(sltdUnit.isPlayerControlled()
-                && deploymentArea.contains(row, col)
+                && deploymentAreaWidget.contains(row, col)
                 && bim.battlefield.isTileAvailable(row, col, sltdUnit.has(Data.Ability.PATHFINDER))){
             // if the selected unit belongs to the player's army and the tile at (row, col) is available and within the deployment area, then redeploy the unit
             bim.battlefield.moveUnit(rowUnit, colUnit, row, col);
@@ -81,9 +80,9 @@ public class DeploymentBIS extends BattleInteractionState {
 
     @Override
     public void renderBetween(SpriteBatch batch) {
-        deploymentArea.render(batch);
-        if(moveArea != null)
-            moveArea.render(batch);
+        deploymentAreaWidget.render(batch);
+        if(moveAreaWidget != null)
+            moveAreaWidget.render(batch);
     }
 
     @Override
