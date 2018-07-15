@@ -330,37 +330,48 @@ public class Data {
         }
     }
 
-    public enum OffensiveAbility {
-        FOCUSED_BLOW,
-        CRIPPLING_BLOW,
-        SWIRLING_BLOW,
-        SWIFT_BLOW,
-        HEAVY_BLOW,
-        CRUNCHING_BLOW,
-        WAR_CRY,
-        POISONOUS_ATTACK,
-        HARASS,
-        LINIENT_BLOW,
-        FURY,
+    public enum AbilityType{
+        OFFENSIVE,
+        SUPPORT,
+        PASSIVE,
         NONE
     }
 
-    public enum SupportAbility {
-        COVER,
-        PRAY,
-        HEAL,
-        STEAL,
-        BUILD,
-        GUARD,
-        NONE
-    }
+    public enum Ability {
+        FOCUSED_BLOW(AbilityType.OFFENSIVE),
+        CRIPPLING_BLOW(AbilityType.OFFENSIVE),
+        SWIRLING_BLOW(AbilityType.OFFENSIVE),
+        SWIFT_BLOW(AbilityType.OFFENSIVE),
+        HEAVY_BLOW(AbilityType.OFFENSIVE),
+        CRUNCHING_BLOW(AbilityType.OFFENSIVE),
+        WAR_CRY(AbilityType.OFFENSIVE),
+        POISONOUS_ATTACK(AbilityType.OFFENSIVE),
+        HARASS(AbilityType.OFFENSIVE),
+        LINIENT_BLOW(AbilityType.OFFENSIVE),
+        FURY(AbilityType.OFFENSIVE),
 
-    public enum PassiveAbility{
-        NONE,
-        PATHFINDER,         // OK
-        UNBREAKABLE,
-        SHADOW,
-        VIGILANT
+        COVER(AbilityType.SUPPORT),
+        PRAY(AbilityType.SUPPORT),
+        HEAL(AbilityType.SUPPORT),
+        STEAL(AbilityType.SUPPORT),
+        BUILD(AbilityType.SUPPORT),
+        GUARD(AbilityType.SUPPORT),
+
+        PATHFINDER(AbilityType.PASSIVE),         // OK
+        UNBREAKABLE(AbilityType.PASSIVE),
+        SHADOW(AbilityType.PASSIVE),
+        VIGILANT(AbilityType.PASSIVE),
+        NONE(AbilityType.NONE);
+
+        AbilityType type;
+
+        Ability(AbilityType type) {
+            this.type = type;
+        }
+
+        public AbilityType getType() {
+            return type;
+        }
     }
 
     /**
@@ -435,7 +446,7 @@ public class Data {
         PUSH                (1, 1),
         PRAY                (1, 1),
         HEAL                (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        GUARD               (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE, new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        GUARD               (RangedBasedType.ONESELF),
         STEAL               (1, 1),
         BUILD               (1, 1),
         COVER               (RangedBasedType.ONESELF),
@@ -463,7 +474,7 @@ public class Data {
         private RangedBasedType rangeType;
         private int rangeMax;
         private int rangeMin;
-        private Array<int[]> impactArea;
+        private Array<int[]> impactArea; // area on which the action is performed.
 
 
         ActionChoice(RangedBasedType type, int rangeMax, int rangeMin , boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
@@ -664,10 +675,17 @@ public class Data {
     public enum JobTemplate {
         CONSCRIPT("conscript", "bushi",             4,  false, true, true,
                 new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA},
-                new Weapon[]{Weapon.NODACHI, Weapon.NAGINATA}),
+                new Weapon[]{Weapon.NODACHI, Weapon.NAGINATA},
+                Ability.NONE, Ability.NONE,
+                Ability.NONE, Ability.NONE,
+                new  Ability[]{Ability.BUILD, Ability.GUARD, Ability.COVER}),
+
         EMISHI( "emishi warrior", "emishi warrior", 4,  false, true, true,
                 new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI},
-                new Weapon[]{Weapon.KANABO});
+                new Weapon[]{Weapon.KANABO},
+                Ability.NONE, Ability.NONE,
+                Ability.NONE, Ability.NONE,
+                new  Ability[]{Ability.GUARD, Ability.COVER});
 
         private String recruitName;
         private String promotionName;
@@ -678,9 +696,21 @@ public class Data {
         private Weapon[] availableWeapons;
         private Weapon[] availableWeaponsAfterPromotion;
 
+        private Ability nativePassiveAbility;
+        private Ability nativePassiveAbilityUponPromotion;
+        private Ability nativeSupportAbility;
+        private Ability nativeSupportAbilityUponPromotion;
+        private Ability[] availableSupportAbilities;
+
+
         JobTemplate(String recruitName, String promotionName, int mobility, boolean possiblyHorseman, boolean possiblyHorsemanUnponPromotion, boolean standardBearer,
                     Weapon[] availableWeapons,
-                    Weapon[] availableWeaponsAfterPromotion) {
+                    Weapon[] availableWeaponsAfterPromotion,
+                    Ability nativePassiveAbility,
+                    Ability nativePassiveAbilityUponPromotion,
+                    Ability nativeSupportAbility,
+                    Ability nativeSupportAbilityUponPromotion,
+                    Ability[] availableSupportAbilities) {
             this.recruitName = recruitName;
             this.promotionName = promotionName;
             this.mobility = mobility;
@@ -695,6 +725,12 @@ public class Data {
             for(int i =0; i < availableWeapons.length; i++){
                 this.availableWeaponsAfterPromotion[i] = availableWeapons[i];
             }
+            this.nativePassiveAbility = nativePassiveAbility;
+            this.nativePassiveAbilityUponPromotion = nativePassiveAbilityUponPromotion;
+            this.nativeSupportAbility = nativeSupportAbility;
+            this.nativeSupportAbilityUponPromotion = nativeSupportAbilityUponPromotion;
+            this.availableSupportAbilities = availableSupportAbilities;
+
         }
 
         public String getRecruitName(){
@@ -728,15 +764,37 @@ public class Data {
         public boolean isPossiblyStandardBearerJob() {
             return possiblyStandardBearer;
         }
+
+        public Ability getNativePassiveAbility() {
+            return nativePassiveAbility;
+        }
+
+        public Ability getNativePassiveAbilityUponPromotion() {
+            return nativePassiveAbilityUponPromotion;
+        }
+
+        public Ability getNativeSupportAbility() {
+            return nativeSupportAbility;
+        }
+
+        public Ability getNativeSupportAbilityUponPromotion() {
+            return nativeSupportAbilityUponPromotion;
+        }
+
+        public Ability[] getAvailableSupportAbilities() {
+            return availableSupportAbilities;
+        }
     }
 
     public enum UnitTemplate {
         CONSCRIPT(1, JobTemplate.CONSCRIPT,
                 1, 1, 39, 11, 3, 3, 5, 3, 1,    0.20f, 0.00f, 0.70f, 0.15f, 0.50f, 0.35f, 0.20f, 0.30f, 0.35f,
-                0, 1, 10, 2, 3, 1, 3, 2, 3,     0.30f, 0.00f, 0.85f, 0.30f, 0.60f, 0.35f, 0.25f, 0.50f, 0.55f),
+                0, 1, 10, 2, 3, 1, 3, 2, 3,     0.30f, 0.00f, 0.85f, 0.30f, 0.60f, 0.35f, 0.25f, 0.50f, 0.55f,
+                new Ability[]{}),
         EMISHI_TRIBESMAN(1, JobTemplate.EMISHI,
                 1, 1, 33, 13, 4, 3, 2, 3, 3,    0.20f, 0.00f, 0.50f, 0.25f, 0.55f, 0.50f, 0.15f, 0.30f, 0.40f,
-                0, 1, 6, 2, 2, 2, 2, 2, 2,      0.30f, 0.00f, 0.60f, 0.30f, 0.60f, 0.55f, 0.15f, 0.50f, 0.50f);
+                0, 1, 6, 2, 2, 2, 2, 2, 2,      0.30f, 0.00f, 0.60f, 0.30f, 0.60f, 0.55f, 0.15f, 0.50f, 0.50f,
+                new Ability[]{});
 
         private int startLevel;
         private JobTemplate job;
@@ -781,7 +839,10 @@ public class Data {
         private float proGrowthSk;
         private float proGrowthBr;
 
-        UnitTemplate(int startLevel, JobTemplate job, int baseCha, int baseLd, int baseHP, int baseStr, int baseDex, int baseAg, int baseDef, int baseSk, int baseBr, float growthCha, float growthLd, float growthHP, float growthStr, float growthDex, float growthAg, float growthDef, float growthSk, float growthBr, int proBoCha, int proBoLd, int proBoHP, int proBoStr, int proBoDex, int proBoAg, int proBoDef, int proBoSk, int proBoBr, float proGrowthCha, float proGrowthLd, float getProGrowthHP, float proGrowthStr, float proGrowthDex, float proGrowthAg, float proGrowthDef, float proGrowthSk, float proGrowthBr) {
+        private Ability[] offensiveAbilityChoices;
+
+        UnitTemplate(int startLevel, JobTemplate job, int baseCha, int baseLd, int baseHP, int baseStr, int baseDex, int baseAg, int baseDef, int baseSk, int baseBr, float growthCha, float growthLd, float growthHP, float growthStr, float growthDex, float growthAg, float growthDef, float growthSk, float growthBr, int proBoCha, int proBoLd, int proBoHP, int proBoStr, int proBoDex, int proBoAg, int proBoDef, int proBoSk, int proBoBr, float proGrowthCha, float proGrowthLd, float getProGrowthHP, float proGrowthStr, float proGrowthDex, float proGrowthAg, float proGrowthDef, float proGrowthSk, float proGrowthBr,
+                     Ability[] offensiveAbilityChoices) {
             this.startLevel = startLevel;
             this.job = job;
             this.baseCha = baseCha;
@@ -820,6 +881,7 @@ public class Data {
             this.proGrowthDef = proGrowthDef;
             this.proGrowthSk = proGrowthSk;
             this.proGrowthBr = proGrowthBr;
+            this.offensiveAbilityChoices = offensiveAbilityChoices;
         }
 
         public int getBaseLd() {
@@ -974,8 +1036,8 @@ public class Data {
             return proGrowthBr;
         }
 
-        public  static UnitTemplate getStandard(){
-            return CONSCRIPT;
+        public Ability[] getOffensiveAbilityChoices() {
+            return offensiveAbilityChoices;
         }
     }
 

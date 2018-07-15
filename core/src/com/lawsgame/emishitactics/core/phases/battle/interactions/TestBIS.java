@@ -188,7 +188,7 @@ public class TestBIS extends BattleInteractionState {
             if (unitPos != null) {
                 ar.reset();
                 bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
-                path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.PassiveAbility.PATHFINDER), soldier1.getAllegeance());
+                path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.Ability.PATHFINDER), soldier1.getAllegeance());
                 bim.battlefield.notifyAllObservers(new int[]{r, c});
                 //ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
             }

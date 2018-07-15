@@ -59,7 +59,7 @@ public class DeploymentBIS extends BattleInteractionState {
             }
         }else if(sltdUnit.isPlayerControlled()
                 && deploymentArea.contains(row, col)
-                && bim.battlefield.isTileAvailable(row, col, sltdUnit.has(Data.PassiveAbility.PATHFINDER))){
+                && bim.battlefield.isTileAvailable(row, col, sltdUnit.has(Data.Ability.PATHFINDER))){
             // if the selected unit belongs to the player's army and the tile at (row, col) is available and within the deployment area, then redeploy the unit
             bim.battlefield.moveUnit(rowUnit, colUnit, row, col);
             bim.battlefield.notifyAllObservers(new int[]{row, col});

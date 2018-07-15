@@ -241,21 +241,24 @@ public class BattlefieldLoader {
                 }
             }
             if(attributeElt.get("id") == "offensive ability"){
-                for(OffensiveAbility ability: OffensiveAbility.values()){
+                for(Ability ability: Ability.values()){
                     if(ability.name().equals(attributeElt.get("value"))){
-                        unit.setOffensiveActiveAbility(ability);
+                        if(ability.getType() == AbilityType.OFFENSIVE || ability.getType() == AbilityType.NONE)
+                            unit.setOffensiveActiveAbility(ability);
                     }
                 }
             }else if(attributeElt.get("id") == "passive ability"){
-                for(PassiveAbility ability: PassiveAbility.values()){
+                for(Ability ability: Ability.values()){
                     if(ability.name().equals(attributeElt.get("value"))){
-                        unit.setPassiveAbility(ability);
+                        if(ability.getType() == AbilityType.PASSIVE || ability.getType() == AbilityType.NONE)
+                            unit.setPassiveAbility(ability);
                     }
                 }
             }else if(attributeElt.get("id") == "support ability"){
-                for(SupportAbility ability: SupportAbility.values()){
+                for(Ability ability: Ability.values()){
                     if(ability.name().equals(attributeElt.get("value"))){
-                        unit.setSupportActiveAbility(ability);
+                        if(ability.getType() == AbilityType.SUPPORT || ability.getType() == AbilityType.NONE)
+                            unit.setSupportActiveAbility(ability);
                     }
                 }
             }else if(attributeElt.get("id") == "item"){

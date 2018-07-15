@@ -323,7 +323,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case LINIENT_BLOW:
             case FURY:
                 unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly());
-                for(Data.OffensiveAbility ability : Data.OffensiveAbility.values()) {
+                for(Data.Ability ability : Data.Ability.values()) {
                     if(ability.name().equals(id.name()))
                         offabbTexture = TempoSprite2DPool.get().getOffensiveAbbSprite(ability);
                 }

@@ -31,7 +31,7 @@ public class TempoSprite2DPool {
     private TextureRegion unitDoneSprite;
     private HashMap<Data.Weapon, TextureRegion> weaponSprites;
     private HashMap<Data.Orientation, TextureRegion> orientationSprites;
-    private HashMap<Data.OffensiveAbility, TextureRegion> offensiveAbilitySprites;
+    private HashMap<Data.Ability, TextureRegion> offensiveAbilitySprites;
     private TextureRegion shieldSprite;
     private TextureRegion mountedSprite;
     private TextureRegion bridgeInConstruction;
@@ -45,7 +45,7 @@ public class TempoSprite2DPool {
         this.foeSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.weaponSprites = new HashMap<Data.Weapon, TextureRegion>();
         this.orientationSprites = new HashMap<Data.Orientation, TextureRegion>();
-        this.offensiveAbilitySprites = new HashMap<Data.OffensiveAbility, TextureRegion>();
+        this.offensiveAbilitySprites = new HashMap<Data.Ability, TextureRegion>();
         shieldSprite = null;
         mountedSprite = null;
         unitDoneSprite = null;
@@ -132,17 +132,17 @@ public class TempoSprite2DPool {
                 orientationSprites.put(Data.Orientation.WEST, iconRegions[3][14]);
                 orientationSprites.put(Data.Orientation.SOUTH, iconRegions[3][15]);
 
-                offensiveAbilitySprites.put(Data.OffensiveAbility.FOCUSED_BLOW,    offabbRegions[0][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.CRIPPLING_BLOW,  offabbRegions[1][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.SWIRLING_BLOW,   offabbRegions[2][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.SWIFT_BLOW,      offabbRegions[3][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.HEAVY_BLOW,      offabbRegions[4][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.CRUNCHING_BLOW,  offabbRegions[5][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.WAR_CRY,         offabbRegions[6][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.POISONOUS_ATTACK, offabbRegions[7][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.HARASS,          offabbRegions[8][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.LINIENT_BLOW,    offabbRegions[9][8]);
-                offensiveAbilitySprites.put(Data.OffensiveAbility.FURY,            offabbRegions[10][8]);
+                offensiveAbilitySprites.put(Data.Ability.FOCUSED_BLOW,    offabbRegions[0][8]);
+                offensiveAbilitySprites.put(Data.Ability.CRIPPLING_BLOW,  offabbRegions[1][8]);
+                offensiveAbilitySprites.put(Data.Ability.SWIRLING_BLOW,   offabbRegions[2][8]);
+                offensiveAbilitySprites.put(Data.Ability.SWIFT_BLOW,      offabbRegions[3][8]);
+                offensiveAbilitySprites.put(Data.Ability.HEAVY_BLOW,      offabbRegions[4][8]);
+                offensiveAbilitySprites.put(Data.Ability.CRUNCHING_BLOW,  offabbRegions[5][8]);
+                offensiveAbilitySprites.put(Data.Ability.WAR_CRY,         offabbRegions[6][8]);
+                offensiveAbilitySprites.put(Data.Ability.POISONOUS_ATTACK, offabbRegions[7][8]);
+                offensiveAbilitySprites.put(Data.Ability.HARASS,          offabbRegions[8][8]);
+                offensiveAbilitySprites.put(Data.Ability.LINIENT_BLOW,    offabbRegions[9][8]);
+                offensiveAbilitySprites.put(Data.Ability.FURY,            offabbRegions[10][8]);
             }
 
             if(asm.isLoaded(Assets.ATLAS_UI)) {
@@ -196,7 +196,7 @@ public class TempoSprite2DPool {
         return orientationSprites.get(orientation);
     }
 
-    public TextureRegion getOffensiveAbbSprite(Data.OffensiveAbility offensiveAbility){
+    public TextureRegion getOffensiveAbbSprite(Data.Ability offensiveAbility){
         return offensiveAbilitySprites.get(offensiveAbility);
     }
 

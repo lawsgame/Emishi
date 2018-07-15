@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
-import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
 import com.lawsgame.emishitactics.core.constants.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -280,7 +279,7 @@ public class Battlefield extends Observable {
                 continue;
             }
         }
-        if(isTileAvailable(row, col, unit.has(PassiveAbility.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
+        if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
             this.units[row][col] = unit;
             notifyAllObservers(new int[]{row, col});
         }
@@ -301,7 +300,7 @@ public class Battlefield extends Observable {
         if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2)){
             Unit unit1 = getUnit(rowUnit1, colUnit1);
             Unit unit2 = getUnit(rowUnit2, colUnit2);
-            if(isTileReachable(rowUnit1, colUnit1, unit2.has(PassiveAbility.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(PassiveAbility.PATHFINDER)))){
+            if(isTileReachable(rowUnit1, colUnit1, unit2.has(Data.Ability.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(Data.Ability.PATHFINDER)))){
                 this.units[rowUnit2][colUnit2] = unit1;
                 this.units[rowUnit1][colUnit1] = unit2;
                 return true;
@@ -313,7 +312,7 @@ public class Battlefield extends Observable {
     public boolean moveUnit(int rowI, int colI, int rowf, int colf){
         if(isTileOccupied(rowI, colI)) {
             Unit unit = getUnit(rowI, colI);
-            if(isTileAvailable(rowf, colf, unit.has(PassiveAbility.PATHFINDER))){
+            if(isTileAvailable(rowf, colf, unit.has(Data.Ability.PATHFINDER))){
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
                 return true;
@@ -418,40 +417,6 @@ public class Battlefield extends Observable {
         return false;
     }
 
-     public boolean isGuardianAtRange(int row, int  col){
-        if(isTileOccupied(row, col)) {
-            Unit unit = getUnit(row, col);
-            for (int r = row - 1; r < row + 2; r++) {
-                for (int c = col - 1; c < col + 2; c++) {
-                    if (isTileOccupied(r, c)
-                            && Utils.dist(row, col, r, c) > 0
-                            && getUnit(r, c).sameSquadAs(unit)
-                            && getUnit(r, c).isGuarding()) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public Array<Unit> getNearbyGardiens(int row, int col) {
-        Array<Unit> units = new Array<Unit>();
-        if(isTileOccupied(row, col)) {
-            Unit unit = getUnit(row, col);
-            for (int r = row - 1; r < row + 2; r++) {
-                for (int c = col - 1; c < col + 2; c++) {
-                    if (isTileOccupied(r, c)
-                            && Utils.dist(row, col, r, c) > 0
-                            && getUnit(r, c).sameSquadAs(unit)
-                            && getUnit(r, c).isGuarding()) {
-                        units.add(getUnit(r, c));
-                    }
-                }
-            }
-        }
-        return units;
-    }
 
     public void setAsPlain() {
         if(tiles != null){
@@ -498,7 +463,7 @@ public class Battlefield extends Observable {
             if(bf.isTileOccupied(rowActor, colActor)) {
                 // get actor relevant pieces of information
                 Unit actor = bf.getUnit(rowActor, colActor);
-                this.pathfinder = actor.has(PassiveAbility.PATHFINDER);
+                this.pathfinder = actor.has(Data.Ability.PATHFINDER);
                 this.moveRange = actor.hasMoved() ? 0 : actor.getCurrentMob();
                 this.allegeance = actor.getAllegeance();
                 this.battlefield = bf;

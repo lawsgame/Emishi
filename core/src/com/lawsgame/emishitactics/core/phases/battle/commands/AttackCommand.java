@@ -76,7 +76,7 @@ public class AttackCommand extends BattleCommand {
         if (battlefield.isTileOccupied(rowActor, colActor)) {
 
             Unit actor = battlefield.getUnit(rowActor, colActor);
-            if(battlefield.isTileAvailable(row, col, actor.has(Data.PassiveAbility.PATHFINDER))) {
+            if(battlefield.isTileAvailable(row, col, actor.has(Data.Ability.PATHFINDER))) {
 
                 Data.TileType tile = battlefield.getTile(row, col);
                 boolean bannerAtRange = battlefield.isStandardBearerAtRange(actor, row, col);

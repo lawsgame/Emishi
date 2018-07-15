@@ -6,10 +6,7 @@ import com.lawsgame.emishitactics.core.constants.Data.BannerSign;
 import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
 import com.lawsgame.emishitactics.core.constants.Data.Ethnicity;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
-import com.lawsgame.emishitactics.core.constants.Data.OffensiveAbility;
 import com.lawsgame.emishitactics.core.constants.Data.Orientation;
-import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
-import com.lawsgame.emishitactics.core.constants.Data.SupportAbility;
 import com.lawsgame.emishitactics.core.constants.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Data.UnitAppointmentErrorMsg;
 import com.lawsgame.emishitactics.core.constants.Data.UnitTemplate;
@@ -92,15 +89,16 @@ public class Unit extends Observable{
     protected Item item1 = Item.NONE;
     protected Item item2 = Item.NONE;
     protected boolean itemStealable = false;
-    protected PassiveAbility passiveAbility = PassiveAbility.NONE;
-    protected SupportAbility supportAbility = SupportAbility.NONE;
-    protected OffensiveAbility offensiveAbility = OffensiveAbility.NONE;
+    protected Data.Ability passiveAbility;
+    protected Data.Ability supportAbility;
+    protected Data.Ability offensiveAbility = Data.Ability.NONE;
     protected final Banner banner = new Banner();
 
     /**
      * battlefield execution related attributes
      */
     protected boolean guarding;
+    protected boolean covering;
     protected Orientation orientation = Orientation.SOUTH;
     protected Behaviour behaviour = Behaviour.PASSIVE;
     protected int numberOfOAUses = 0;
@@ -152,8 +150,10 @@ public class Unit extends Observable{
         this.job = (PROMOTION_LEVEL <= level)? template.getJob().getPromotionName() : template.getJob().getRecruitName();
         this.name = job;
         this.ethnicity = ethnicity;
-        setHorsemanValue();
         this.standardBearer = template.getJob().isPossiblyStandardBearerJob() && standardBearer;
+        setHorseman();
+        setPassiveAbility(template.getJob().getNativePassiveAbility());
+        setSupportActiveAbility(template.getJob().getNativeSupportAbility());
 
         this.mobility = template.getJob().getMobility();
         this.charisma = template.getBaseCha();
@@ -208,7 +208,10 @@ public class Unit extends Observable{
         this.job = template.getJob().getPromotionName();
         if(setWeapon(secondaryWeapon, false))
             this.secondaryWeapon = pickWeapon(false);
-        this.setHorsemanValue();
+        this.setHorseman();
+        setPassiveAbility(template.getJob().getNativePassiveAbilityUponPromotion());
+        setSupportActiveAbility(template.getJob().getNativeSupportAbilityUponPromotion());
+
 
         becomeHorsman = becomeHorsman && isHorseman();
 
@@ -801,15 +804,8 @@ public class Unit extends Observable{
         return itemStealable && item1 != null && item1 != Item.NONE;
     }
 
-    public boolean has(PassiveAbility abb) {
-        return abb == passiveAbility;
-    }
-
-    public boolean has(SupportAbility abb) {
-        return  abb == supportAbility; }
-
-    public boolean has(OffensiveAbility abb) {
-        return abb == offensiveAbility;
+    public boolean has(Data.Ability abb) {
+        return abb == passiveAbility || abb == offensiveAbility || abb == supportAbility;
     }
 
     public Banner getBanner() { return banner; }
@@ -866,18 +862,21 @@ public class Unit extends Observable{
         return bonus;
     }
 
-    public void setPassiveAbility(PassiveAbility pasAb) {
-        this.passiveAbility = pasAb;
+    public void setPassiveAbility(Data.Ability pasAb) {
+        if(pasAb.getType() == Data.AbilityType.PASSIVE || pasAb.getType() == Data.AbilityType.NONE)
+            this.passiveAbility = pasAb;
         notifyAllObservers(null);
     }
 
-    public void setSupportActiveAbility(SupportAbility supAb) {
-        this.supportAbility = supAb;
+    public void setSupportActiveAbility(Data.Ability supAb) {
+        if(supAb.getType() == Data.AbilityType.PASSIVE || supAb.getType() == Data.AbilityType.NONE)
+            this.supportAbility = supAb;
         notifyAllObservers(null);
     }
 
-    public void setOffensiveActiveAbility(OffensiveAbility offAb) {
-        this.offensiveAbility = offAb;
+    public void setOffensiveActiveAbility(Data.Ability offAb) {
+        if(offAb.getType() == Data.AbilityType.OFFENSIVE || offAb.getType() == Data.AbilityType.NONE)
+            this.offensiveAbility = offAb;
         notifyAllObservers(null);
     }
 
@@ -917,7 +916,7 @@ public class Unit extends Observable{
         return horseman;
     }
 
-    public void setHorsemanValue(){
+    public void setHorseman(){
         boolean canbehorseman = (isPromoted()) ? template.getJob().isPossiblyHorsemanUnponPromotion() : template.getJob().isPossiblyHorseman();
         if(!primaryWeapon.isFootmanOnly() && !secondaryWeapon.isFootmanOnly() && canbehorseman){
             horseman = true;
@@ -1150,15 +1149,15 @@ public class Unit extends Observable{
         return  critDamMod;
     }
 
-    public PassiveAbility getPassiveAbility() {
+    public Data.Ability getPassiveAbility() {
         return passiveAbility;
     }
 
-    public SupportAbility getSupportAbility() {
+    public Data.Ability getSupportAbility() {
         return supportAbility;
     }
 
-    public OffensiveAbility getOffensiveAbility() {
+    public Data.Ability getOffensiveAbility() {
         return offensiveAbility;
     }
 
@@ -1269,6 +1268,14 @@ public class Unit extends Observable{
 
     public void setGuarding(boolean guarding) {
         this.guarding = guarding;
+    }
+
+    public boolean isCovering() {
+        return covering;
+    }
+
+    public void setCovering(boolean covering) {
+        this.covering = covering;
     }
 
     @Override
