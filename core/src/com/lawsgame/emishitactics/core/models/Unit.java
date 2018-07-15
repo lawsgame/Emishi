@@ -6,7 +6,6 @@ import com.lawsgame.emishitactics.core.constants.Data.BannerSign;
 import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
 import com.lawsgame.emishitactics.core.constants.Data.Ethnicity;
 import com.lawsgame.emishitactics.core.constants.Data.Item;
-import com.lawsgame.emishitactics.core.constants.Data.ItemType;
 import com.lawsgame.emishitactics.core.constants.Data.OffensiveAbility;
 import com.lawsgame.emishitactics.core.constants.Data.Orientation;
 import com.lawsgame.emishitactics.core.constants.Data.PassiveAbility;
@@ -487,7 +486,12 @@ public class Unit extends Observable{
     }
 
     public Array<Unit> getSquad(){
-        return army.getSquad(this);
+        Array<Unit> squad;
+        if(army != null)
+            squad = army.getSquad(this);
+        else
+            squad = new Array<Unit>();
+        return  squad;
     }
 
     public boolean isStandardBearer(){ return standardBearer; }
@@ -515,8 +519,8 @@ public class Unit extends Observable{
      */
 
 
-    public int getAbilityTriggerRate(boolean bannerAtRange){
-        return AB_TRIGGER_RATE_SKILL_FACTOR * getCurrentSk() + getChaChiefsBonus() + getSquadBannerBonus(BannerSign.IZANAGI, bannerAtRange);
+    public int getCurrentAbilityTriggerRate(boolean bannerAtRange){
+        return AB_TRIGGER_RATE_SKILL_FACTOR * getCurrentSk() + getChiefCharsima() + getSquadBannerBonus(BannerSign.IZANAGI, bannerAtRange);
     }
 
     public int getStealRate(Unit target, TileType stealerTile, boolean bannerAtRange){
@@ -527,7 +531,7 @@ public class Unit extends Observable{
     }
 
     public int getDropRate(boolean bannerAtRange){
-        return DEX_FAC_DROP_RATE * getCurrentDex(bannerAtRange) + getChaChiefsBonus()/2;
+        return DEX_FAC_DROP_RATE * getCurrentDex(bannerAtRange) + getChiefCharsima();
     }
 
     public int getAppHealPower(){
@@ -558,34 +562,6 @@ public class Unit extends Observable{
         return false;
     }
 
-    public int getLeadershipExperiencePoints(boolean[] secondaryObjectiveDone, int[] bonusSecondaryObjective, int nbOfTurnsToCompletion, int nbOfTurnMin, int nbOfTurnMax) {
-        float exp = 0f;
-        if(isWarChief()) {
-            int nbTurns;
-            if (nbOfTurnsToCompletion <= nbOfTurnMin) {
-                nbTurns = nbOfTurnMin;
-            } else if (nbOfTurnMax <= nbOfTurnsToCompletion) {
-                nbTurns = nbOfTurnMax;
-            } else {
-                nbTurns = nbOfTurnsToCompletion;
-            }
-
-            //calculate the base exp gained
-            exp = 100f * getAppGrowthRate(GrowthStat.LEADERSHIP) * ((float)(nbOfTurnMax - nbTurns)) / ((float)(nbOfTurnMax - nbOfTurnMin));
-
-            //factorize the size of the squad in the equation
-            exp *= 1f + (float)(getSquad().size - 1) / ((isWarlord())? MAX_UNITS_UNDER_WARLORD - 1: MAX_UNITS_UNDER_WAR_CHIEF - 1) ;
-
-            //add secondary objective completion bonus
-            for (int i = 0; i < secondaryObjectiveDone.length; i++) {
-                if (i < bonusSecondaryObjective.length && secondaryObjectiveDone[i]) {
-                    exp += bonusSecondaryObjective[i];
-                }
-            }
-        }
-        return (int)exp;
-    }
-
     public int addLeadershipExperience(int gainEXP) {
         this.commandmentExperience += gainEXP;
         int gainLd = this.commandmentExperience / Data.EXP_REQUIRED_LD_LEVEL_UP;
@@ -594,9 +570,44 @@ public class Unit extends Observable{
         return gainLd;
     }
 
-    public int getExperiencePoints(int defenderLevel){
-        double exp = EXP_BASE_MODIFIER * Math.atan((defenderLevel - getLevel())* LVL_GAP_FACTOR) - getLevel();
-        return (exp > 1) ? (int)exp : 1;
+    public static int getExperiencePoints(int attackerLevel, int defenderLevel, boolean killed, boolean withdrawn){
+        double exp = EXP_BASE_MODIFIER * Math.atan((defenderLevel - attackerLevel)* LVL_GAP_FACTOR) - attackerLevel;
+        if(withdrawn){
+            if(!killed){
+                exp += Data.EXP_BONUS_FROM_LETTING_ENEMY_FLEES;
+            }
+        }else{
+            exp *= Data.EXP_WOUNDED_ONLY_FACTOR;
+        }
+        exp = (exp < 99) ? exp : 99;
+        exp = (exp > 1) ? exp : 1;
+        return (int)exp;
+    }
+
+    public int getExperiencePoints(int defenderLevel, boolean killed, boolean withdrawn){
+        return Unit.getExperiencePoints(this.getLevel(), defenderLevel, killed, withdrawn);
+    }
+
+    public int getExperiencePointsPerUnitSquad(Array<Integer> lvlFleeingUnits){
+        int exp = 0;
+        Array<Unit> squad = getSquad();
+
+        if(squad.size > 0) {
+
+            int averageLvl = 0;
+            int squadsize = getSquad().size;
+            for (int i = 0; i < squad.size; i++) {
+                averageLvl = squad.get(i).getLevel();
+            }
+
+            averageLvl /=squadsize;
+            for (int i = 0; i < lvlFleeingUnits.size; i++) {
+                exp = Unit.getExperiencePoints(averageLvl, lvlFleeingUnits.get(i), false, true);
+            }
+            exp /= squadsize;
+
+        }
+        return exp;
     }
 
     public boolean addExperience(int exp) {
@@ -618,27 +629,27 @@ public class Unit extends Observable{
     }
 
     public int getAppAttackAccuracy(){
-        return getCurrentWeapon().getAccuracy() + getChaChiefsBonus()/2 + DEX_HIT_FACTOR* getAppDexterity();
+        return getCurrentWeapon().getAccuracy() + getChiefCharsima() + DEX_HIT_FACTOR* getAppDexterity();
     }
 
-    public int getHitRate(Unit defender, TileType defenderTile, boolean attackBannerAtRange, boolean defenderBannerAtRange){
-        int attackAcc = getCurrentWeapon().getAccuracy() + getChaChiefsBonus()/2 + DEX_HIT_FACTOR* getCurrentDex(attackBannerAtRange);
+    public int getHitRate(Unit defender, TileType defenderTile, boolean attackBannerAtRange){
+        int attackAcc = getCurrentWeapon().getAccuracy() + getChiefCharsima() + DEX_HIT_FACTOR* getCurrentDex(attackBannerAtRange);
         int defenderAvo = AGI_DODGE_FACTOR* defender.getCurrentAg(this.getCurrentWeapon()) + defenderTile.getAvoidBonus();
         int hitrate = attackAcc - defenderAvo;
         return hitrate;
     }
 
     public int geAppCriticalHitAccuracy(){
-        return getAppDexterity() + getAppSkill() + getChaChiefsBonus()/2;
+        return getAppDexterity() + getAppSkill() + getChiefCharsima();
     }
 
     public int getAppCriticalHitAvoidance(DamageType damageType){
-        return getAppAgility(damageType) + getAppSkill() + getChaChiefsBonus()/2;
+        return getAppAgility(damageType) + getAppSkill();
     }
 
     public int getCriticalHitRate(boolean attackerBannerAtRange, Unit defender, int currentHitRate){
-        int currentHitAcc = getCurrentDex(attackerBannerAtRange) + getCurrentSk() + getChaChiefsBonus()/2;
-        int currentHitAvo = defender.getCurrentDex(attackerBannerAtRange) + defender.getCurrentSk() + defender.getChaChiefsBonus()/2;
+        int currentHitAcc = getCurrentDex(attackerBannerAtRange) + getCurrentSk();
+        int currentHitAvo = defender.getCurrentDex(attackerBannerAtRange) + defender.getCurrentSk();
         int criticalHitrate = currentHitAcc - currentHitAvo;
         if(criticalHitrate > currentHitRate) criticalHitrate = currentHitRate  -1;
         if(criticalHitrate < 0 ) criticalHitrate = 0;
@@ -656,17 +667,17 @@ public class Unit extends Observable{
         return (int) (critMod*attackDamage - defenseDefender);
     }
 
-    public void receiveDamage(int attackMight, boolean moralDamageOnly, boolean notifyObservers){
-        if(this.currentMoral > attackMight){
+    public void applyDamage(int damageTaken, boolean moralDamageOnly, boolean notifyObservers){
+        if(this.currentMoral > damageTaken){
             // the unit survive
-            this.currentMoral -= attackMight;
-            if(!moralDamageOnly) this.currentHitPoints -= attackMight;
+            this.currentMoral -= damageTaken;
+            if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
 
         }else{
             // the unit dies or flies
-            if(this.currentHitPoints > attackMight){
+            if(this.currentHitPoints > damageTaken){
                 this.currentMoral = 0;
-                if(!moralDamageOnly) this.currentHitPoints -= attackMight;
+                if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
             }else{
                 this.currentMoral = 0;
                 if(!moralDamageOnly) this.currentHitPoints =0;
@@ -680,7 +691,7 @@ public class Unit extends Observable{
                     for(int i = 0; i < army.size; i++) {
                         for(int j = 0; j < army.get(i).size; j++){
                             if( i + j > 0) {
-                                army.get(i).get(j).receiveDamage((i == 0) ? moralDamage * 2 : moralDamage, true, notifyObservers);
+                                army.get(i).get(j).applyDamage((i == 0) ? moralDamage * 2 : moralDamage, true, notifyObservers);
 
                             }
                         }
@@ -688,22 +699,35 @@ public class Unit extends Observable{
                 }else{
                     Array<Unit> squad = getArmy().getSquad(this);
                     for(int i = 1; i < squad.size; i++){
-                        squad.get(i).receiveDamage(moralDamage, true, notifyObservers);
+                        squad.get(i).applyDamage(moralDamage, true,notifyObservers);
 
                     }
                 }
             }
         }
-        if(notifyObservers) notifyAllObservers(new DamageNotification(moralDamageOnly, attackMight));
+
+        /*
+         * that line can be explained as followed
+         * purpose : it follows the notification automatically subordinates who face moral damage without
+         * having notify the target (main defender) whose notification requires more paramaters to be sent,
+         * namely "critical" & "backstabé parameters, yet those parameters are irrelevant modelwise and shall not
+         * be added to this method signature.
+         * Therefore, adding the "&& moralDamageOnly" allows to elegantly accomplish all the points above.
+         */
+        if(notifyObservers && moralDamageOnly) notifyAllObservers(new DamageNotification(moralDamageOnly, damageTaken, false, false));
     }
 
     public static class DamageNotification{
         public boolean moralOnly;
         public int damageTaken;
+        public boolean critical;
+        public boolean backstab;
 
-        public DamageNotification (boolean moralOnly, int damageTaken){
+        public DamageNotification (boolean moralOnly, int damageTaken, boolean critical, boolean backstab){
             this.moralOnly = moralOnly;
             this.damageTaken = damageTaken;
+            this.critical = critical;
+            this.backstab = backstab;
         }
 
         public boolean isRelevant(){
@@ -766,10 +790,6 @@ public class Unit extends Observable{
 
     public boolean isUsing(Item eq){
         return item1 == eq || item2 == eq;
-    }
-
-    public boolean isUsingShield(){
-        return  (item1.getItemType() == ItemType.SHIELD && isUsing(item1)) || (item2.getItemType() == ItemType.SHIELD && isUsing(item2));
     }
 
     public void setItemStealable(boolean itemStealable) {
@@ -838,18 +858,10 @@ public class Unit extends Observable{
         return 1 + (int) ((isWarlord())? getAppLaedership()/6.0f: 0);
     }
 
-    public int getChaChiefsBonus(){
+    public int getChiefCharsima(){
         int bonus = 0;
-        if(army != null){
-            Array<Array<Unit>> squads = army.getAllSquads();
-            for(int i=0; i< squads.size; i++){
-                for(int j=0; j < squads.get(i).size; j++){
-                    if(squads.get(i).get(j) == this){
-                        bonus += (!squads.get(0).get(0).isOutOfCombat()) ? squads.get(0).get(0).getAppCharisma() : 0;
-                        bonus += (!squads.get(i).get(0).isOutOfCombat()) ? squads.get(i).get(0).getAppCharisma() : 0;
-                    }
-                }
-            }
+        if(isMobilized()){
+            bonus = getSquad().get(0).getAppCharisma();
         }
         return bonus;
     }
@@ -936,7 +948,7 @@ public class Unit extends Observable{
     }
 
     public int getAppMoral(){
-        int moral = Data.BRAVERY_MORAL_FACTOR*getAppBravery() + getChaChiefsBonus();
+        int moral = Data.BRAVERY_MORAL_FACTOR*getAppBravery() + getChiefCharsima();
         if(moral >= currentHitPoints) moral = currentHitPoints - 1;
         return moral;
     }
@@ -1011,7 +1023,7 @@ public class Unit extends Observable{
     public int getAppCurrentWeaponRangeMax(){ return (primaryWeaponEquipped) ? getAppPrimaryWeaponRangeMax() : getAppSecondaryWeaponRangeMex(); }
 
     public int getAppAbilityTriggerRate() {
-        return AB_TRIGGER_RATE_SKILL_FACTOR * getCurrentSk() + getChaChiefsBonus()/2;
+        return AB_TRIGGER_RATE_SKILL_FACTOR * getCurrentSk() + getChiefCharsima();
     }
 
     public int getCurrentMob(){ return getAppMobility(); }

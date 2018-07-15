@@ -20,11 +20,6 @@ public abstract class Area implements GameRenderableEntity{
     public abstract void addTiles(Array<int[]> area);
     public abstract void reset();
     public abstract boolean contains(int r, int c);
-
-    public boolean isVisible() {
-        return visible;
-    }
-
     public void setVisible(boolean visible) {
         this.visible = visible;
     }

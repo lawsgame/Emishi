@@ -8,6 +8,8 @@ import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoArea;
@@ -23,6 +25,8 @@ public class TestBIS extends BattleInteractionState {
     Unit soldier2;
     Unit soldier3;
     Area bannerArea;
+    BattleCommand testCommand;
+    boolean commandExecutionMode = false;
 
     public TestBIS(BattleInteractionMachine bis) {
         super(bis, true, true, true);
@@ -106,7 +110,7 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("soldier3  : "+soldier3.isStandardBearer());
 
 
-        soldier2.receiveDamage(3, false, false);
+        soldier2.applyDamage(3, false, false);
         System.out.println("\nJohnny hitpoints :"+ soldier2.getCurrentHitpoints() +"/"+ soldier2.getAppHitPoints());
         System.out.println("Johnny moral :"+ soldier2.getCurrentMoral() +"/"+soldier2.getAppMoral());
         System.out.println("wounded ? :"+ soldier2.isWounded()+"\n");
@@ -156,65 +160,86 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("col : "+c);
         int[] unitPos = bim.battlefield.getUnitPos(soldier1);
 
-        // MOVE TEST
+        if(commandExecutionMode){
 
-        if(unitPos != null) {
-            ar.reset();
-            bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
-            path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.PassiveAbility.PATHFINDER), soldier1.getAllegeance());
-            bim.battlefield.notifyAllObservers(path);
-            ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
+            //TEST COMMAND
+            testCommand = new AttackCommand(bim.bfr);
+            testCommand.setActor(unitPos[1], unitPos[2]);
+            testCommand.setTarget(r, c);
+            if(testCommand.isTargetValid()){
+                System.out.println("Chosen target valid!");
+                testCommand.execute();
+            }
+
+
+        }else {
+
+            // MOVE TEST
+            /*
+            if(unitPos != null) {
+                ar.reset();
+                bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
+                path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.PassiveAbility.PATHFINDER), soldier1.getAllegeance());
+                bim.battlefield.notifyAllObservers(path);
+                ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
+            }
+            */
+
+            if (unitPos != null) {
+                ar.reset();
+                bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
+                path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.PassiveAbility.PATHFINDER), soldier1.getAllegeance());
+                bim.battlefield.notifyAllObservers(new int[]{r, c});
+                //ar.addTiles(bim.battlefield.getMoveArea(unitPos[0], unitPos[1]));
+            }
+
+
+                //IMPACT AREA TEST
+            /*
+            if(unitPos != null) {
+                ar.reset();
+                unitPos = bim.getBattlefield().getUnitPos(soldier1);
+                //path = bim.battlefield.getImpactArea(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
+                path = bim.getBattlefield().getTargetFromCollateral(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
+                ar.addTiles(path);
+            }
+            */
+
+                //BUILD TEST
+                //bim.getBattlefield().build(unitPos[0], unitPos[1], r, c, true);
+
+                //GUARD TEST
+
+
+                //TARGET TILE VALIDITY TEST
+
+
+                //PANEL TEST
+
+            /*
+            bim.shortUnitPanel.hide();
+            bim.longUnitPanel.hide();
+            bim.longTilePanel.hide();
+            if(bim.battlefield.isTileOccupied(r,c)) {
+                bim.shortUnitPanel.set(bim.battlefield,r , c);
+                bim.shortUnitPanel.show();
+                bim.longUnitPanel.set(bim.battlefield, r, c);
+                bim.longUnitPanel.show();
+            }else{
+                bim.longTilePanel.set(bim.battlefield.getTile(r, c));
+                bim.longTilePanel.show();
+            }
+
+            bim.shortTilePanel.hide();
+            bim.shortTilePanel.set(bim.battlefield.getTile(r, c));
+            bim.shortTilePanel.show();
+            */
+
+            //CAMERA TEST
+            //bim.gcm.focusOn(c, r, true);
+
+
         }
-
-
-        //IMPACT AREA TEST
-        /*
-        if(unitPos != null) {
-            ar.reset();
-            unitPos = bim.getBattlefield().getUnitPos(soldier1);
-            //path = bim.battlefield.getImpactArea(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
-            path = bim.getBattlefield().getTargetFromCollateral(Data.ActionChoice.USE_SWIRLING_BLOW, unitPos[0], unitPos[1], r, c);
-            ar.addTiles(path);
-        }
-        */
-
-        //BUILD TEST
-        //bim.getBattlefield().build(unitPos[0], unitPos[1], r, c, true);
-
-        //GUARD TEST
-
-
-        //TARGET TILE VALIDITY TEST
-
-
-        //PANEL TEST
-
-        /*
-        bim.shortUnitPanel.hide();
-        bim.longUnitPanel.hide();
-        bim.longTilePanel.hide();
-        if(bim.battlefield.isTileOccupied(r,c)) {
-            bim.shortUnitPanel.set(bim.battlefield,r , c);
-            bim.shortUnitPanel.show();
-            bim.longUnitPanel.set(bim.battlefield, r, c);
-            bim.longUnitPanel.show();
-        }else{
-            bim.longTilePanel.set(bim.battlefield.getTile(r, c));
-            bim.longTilePanel.show();
-        }
-
-        bim.shortTilePanel.hide();
-        bim.shortTilePanel.set(bim.battlefield.getTile(r, c));
-        bim.shortTilePanel.show();
-        */
-
-        //CAMERA TEST
-        //bim.gcm.focusOn(c, r, true);
-
-
-
-
-
 
 
 
@@ -228,6 +253,7 @@ public class TestBIS extends BattleInteractionState {
     @Override
     public void update60(float dt) {
 
+
         // CHOICES TEST
         if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
             int[] coords = bim.battlefield.getUnitPos(warlord);
@@ -237,33 +263,51 @@ public class TestBIS extends BattleInteractionState {
             }
         }
 
-        // DAMAGE DEALING TEST
-        if(Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            System.out.println("Damage received!");
-            warlord.receiveDamage(3, false, true);
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.K)) {
-            System.out.println("Kill!");
-            warlord.receiveDamage(300, false, true);
-        }
+        //TEST COMMAND
+        if(testCommand != null)
+            testCommand.update(dt);
 
-        //TEST SWITCH POSITION
-        if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
-            int[] coords = bim.battlefield.getUnitPos(warlord);
-            int[] coords0 = bim.battlefield.getUnitPos(warchief1);
-            bim.battlefield.switchUnitsPosition(coords[0], coords[1], coords0[0], coords0[1]);
-            bim.battlefield.notifyAllObservers(new int[]{coords[0], coords[1], coords0[0], coords0[1]});
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
+            commandExecutionMode = !commandExecutionMode;
+            if(commandExecutionMode){
+                System.out.println("Command Execution Mode");
+            }else{
+                System.out.println("Normal Mode");
+            }
         }
 
-        //TEST HEAL
-        if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
-            warlord.notifyAllObservers(new int[]{warlord.getCurrentMoral(), warlord.getCurrentHitpoints()});
-            warlord.treated(warchief1.getCurrentHealPower());
-            warchief1.notifyAllObservers(Data.AnimationId.HEAL);
+        //OTHER TESTS
+        if(!commandExecutionMode) {
+
+            // DAMAGE DEALING TEST
+            if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+                System.out.println("Damage received!");
+                warlord.applyDamage(3, false, true);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+                System.out.println("Kill!");
+                warlord.applyDamage(300, false, true);
+            }
+
+            //TEST SWITCH POSITION
+            if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+                int[] coords = bim.battlefield.getUnitPos(warlord);
+                int[] coords0 = bim.battlefield.getUnitPos(warchief1);
+                bim.battlefield.switchUnitsPosition(coords[0], coords[1], coords0[0], coords0[1]);
+                bim.battlefield.notifyAllObservers(new int[]{coords[0], coords[1], coords0[0], coords0[1]});
+
+            }
+
+            //TEST HEAL
+            if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+                warlord.notifyAllObservers(new int[]{warlord.getCurrentMoral(), warlord.getCurrentHitpoints()});
+                warlord.treated(warchief1.getCurrentHealPower());
+                warchief1.notifyAllObservers(Data.AnimationId.HEAL);
+            }
+
+            //
+
         }
-
-        //
-
     }
 }

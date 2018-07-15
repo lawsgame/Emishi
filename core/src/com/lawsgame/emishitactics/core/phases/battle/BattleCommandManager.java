@@ -56,7 +56,7 @@ public class BattleCommandManager {
      * there is 3 types of requirements for an action to be performable by an actor
      *  - abiility type
      *  - equipement type (weapon mainly)
-     *  - target  type (checked by the method: Battlefield.atActionRange() and Battlefield.isTargetValid())
+     *  - target  type (checked by the method: BattleCommand.atActionRange() and Battlefield.isTargetValid())
      *
      * @return whether or not an action can be performed by the actor regardless the actor's history or target availability.
      */
@@ -85,9 +85,7 @@ public class BattleCommandManager {
             case USE_HARASS:            if(!actor.has(Data.OffensiveAbility.HARASS)) return false; break;
             case USE_LINIENT_BLOW:      if(!actor.has(Data.OffensiveAbility.LINIENT_BLOW)) return false; break;
             case USE_FURY:              if(!actor.has(Data.OffensiveAbility.FURY)) return false; break;
-            default:
-
-                return false;
+            default: return false;
         }
 
         // check EQUIPEMENT & WEAPON REQUIREMENTS

@@ -18,7 +18,7 @@ public class Data {
     public static final float SPEED_WALK = 3f;  //tile/s
     public static final float SPEED_PUSHED = 8f;
     public static final int OA_CHARGING_BAR_MAW_VALUE = 100;
-    public static final int BRAVERY_MORAL_FACTOR = 2;
+    public static final int BRAVERY_MORAL_FACTOR = 1;
     public static final int NB_BUILDING_MAX = 2;
 
     // item bonus
@@ -54,6 +54,8 @@ public class Data {
     public static final int EXP_BASE_MODIFIER = 50;
     public static final int EXP_REQUIRED_LEVEL_UP = 100;
     public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
+    public static final double EXP_WOUNDED_ONLY_FACTOR = 1.0/3.0;
+    public static final double EXP_BONUS_FROM_LETTING_ENEMY_FLEES = 20.0;
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
@@ -165,13 +167,13 @@ public class Data {
     }
 
     public enum Item {
-        YAYOI_SHIELD("yayoi shield", ItemType.SHIELD),
-        GREAT_SHIELD("great shield", ItemType.SHIELD),
-        TANKO_ARMOR("tanko armor", ItemType.PLASTRON),
-        KEIKO_ARMOR("keiko armor", ItemType.PLASTRON),
-        OYOROI_ARMOR("o yoroi armor", ItemType.PLASTRON),
-        EMISHI_LEGGINGS("emishi leggings", ItemType.LEGS),
-        YAMATO_TROUSERS("yamato trousers", ItemType.LEGS),
+        YAYOI_SHIELD("yayoi shield", ItemType.ARMOR),
+        GREAT_SHIELD("great shield", ItemType.ARMOR),
+        TANKO_ARMOR("tanko armor", ItemType.ARMOR),
+        KEIKO_ARMOR("keiko armor", ItemType.ARMOR),
+        OYOROI_ARMOR("o yoroi armor", ItemType.ARMOR),
+        EMISHI_LEGGINGS("emishi leggings", ItemType.ARMOR),
+        YAMATO_TROUSERS("yamato trousers", ItemType.ARMOR),
         ARMBAND("armband", ItemType.UNIQUE),
         GAUNLET("gaunlet", ItemType.UNIQUE),
         MASTER_BELT("master belt", ItemType.UNIQUE),
@@ -209,9 +211,7 @@ public class Data {
     }
 
     public enum ItemType {
-        SHIELD,
-        PLASTRON,
-        LEGS,
+        ARMOR,
         UNIQUE,
         NOTHING
     }
@@ -662,8 +662,12 @@ public class Data {
 
 
     public enum JobTemplate {
-        CONSCRIPT("conscript", "bushi",             4,  false, true, true, true, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA}, new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA, Weapon.NODACHI, Weapon.NAGINATA}),
-        EMISHI( "emishi warrior", "emishi warrior", 4,  false, true, true, true, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI}, new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI, Weapon.KANABO});
+        CONSCRIPT("conscript", "bushi",             4,  false, true, true,
+                new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA},
+                new Weapon[]{Weapon.NODACHI, Weapon.NAGINATA}),
+        EMISHI( "emishi warrior", "emishi warrior", 4,  false, true, true,
+                new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI},
+                new Weapon[]{Weapon.KANABO});
 
         private String recruitName;
         private String promotionName;
@@ -674,7 +678,9 @@ public class Data {
         private Weapon[] availableWeapons;
         private Weapon[] availableWeaponsAfterPromotion;
 
-        JobTemplate(String recruitName, String promotionName, int mobility, boolean possiblyHorseman, boolean possiblyHorsemanUnponPromotion, boolean allowedWieldShield, boolean standardBearer, Weapon[] availableWeapons, Weapon[] availableWeaponsAfterPromotion) {
+        JobTemplate(String recruitName, String promotionName, int mobility, boolean possiblyHorseman, boolean possiblyHorsemanUnponPromotion, boolean standardBearer,
+                    Weapon[] availableWeapons,
+                    Weapon[] availableWeaponsAfterPromotion) {
             this.recruitName = recruitName;
             this.promotionName = promotionName;
             this.mobility = mobility;
@@ -682,7 +688,13 @@ public class Data {
             this.possiblyHorsemanUnponPromotion = possiblyHorsemanUnponPromotion;
             this.possiblyStandardBearer = standardBearer;
             this.availableWeapons = availableWeapons;
-            this.availableWeaponsAfterPromotion = availableWeaponsAfterPromotion;
+            this.availableWeaponsAfterPromotion = new Weapon[availableWeapons.length + availableWeaponsAfterPromotion.length];
+            for(int i =0; i < availableWeapons.length; i++){
+                this.availableWeaponsAfterPromotion[i] = availableWeapons[i];
+            }
+            for(int i =0; i < availableWeapons.length; i++){
+                this.availableWeaponsAfterPromotion[i] = availableWeapons[i];
+            }
         }
 
         public String getRecruitName(){

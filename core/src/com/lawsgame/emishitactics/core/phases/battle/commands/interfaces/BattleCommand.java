@@ -1,11 +1,13 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 
@@ -40,7 +42,17 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
      * @return whether or not THIS SPECIFIC TARGET is at range by the actor performing the given action if one's is standing the tile (rowActor, colActor)
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public abstract boolean isTargetValid();
+    public boolean isTargetValid() {
+        return isTargetValid(rowTarget, colActor, rowTarget, colTarget);
+    }
+
+    /*
+    required for testing retaliation availability for the attacked target without copy and paste the code of the
+    BattleCommand.isTargetValid() method.
+     */
+    public abstract boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0);
+
+
 
     /**
      * AI ORIENTED METHOD
@@ -54,7 +66,6 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public abstract boolean atActionRange(int row, int col);
-
 
     /**
      *
@@ -88,33 +99,6 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
 
     /**
      *
-     * @param choice
-     * @param rowActor
-     * @param colActor
-     * @param rowImpactTile
-     * @param colImpactTile
-     * @return get all possible target tile knowing thtat the given tile is within the impact area
-     */
-    private Array<int[]> getTargetFromCollateral(Data.ActionChoice choice, int rowActor, int colActor, int rowImpactTile, int colImpactTile) {
-        Array<int[]> possibleTargetTiles = new Array<int[]>();
-        Array<int[]> impactArea;
-        int row;
-        int col;
-        for(Data.Orientation or: Data.Orientation.values()){
-            impactArea = choice.getOrientedImpactArea(or);
-            for(int i = 0; i < impactArea.size; i++){
-                row =rowImpactTile - impactArea.get(i)[0];
-                col =colImpactTile - impactArea.get(i)[1];
-                if(battlefield.isTileExisted(row, col) && or == Utils.getOrientationFromCoords(rowActor, colActor, row, col)){
-                    possibleTargetTiles.add(new int[]{row, col});
-                }
-            }
-        }
-        return possibleTargetTiles;
-    }
-
-    /**
-     *
      * @return the relevantly oriented impact area of an action performed by an actor while targeting the tile {rowTarget, colTarget}
      */
     public Array<int[]> getImpactArea(){
@@ -132,6 +116,32 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
         }
         return orientedArea;
     }
+
+
+    /**
+     *
+     * @param rowImpactTile
+     * @param colImpactTile
+     * @return get all possible target tile knowing that the given tile is within the impact area
+     */
+    protected Array<int[]> getTargetFromCollateral(int rowImpactTile, int colImpactTile) {
+        Array<int[]> possibleTargetTiles = new Array<int[]>();
+        Array<int[]> impactArea;
+        int row;
+        int col;
+        for(Data.Orientation or: Data.Orientation.values()){
+            impactArea = choice.getOrientedImpactArea(or);
+            for(int i = 0; i < impactArea.size; i++){
+                row =rowImpactTile - impactArea.get(i)[0];
+                col =colImpactTile - impactArea.get(i)[1];
+                if(battlefield.isTileExisted(row, col) && or == Utils.getOrientationFromCoords(rowActor, colActor, row, col)){
+                    possibleTargetTiles.add(new int[]{row, col});
+                }
+            }
+        }
+        return possibleTargetTiles;
+    }
+
 
 
 
@@ -165,4 +175,6 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
             this.colTarget = colTarget;
         }
     }
+
+    public abstract ActionPanel getActionPanel(Viewport UIViewport);
 }

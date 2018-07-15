@@ -11,6 +11,7 @@ import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoArea;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Area;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.LongTilePanel;
@@ -66,6 +67,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         stageUI.addActor(shortUnitPanel);
         stageUI.addActor(longUnitPanel);
         stageUI.addActor(longTilePanel);
+
 
     }
 

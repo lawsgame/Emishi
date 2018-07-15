@@ -1,14 +1,18 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoActionPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 
 public class AttackCommand extends BattleCommand {
     boolean executing;
     boolean executionCompleted;
+    boolean counterAttackEnabled;
 
     public AttackCommand(BattlefieldRenderer bfr) {
         super(bfr, Data.ActionChoice.ATTACK);
@@ -19,6 +23,7 @@ public class AttackCommand extends BattleCommand {
     public void init() {
         executing = false;
         executionCompleted = false;
+        counterAttackEnabled = false;
     }
 
     @Override
@@ -47,7 +52,7 @@ public class AttackCommand extends BattleCommand {
     }
 
     @Override
-    public boolean isTargetValid() {
+    public boolean isTargetValid(int rowActor, int colActor, int rowTarget, int colTarget) {
         boolean validate = false;
         if(battlefield.isTileOccupied(rowActor, colActor)){
 
@@ -93,22 +98,49 @@ public class AttackCommand extends BattleCommand {
     }
 
     @Override
+    public ActionPanel getActionPanel(Viewport UIStageViewport) {
+        return new TempoActionPanel(UIStageViewport) {
+            @Override
+            public void set() {
+                StringBuilder builder = getBuilder();
+
+            }
+        };
+    }
+
+    @Override
     public void execute() {
 
         if(battlefield.isTileOccupied(rowActor, colActor) && battlefield.isTileOccupied(rowTarget, colTarget)){
+            // set all required parameters
             Unit actor = battlefield.getUnit(rowActor, colActor);
             Unit target = battlefield.getUnit(rowTarget, colTarget);
             Data.TileType actorTile = battlefield.getTile(rowActor, colActor);
             Data.TileType targetTile = battlefield.getTile(rowTarget, colTarget);
             boolean actorBannerAtRange = battlefield.isStandardBearerAtRange(actor, rowActor, colActor);
             boolean targetBannerAtRange = battlefield.isStandardBearerAtRange(target, rowActor, colActor);
-            int hitrate = actor.getHitRate(target, targetTile, actorBannerAtRange, targetBannerAtRange);
+
+            // set up the hit result
+            int hitrate = actor.getHitRate(target, targetTile, actorBannerAtRange);
             int criticalHitRate = actor.getCriticalHitRate(actorBannerAtRange, target, hitrate);
-
-            // first phase, the attacker
             int diceResult = Utils.getMean(2,100);
-            if(diceResult < hitrate){
 
+            //set actor orientation to perform one's attack on the target
+            actor.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+
+            if(diceResult < hitrate){
+                // the attack meet the target
+                boolean backstab = actor.getCurrentWeapon().getArt() == Data.WeaponArt.BACKSTAB && actor.getOrientation() == target.getOrientation();
+                boolean critical = diceResult < criticalHitRate || backstab;
+                int dealtDamage = actor.getDealtDamage(target, critical, actorTile, targetTile, actorBannerAtRange, targetBannerAtRange);
+                target.applyDamage(dealtDamage, false, true);
+                target.notifyAllObservers(new Unit.DamageNotification(false, dealtDamage, critical, backstab));
+                actor.notifyAllObservers(Data.AnimationId.ATTACK);
+                if(target.isOutOfCombat()){
+                    counterAttackEnabled = isTargetValid(rowTarget, colTarget, rowActor, colActor);
+                }
+            }else{
+                counterAttackEnabled = isTargetValid(rowTarget, colTarget, rowActor, colActor);
             }
         }
     }
@@ -125,6 +157,9 @@ public class AttackCommand extends BattleCommand {
 
     @Override
     public void update(float dt) {
-
+        if(counterAttackEnabled && !battlefieldRenderer.isExecuting()){
+            counterAttackEnabled = false;
+            System.out.println("RETALIATE");
+        }
     }
 }

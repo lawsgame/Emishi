@@ -8,6 +8,8 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSprite2DPool;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.engine.patterns.command.Command;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 import java.util.LinkedList;
@@ -91,7 +93,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
                 if (query instanceof Unit.DamageNotification) {
                     Unit.DamageNotification notification = (Unit.DamageNotification) query;
-                    displayTakeHit(notification.moralOnly, notification.damageTaken);
+                    displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical);
                 } else if (query instanceof int[]) {
                     int[] array = (int[]) query;
                     if (array.length == 2) {
@@ -108,9 +110,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 } else if (query instanceof Data.Orientation) {
                     displayPushed((Data.Orientation) query);
 
-                } else if (query instanceof Query){
-                    Query customQuery = (Query)query;
-                    customQuery.handle();
+                } else if (query instanceof Command){
+                    Command customQuery = (Command)query;
+                    customQuery.execute();
 
                 } else {
                     launchNextAnimation();
@@ -235,7 +237,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public void displayTakeHit(boolean moralOnly, int damageTaken) {
+    public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical) {
         unitTexture = TempoSprite2DPool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
         countDown.run();
     }
@@ -370,20 +372,16 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         }else{
             animationQueue.offer(data);
             if(data instanceof Unit.DamageNotification){
-                if (model.isDead()) {
-                    animationQueue.offer(Data.AnimationId.DIE);
-                    animationQueue.offer(new Query() {
+                if(model.isOutOfCombat()) {
+                    if (model.isDead()) {
+                        animationQueue.offer(Data.AnimationId.DIE);
+                    } else if (model.isOutOfCombat()) {
+                        animationQueue.offer(Data.AnimationId.FLEE);
+                    }
+                    animationQueue.offer(new SimpleCommand() {
                         @Override
-                        public void handle() {
-                            setVisible(false);
-                        }
-                    });
-                } else  if(model.isOutOfCombat()){
-                    animationQueue.offer(Data.AnimationId.FLEE);
-                    animationQueue.offer(new Query() {
-                        @Override
-                        public void handle() {
-                            setVisible(false);
+                        public void execute() {
+                            setVisible(true);
                         }
                     });
                 }
@@ -401,7 +399,4 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         this.y = y;
     }
 
-    public interface Query{
-        void handle();
-    }
 }
