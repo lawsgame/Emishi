@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -50,7 +51,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.multiplexer = new InputMultiplexer();
 
 
-        this.sltdTile = new TempoAreaWidget(battlefield, Assets.AreaColor.SELECTED_UNIT);
+        this.sltdTile = new TempoAreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
         this.sltdTile.setVisible(false);
 
         // UI

@@ -33,7 +33,8 @@ public class Battlefield extends Observable {
     private Unit[][] units;
     private boolean[][] looted;
     private Array<int[]> deploymentArea;
-
+    private HashMap<Allegeance, Array<Area.UnitArea>> guardedAreas;
+    private HashMap<Allegeance, Array<Area.UnitArea>> coveredAreas;
     private HashMap<Integer, Unit> recruits;
     private HashMap<Integer, Item> tombItems;
 
@@ -45,6 +46,14 @@ public class Battlefield extends Observable {
             this.units = new Unit[nbRows][nbCols];
         }
         this.deploymentArea = new Array<int[]>();
+
+        this.guardedAreas = new HashMap<Allegeance, Array<Area.UnitArea>>();
+        this.guardedAreas.put(Allegeance.ALLY, new Array<Area.UnitArea>());
+        this.guardedAreas.put(Allegeance.ENEMY, new Array<Area.UnitArea>());
+        this.coveredAreas = new HashMap<Allegeance, Array<Area.UnitArea>>();
+        this.coveredAreas.put(Allegeance.ALLY, new Array<Area.UnitArea>());
+        this.coveredAreas.put(Allegeance.ENEMY, new Array<Area.UnitArea>());
+
         this.recruits = new HashMap<Integer, Unit>();
         this.tombItems = new HashMap<Integer, Item>();
     }
@@ -151,6 +160,58 @@ public class Battlefield extends Observable {
     private int _getLootId(int r, int c){
         return c + getNbColumns() * r;
     }
+
+    public void addCoveredArea(int rowActor, int colActor){
+        if(isTileOccupied(rowActor, colActor)) {
+            Unit actor = getUnit(rowActor, colActor);
+            if(actor.isMobilized()) {
+                int rangeMin = actor.getCurrentRangeMin();
+                int rangeMax = actor.getCurrentRangeMax(getTile(rowActor, colActor), isStandardBearerAtRange(actor, rowActor, colActor));
+                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, rangeMin, rangeMax);
+                Area.UnitArea area = new Area.UnitArea(this, Data.AreaType.COVERING_FIRE, tiles, actor);
+                this.coveredAreas.get(actor.getAllegeance()).add(area);
+                notifyAllObservers(area);
+            }
+        }
+    }
+
+    public void removeCovoredArea(Unit actor){
+        if(actor != null && actor.isMobilized()){
+            Array<Area.UnitArea> areas = this.coveredAreas.get(actor.getAllegeance());
+            for (int i = 0; i < areas.size; i++) {
+                if (areas.get(i).getActor() == actor) {
+                    Area.UnitArea area = areas.removeIndex(i);
+                    notifyAllObservers(area);
+                }
+            }
+
+        }
+    }
+
+    public void addGuardedArea(int rowActor, int colActor){
+        if(isTileOccupied(rowActor, colActor)) {
+            Unit actor = getUnit(rowActor, colActor);
+            if(actor.isMobilized()) {
+                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.GUARD_RANGE_MIN, Data.GUARD_RANGE_MAX);
+                Area.UnitArea area = new Area.UnitArea(this, Data.AreaType.GUARD_RANGE, tiles, actor);
+                this.guardedAreas.get(actor.getAllegeance()).add(area);
+                notifyAllObservers(area);
+            }
+        }
+    }
+
+    public void removeGuardedArea(Unit actor){
+        if(actor != null && actor.isMobilized()){
+            Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getAllegeance());
+            for (int i = 0; i < areas.size; i++) {
+                if (areas.get(i).getActor() == actor) {
+                    notifyAllObservers(areas.removeIndex(i));
+                }
+            }
+
+        }
+    }
+
 
 
     //-------------- TILE STATE CHECK METHODS HIERARCHY ----------------------
@@ -753,9 +814,13 @@ public class Battlefield extends Observable {
         }
     }
 
+    public HashMap<Allegeance, Array<Area.UnitArea>> getGuardedAreas() {
+        return guardedAreas;
+    }
 
-
-
+    public HashMap<Allegeance, Array<Area.UnitArea>> getCoveredAreas() {
+        return coveredAreas;
+    }
 
     //----------------- NODE HELPER CLASSES -------------------
 

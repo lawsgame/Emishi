@@ -26,19 +26,7 @@ public class Assets {
         return tileType.name().toLowerCase();
     }
 
-    public enum AreaColor {
-        SELECTED_UNIT,
-        MOVE_RANGE,
-        ACTION_RANGE,
-        GUARD_RANGE,
-        BANNER_RANGE,
-        COVERING_FIRE,
-        FOE_ACTION_AREA,
-        DEPLOYMENT
-
-    }
-
-    public static String getTileHighlighted(AreaColor id){
+    public static String getTileHighlighted(Data.AreaType id){
         return id.name().toLowerCase();
     }
     public static String UI_BLACK_BACKGROUND = "black_background";

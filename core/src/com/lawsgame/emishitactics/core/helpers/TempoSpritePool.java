@@ -25,7 +25,7 @@ public class TempoSpritePool {
     }
 
     private HashMap<Data.TileType, TextureRegion> tileSprites;
-    private HashMap<Assets.AreaColor, TextureRegion> uiSprites;
+    private HashMap<Data.AreaType, TextureRegion> uiSprites;
     private TextureRegion blackBGSprite;
     private HashMap<Data.AnimationId, TextureRegion> unitSprites;
     private HashMap<Data.AnimationId, TextureRegion> foeSprites;
@@ -38,25 +38,25 @@ public class TempoSpritePool {
     private TextureRegion bridgeInConstruction;
     private TextureRegion towerInConstruction;
 
-    public HashMap<Assets.AreaColor,Sprite> topLeftCorner = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> topRightCorner = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> bottomLeftCorner = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> bottomRightCorner = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> middle = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> westStraight = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> northStraight = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> southStraight = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> eastStraight = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> topLeftAnticorner = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> topRightAnticorner = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> bottomLeftAnticorner = new HashMap<Assets.AreaColor, Sprite>();
-    public HashMap<Assets.AreaColor,Sprite> bottomRightAnticorner = new HashMap<Assets.AreaColor, Sprite>();
+    public HashMap<Data.AreaType,Sprite> topLeftCorner = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> topRightCorner = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> bottomLeftCorner = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> bottomRightCorner = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> middle = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> westStraight = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> northStraight = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> southStraight = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> eastStraight = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> topLeftAnticorner = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> topRightAnticorner = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> bottomLeftAnticorner = new HashMap<Data.AreaType, Sprite>();
+    public HashMap<Data.AreaType,Sprite> bottomRightAnticorner = new HashMap<Data.AreaType, Sprite>();
 
 
 
     private TempoSpritePool(){
         this.tileSprites = new HashMap<Data.TileType, TextureRegion>();
-        this.uiSprites = new HashMap<Assets.AreaColor, TextureRegion>();
+        this.uiSprites = new HashMap<Data.AreaType, TextureRegion>();
         this.unitSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.foeSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.weaponSprites = new HashMap<Data.Weapon, TextureRegion>();
@@ -166,7 +166,7 @@ public class TempoSpritePool {
 
             if(asm.isLoaded(Assets.ATLAS_UI)) {
                 atlas = asm.get(Assets.ATLAS_UI);
-                for(Assets.AreaColor id : Assets.AreaColor.values()){
+                for(Data.AreaType id : Data.AreaType.values()){
                     region = atlas.findRegion(Assets.getTileHighlighted(id));
                     if(region != null )
                         uiSprites.put(id, region);
@@ -176,7 +176,7 @@ public class TempoSpritePool {
 
                 // SET AREA COLOR SPRITE
                 Sprite sprite;
-                for(Assets.AreaColor id: Assets.AreaColor.values()){
+                for(Data.AreaType id: Data.AreaType.values()){
                     region = atlas.findRegion(Assets.getTileHighlighted(id));
                     TextureRegion[][] assets = region.split(region.getRegionWidth()/2, region.getRegionHeight()/2);
 
@@ -247,7 +247,7 @@ public class TempoSpritePool {
         return tileSprites.get(tileType);
     }
 
-    public TextureRegion getUISprite(Assets.AreaColor id) {
+    public TextureRegion getUISprite(Data.AreaType id) {
         return uiSprites.get(id);
     }
 

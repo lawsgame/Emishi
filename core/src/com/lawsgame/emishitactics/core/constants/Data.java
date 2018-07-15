@@ -20,6 +20,8 @@ public class Data {
     public static final int OA_CHARGING_BAR_MAW_VALUE = 100;
     public static final int BRAVERY_MORAL_FACTOR = 1;
     public static final int NB_BUILDING_MAX = 2;
+    public static final int GUARD_RANGE_MIN = 1;
+    public static final int GUARD_RANGE_MAX = 1;
 
     // item bonus
     public static final int DEF_BONUS_YAYOI_SHIELD = 2;
@@ -59,6 +61,18 @@ public class Data {
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
+
+
+    public enum AreaType {
+        SELECTED_UNIT,
+        MOVE_RANGE,
+        ACTION_RANGE,
+        GUARD_RANGE,
+        BANNER_RANGE,
+        COVERING_FIRE,
+        FOE_ACTION_AREA,
+        DEPLOYMENT
+    }
 
 
     public enum Behaviour {

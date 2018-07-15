@@ -467,7 +467,7 @@ public class Unit extends Observable{
     }
 
     public Allegeance getAllegeance(){
-        Allegeance a = null;
+        Allegeance a;
         if(army == null){
             a = Allegeance.NEUTRAL;
         }else{

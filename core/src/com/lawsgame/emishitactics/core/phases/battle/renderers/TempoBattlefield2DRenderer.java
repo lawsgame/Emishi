@@ -4,11 +4,14 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -18,6 +21,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     protected Array<BattleUnitRenderer> unitRenderers;
+    protected Array<AreaRenderer> areaRenderers;
     protected TextureRegion[][] tileRenderers;
     protected TempoSpritePool sprite2DPool;
     protected boolean executing;
@@ -37,6 +41,20 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             }
         }
 
+        // set up area renderers
+        this.areaRenderers = new Array<AreaRenderer>();
+        Array<Area.UnitArea> areas = model.getCoveredAreas().get(Data.Allegeance.ALLY);
+        areas.addAll(model.getCoveredAreas().get(Data.Allegeance.ENEMY));
+        for(int i = 0; i < areas.size; i++){
+            addaAreaRenderer(areas.get(i));
+        }
+        areas.clear();
+        areas.addAll(model.getGuardedAreas().get(Data.Allegeance.ALLY));
+        areas.addAll(model.getGuardedAreas().get(Data.Allegeance.ENEMY));
+        for(int i = 0; i < areas.size; i++){
+            addaAreaRenderer(areas.get(i));
+        }
+
     }
 
 
@@ -49,6 +67,9 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 }
             }
         }
+
+        for(int i = 0; i < areaRenderers.size; i++)
+            areaRenderers.get(i).render(batch);
     }
 
     @Override
@@ -82,6 +103,20 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             }
         }catch (BFRendererException e){
             e.printStackTrace();
+        }
+    }
+
+    public void addaAreaRenderer(Area model){
+        areaRenderers.add(new TempoAreaRenderer(model));
+    }
+
+    public void removeAreaRenderer(Area model){
+        for(int i = 0; i < areaRenderers.size; i++){
+            if(areaRenderers.get(i).getModel() == model) {
+                model.detach(areaRenderers.get(i));
+                areaRenderers.removeIndex(i);
+            }
+            continue;
         }
     }
 
@@ -196,6 +231,21 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }else if(data instanceof BuildMessage){
             BuildMessage msg = (BuildMessage)data;
             addTileRenderer(msg.row , msg.col);
+        }else if(data instanceof Area){
+            Area area = (Area)data;
+
+            boolean areaRemoved = false;
+            for(int i = 0; i < areaRenderers.size; i++){
+                if(area == areaRenderers.get(i).getModel()){
+                    removeAreaRenderer(area);
+                    areaRemoved = true;
+                    continue;
+                }
+            }
+
+            if(!areaRemoved){
+                addaAreaRenderer(area);
+            }
         }
     }
 

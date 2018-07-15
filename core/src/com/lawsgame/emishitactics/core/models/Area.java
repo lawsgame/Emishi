@@ -1,6 +1,8 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
@@ -10,19 +12,22 @@ public  class Area extends Observable {
     private int colInit;
     private boolean[][] checkmap;
     private Battlefield battlefield;
+    private Data.AreaType type;
 
-    public Area(Battlefield battlefield, int row, int col){
+    public Area(Battlefield battlefield, Data.AreaType type, int row, int col){
         this.battlefield = battlefield;
+        this.type = type;
         set(row, col);
     }
 
-    public Area(Battlefield battlefield, Array<int[]> tiles){
+    public Area(Battlefield battlefield, Data.AreaType type, Array<int[]> tiles){
         this.battlefield = battlefield;
+        this.type = type;
         set(tiles);
     }
 
-    public Area(Battlefield battlefield, int rCenter, int cCenter, int rangeMin, int rangeMax){
-        this(battlefield , Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax));
+    public Area(Battlefield battlefield, Data.AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax){
+        this(battlefield , type, Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax));
     }
 
     public void addTile(int row, int col){
@@ -111,6 +116,10 @@ public  class Area extends Observable {
         return battlefield;
     }
 
+    public Data.AreaType getType() {
+        return type;
+    }
+
     public String toString(){
         String str ="";
         if(checkmap != null) {
@@ -127,7 +136,25 @@ public  class Area extends Observable {
 
     // --------------- SPECIFIC IMPLEMENTATION OF THE AREA CLASS
 
+    public static class UnitArea extends Area{
+        private Unit actor;
 
+        public UnitArea(Battlefield battlefield, Data.AreaType type, Array<int[]> tiles, Unit actor) {
+            super(battlefield, type, tiles);
+            this.actor = actor;
+        }
+
+        public UnitArea(Battlefield battlefield, Data.AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax, Unit actor) {
+            super(battlefield, type, rCenter, cCenter, rangeMin, rangeMax);
+            this.actor = actor;
+        }
+
+        public Unit getActor(){
+            return actor;
+        }
+
+
+    }
 
 
 

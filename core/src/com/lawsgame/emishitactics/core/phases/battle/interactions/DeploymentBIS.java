@@ -27,14 +27,14 @@ public class DeploymentBIS extends BattleInteractionState {
         this.colUnit = warlordPos[1];
         highlight(rowUnit, colUnit);
         focusOn(rowUnit, colUnit, true);
-        this.deploymentAreaWidget = new TempoAreaWidget(bim.battlefield, Assets.AreaColor.DEPLOYMENT, bim.battlefield.getDeploymentArea());
+        this.deploymentAreaWidget = new TempoAreaWidget(bim.battlefield, Data.AreaType.DEPLOYMENT, bim.battlefield.getDeploymentArea());
 
     }
 
     @Override
     public void init() {
         if(initialized) {
-            this.moveAreaWidget = new TempoAreaWidget(bim.battlefield, Assets.AreaColor.MOVE_RANGE, bim.battlefield.getMoveArea(rowUnit, colUnit));
+            this.moveAreaWidget = new TempoAreaWidget(bim.battlefield, Data.AreaType.MOVE_RANGE, bim.battlefield.getMoveArea(rowUnit, colUnit));
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
             focusOn(rowUnit, colUnit, true);
             highlight(rowUnit, colUnit);

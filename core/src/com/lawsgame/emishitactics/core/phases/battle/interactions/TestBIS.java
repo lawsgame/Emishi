@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -27,10 +28,11 @@ public class TestBIS extends BattleInteractionState {
     AreaWidget bannerAreaWidget;
     BattleCommand testCommand;
     boolean commandExecutionMode = false;
+    Area area;
 
     public TestBIS(BattleInteractionMachine bis) {
         super(bis, true, true, true);
-        ar = new TempoAreaWidget(bis.battlefield, Assets.AreaColor.ACTION_RANGE);
+        ar = new TempoAreaWidget(bis.battlefield, Data.AreaType.ACTION_RANGE);
         //ar =  new TempoAreaWidget(bim.asm, bim.battlefield, Assets.AreaColor.ACTION_RANGE, path);
         guineapig = bis.battlefield.getUnit(5,7);
         path = new Array<int[]>();
@@ -100,7 +102,7 @@ public class TestBIS extends BattleInteractionState {
         bis.battlefield.deployUnit(8,8,soldier1);
 
         //BANNER_RANGE TEST
-        bannerAreaWidget =  new TempoAreaWidget(bis.battlefield, Assets.AreaColor.BANNER_RANGE);
+        bannerAreaWidget =  new TempoAreaWidget(bis.battlefield, Data.AreaType.BANNER_RANGE);
         bannerAreaWidget.setTiles(Utils.getEreaFromRange(bis.battlefield,6,8,1,army.getBannerRange()));
         System.out.println("BANNER_RANGE TEST");
         System.out.println("warlord   : "+warlord.isStandardBearer());
@@ -324,8 +326,25 @@ public class TestBIS extends BattleInteractionState {
                 warchief1.notifyAllObservers(Data.AnimationId.HEAL);
             }
 
-            //
+            //AREA TEST
+            if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+
+                if(removed) {
+                    removed = false;
+                    System.out.println("add cover");
+                    int[] unitPos = bim.battlefield.getUnitPos(warlord);
+                    bim.battlefield.addCoveredArea(unitPos[0], unitPos[1]);
+                }else{
+                    System.out.println("remove cover");
+                    removed = true;
+                    bim.battlefield.removeCovoredArea(warlord);
+                }
+                System.out.println(bim.battlefield.getCoveredAreas());
+            }
+
 
         }
     }
+
+    boolean removed = true;
 }
