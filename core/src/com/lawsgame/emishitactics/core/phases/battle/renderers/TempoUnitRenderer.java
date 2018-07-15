@@ -1,7 +1,9 @@
 package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
@@ -18,17 +20,19 @@ import static com.lawsgame.emishitactics.core.constants.Data.SPEED_PUSHED;
 import static com.lawsgame.emishitactics.core.constants.Data.SPEED_WALK;
 
 public class TempoUnitRenderer extends BattleUnitRenderer {
-    protected float x;
-    protected float y;
+
+    private static float BLINK_PERIOD = 1.5f * MathUtils.PI;
+
     protected boolean visible;
 
-    private TextureRegion unitTexture;
+    private Sprite unitSprite;
     private TextureRegion weapontTexture;
     private TextureRegion mountedTexture;
     private TextureRegion orientationTexture;
     private TextureRegion offabbTexture = null;
 
     private boolean targeted;
+    private float blinkTime = 0;
     private boolean executing;
 
     private CountDown countDown = new CountDown(2f){
@@ -56,8 +60,10 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     public TempoUnitRenderer(int row, int col, Unit model) {
         super(model);
-        this.x = col;
-        this.y = row;
+        this.unitSprite = new Sprite();
+        unitSprite.setX(col);
+        unitSprite.setY(row);
+        unitSprite.setSize(1, 1);
         this.executing = false;
         this.executing = false;
         this.visible = true;
@@ -81,6 +87,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 display(Data.AnimationId.REST);
 
         }
+
+        if(targeted) blinkTime += dt;
 
         handleWalkAnimation(dt);
         launchNextAnimation();
@@ -127,26 +135,26 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         // handle walk animation
         if (remainingPath.size > 0) {
             dl = dt * ((pushed) ? SPEED_PUSHED: SPEED_WALK);
-            if (x == remainingPath.get(0)[1]) {
-                if ((y < remainingPath.get(0)[0] && y + dl >= remainingPath.get(0)[0])
-                        || (y > remainingPath.get(0)[0] && y + dl <= remainingPath.get(0)[0])) {
-                    y = remainingPath.get(0)[0];
+            if (unitSprite.getX() == remainingPath.get(0)[1]) {
+                if ((unitSprite.getY() < remainingPath.get(0)[0] && unitSprite.getY() + dl >= remainingPath.get(0)[0])
+                        || (unitSprite.getY() > remainingPath.get(0)[0] && unitSprite.getY() + dl <= remainingPath.get(0)[0])) {
+                    setY(remainingPath.get(0)[0]);
                     updatePoint = true;
-                } else if (y < remainingPath.get(0)[0]) {
-                    y += dl;
-                } else if (y > remainingPath.get(0)[0]) {
-                    y -= dl;
+                } else if (unitSprite.getY() < remainingPath.get(0)[0]) {
+                    setY(unitSprite.getY() + dl);
+                } else if (unitSprite.getY() > remainingPath.get(0)[0]) {
+                    setY(unitSprite.getY() - dl);
                 }
             }
-            if (y == remainingPath.get(0)[0]) {
-                if ((x < remainingPath.get(0)[1] && x + dl >= remainingPath.get(0)[1])
-                        || (x > remainingPath.get(0)[1] && x + dl <= remainingPath.get(0)[1])) {
-                    x = remainingPath.get(0)[1];
+            if (unitSprite.getY() == remainingPath.get(0)[0]) {
+                if ((unitSprite.getX() < remainingPath.get(0)[1] && unitSprite.getX() + dl >= remainingPath.get(0)[1])
+                        || (unitSprite.getX() > remainingPath.get(0)[1] && unitSprite.getX() + dl <= remainingPath.get(0)[1])) {
+                    setX(remainingPath.get(0)[1]);
                     updatePoint = true;
-                } else if (x < remainingPath.get(0)[1]) {
-                    x += dl;
-                } else if (x > remainingPath.get(0)[1])
-                    x -= dl;
+                } else if (unitSprite.getX() < remainingPath.get(0)[1]) {
+                    setX(  unitSprite.getX() + dl);
+                } else if (unitSprite.getX() > remainingPath.get(0)[1])
+                    setX(unitSprite.getX() - dl);
             }
 
             if (updatePoint) {
@@ -158,7 +166,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     executing = false;
                     display(Data.AnimationId.REST);
                 } else {
-                    model.setOrientation(Utils.getOrientationFromCoords(y, x, remainingPath.get(0)[0], remainingPath.get(0)[1]));
+                    model.setOrientation(Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(), remainingPath.get(0)[0], remainingPath.get(0)[1]));
 
                 }
             }
@@ -169,11 +177,14 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void render(SpriteBatch batch) {
         if(visible) {
-            batch.draw(unitTexture, x, y, 1, 1);
-            batch.draw(weapontTexture, x, y, 0.25f, 0.25f);
-            batch.draw(orientationTexture, x + 0.75f, y + 0.75f, 0.25f, 0.25f);
-            if (mountedTexture != null) batch.draw(mountedTexture, x + 0.75f, y + 0f, 0.25f, 0.25f);
-            if (offabbTexture != null) batch.draw(offabbTexture, x, y + 1, 1, 0.25f);
+            if(targeted){
+                unitSprite.setAlpha(0.7f + 0.3f*MathUtils.cos(BLINK_PERIOD * blinkTime));
+            }
+            unitSprite.draw(batch);
+            batch.draw(weapontTexture, getX(), getY(), 0.25f, 0.25f);
+            batch.draw(orientationTexture, getX() + 0.75f, getY() + 0.75f, 0.25f, 0.25f);
+            if (mountedTexture != null) batch.draw(mountedTexture, getX() + 0.75f, getY() + 0f, 0.25f, 0.25f);
+            if (offabbTexture != null) batch.draw(offabbTexture, getX(), getY() + 1, 1, 0.25f);
         }
     }
 
@@ -188,7 +199,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayWalk(Array<int[]> path) {
         boolean validPath = true;
-        int[] oldCoords = new int[]{(int)y, (int)x};
+        int[] oldCoords = new int[]{(int) unitSprite.getY(), (int) unitSprite.getX()};
 
         /*
         CHECK PATH VALIDITY
@@ -224,9 +235,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
                 }
 
-                Data.Orientation or = Utils.getOrientationFromCoords(y,x,path.get(0)[0], path.get(0)[1]);
+                Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
                 model.setOrientation(or);
-                unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly()));
                 executing = true;
 
             }
@@ -238,33 +249,35 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical) {
-        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly());
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().isAlly()));
         countDown.run();
     }
 
 
     @Override
     public void displayLevelup(int[] gainlvl) {
-        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.LEVELUP, model.getArmy().isAlly());
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.LEVELUP, model.getArmy().isAlly()));
         countDown.run();
     }
 
     @Override
     public void displayTreated(int[] oldHtpsAndMoral) {
-        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().isAlly());
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().isAlly()));
         countDown.run();
     }
 
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
         model.setOrientation(pushedTowards);
-        unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().isAlly());
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().isAlly()));
         pushed = true;
+        int y = (int) getX();
+        int x = (int) getY();
         switch (pushedTowards){
-            case WEST: remainingPath.add(new int[]{(int)y, (int)x - 1}); break;
-            case NORTH: remainingPath.add(new int[]{(int)y + 1, (int)x}); break;
-            case SOUTH: remainingPath.add(new int[]{(int)y - 1, (int)x}); break;
-            case EAST: remainingPath.add(new int[]{(int)y, (int)x + 1}); break;
+            case WEST: remainingPath.add(new int[]{y, x - 1}); break;
+            case NORTH: remainingPath.add(new int[]{y + 1, x}); break;
+            case SOUTH: remainingPath.add(new int[]{y - 1, x}); break;
+            case EAST: remainingPath.add(new int[]{y, x + 1}); break;
         }
 
     }
@@ -295,16 +308,16 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case DODGE:
             case BACKSTABBED:
             case COVER:
-                unitTexture = TempoSpritePool.get().getUnitSprite(id, model.getArmy().isAlly());
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, model.getArmy().isAlly()));
                 countDown.run();
             case REST:
-                unitTexture = TempoSpritePool.get().getUnitSprite(id, model.getArmy().isAlly());
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, model.getArmy().isAlly()));
                 break;
             case SWITCH_WEAPON:
                 weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon());
                 break;
             case FLEE:
-                unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly());
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().isAlly()));
                 orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation().getOpposite());
                 countDown.run();
                 break;
@@ -322,7 +335,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case HARASS:
             case LINIENT_BLOW:
             case FURY:
-                unitTexture = TempoSpritePool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly());
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.ATTACK, model.getArmy().isAlly()));
                 for(Data.Ability ability : Data.Ability.values()) {
                     if(ability.name().equals(id.name()))
                         offabbTexture = TempoSpritePool.get().getOffensiveAbbSprite(ability);
@@ -346,6 +359,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void setTargeted(boolean targeted) {
         this.targeted = targeted;
+        blinkTime = 0;
+    }
+
+    @Override
+    public boolean isTargeted() {
+        return targeted;
     }
 
     @Override
@@ -391,12 +410,20 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void setX(float x) {
-        this.x = x;
+        this.unitSprite.setX(x);
     }
 
     @Override
     public void setY(float y) {
-        this.y = y;
+        this.unitSprite.setY(y);
+    }
+
+    public float getX(){
+        return unitSprite.getX();
+    }
+
+    public float getY(){
+        return unitSprite.getY();
     }
 
 }

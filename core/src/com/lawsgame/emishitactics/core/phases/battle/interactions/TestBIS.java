@@ -13,6 +13,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoAreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 
@@ -178,30 +179,13 @@ public class TestBIS extends BattleInteractionState {
 
             // MOVE TEST
 
+
             if(unitPos != null) {
                 path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], r, c, soldier1.has(Data.Ability.PATHFINDER), soldier1.getAllegeance());
                 if(path.size > 0) {
-
-
-
                     bim.battlefield.moveUnit(unitPos[0], unitPos[1], r, c);
-
-                    /*
-                    Array<int[]> moveArea = bim.battlefield.getMoveArea(r, c);
-                    System.out.println(moveArea.size);
-                    for(int i = 0; i < moveArea.size; i++){
-                        System.out.println("MA : "+ moveArea.get(i)[0]+ " "+ moveArea.get(i)[1]);
-                    }*/
-
-
                     ar.setTiles(bim.battlefield.getMoveArea(r, c));
-
-
-                    //System.out.println(ar.getModel().toString());
-
-
                     bim.battlefield.notifyAllObservers(path);
-
                 }
             }
 
@@ -261,6 +245,8 @@ public class TestBIS extends BattleInteractionState {
             //bim.gcm.focusOn(c, r, true);
 
 
+            // COVERED AREA TEST
+            //System.out.println("area covered by foe ? "+ bim.battlefield.isTileCovered(r, c, Data.Allegeance.ALLY));
         }
 
 
@@ -342,6 +328,12 @@ public class TestBIS extends BattleInteractionState {
                 System.out.println(bim.battlefield.getCoveredAreas());
             }
 
+
+            // TARGET RENDER TEST
+            if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+                BattleUnitRenderer bur = bim.bfr.getUnitRenderer(warlord);
+                bur.setTargeted(!bur.isTargeted());
+            }
 
         }
     }

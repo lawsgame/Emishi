@@ -74,6 +74,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void renderUnits(SpriteBatch batch) {
+
         for(int i = 0; i < unitRenderers.size; i++){
             unitRenderers.get(i).render(batch);
         }

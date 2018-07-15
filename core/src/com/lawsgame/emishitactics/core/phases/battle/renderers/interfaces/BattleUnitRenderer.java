@@ -15,7 +15,8 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
     public abstract void setX(float x);
     public abstract void setY(float y);
     public abstract void setTargeted(boolean targeted);
-    public abstract void setVisible(boolean visible);
+    public abstract boolean isTargeted()
+;    public abstract void setVisible(boolean visible);
 
     public abstract void displayWalk(Array<int[]> path);
     public abstract void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical);

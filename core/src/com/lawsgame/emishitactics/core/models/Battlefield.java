@@ -221,7 +221,6 @@ public class Battlefield extends Observable {
     checkIndexes
     > isTileLooted
     > isTileExisted
-    -> isTileType
     -> isTilePlunderable
     -> isTileReachable
     |-> isTileAvailable
@@ -252,9 +251,6 @@ public class Battlefield extends Observable {
     public boolean isTileExisted(int r, int c){
         return checkIndexes(r,c) && getTile(r,c) != null;
     }
-
-    public boolean isTileType(int r, int c, TileType type) {
-        return isTileExisted(r, c) && getTile(r , c) == type;}
 
     public boolean isTilePlunderable(int r, int c){
         return isTileExisted(r,c) && getTile(r,c).isPlunderable();
@@ -288,6 +284,34 @@ public class Battlefield extends Observable {
 
     public boolean isTileOccupiedByFoe(int row , int col, Allegeance allegeance){
         return isTileOccupied(row, col) && getUnit(row, col).fightWith(allegeance);
+    }
+
+    public boolean isTileCovered(int row, int col, Allegeance opponentAllegeance){
+        boolean res = false;
+        if(isTileExisted(row, col) && opponentAllegeance != Allegeance.NEUTRAL){
+            Array<Area.UnitArea> foeCoveredArea = coveredAreas.get(opponentAllegeance);
+            for(int i = 0; i < foeCoveredArea.size; i++){
+                if(foeCoveredArea.get(i).contains(row, col)){
+                    res = true;
+                    continue;
+                }
+            }
+        }
+        return res;
+    }
+
+    public boolean isTileGuarded(int row, int col, Allegeance allyAllegeance){
+        boolean res = false;
+        if(isTileExisted(row, col) && allyAllegeance != Allegeance.NEUTRAL){
+            Array<Area.UnitArea> allyGuardedArea = coveredAreas.get(allyAllegeance);
+            for(int i = 0; i < allyGuardedArea.size; i++){
+                if(allyGuardedArea.get(i).contains(row, col)){
+                    res = true;
+                    continue;
+                }
+            }
+        }
+        return res;
     }
 
 
