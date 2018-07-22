@@ -39,7 +39,7 @@ public class LongTilePanel extends TilePanel {
         builder.append("tile");
 
         builder.append("\n\nHeal / turn : "+tileType.getHealPower());
-        builder.append("\nStrength bonus : "+tileType.getStrengthBonus());
+        builder.append("\nStrength bonus : "+tileType.getAttackMightBonus());
         builder.append("\nDefense bonus : "+ tileType.getDefenseBonus());
         builder.append("\nAvoidance bonus : "+tileType.getAvoidBonus());
         builder.append("\nAttack accuracy bonus : "+tileType.getAttackAccBonus());

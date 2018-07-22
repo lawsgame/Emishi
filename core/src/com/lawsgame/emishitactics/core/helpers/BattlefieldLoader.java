@@ -10,9 +10,11 @@ import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.AArmy;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
 
 import java.io.IOException;
@@ -20,8 +22,7 @@ import java.util.HashMap;
 
 public class BattlefieldLoader {
     private static XmlReader reader = new XmlReader();
-    private static Array<String> japaneseNames = new Array<String>();
-    private static Array<String> ainuNames = new Array<String>();
+    private static Array<String> NAME_DICTIONARY = new Array<String>();
     private static boolean dictionariesLoaded = false;
 
 
@@ -78,7 +79,7 @@ public class BattlefieldLoader {
                         // set the tile type
                         fieldType = colorToFieldTypeMap.get(colorKey);
                         if(fieldType == null){
-                            fieldType = TileType.getStandard();
+                            fieldType = TileType.PLAIN;
                         }
                         bf.setTile(rowTile, colTile, fieldType);
 
@@ -107,14 +108,15 @@ public class BattlefieldLoader {
 
 
         try {
+            loadNameDictionary();
+
             XmlReader.Element battlesElt = reader.parse(Gdx.files.internal(Assets.XML_UNITS_DEPLOYMENT));
             XmlReader.Element battleElt;
             XmlReader.Element armyElt;
             XmlReader.Element squadElt;
             XmlReader.Element unitElt;
-            Unit unit;
-            AArmy army;
-            boolean ally;
+            IUnit unit;
+            IArmy army;
             for (int i = 0; i < battlesElt.getChildCount(); i++) {
 
                 battleElt = battlesElt.getChild(i);
@@ -122,8 +124,14 @@ public class BattlefieldLoader {
                     for (int j = 0; j < battleElt.getChildCount(); j++) {
 
                         armyElt = battleElt.getChild(i);
-                        ally = armyElt.getBoolean("ally");
-                        army = new Unit.Army((ally) ? Data.ArmyType.ALLY: Data.ArmyType.FOE);
+                        Data.Allegeance allegeance = Data.Allegeance.ENEMY;
+                        for(Data.Allegeance a: Data.Allegeance.values()){
+                            if(a.name().equals(armyElt.get("allegeance"))){
+                                allegeance = a;
+                            }
+                        }
+                        bf.addAllegeance(allegeance);
+                        army = new Army(allegeance, false);
 
                         // IF: an amry with the relevant battlefield ID
 
@@ -137,6 +145,7 @@ public class BattlefieldLoader {
                                 int colUnit = unitElt.getInt("col");
 
                                 // add to the army composition
+                                army.add(unit);
                                 if(n == 0){
                                     if(k == 0){
                                         army.appointWarLord(unit);
@@ -159,6 +168,8 @@ public class BattlefieldLoader {
                     }
                 }
             }
+
+            unloadNameDictionary();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -166,113 +177,113 @@ public class BattlefieldLoader {
         layoutAtlas.dispose();
         layoutPixmap.dispose();
         layoutTexture.dispose();
-
         return bf;
     }
 
 
     // ------------- CREATE A UNIT ------------------
 
-    public static Unit instanciateUnit(XmlReader.Element unitElt){
-        Unit unit;
+    public static IUnit instanciateUnit(XmlReader.Element unitElt){
+        IUnit unit;
 
-        boolean standardbearer;
-        UnitTemplate templateUnit = UnitTemplate.CONSCRIPT;
-        int gainLvl;
-        Ethnicity ethnicityUnit = Ethnicity.JAPANESE;
-        String nameUnit ="";
-        Weapon primaryW = Weapon.NONE;
-        Weapon secondaryW = Weapon.NONE;
-        boolean homogeousLevels;
+        String name = unitElt.get("name");
+        Job job = Job.getStandard();
+        int level = unitElt.getInt("level");
+        WeaponType weaponType = WeaponType.FIST;
+        boolean horseman = unitElt.getBoolean("horseman");
+        boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
+        boolean standardbearer = unitElt.getBoolean("standardBearer");
+        boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
 
-        standardbearer = unitElt.getBoolean("standardBearer");
-        for(UnitTemplate template: UnitTemplate.values()){
-            if(template.name().equals(unitElt.get("template"))){
-                templateUnit = template;
+        if(name == "") name = NAME_DICTIONARY.get(Data.rand(NAME_DICTIONARY.size));
+        for(Job j: Job.values()){
+            if(j.name().equals(unitElt.get("job"))){
+                job = j;
+                continue;
+            }
+        }
+        for(WeaponType wt: WeaponType.values()){
+            if(wt.name().equals(unitElt.get("job"))){
+                weaponType = wt;
+                continue;
             }
         }
 
-        gainLvl = unitElt.getInt("level") - templateUnit.getStartLevel();
-        for(Ethnicity eth: Ethnicity.values()){
-            if(eth.name().equals(unitElt.get("ethinicity"))){
-                ethnicityUnit = eth;
-            }
-        }
-        loadNameDictionaries();
-        if(japaneseNames.size > 0 && ainuNames.size >0) {
-            nameUnit = (ethnicityUnit == Data.Ethnicity.JAPANESE) ? japaneseNames.random() : ainuNames.random();
-        }
-        for(Weapon wpn: Weapon.values()){
-            if(wpn.name().equals(unitElt.get("primaryWeapon"))){
-                primaryW = wpn;
-            }
-        }
-        for(Weapon wpn: Weapon.values()){
-            if(wpn.name().equals(unitElt.get("secondaryWeapon"))){
-                secondaryW = wpn;
-            }
-        }
-        homogeousLevels = unitElt.getBoolean("homogeneousLevels");
+        unit = new Unit(name, job ,level, weaponType, horseman, horsemanUponPromotion, standardbearer, homogeneousLevels);
 
 
-
-        unit = new Unit(templateUnit, standardbearer, gainLvl, ethnicityUnit, primaryW, secondaryW, homogeousLevels);
-        unit.setName(nameUnit);
         XmlReader.Element attributeElt;
         for(int k = 0; k < unitElt.getChildCount(); k++){
             attributeElt = unitElt.getChild(k);
 
-            if(attributeElt.get("id") == "right handed")
-                unit.setRightHanded(attributeElt.getBoolean("right handed"));
-
-            if(attributeElt.get("id") == "orientation") {
-                for (Orientation orientation : Orientation.values()) {
-                    if (orientation.name().equals(attributeElt.get("orientation"))) {
-                        unit.setOrientation(orientation);
+            if(attributeElt.get("id") == "weapon") {
+                for (Weapon value : Weapon.values()) {
+                    if (value.name().equals(attributeElt.get("weapon"))) {
+                        unit.addWeapon(value);
                         continue;
                     }
                 }
             }
-            if(attributeElt.get("id") == "behaviour") {
-                for (Behaviour behaviour : Behaviour.values()) {
-                    if (behaviour.name().equals(unitElt.get("behaviour"))) {
-                        unit.setBehaviour(behaviour);
+
+            if(attributeElt.get("id") == "right handed")
+                unit.setRightHanded(attributeElt.getBoolean("right handed"));
+
+            if(attributeElt.get("id") == "item") {
+                for (Item value : Item.values()) {
+                    if (value.name().equals(attributeElt.get("item"))) {
+                        unit.addItem(value);
+                        continue;
                     }
                 }
             }
-            if(attributeElt.get("id") == "offensive ability"){
-                for(Ability ability: Ability.values()){
-                    if(ability.name().equals(attributeElt.get("value"))){
-                        if(ability.getType() == AbilityType.OFFENSIVE || ability.getType() == AbilityType.NONE)
-                            unit.setOffensiveActiveAbility(ability);
+
+            if(attributeElt.get("id") == "stealable 1")
+                unit.setItem1Stealable(attributeElt.getBoolean("stealable 1"));
+
+            if(attributeElt.get("id") == "stealable 2")
+                unit.setItem1Stealable(attributeElt.getBoolean("stealable 2"));
+
+            if(attributeElt.get("id") == "passive ability") {
+                for (PassiveAbility value : PassiveAbility.values()) {
+                    if (value.name().equals(attributeElt.get("passive ability"))) {
+                        unit.setPassiveAbility(value);
+                        continue;
                     }
                 }
-            }else if(attributeElt.get("id") == "passive ability"){
-                for(Ability ability: Ability.values()){
-                    if(ability.name().equals(attributeElt.get("value"))){
-                        if(ability.getType() == AbilityType.PASSIVE || ability.getType() == AbilityType.NONE)
-                            unit.setPassiveAbility(ability);
+            }
+
+            if(attributeElt.get("id") == "support ability") {
+                for (SupportAbility value : SupportAbility.values()) {
+                    if (value.name().equals(attributeElt.get("support ability"))) {
+                        unit.setSupportAbility(value);
+                        continue;
                     }
                 }
-            }else if(attributeElt.get("id") == "support ability"){
-                for(Ability ability: Ability.values()){
-                    if(ability.name().equals(attributeElt.get("value"))){
-                        if(ability.getType() == AbilityType.SUPPORT || ability.getType() == AbilityType.NONE)
-                            unit.setSupportActiveAbility(ability);
+            }
+
+            if(attributeElt.get("id") == "banner sign") {
+                for (BannerSign value : BannerSign.values()) {
+                    if (value.name().equals(attributeElt.get("banner sign"))) {
+                        unit.getBanner().addSign(value);
+                        continue;
                     }
                 }
-            }else if(attributeElt.get("id") == "item"){
-                for(Item item: Item.values()){
-                    if(item.name().equals(attributeElt.get("value"))){
-                        unit.equip(item, unit.getNbItemsEquiped() > 0);
+            }
+
+            if(attributeElt.get("id") == "Orientation") {
+                for (Orientation value : Orientation.values()) {
+                    if (value.name().equals(attributeElt.get("orientation"))) {
+                        unit.setOrientation(value);
+                        continue;
                     }
                 }
-            }else if(attributeElt.get("id") == "stealable"){
-                unit.setItemStealable(attributeElt.getBoolean("value"));
-            }else if(attributeElt.get("id") == "banner sign"){
-                for(BannerSign sign: BannerSign.values()){
-                    if(sign.name().equals(attributeElt.get("value"))){
-                        unit.addBannerSign(sign);
+            }
+
+            if(attributeElt.get("id") == "behaviour") {
+                for (Behaviour value : Behaviour.values()) {
+                    if (value.name().equals(attributeElt.get("behaviour"))) {
+                        unit.setBehaviour(value);
+                        continue;
                     }
                 }
             }
@@ -284,28 +295,26 @@ public class BattlefieldLoader {
 
     // ------------- LOAD DICTIONARIES ------------------
 
-    public static void loadNameDictionaries(){
+    public static void loadNameDictionary(){
         XmlReader reader = new XmlReader();
 
         if(!dictionariesLoaded) {
             dictionariesLoaded = true;
             try {
                 XmlReader.Element namesElt = reader.parse(Gdx.files.internal(Assets.XML_NAME_DB));
-                XmlReader.Element japaneseNamesElt = namesElt.getChild(0);
-                XmlReader.Element ainuNamesElt = namesElt.getChild(1);
                 XmlReader.Element nameElt;
-                for (int i = 0; i < japaneseNamesElt.getChildCount(); i++) {
-                    nameElt = japaneseNamesElt.getChild(i);
-                    japaneseNames.add(nameElt.get("value"));
-                }
-                for (int i = 0; i < ainuNamesElt.getChildCount(); i++) {
-                    nameElt = ainuNamesElt.getChild(i);
-                    ainuNames.add(nameElt.get("value"));
+                for (int i = 0; i < namesElt.getChildCount(); i++) {
+                    nameElt = namesElt.getChild(i);
+                    NAME_DICTIONARY.add(nameElt.get("value"));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
+    }
+
+    public static void unloadNameDictionary(){
+        NAME_DICTIONARY.clear();
     }
 }

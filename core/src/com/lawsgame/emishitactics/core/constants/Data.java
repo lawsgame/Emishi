@@ -1,67 +1,78 @@
 package com.lawsgame.emishitactics.core.constants;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 
 import java.util.Random;
 
 public class Data {
 
 
+    static Random r = new Random();
+    public static int rand(int n){
+        return r.nextInt(n);
+    }
+
+
     public static final float GAME_PORT_WIDTH = 15f;
     public static final int MOBILITY_BONUS_PROMOTED = 1;
-    public static final int MOBILITY_BONUS_HORSEMAN = 2;
-    public static final int PROMOTION_LEVEL = 15;
+    public static final int PROMOTION_LEVEL = 10;
     public static final int MAX_LEVEL = 30;
     public static final int HEAL_BASE_POWER = 5;
-    public static final float MAX_UNITS_UNDER_WARLORD = 5f; // including the warlord himself / herself
-    public static final float MAX_UNITS_UNDER_WAR_CHIEF = 4f; // including the war chief himself / herself
-    public static final float SPEED_WALK = 3f;  //tile/s
-    public static final float SPEED_PUSHED = 8f;
-    public static final int OA_CHARGING_BAR_MAW_VALUE = 100;
-    public static final int BRAVERY_MORAL_FACTOR = 1;
+    public static final float MAX_UNITS_UNDER_WARLORD = 6; // including the warlord himself / herself
+    public static final float MAX_UNITS_UNDER_WAR_CHIEF = 5; // including the war chief himself / herself
+    public static final int OA_CHARGING_BAR_MAX_VALUE = 100;
     public static final int NB_BUILDING_MAX = 2;
+    public static final int DEX_FACTOR_ATT_ACC = 3;
+    public static final int DEX_FACTOR_AVO = 4;
+    public static final int DEX_FACTOR_DROP = 2;
     public static final int GUARD_RANGE_MIN = 1;
     public static final int GUARD_RANGE_MAX = 1;
 
-    // item bonus
-    public static final int DEF_BONUS_YAYOI_SHIELD = 2;
-    public static final int DEF_BONUS_GREAT_SHIELD = 3;
-    public static final int DEF_BONUS_OYOROI = 2;
-    public static final int DEF_BONUS_TANKO = 2;
-    public static final int DEF_BONUS_KEIKO = 3;
-    public static final int DEX_BONUS_YAYOI_SHIELD = 3;
-    public static final int DEX_BONUS_TANKO = 3;
-    public static final int DEX_BONUS_EMISHI_LEGGINS = 3;
-    public static final int DEX_BONUS_YAMATO_TROUSERS = 5;
-    public static final float CRITICAL_DAMAGE_MODIFIER = 2f;
-    public static final float CRIT_BONUS_IMP_GAUNLET = 1f;
-    public static final float CRIT_REDUCTION_DAMAGE_IMP_ARMBAND = 3f;
-    public static final float UNIQUE_EQUIPMENT_HIGH_GROWTH_BONUS = 0.2f;
-    public static final float UNIQUE_EQUIPMENT_LOW_GROWTH_BONUS = 0.1f;
-    public static final int UNIQUE_EQUIPMENT_FIXE_STD_BONUS = 1;
-    public static final int CHARM_HEAL_BONUS = 4;
+    // RENDER parameters
+    public static final float SPEED_WALK = 3f;  //tile/s
+    public static final float SPEED_PUSHED = 8f;
 
-    // weapon parameters
-    public static final int STR_FIXE_BONUS_YARI_1 = 3;
-    public static final int STR_FIXE_BONUS_YARI_2 = 2;
-    public static final int STR_FIXE_BONUS_NAGINATA_1 = 2;
-    public static final int STR_FIXE_BONUS_NAGINATE_2 = 3;
-    public static final int AGI_DODGE_FACTOR = 4;
-    public static final int DEX_HIT_FACTOR = 3;
-    public static final int AB_TRIGGER_RATE_SKILL_FACTOR = 2;
-    public static final int DEX_FAC_DROP_RATE = 2;
-
-    // experience parameter
-    public static final double LVL_GAP_FACTOR = 0.35;
-    public static final int EXP_BASE_MODIFIER = 50;
+    // EXP parameter
+    public static final double EXP_LVL_GAP_FACTOR_1 = 0.35;
+    public static final double EXP_LVL_GAP_FACTOR_2 = 5;
+    public static final double EXP_WOUNDED_ONLY_FACTOR = 1.0/3.0;
     public static final int EXP_REQUIRED_LEVEL_UP = 100;
     public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
-    public static final double EXP_WOUNDED_ONLY_FACTOR = 1.0/3.0;
-    public static final double EXP_BONUS_FROM_LETTING_ENEMY_FLEES = 20.0;
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
 
+
+    /**
+     * for animation / rendering purposes, use to define:
+     *  - ids of animation sprite sets.
+     *  - ids of animations
+     */
+    public enum AnimationId {
+        WALK,
+        SWITCH_WEAPON,
+        SWITCH_POSITION,
+        PUSH,
+        HEAL,
+        STEAL,
+        BUILD,
+        GUARD,
+        COVER,
+        LEVELUP,
+        REST,
+        ATTACK,
+        DODGE,
+        PUSHED,
+        TREATED,
+        BACKSTABBED,
+        TAKE_HIT,
+        FLEE,
+        DIE,
+        GUARDED,
+
+
+    }
 
     public enum AreaType {
         SELECTED_UNIT,
@@ -74,180 +85,24 @@ public class Data {
         DEPLOYMENT
     }
 
-
-    public enum Behaviour {
-        CONTROLLED_BY_PLAYER,
-        PASSIVE;
-
-        public static Behaviour getStandard(){
-            return PASSIVE;
-        }
-    }
-
-    public enum Ethnicity{
-        JAPANESE,
-        AINU;
-
-        public static Ethnicity getStandard(){
-            return JAPANESE;
-        }
-    }
-
-
-    public enum  Orientation{
-        WEST,
-        NORTH,
-        SOUTH,
-        EAST;
-
-        public boolean isOpposedTo(Orientation or){
-            return (or == WEST && this == EAST )|| (or == SOUTH && this == NORTH);
-        }
-
-        public Orientation getOpposite() {
-            Orientation opposite = null;
-            if(this == NORTH) opposite = SOUTH;
-            if(this == SOUTH) opposite = NORTH;
-            if(this == EAST) opposite = WEST;
-            if(this == WEST) opposite = EAST;
-            return opposite;
-        }
-
-        public static Orientation getStandard(){
-            return SOUTH;
-        }
-    }
-
-    public enum Allegeance {
-        ALLY,
-        ENEMY,
-        NEUTRAL
-    }
-
-    public enum ArmyType{
-        PLAYER,
-        ALLY,
-        FOE
-    }
-
-    public enum GrowthStat {
-        CHARISMA,
-        LEADERSHIP,
-        MOBILITY,
-        HIT_POINTS,
-        STRENGTH,
-        DEFENSE,
-        DEXTERITY,
-        AGILITY,
-        SKILL,
-        BRAVERY
-    }
-
-    public enum UnitAppointmentErrorMsg{
-        SUCCESSFULLY_INSERTED,
-        NO_WC_SLOT_AVAILABLE,
-        IS_ALREADY_A_WC,
-        HAS_ALREADY_STANDARD_BEARER,
-        ALREADY_PART_OF_THIS_SQUAD,
-        SELECTED_SQUAD_DOES_NOT_EXIST,
-        NO_SLOT_AVAILABLE,
-        NULL_ARG
-    }
-
-    public enum BannerSign {
-        NONE(0,3),
-        IZANAGI(15,1),    // ABILITY
-        AMATERASU(1,1),  // PO
-        HACHIMAN(1,3),   // DEFENSE
-        APEHUCI(1,3),    // STRENGTH
-        TUNTU(10,2),      // EXPERIENCE
-        SHIRAMBA(1,3);   // DEXTERITY
-
-        private int gain;
-        private int maxSignByBanner;
-
-        BannerSign(int gain, int maxSignByBanner){
-            this.gain = gain;
-            this.maxSignByBanner = maxSignByBanner;
-        }
-
-        public int getGain(){
-            return gain;
-        }
-
-        public int getMax() {
-            return maxSignByBanner;
-        }
-    }
-
-    public enum Item {
-        YAYOI_SHIELD("yayoi shield", ItemType.ARMOR),
-        GREAT_SHIELD("great shield", ItemType.ARMOR),
-        TANKO_ARMOR("tanko armor", ItemType.ARMOR),
-        KEIKO_ARMOR("keiko armor", ItemType.ARMOR),
-        OYOROI_ARMOR("o yoroi armor", ItemType.ARMOR),
-        EMISHI_LEGGINGS("emishi leggings", ItemType.ARMOR),
-        YAMATO_TROUSERS("yamato trousers", ItemType.ARMOR),
-        ARMBAND("armband", ItemType.UNIQUE),
-        GAUNLET("gaunlet", ItemType.UNIQUE),
-        MASTER_BELT("master belt", ItemType.UNIQUE),
-        KABUTO("war chief kabuto", ItemType.UNIQUE),
-        WAR_CHIEF_CLOAK("war chief cloak", ItemType.UNIQUE),
-        WEI_BOOTS("wei boots", ItemType.UNIQUE),
-        IMPERIAL_ARMBAND("imperial armband", ItemType.UNIQUE),
-        IMPERIAL_GAUNTLET("imperial gauntlet", ItemType.UNIQUE),
-        EMISHI_RING("emishi ring", ItemType.UNIQUE),
-        DEAR_MANTLE("emishi dear mantle", ItemType.UNIQUE),
-        THIEF_RING("thief ring", ItemType.UNIQUE),
-        SEISMOMETER("seismometer", ItemType.UNIQUE),
-        CHARM("charm", ItemType.UNIQUE),
-        NONE("nothing", ItemType.NOTHING);
-
-        private String name;
-        private ItemType itemType;
-
-        Item(String name, ItemType itemType) {
-            this.name = name;
-            this.itemType = itemType;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public ItemType getItemType() {
-            return itemType;
-        }
-
-        public static Item getStandard(){
-            return NONE;
-        }
-    }
-
-    public enum ItemType {
-        ARMOR,
-        UNIQUE,
-        NOTHING
-    }
-
     public enum TileType {
-        VILLAGE(    "village", 204, 143, 37,                    true, true, true, true,         5, 0, 1, 0, 0, false),
-        SANCTUARY(  "sanctuary", 228, 56, 56,                   true, true, true, true,         5, 0, 1, 0, 0, false),
-        STOCKADE(   "stockade", 204, 112, 37,                   true, true, false, true,        5, 0, 2, 0, 0, false),
-        CASTLE(     "castle", 204, 73 ,37 ,                     true, true, false, true,        5, 0, 3, 20, 0, false),
-        TOMB(       "kofun burial mount", 38 ,67, 47,           true, true, true, true,         0, 1, 0, 0, 0, true),
-        RUINS(      "ruins", 152, 152, 152,                     true, false, false, true,       0, 0, 1, 0, 0, false),
-        MOUNTAINS(   "mountain", 101, 91, 16,                   false, false, false, false,     0, 0, 0, 0, 0, false),
-        FOREST(     "deep forest", 5, 96, 34,                   false, false, false, false,     0, 0, 0, 0, 0, false),
-        OCEAN(      "deep waters", 25, 157, 197,                false, false, false, false,     0, 0, 0, 0, 0, false),
-        SHALLOWS(   "shallows", 30, 211, 227,                   false, false, false, false,     0, 0, 0, 0, 0, false),
-        HILLS(      "hill", 146, 134, 40,                       false, false, false, true,      0, 1, 0, 0, 0, true),
-        WOODS(      "woods", 10, 158, 57,                       false, false, false, true,      0, 0, 0, 15, 0, false),
-        SWAMP(      "swamp", 112, 155, 80,                      false, false, false, true,      0, 0, 0, 0, -15, false),
-        PLAIN(      "plain", 17, 215, 80,                       false, false, false, true,      0, 0, 0, 0, 0, false),
-        BRIDGE(      "wooden bridge", 85, 96, 134,              false, false, false, true,      0, 0, 0, 0, 0, false),
-        BROKEN_BRIDGE("broken wooden bridge", 95, 101, 124,     false, false, false, false,     0, 0, 0, 0, 0, false),
-        WATCH_TOWER("future bridge", 193, 26, 137,              true, true, false, true,      3, 0, 1, 0, 0, true);
+        VILLAGE(        "village", 204, 143, 37,                    true, true, true, true,         5, 0, 1, 0, 0, false),
+        SANCTUARY(      "sanctuary", 228, 56, 56,                   true, true, true, true,         5, 0, 1, 0, 0, false),
+        STOCKADE(       "stockade", 204, 112, 37,                   true, true, false, true,        5, 0, 2, 0, 0, false),
+        CASTLE(         "castle", 204, 73 ,37 ,                     true, true, false, true,        5, 0, 3, 20, 0, false),
+        ANCIENT_SITE(   "ancient site", 38 ,67, 47,                 true, true, true, true,         0, 1, 0, 0, 0, true),
+        RUINS(          "ruins", 152, 152, 152,                     true, false, false, true,       0, 0, 1, 0, 0, false),
+        MOUNTAINS(      "mountain", 101, 91, 16,                    false, false, false, false,     0, 0, 0, 0, 0, false),
+        FOREST(         "deep forest", 5, 96, 34,                   false, false, false, false,     0, 0, 0, 0, 0, false),
+        OCEAN(          "deep waters", 25, 157, 197,                false, false, false, false,     0, 0, 0, 0, 0, false),
+        SHALLOWS(       "shallows", 30, 211, 227,                   false, false, false, false,     0, 0, 0, 0, 0, false),
+        HILLS(          "hill", 146, 134, 40,                       false, false, false, true,      0, 1, 0, 0, 0, true),
+        WOODS(          "woods", 10, 158, 57,                       false, false, false, true,      0, 0, 0, 15, 0, false),
+        SWAMP(          "swamp", 112, 155, 80,                      false, false, false, true,      0, 0, 0, 0, -15, false),
+        PLAIN(          "plain", 17, 215, 80,                       false, false, false, true,      0, 0, 0, 0, 0, false),
+        BRIDGE(         "wooden bridge", 85, 96, 134,               false, false, false, true,      0, 0, 0, 0, 0, false),
+        BROKEN_BRIDGE(  "broken wooden bridge", 95, 101, 124,       false, false, false, false,     0, 0, 0, 0, 0, false),
+        WATCH_TOWER(    "future bridge", 193, 26, 137,              true, true, false, true,      3, 0, 1, 0, 0, true);
 
         private String name;
 
@@ -261,13 +116,13 @@ public class Data {
         private boolean reachable;          // can be traversable by standard unit
 
         private int healPower;
-        private int strengthBonus;
+        private int attackMightBonus;
         private int defenseBonus;
         private int avoidBonus;
         private int attackAccBonus;
         private boolean rangeBonus;
 
-        TileType(String name, int r, int g, int b, boolean urbanArea, boolean plunderable, boolean lootable, boolean reachable, int healPower, int strengthBonus, int defenseBonus, int avoidBonus, int attackAccBonus, boolean rangeBonus) {
+        TileType(String name, int r, int g, int b, boolean urbanArea, boolean plunderable, boolean lootable, boolean reachable, int healPower, int attackMightBonus, int defenseBonus, int avoidBonus, int attackAccBonus, boolean rangeBonus) {
             this.name = name;
             this.r = r;
             this.g = g;
@@ -277,7 +132,7 @@ public class Data {
             this.lootable = lootable;
             this.healPower = healPower;
             this.reachable = reachable;
-            this.strengthBonus = strengthBonus;
+            this.attackMightBonus = attackMightBonus;
             this.defenseBonus = defenseBonus;
             this.avoidBonus = avoidBonus;
             this.attackAccBonus = attackAccBonus;
@@ -301,8 +156,8 @@ public class Data {
             return name;
         }
 
-        public int getStrengthBonus(){
-            return strengthBonus;
+        public int getAttackMightBonus(){
+            return attackMightBonus;
         }
 
         public boolean isUrbanArea(){
@@ -339,101 +194,530 @@ public class Data {
             return rangeBonus;
         }
 
-        public static TileType getStandard(){
-            return PLAIN;
-        }
     }
 
-    public enum AbilityType{
-        OFFENSIVE,
-        SUPPORT,
-        PASSIVE,
-        NONE
+    public enum DamageType{
+        BLUNT,
+        EDGED,
+        PIERCING
     }
 
-    public enum Ability {
-        FOCUSED_BLOW(AbilityType.OFFENSIVE),
-        CRIPPLING_BLOW(AbilityType.OFFENSIVE),
-        SWIRLING_BLOW(AbilityType.OFFENSIVE),
-        SWIFT_BLOW(AbilityType.OFFENSIVE),
-        HEAVY_BLOW(AbilityType.OFFENSIVE),
-        CRUNCHING_BLOW(AbilityType.OFFENSIVE),
-        WAR_CRY(AbilityType.OFFENSIVE),
-        POISONOUS_ATTACK(AbilityType.OFFENSIVE),
-        HARASS(AbilityType.OFFENSIVE),
-        LINIENT_BLOW(AbilityType.OFFENSIVE),
-        FURY(AbilityType.OFFENSIVE),
+    public enum WeaponType{
+        SWORD,
+        AXE,
+        BOW,
+        MACE,
+        POLEARM,
+        FIST
+    }
 
-        COVER(AbilityType.SUPPORT),
-        PRAY(AbilityType.SUPPORT),
-        HEAL(AbilityType.SUPPORT),
-        STEAL(AbilityType.SUPPORT),
-        BUILD(AbilityType.SUPPORT),
-        GUARD(AbilityType.SUPPORT),
+    public enum WeaponArt{
+        NONE(0);
 
-        PATHFINDER(AbilityType.PASSIVE),         // OK
-        UNBREAKABLE(AbilityType.PASSIVE),
-        SHADOW(AbilityType.PASSIVE),
-        VIGILANT(AbilityType.PASSIVE),
-        NONE(AbilityType.NONE);
+        private int cost;
 
-        AbilityType type;
-
-        Ability(AbilityType type) {
-            this.type = type;
+        WeaponArt(int cost) {
+            this.cost = cost;
         }
 
-        public AbilityType getType() {
-            return type;
+        public int getCost() {
+            return cost;
         }
     }
 
     /**
-     * for animation / rendering purposes, use to define:
-     *  - ids of animation sprite sets.
-     *  - ids of animations
+     * SWORD
+     *  - shortsword
+     *  - arming sword
+     *  - broadsword
+     *  - falchion
+     *  - bastard sward (blunt)
+     *  - long sword
+     *  - claymore
+     *  - flamberge
+     *  - estoc
+     *  - rapier
+     *  - zweihander
+     *  - dagger
+     *
+     *  POLEARM
+     *  - pike
+     *  - lance
+     *  - spear
+     *  - javelin
+     *  - Fauchard
+     *  - Voulge
+     *  - Guisarme
+     *  - Partisan
+     *  - Corseque
+     *  - lucerne hammer
+     *
+     *  AXE
+     *  - broad axe
+     *  - Francish axe
+     *  - Shepherd's axe
+     *  - battle axe
+     *  - sagaris
+     *  - danish axe
+     *  - Great axe
+     *  - halberd
+     *  - bardiche
+     *
+     *  MACE & HAMMER
+     *  - club
+     *  - spicked club
+     *  - mace
+     *  - Morning star
+     *  - Pernach
+     *  - flail
+     *  - war hammer
+     *
+     *  BOW:
+     *  - Hunting bow
+     *  - Recurve bow
+     *  - horse bow
+     *  - flat bow
+     *  - composite bow
+     *  - Cable-backed bow
+     *  - longbow
+     *  - crossbow
      */
-    public enum AnimationId {
-        WALK,               //automatized
-        SWITCH_WEAPON,      //automatized
-        SWITCH_POSITION,    //automatized
-        PUSH,               //automatized
-        HEAL,
-        PRAY,
-        STEAL,              //automatized
-        BUILD,              //automatized
-        GUARD,
-        COVER,
-        LEVELUP,            //automatized, partially at least, the chosen secondary and level-up panels are displayed separately to distinguish between player and AI's units
-        REST,               //automatized, standard animation
-        ATTACK,
+    public enum Weapon{
+        FIST(           1, 100, 1, 1, WeaponType.FIST, DamageType.BLUNT, WeaponArt.NONE),
+        SHORTSWORD(     5,  90, 1, 1, WeaponType.SWORD, DamageType.EDGED, WeaponArt.NONE),
+        LANCE(          4, 100, 1, 1, WeaponType.POLEARM, DamageType.PIERCING, WeaponArt.NONE),
+        BROAD_AXE(      3,  95, 1, 1, WeaponType.AXE, DamageType.EDGED, WeaponArt.NONE),
+        CLUB(           3,  90, 1, 1, WeaponType.MACE, DamageType.BLUNT, WeaponArt.NONE),
+        HUNTING_BOW(    3,  85, 2, 2, WeaponType.BOW, DamageType.PIERCING, WeaponArt.NONE);
 
-        // REACTION ANIMATION
+        private int damage;
+        private int accuracy;
+        private int rangeMin;
+        private int rangeMax;
+        private WeaponType weaponType;
+        private DamageType damageType;
+        private WeaponArt art;
 
-        DODGE,
-        PUSHED,             //automatized
-        TREATED,            //automatized
-        BACKSTABBED,
-        TAKE_HIT,           //automatized
-        FLEE,               //automatized
-        DIE,                //automatized
-        GUARDED,            //automatized
+        Weapon(int damage, int accuracy, int rangeMin, int rangeMax, WeaponType weaponType, DamageType damageType, WeaponArt art) {
+            this.damage = damage;
+            this.accuracy = accuracy;
+            this.rangeMin = rangeMin;
+            this.rangeMax = rangeMax;
+            this.weaponType = weaponType;
+            this.damageType = damageType;
+            this.art = art;
+        }
 
-        //OFFFENSIVE ABILITY ANIMATINO
+        public WeaponType getWeaponType() {
+            return weaponType;
+        }
 
-        FOCUSED_BLOW,
-        CRIPPLING_BLOW,
-        SWIRLING_BLOW,
-        SWIFT_BLOW,
-        HEAVY_BLOW,
-        CRUNCHING_BLOW,
-        WAR_CRY,
-        POISONOUS_ATTACK,
-        HARASS,
-        LINIENT_BLOW,
-        FURY,
+        public int getDamage() {
+            return damage;
+        }
 
+        public int getAccuracy() {
+            return accuracy;
+        }
+
+        public int getRangeMin() {
+            return rangeMin;
+        }
+
+        public int getRangeMax() {
+            return rangeMax;
+        }
+
+        public DamageType getDamageType() {
+            return damageType;
+        }
+
+        public WeaponArt getArt() {
+            return art;
+        }
     }
+
+    public enum Behaviour{
+        PLAYER,
+        PASSIVE
+    }
+
+    public enum  Orientation{
+        WEST,
+        NORTH,
+        SOUTH,
+        EAST;
+
+        public boolean isOpposedTo(Orientation or){
+            return (or == WEST && this == EAST )|| (or == SOUTH && this == NORTH);
+        }
+
+        public Orientation getOpposite() {
+            Orientation opposite = null;
+            if(this == NORTH) opposite = SOUTH;
+            if(this == SOUTH) opposite = NORTH;
+            if(this == EAST) opposite = WEST;
+            if(this == WEST) opposite = EAST;
+            return opposite;
+        }
+
+        public static Orientation getStandard(){
+            return SOUTH;
+        }
+    }
+
+    public enum Allegeance{
+        ALLY,
+        ENEMY
+    }
+
+    public enum BannerSign {
+        NONE(0,3);
+
+        private int gain;
+        private int maxSignByBanner;
+
+        BannerSign(int gain, int maxSignByBanner){
+            this.gain = gain;
+            this.maxSignByBanner = maxSignByBanner;
+        }
+
+        public int getGain(){
+            return gain;
+        }
+
+        public int getMax() {
+            return maxSignByBanner;
+        }
+    }
+
+    public enum PassiveAbility{
+        PATHFINDER,
+        SHADOW,
+        VILIGANT,
+        NONE
+    }
+
+    public enum SupportAbility{
+        GUARD,
+        HEAL,
+        STEAL,
+        BUILD,
+        NONE
+    }
+
+    public enum Item{
+        NOTHING
+    }
+
+    public enum Job {
+        SOLAR_KNIGHT(1, "Solar knight", 3, 5,
+                3, 1, 45, 9, 3, 5, 11, 7, 8, 3, 5,
+                0.10f, 0.05f, 0.55f, 0.35f, 0.20f, 0.10f, 0.10f, 0.10f, 0.15f, 0.25f, 0.45f,
+                1, 4, 10, 2, 1, 0, 3, 1, 1, 3, 3,
+                0.15f, 0.05f, 0.70f, 0.50f, 0.30f, 0.10f,  0.10f,  0.10f, 0.20f, 0.30f, 0.50f);
+
+        private int startingLevel;
+        private String name;
+        private int footmanMob;
+        private int horsemanMob;
+
+        private int baseCha;
+        private int baseLd;
+        private int baseHP;
+        private int baseStr;
+        private int baseDex;
+        private int baseAg;
+        private int basePiercingArmor;
+        private int baseBluntArmor;
+        private int baseEgdedArmor;
+        private int baseSk;
+        private int baseBr;
+
+        private float growthCha;
+        private float growthLd;
+        private float growthHP;
+        private float growthStr;
+        private float growthDex;
+        private float growthAg;
+        private float growthPiercingArmor;
+        private float growthBluntArmor;
+        private float growthEdgegArmor;
+        private float growthSk;
+        private float growthBr;
+
+        private int proBoCha;
+        private int proBoLd;
+        private int proBoHP;
+        private int proBoStr;
+        private int proBoDex;
+        private int proBoAg;
+        private int proBoPiercingArmor;
+        private int proBoBluntArmor;
+        private int proBoEdgedArmor;
+        private int proBoSk;
+        private int proBoBr;
+
+        private float proGrowthCha;
+        private float proGrowthLd;
+        private float getProGrowthHP;
+        private float proGrowthStr;
+        private float proGrowthDex;
+        private float proGrowthAg;
+        private float proGrowthPiercingArmor;
+        private float proGrowthBluntArmor;
+        private float proGrowthEdgedArmor;
+        private float proGrowthSk;
+        private float proGrowthBr;
+
+        Job(int startingLevel, String name, int footmanMob, int horsemanMob, int baseCha, int baseLd, int baseHP, int baseStr, int baseDex, int baseAg, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseSk, int baseBr, float growthCha, float growthLd, float growthHP, float growthStr, float growthDex, float growthAg, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthSk, float growthBr, int proBoCha, int proBoLd, int proBoHP, int proBoStr, int proBoDex, int proBoAg, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoSk, int proBoBr, float proGrowthCha, float proGrowthLd, float getProGrowthHP, float proGrowthStr, float proGrowthDex, float proGrowthAg, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthSk, float proGrowthBr) {
+            this.startingLevel = startingLevel;
+            this.name = name;
+            this.footmanMob = footmanMob;
+            this.horsemanMob = horsemanMob;
+            this.baseCha = baseCha;
+            this.baseLd = baseLd;
+            this.baseHP = baseHP;
+            this.baseStr = baseStr;
+            this.baseDex = baseDex;
+            this.baseAg = baseAg;
+            this.basePiercingArmor = basePiercingArmor;
+            this.baseBluntArmor = baseBluntArmor;
+            this.baseEgdedArmor = baseEgdedArmor;
+            this.baseSk = baseSk;
+            this.baseBr = baseBr;
+            this.growthCha = growthCha;
+            this.growthLd = growthLd;
+            this.growthHP = growthHP;
+            this.growthStr = growthStr;
+            this.growthDex = growthDex;
+            this.growthAg = growthAg;
+            this.growthPiercingArmor = growthPiercingArmor;
+            this.growthBluntArmor = growthBluntArmor;
+            this.growthEdgegArmor = growthEdgegArmor;
+            this.growthSk = growthSk;
+            this.growthBr = growthBr;
+            this.proBoCha = proBoCha;
+            this.proBoLd = proBoLd;
+            this.proBoHP = proBoHP;
+            this.proBoStr = proBoStr;
+            this.proBoDex = proBoDex;
+            this.proBoAg = proBoAg;
+            this.proBoPiercingArmor = proBoPiercingArmor;
+            this.proBoBluntArmor = proBoBluntArmor;
+            this.proBoEdgedArmor = proBoEdgedArmor;
+            this.proBoSk = proBoSk;
+            this.proBoBr = proBoBr;
+            this.proGrowthCha = proGrowthCha;
+            this.proGrowthLd = proGrowthLd;
+            this.getProGrowthHP = getProGrowthHP;
+            this.proGrowthStr = proGrowthStr;
+            this.proGrowthDex = proGrowthDex;
+            this.proGrowthAg = proGrowthAg;
+            this.proGrowthPiercingArmor = proGrowthPiercingArmor;
+            this.proGrowthBluntArmor = proGrowthBluntArmor;
+            this.proGrowthEdgedArmor = proGrowthEdgedArmor;
+            this.proGrowthSk = proGrowthSk;
+            this.proGrowthBr = proGrowthBr;
+        }
+
+        public int getStartingLevel() {
+            return startingLevel;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getFootmanMob() {
+            return footmanMob;
+        }
+
+        public int getHorsemanMob() {
+            return horsemanMob;
+        }
+
+        public int getBaseCha() {
+            return baseCha;
+        }
+
+        public int getBaseLd() {
+            return baseLd;
+        }
+
+        public int getBaseHP() {
+            return baseHP;
+        }
+
+        public int getBaseStr() {
+            return baseStr;
+        }
+
+        public int getBaseDex() {
+            return baseDex;
+        }
+
+        public int getBaseAg() {
+            return baseAg;
+        }
+
+        public int getBasePiercingArmor() {
+            return basePiercingArmor;
+        }
+
+        public int getBaseBluntArmor() {
+            return baseBluntArmor;
+        }
+
+        public int getBaseEgdedArmor() {
+            return baseEgdedArmor;
+        }
+
+        public int getBaseSk() {
+            return baseSk;
+        }
+
+        public int getBaseBr() {
+            return baseBr;
+        }
+
+        public float getGrowthCha() {
+            return growthCha;
+        }
+
+        public float getGrowthLd() {
+            return growthLd;
+        }
+
+        public float getGrowthHP() {
+            return growthHP;
+        }
+
+        public float getGrowthStr() {
+            return growthStr;
+        }
+
+        public float getGrowthDex() {
+            return growthDex;
+        }
+
+        public float getGrowthAg() {
+            return growthAg;
+        }
+
+        public float getGrowthPiercingArmor() {
+            return growthPiercingArmor;
+        }
+
+        public float getGrowthBluntArmor() {
+            return growthBluntArmor;
+        }
+
+        public float getGrowthEdgegArmor() {
+            return growthEdgegArmor;
+        }
+
+        public float getGrowthSk() {
+            return growthSk;
+        }
+
+        public float getGrowthBr() {
+            return growthBr;
+        }
+
+        public int getProBoCha() {
+            return proBoCha;
+        }
+
+        public int getProBoLd() {
+            return proBoLd;
+        }
+
+        public int getProBoHP() {
+            return proBoHP;
+        }
+
+        public int getProBoStr() {
+            return proBoStr;
+        }
+
+        public int getProBoDex() {
+            return proBoDex;
+        }
+
+        public int getProBoAg() {
+            return proBoAg;
+        }
+
+        public int getProBoPiercingArmor() {
+            return proBoPiercingArmor;
+        }
+
+        public int getProBoBluntArmor() {
+            return proBoBluntArmor;
+        }
+
+        public int getProBoEdgedArmor() {
+            return proBoEdgedArmor;
+        }
+
+        public int getProBoSk() {
+            return proBoSk;
+        }
+
+        public int getProBoBr() {
+            return proBoBr;
+        }
+
+        public float getProGrowthCha() {
+            return proGrowthCha;
+        }
+
+        public float getProGrowthLd() {
+            return proGrowthLd;
+        }
+
+        public float getGetProGrowthHP() {
+            return getProGrowthHP;
+        }
+
+        public float getProGrowthStr() {
+            return proGrowthStr;
+        }
+
+        public float getProGrowthDex() {
+            return proGrowthDex;
+        }
+
+        public float getProGrowthAg() {
+            return proGrowthAg;
+        }
+
+        public float getProGrowthPiercingArmor() {
+            return proGrowthPiercingArmor;
+        }
+
+        public float getProGrowthBluntArmor() {
+            return proGrowthBluntArmor;
+        }
+
+        public float getProGrowthEdgedArmor() {
+            return proGrowthEdgedArmor;
+        }
+
+        public float getProGrowthSk() {
+            return proGrowthSk;
+        }
+
+        public float getProGrowthBr() {
+            return proGrowthBr;
+        }
+
+        public static Job getStandard(){
+            return SOLAR_KNIGHT;
+        }
+    }
+
 
     public enum RangedBasedType{
         MOVE,
@@ -454,35 +738,18 @@ public class Data {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                (RangedBasedType.MOVE),
-        SWITCH_WEAPON       (RangedBasedType.ONESELF),
-        SWITCH_POSITION     (1, 1),
-        PUSH                (1, 1),
-        PRAY                (1, 1),
-        HEAL                (RangedBasedType.ONESELF, -1, -1,false, false, DamageType.NONE,new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        GUARD               (RangedBasedType.ONESELF),
-        STEAL               (1, 1),
-        BUILD               (1, 1),
-        COVER               (RangedBasedType.ONESELF),
-        ATTACK              (RangedBasedType.WEAPON),
-        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF),
-        USE_FOCUSED_BLOW    (false, false, DamageType.PIERCING, new int[][]{{}}),
-        USE_CRIPPLING_BLOW  (false, false, DamageType.PIERCING, new int[][]{{}}),
-        USE_SWIRLING_BLOW   (true, false, DamageType.EDGED, new int[][]{{-1,1}, {-1,-1}}),
-        USE_SWIFT_BLOW      (false, false, DamageType.EDGED, new int[][]{}),
-        USE_HEAVY_BLOW      (false, false, DamageType.BLUNT, new int[][]{}),
-        USE_CRUNCHING_BLOW  (true, false, DamageType.BLUNT, new int[][]{{1, 0}, {-1, 0}}),
-        USE_WAR_CRY         (false, false, DamageType.NONE, new int[][]{{}}),
-        USE_POISONOUS_ATTACK(false, false, DamageType.NONE, new int[][]{{}}),
-        USE_HARASS          (false, false, DamageType.NONE, new int[][]{{}}),
-        USE_LINIENT_BLOW    (false, false, DamageType.NONE, new int[][]{{}}),
-        USE_FURY            (false, false, DamageType.NONE, new int[][]{{}});
+        WALK                (RangedBasedType.MOVE, new int[0][0]),
+        SWITCH_WEAPON       (RangedBasedType.ONESELF, new int[0][0]),
+        SWITCH_POSITION     (1, 1, new int[0][0]),
+        PUSH                (1, 1, new int[0][0]),
+        HEAL                (RangedBasedType.ONESELF, -1, -1, new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
+        GUARD               (RangedBasedType.ONESELF, new int[0][0]),
+        STEAL               (1, 1, new int[0][0]),
+        BUILD               (1, 1, new int[0][0]),
+        COVER               (RangedBasedType.ONESELF, new int[0][0]),
+        ATTACK              (RangedBasedType.WEAPON, new int[0][0]),
+        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF, new int[0][0]);
 
-
-        // WEAPON REQUIREMENTS
-        private boolean meleeOnly;
-        private boolean rangeOnly;
-        private DamageType damageTypeRequired;
 
         // RANGE REQUIREMENT
         private RangedBasedType rangeType;
@@ -491,13 +758,10 @@ public class Data {
         private Array<int[]> impactArea; // area on which the action is performed.
 
 
-        ActionChoice(RangedBasedType type, int rangeMax, int rangeMin , boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
+        ActionChoice(RangedBasedType type, int rangeMin, int rangeMax, int[][] impactArea) {
             this.rangeType = type;
             this.rangeMax = rangeMax;
             this.rangeMin = rangeMin;
-            this.meleeOnly = meleeOnly;
-            this.rangeOnly = rangeOnly;
-            this.damageTypeRequired = damageTypeRequired;
             this.impactArea = new Array<int[]>();
             for(int[] relativeTileCoordinates : impactArea){
                 this.impactArea.add(relativeTileCoordinates);
@@ -505,17 +769,12 @@ public class Data {
 
         }
 
-        // offensive ability constructor
-        ActionChoice(boolean meleeOnly, boolean rangeOnly, DamageType damageTypeRequired, int[][] impactArea) {
-            this(RangedBasedType.WEAPON,-1, -1, meleeOnly, rangeOnly, damageTypeRequired, impactArea);
+        ActionChoice(int rangeMin, int rangeMax, int[][] impactArea){
+            this(RangedBasedType.SPECIFIC, rangeMax, rangeMin, impactArea);
         }
 
-        ActionChoice(int rangeMax, int rangeMin) {
-            this(RangedBasedType.SPECIFIC,rangeMax, rangeMin, false , false, DamageType.NONE, new int[][]{{}});
-        }
-
-        ActionChoice(RangedBasedType type){
-            this(type, -1,-1,false, false, DamageType.NONE, new int[][]{{}});
+        ActionChoice(RangedBasedType type, int[][] impactArea) {
+            this(type, -1, -1 ,impactArea);
         }
 
         public RangedBasedType getRangeType() { return rangeType; }
@@ -527,16 +786,6 @@ public class Data {
         public int getRangeMin() {
             return rangeMin;
         }
-
-        public boolean isMeleeOnly() {
-            return meleeOnly;
-        }
-
-        public boolean isRangeOnly() {
-            return rangeOnly;
-        }
-
-        public DamageType getDamageTypeRequired() { return damageTypeRequired; }
 
         /*
                                         NORTH (standard):
@@ -594,469 +843,26 @@ public class Data {
             return orientedArea;
         }
 
+        public Array<int[]> getOrientedImpactArea(Data.Orientation orientation, int rowActor, int colActor, Battlefield battlefield) {
+            Array<int[]> orientedArea = getOrientedImpactArea(orientation);
+            int r;
+            int c;
+            for(int i = 0; i < orientedArea.size; i++){
+                r = orientedArea.get(i)[0] + rowActor;
+                c  = orientedArea.get(i)[0] + colActor;
+                if(battlefield.isTileExisted(r, c)){
+                    orientedArea.get(i)[0] = r;
+                    orientedArea.get(i)[1] = c;
+                }
+            }
+            return orientedArea;
+        }
+
+
+
         public int getImpactAreaSize(){
             return impactArea.size + 1;
         }
 
-    }
-
-    public enum DamageType {
-        EDGED,
-        PIERCING,
-        BLUNT,
-        NONE
-    }
-
-    public enum WeaponArt{
-        NONE,
-        KENJUTSU,
-        BACKSTAB,
-        ARMOR_SLAYER,
-        HORSEMAN_SLAYER,
-        COVERING_FIRE,
-        FIRST_STRIKE,
-        NODACHI_JUSTU,
-        NAGINATA_JUTSU
-    }
-
-    public enum Weapon{
-        NONE(false,      0, 0, 1, 1, DamageType.BLUNT, WeaponArt.NONE),
-        KATANA(false,    3, 70, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
-        WARABITE(false,  4, 70, 1, 1, DamageType.EDGED, WeaponArt.KENJUTSU),
-        SAI(true,         1, 90, 1, 1, DamageType.PIERCING, WeaponArt.BACKSTAB),
-        NAGINATA(false,   4, 65, 1, 1, DamageType.EDGED, WeaponArt.NAGINATA_JUTSU),
-        NODACHI(true,     5, 60, 1, 1, DamageType.BLUNT, WeaponArt.NODACHI_JUSTU ),
-        YARI(false,      3, 80, 1, 1, DamageType.PIERCING, WeaponArt.HORSEMAN_SLAYER),
-        YUMI(false,       4, 60, 2, 2, DamageType.PIERCING, WeaponArt.COVERING_FIRE),
-        BO(true,          3, 65, 1, 1, DamageType.BLUNT, WeaponArt.FIRST_STRIKE),
-        KANABO(true,      5, 55, 1, 1, DamageType.BLUNT, WeaponArt.ARMOR_SLAYER);
-
-        private boolean footmanOnly;
-        private int damage;
-        private int accuracy;
-        private int rangeMin;
-        private int rangeMax;
-        private DamageType type;
-        private WeaponArt art;
-
-        Weapon(boolean footmanOnly, int damage, int accuracy, int rangeMin, int rangeMax, DamageType type, WeaponArt art) {
-           this.footmanOnly = footmanOnly;
-            this.damage = damage;
-            this.accuracy = accuracy;
-            this.rangeMin = rangeMin;
-            this.rangeMax = rangeMax;
-            this.type = type;
-            this.art = art;
-        }
-
-        public boolean isRangedW(){
-            return getRangeMax() > 1;
-        }
-
-        public boolean isMeleeW() { return  getRangeMin() == 1; }
-
-        public boolean isFootmanOnly() {
-            return footmanOnly;
-        }
-
-        public int getDamage() {
-            return damage;
-        }
-
-        public int getAccuracy() {
-            return accuracy;
-        }
-
-        public int getRangeMin() {
-            return rangeMin;
-        }
-
-        public int getRangeMax() {
-            return rangeMax;
-        }
-
-        public DamageType getType() {
-            return type;
-        }
-
-        public WeaponArt getArt() {
-            return art;
-        }
-
-    }
-
-
-    public enum JobTemplate {
-        CONSCRIPT("conscript", "bushi",             4,  false, true, true,
-                new Weapon[]{Weapon.YARI, Weapon.YUMI, Weapon.KATANA},
-                new Weapon[]{Weapon.NODACHI, Weapon.NAGINATA},
-                Ability.NONE, Ability.NONE,
-                Ability.NONE, Ability.NONE,
-                new  Ability[]{Ability.BUILD, Ability.GUARD, Ability.COVER}),
-
-        EMISHI( "emishi warrior", "emishi warrior", 4,  false, true, true,
-                new Weapon[]{Weapon.WARABITE, Weapon.YUMI, Weapon.YARI},
-                new Weapon[]{Weapon.KANABO},
-                Ability.NONE, Ability.NONE,
-                Ability.NONE, Ability.NONE,
-                new  Ability[]{Ability.GUARD, Ability.COVER});
-
-        private String recruitName;
-        private String promotionName;
-        private int mobility;
-        private boolean possiblyHorseman;
-        private boolean possiblyHorsemanUnponPromotion;
-        private boolean possiblyStandardBearer;
-        private Weapon[] availableWeapons;
-        private Weapon[] availableWeaponsAfterPromotion;
-
-        private Ability nativePassiveAbility;
-        private Ability nativePassiveAbilityUponPromotion;
-        private Ability nativeSupportAbility;
-        private Ability nativeSupportAbilityUponPromotion;
-        private Ability[] availableSupportAbilities;
-
-
-        JobTemplate(String recruitName, String promotionName, int mobility, boolean possiblyHorseman, boolean possiblyHorsemanUnponPromotion, boolean standardBearer,
-                    Weapon[] availableWeapons,
-                    Weapon[] availableWeaponsAfterPromotion,
-                    Ability nativePassiveAbility,
-                    Ability nativePassiveAbilityUponPromotion,
-                    Ability nativeSupportAbility,
-                    Ability nativeSupportAbilityUponPromotion,
-                    Ability[] availableSupportAbilities) {
-            this.recruitName = recruitName;
-            this.promotionName = promotionName;
-            this.mobility = mobility;
-            this.possiblyHorseman = possiblyHorseman;
-            this.possiblyHorsemanUnponPromotion = possiblyHorsemanUnponPromotion;
-            this.possiblyStandardBearer = standardBearer;
-            this.availableWeapons = availableWeapons;
-            this.availableWeaponsAfterPromotion = new Weapon[availableWeapons.length + availableWeaponsAfterPromotion.length];
-            for(int i =0; i < availableWeapons.length; i++){
-                this.availableWeaponsAfterPromotion[i] = availableWeapons[i];
-            }
-            for(int i =0; i < availableWeapons.length; i++){
-                this.availableWeaponsAfterPromotion[i] = availableWeapons[i];
-            }
-            this.nativePassiveAbility = nativePassiveAbility;
-            this.nativePassiveAbilityUponPromotion = nativePassiveAbilityUponPromotion;
-            this.nativeSupportAbility = nativeSupportAbility;
-            this.nativeSupportAbilityUponPromotion = nativeSupportAbilityUponPromotion;
-            this.availableSupportAbilities = availableSupportAbilities;
-
-        }
-
-        public String getRecruitName(){
-            return recruitName;
-        }
-
-        public String getPromotionName() {
-            return promotionName;
-        }
-
-        public int getMobility() {
-            return mobility;
-        }
-
-        public boolean isPossiblyHorseman() {
-            return possiblyHorseman;
-        }
-
-        public boolean isPossiblyHorsemanUnponPromotion() {
-            return possiblyHorsemanUnponPromotion;
-        }
-
-        public Weapon[] getAvailableWeapons() {
-            return availableWeapons;
-        }
-
-        public Weapon[] getAvailableWeaponsAfterPromotion() {
-            return availableWeaponsAfterPromotion;
-        }
-
-        public boolean isPossiblyStandardBearerJob() {
-            return possiblyStandardBearer;
-        }
-
-        public Ability getNativePassiveAbility() {
-            return nativePassiveAbility;
-        }
-
-        public Ability getNativePassiveAbilityUponPromotion() {
-            return nativePassiveAbilityUponPromotion;
-        }
-
-        public Ability getNativeSupportAbility() {
-            return nativeSupportAbility;
-        }
-
-        public Ability getNativeSupportAbilityUponPromotion() {
-            return nativeSupportAbilityUponPromotion;
-        }
-
-        public Ability[] getAvailableSupportAbilities() {
-            return availableSupportAbilities;
-        }
-    }
-
-    public enum UnitTemplate {
-        CONSCRIPT(1, JobTemplate.CONSCRIPT,
-                1, 1, 39, 11, 3, 3, 5, 3, 1,    0.20f, 0.00f, 0.70f, 0.15f, 0.50f, 0.35f, 0.20f, 0.30f, 0.35f,
-                0, 1, 10, 2, 3, 1, 3, 2, 3,     0.30f, 0.00f, 0.85f, 0.30f, 0.60f, 0.35f, 0.25f, 0.50f, 0.55f,
-                new Ability[]{}),
-        EMISHI_TRIBESMAN(1, JobTemplate.EMISHI,
-                1, 1, 33, 13, 4, 3, 2, 3, 3,    0.20f, 0.00f, 0.50f, 0.25f, 0.55f, 0.50f, 0.15f, 0.30f, 0.40f,
-                0, 1, 6, 2, 2, 2, 2, 2, 2,      0.30f, 0.00f, 0.60f, 0.30f, 0.60f, 0.55f, 0.15f, 0.50f, 0.50f,
-                new Ability[]{});
-
-        private int startLevel;
-        private JobTemplate job;
-
-        private int baseCha;
-        private int baseLd;
-        private int baseHP;
-        private int baseStr;
-        private int baseDex;
-        private int baseAg;
-        private int baseDef;
-        private int baseSk;
-        private int baseBr;
-
-        private float growthCha;
-        private float growthLd;
-        private float growthHP;
-        private float growthStr;
-        private float growthDex;
-        private float growthAg;
-        private float growthDef;
-        private float growthSk;
-        private float growthBr;
-
-        private int proBoCha;
-        private int proBoLd;
-        private int proBoHP;
-        private int proBoStr;
-        private int proBoDex;
-        private int proBoAg;
-        private int proBoDef;
-        private int proBoSk;
-        private int proBoBr;
-
-        private float proGrowthCha;
-        private float proGrowthLd;
-        private float getProGrowthHP;
-        private float proGrowthStr;
-        private float proGrowthDex;
-        private float proGrowthAg;
-        private float proGrowthDef;
-        private float proGrowthSk;
-        private float proGrowthBr;
-
-        private Ability[] offensiveAbilityChoices;
-
-        UnitTemplate(int startLevel, JobTemplate job, int baseCha, int baseLd, int baseHP, int baseStr, int baseDex, int baseAg, int baseDef, int baseSk, int baseBr, float growthCha, float growthLd, float growthHP, float growthStr, float growthDex, float growthAg, float growthDef, float growthSk, float growthBr, int proBoCha, int proBoLd, int proBoHP, int proBoStr, int proBoDex, int proBoAg, int proBoDef, int proBoSk, int proBoBr, float proGrowthCha, float proGrowthLd, float getProGrowthHP, float proGrowthStr, float proGrowthDex, float proGrowthAg, float proGrowthDef, float proGrowthSk, float proGrowthBr,
-                     Ability[] offensiveAbilityChoices) {
-            this.startLevel = startLevel;
-            this.job = job;
-            this.baseCha = baseCha;
-            this.baseLd = baseLd;
-            this.baseHP = baseHP;
-            this.baseStr = baseStr;
-            this.baseDex = baseDex;
-            this.baseAg = baseAg;
-            this.baseDef = baseDef;
-            this.baseSk = baseSk;
-            this.baseBr = baseBr;
-            this.growthCha = growthCha;
-            this.growthLd = growthLd;
-            this.growthHP = growthHP;
-            this.growthStr = growthStr;
-            this.growthDex = growthDex;
-            this.growthAg = growthAg;
-            this.growthDef = growthDef;
-            this.growthSk = growthSk;
-            this.growthBr = growthBr;
-            this.proBoCha = proBoCha;
-            this.proBoLd = proBoLd;
-            this.proBoHP = proBoHP;
-            this.proBoStr = proBoStr;
-            this.proBoDex = proBoDex;
-            this.proBoAg = proBoAg;
-            this.proBoDef = proBoDef;
-            this.proBoSk = proBoSk;
-            this.proBoBr = proBoBr;
-            this.proGrowthCha = proGrowthCha;
-            this.proGrowthLd = proGrowthLd;
-            this.getProGrowthHP = getProGrowthHP;
-            this.proGrowthStr = proGrowthStr;
-            this.proGrowthDex = proGrowthDex;
-            this.proGrowthAg = proGrowthAg;
-            this.proGrowthDef = proGrowthDef;
-            this.proGrowthSk = proGrowthSk;
-            this.proGrowthBr = proGrowthBr;
-            this.offensiveAbilityChoices = offensiveAbilityChoices;
-        }
-
-        public int getBaseLd() {
-            return baseLd;
-        }
-
-        public float getGrowthLd() {
-            return growthLd;
-        }
-
-        public int getProBoLd() {
-            return proBoLd;
-        }
-
-        public float getProGrowthLd() {
-            return proGrowthLd;
-        }
-
-        public int getStartLevel() {
-            return startLevel;
-        }
-
-        public JobTemplate getJob() {
-            return job;
-        }
-
-        public int getBaseCha() {
-            return baseCha;
-        }
-
-        public int getBaseHP() {
-            return baseHP;
-        }
-
-        public int getBaseStr() {
-            return baseStr;
-        }
-
-        public int getBaseDex() {
-            return baseDex;
-        }
-
-        public int getBaseAg() {
-            return baseAg;
-        }
-
-        public int getBaseDef() {
-            return baseDef;
-        }
-
-        public int getBaseSk() {
-            return baseSk;
-        }
-
-        public int getBaseBr() {
-            return baseBr;
-        }
-
-        public float getGrowthCha() {
-            return growthCha;
-        }
-
-        public float getGrowthHP() {
-            return growthHP;
-        }
-
-        public float getGrowthStr() {
-            return growthStr;
-        }
-
-        public float getGrowthDex() {
-            return growthDex;
-        }
-
-        public float getGrowthAg() {
-            return growthAg;
-        }
-
-        public float getGrowthDef() {
-            return growthDef;
-        }
-
-        public float getGrowthSk() {
-            return growthSk;
-        }
-
-        public float getGrowthBr() {
-            return growthBr;
-        }
-
-        public int getProBoCha() {
-            return proBoCha;
-        }
-
-        public int getProBoHP() {
-            return proBoHP;
-        }
-
-        public int getProBoStr() {
-            return proBoStr;
-        }
-
-        public int getProBoDex() {
-            return proBoDex;
-        }
-
-        public int getProBoAg() {
-            return proBoAg;
-        }
-
-        public int getProBoDef() {
-            return proBoDef;
-        }
-
-        public int getProBoSk() {
-            return proBoSk;
-        }
-
-        public int getProBoBr() {
-            return proBoBr;
-        }
-
-        public float getProGrowthCha() {
-            return proGrowthCha;
-        }
-
-        public float getProGrowthHP() {
-            return getProGrowthHP;
-        }
-
-        public float getProGrowthStr() {
-            return proGrowthStr;
-        }
-
-        public float getProGrowthDex() {
-            return proGrowthDex;
-        }
-
-        public float getProGrowthAg() {
-            return proGrowthAg;
-        }
-
-        public float getProGrowthDef() {
-            return proGrowthDef;
-        }
-
-        public float getProGrowthSk() {
-            return proGrowthSk;
-        }
-
-        public float getProGrowthBr() {
-            return proGrowthBr;
-        }
-
-        public Ability[] getOffensiveAbilityChoices() {
-            return offensiveAbilityChoices;
-        }
-    }
-
-    static Random r = new Random();
-    public static int rand(int n){
-        return r.nextInt(n);
     }
 }

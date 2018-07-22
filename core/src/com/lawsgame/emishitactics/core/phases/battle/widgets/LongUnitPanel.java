@@ -1,13 +1,14 @@
 package com.lawsgame.emishitactics.core.phases.battle.widgets;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.AArmy;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 
@@ -40,12 +41,12 @@ public class LongUnitPanel extends UnitPanel {
     @Override
     public void set(Battlefield bf, int rowUnit, int colUnit) {
         if(bf.isTileOccupied(rowUnit, colUnit)) {
-            Unit unit = bf.getUnit(rowUnit, colUnit);
+            IUnit unit = bf.getUnit(rowUnit, colUnit);
 
             builder = new StringBuilder("   MAIN\n");
             builder.append("\nName : " + unit.getName());
             builder.append("\nLevel : " + unit.getLevel());
-            builder.append("\nJob : " + unit.getJobName());
+            builder.append("\nJob : " + unit.getJob().name());
             if (unit.isWarlord()) {
                 builder.append("\nPosition : warlord");
             } else {
@@ -55,11 +56,11 @@ public class LongUnitPanel extends UnitPanel {
                     builder.append("\nPosition : soldier");
                 }
             }
-            builder.append("\nMoral (HP) : " + unit.getCurrentMoral() + "/" + unit.getAppMoral() + " (" + unit.getCurrentHitpoints() + ")");
-            builder.append("\nAO trigger rate : " + unit.getAppAbilityTriggerRate());
+            builder.append("\nMoral (HP) : " + unit.getCurrentMoral() + "/" + unit.getAppMoral() + " (" + unit.getCurrentHP() + ")");
+            builder.append("\nAO trigger rate : " + unit.getCurrentOATriggerRate(rowUnit, colUnit, bf));
 
             if (unit.isMobilized()) {
-                AArmy army = unit.getArmy();
+                IArmy army = unit.getArmy();
                 builder.append("\n\n    ARMY\n");
                 builder.append("\nWarlord : " + army.getWarlord().getName());
                 builder.append("\nWar chief : " + army.getWarchief(unit).getName());
@@ -74,50 +75,47 @@ public class LongUnitPanel extends UnitPanel {
             builder.setLength(0);
 
             builder.append("    EQUIPEMENT\n");
-            builder.append("\nPrimary weapon : "+unit.getPrimaryWeapon().name().toLowerCase());
-            builder.append("\nSecondary weapon : "+unit.getSecondaryWeapon().name().toLowerCase());
-            builder.append("\nItem : "+unit.getItem1().name().toLowerCase());
-            builder.append("\nItem : "+unit.getItem2().name().toLowerCase());
-            builder.append("\nPassive ability : "+unit.getSupportAbility().name().toLowerCase());
+            Array<Data.Weapon> weapons = unit.getWeapons();
+            for(int i = 0; i < weapons.size ; i++){
+                builder.append("\nweapon "+i+" : "+weapons.get(i).name().toLowerCase());
+            }
+            Array<Data.Item> items = unit.getItems();
+            for(int i = 0; i < items.size ; i++){
+                builder.append("\nitems "+i+" : "+items.get(i).name().toLowerCase());
+            }
+            builder.append("\nSupport ability : "+unit.getSupportAbility().name().toLowerCase());
             builder.append("\nPassive ability : "+unit.getPassiveAbility().name().toLowerCase());
-            builder.append("\nOffensive ability : "+unit.getOffensiveAbility().name().toLowerCase());
             builder.append("\n\nCURRENT WEAPONS\n");
             builder.append("\nName : "+unit.getCurrentWeapon().name().toLowerCase());
-            builder.append("\nFootman only : "+unit.getCurrentWeapon().isFootmanOnly());
             builder.append("\nBase damage : "+unit.getCurrentWeapon().getDamage());
             builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getAccuracy());
-            builder.append("\nDamage type : "+unit.getCurrentWeapon().getType().name().toLowerCase());
             builder.append("\nRange : ("+unit.getCurrentWeapon().getRangeMin()+", "+unit.getCurrentWeapon().getRangeMax()+")");
-            builder.append("\nSpecial move : "+unit.getCurrentWeapon().getArt().name().toLowerCase());
+            builder.append("\nWeapon type : "+ unit.getCurrentWeapon().getWeaponType().name().toLowerCase());
+            builder.append("\nDamage type : "+unit.getCurrentWeapon().getDamageType().name().toLowerCase());
+            builder.append("\nOffensive Ability : "+unit.getCurrentWeapon().getArt().name().toLowerCase());
 
             equipDescription = builder.toString();
             builder.setLength(0);
 
             builder.append("    STATISTICS\n");
-            builder.append("\nHPT  :" + unit.getCurrentHitpoints() +" ("+ unit.getBaseHitPoints()+")");
+            builder.append("\nHPT  :" + unit.getCurrentHP() +" ("+ unit.getBaseHitpoints()+")");
             builder.append("\nSTR  :" + unit.getAppStrength() +" ("+ unit.getBaseStrength()+")");
             builder.append("\nDEX  :" + unit.getAppDexterity() +" ("+ unit.getBaseDexterity()+")");
             builder.append("\nSKI  :" + unit.getAppSkill() +" ("+ unit.getBaseSkill()+")");
-            builder.append("\nDEF  : "+ unit.getBaseDefense());
-            builder.append("\n  against piercing : "+unit.getAppDefense(Data.DamageType.PIERCING));
-            builder.append("\n  against edged    : "+unit.getAppDefense(Data.DamageType.EDGED));
-            builder.append("\n  against blunt    : "+unit.getAppDefense(Data.DamageType.BLUNT));
-            builder.append("\nAGI  : "+ unit.getBaseAgility());
-            builder.append("\n  against piercing : "+unit.getAppAgility(Data.DamageType.PIERCING));
-            builder.append("\n  against edged    : "+unit.getAppAgility(Data.DamageType.EDGED));
-            builder.append("\n  against blunt    : "+unit.getAppAgility(Data.DamageType.BLUNT));
+            builder.append("\nDEF  : ");
+            builder.append("\n  against piercing : "+unit.getAppArmor(Data.DamageType.PIERCING));
+            builder.append("\n  against edged    : "+unit.getAppArmor(Data.DamageType.EDGED));
+            builder.append("\n  against blunt    : "+unit.getAppArmor(Data.DamageType.BLUNT));
+            builder.append("\nAGI  : "+ unit.getAppAgility());
             builder.append("\nBRA  : "+unit.getAppBravery() +" ("+ unit.getBaseBravery()+")");
             builder.append("\nCHA  : "+unit.getAppCharisma() +" ("+ unit.getBaseCharisma()+")");
-            builder.append("\nLDP  : "+unit.getAppLaedership() +" ("+ unit.getBaseLeadership()+")");
+            builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getBaseLeadership()+")");
             builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getBaseMobility()+")");
 
-            builder.append("\n\nAttack might : "+unit.getAppAttackDamage());
+            builder.append("\n\nAttack might : "+unit.getAppAttackMight());
             builder.append("\nAttack accuracy : "+unit.getAppAttackAccuracy());
-            builder.append("\nRange : ("+unit.getAppCurrentWeaponRangeMin()+", "+unit.getAppCurrentWeaponRangeMax()+")");
-            builder.append("\nDODGE ABILITY : ");
-            builder.append("\n  against piercing : "+unit.getAppAvoidance(Data.DamageType.PIERCING));
-            builder.append("\n  against edged    : "+unit.getAppAvoidance(Data.DamageType.EDGED));
-            builder.append("\n  against blunt    : "+unit.getAppAvoidance(Data.DamageType.BLUNT));
+            builder.append("\nRange : ("+unit.getAppWeaponRangeMin()+", "+unit.getAppWeaponRangeMax()+")");
+            builder.append("\nDODGE ABILITY : "+unit.getAppAvoidance());
 
 
             statDescription = builder.toString();

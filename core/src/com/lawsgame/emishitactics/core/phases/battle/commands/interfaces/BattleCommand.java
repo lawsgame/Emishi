@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
@@ -34,6 +34,7 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
     public abstract boolean isEndTurnCommandOnly();                    // is only callable when the unit turn is ending
     public abstract boolean isExecuting();
     public abstract boolean isExecutionCompleted();
+    public abstract int getExperienceGaineduponSuccess();              // get the exp obtained by performing successfully the given action
 
     /**
      * PLAYER ORIENTED METHOD
@@ -79,11 +80,9 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
                     actionArea = battlefield.getMoveArea(rowActor, colActor);
                     break;
                 case WEAPON:
-                    Unit actor = battlefield.getUnit(rowActor, colActor);
-                    Data.TileType tileType = battlefield.getTile(rowActor, colActor);
-                    boolean bannerAtRange = battlefield.isStandardBearerAtRange(actor, rowActor, colActor);
-                    int rangeMin = actor.getCurrentRangeMin();
-                    int rangeMax = actor.getCurrentRangeMax(tileType, bannerAtRange);
+                    IUnit actor = battlefield.getUnit(rowActor, colActor);
+                    int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, battlefield);
+                    int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, battlefield);
                     actionArea = Utils.getEreaFromRange(battlefield, rowActor, colActor, rangeMin, rangeMax);
                     break;
                 case ONESELF:

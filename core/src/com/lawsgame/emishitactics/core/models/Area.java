@@ -1,9 +1,9 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 
@@ -120,6 +120,9 @@ public  class Area extends Observable {
         return type;
     }
 
+
+
+
     public String toString(){
         String str ="";
         if(checkmap != null) {
@@ -137,19 +140,19 @@ public  class Area extends Observable {
     // --------------- SPECIFIC IMPLEMENTATION OF THE AREA CLASS
 
     public static class UnitArea extends Area{
-        private Unit actor;
+        private IUnit actor;
 
-        public UnitArea(Battlefield battlefield, Data.AreaType type, Array<int[]> tiles, Unit actor) {
+        public UnitArea(Battlefield battlefield, Data.AreaType type, Array<int[]> tiles, IUnit actor) {
             super(battlefield, type, tiles);
             this.actor = actor;
         }
 
-        public UnitArea(Battlefield battlefield, Data.AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax, Unit actor) {
+        public UnitArea(Battlefield battlefield, Data.AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax, IUnit actor) {
             super(battlefield, type, rCenter, cCenter, rangeMin, rangeMax);
             this.actor = actor;
         }
 
-        public Unit getActor(){
+        public IUnit getActor(){
             return actor;
         }
 

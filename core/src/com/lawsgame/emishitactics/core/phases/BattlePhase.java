@@ -6,13 +6,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
+import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Unit.Army;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.TestBIS;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
@@ -45,22 +45,16 @@ public class BattlePhase extends GamePhase {
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
         // set the player army
-
-
-        Unit warlord = new Unit(Data.UnitTemplate.CONSCRIPT, false, 15, Data.Ethnicity.JAPANESE, Data.Weapon.YUMI, Data.Weapon.KANABO, true);
-        warlord.equip(Data.Item.NONE, true);
-        warlord.equip(Data.Item.NONE, false);
-        warlord.setItemStealable(false);
-        warlord.setName("Aterui");
-        warlord.setLeadership(15);
-
-        Army playerArmy = new Army(Data.ArmyType.PLAYER);
+        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        warlord.addWeapon(Data.Weapon.SHORTSWORD);
+        IArmy playerArmy = new Army(Data.Allegeance.ALLY, true);
+        playerArmy.add(warlord);
         playerArmy.appointWarLord(warlord);
 
         // set the initial BattleInteractionState
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
 

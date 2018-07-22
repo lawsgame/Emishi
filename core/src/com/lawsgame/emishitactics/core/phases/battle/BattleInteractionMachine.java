@@ -5,25 +5,24 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.models.Unit.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoAreaWidget;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.LongTilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.LongUnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.ShortTilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.ShortUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> {
-    public Army playerArmy;
+    public IArmy playerArmy;
     public Battlefield battlefield;
 
     public BattlefieldRenderer bfr;
@@ -41,7 +40,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public UnitPanel longUnitPanel;
 
 
-    public BattleInteractionMachine(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Army playerArmy) {
+    public BattleInteractionMachine(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, IArmy playerArmy) {
         this.battlefield = battlefield;
         this.bfr = bfr;
         this.gcm = gcm;
@@ -51,7 +50,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.multiplexer = new InputMultiplexer();
 
 
-        this.sltdTile = new TempoAreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
+        this.sltdTile = new SimpleAreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
         this.sltdTile.setVisible(false);
 
         // UI

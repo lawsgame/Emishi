@@ -4,13 +4,12 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
-import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -43,18 +42,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
         // set up area renderers
         this.areaRenderers = new Array<AreaRenderer>();
-        Array<Area.UnitArea> areas = model.getCoveredAreas().get(Data.Allegeance.ALLY);
-        areas.addAll(model.getCoveredAreas().get(Data.Allegeance.ENEMY));
-        for(int i = 0; i < areas.size; i++){
-            addaAreaRenderer(areas.get(i));
+        for(Data.Allegeance a : Data.Allegeance.values()){
+            if(model.getCoveredAreas().keySet().contains(a)) {
+                for (int i = 0; i < model.getCoveredAreas().get(a).size; i++) {
+                    addaAreaRenderer(model.getCoveredAreas().get(a).get(i));
+                }
+                for (int i = 0; i < model.getGuardedAreas().get(a).size; i++) {
+                    addaAreaRenderer(model.getGuardedAreas().get(a).get(i));
+                }
+            }
         }
-        areas.clear();
-        areas.addAll(model.getGuardedAreas().get(Data.Allegeance.ALLY));
-        areas.addAll(model.getGuardedAreas().get(Data.Allegeance.ENEMY));
-        for(int i = 0; i < areas.size; i++){
-            addaAreaRenderer(areas.get(i));
-        }
-
     }
 
 
@@ -98,7 +95,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 if (tileTR != null) {
                     tileRenderers[r][c] = tileTR;
                 } else {
-                    tileRenderers[r][c] = sprite2DPool.getTileSprite(Data.TileType.getStandard());
+                    tileRenderers[r][c] = sprite2DPool.getTileSprite(Data.TileType.PLAIN);
                     throw new BFRendererException("expected tile type can not be rendered :"+model.getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
                 }
             }
@@ -123,14 +120,14 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     public void addUnitRenderer(int r, int c) {
         if(model.isTileOccupied(r,c)) {
-            Unit unit = model.getUnit(r, c);
+            IUnit unit = model.getUnit(r, c);
             if(!isUnitRendererCreated(unit)) {
                 unitRenderers.add(new TempoUnitRenderer(r, c, unit));
             }
         }
     }
 
-    private boolean removeUnitRenderer(Unit unit) {
+    private boolean removeUnitRenderer(IUnit unit) {
         if(unit != null) {
             for(int i = 0; i< unitRenderers.size; i++){
                 if(unitRenderers.get(i).getModel() == unit){
@@ -142,7 +139,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return false;
     }
 
-    public boolean isUnitRendererCreated(Unit unit) {
+    public boolean isUnitRendererCreated(IUnit unit) {
         for(BattleUnitRenderer ur : unitRenderers){
             if(ur.getModel() == unit){
                 return true;
@@ -152,7 +149,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public BattleUnitRenderer getUnitRenderer(Unit model) {
+    public BattleUnitRenderer getUnitRenderer(IUnit model) {
         for(int i = 0; i < unitRenderers.size; i++){
             if(unitRenderers.get(i).getModel() == model)
                 return unitRenderers.get(i);
@@ -181,9 +178,9 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     @Override
     public void getNotification(Object data) {
         int[] coords;
-        if (data instanceof Unit) {
+        if (data instanceof IUnit) {
             // remove the sent unit
-            removeUnitRenderer((Unit) data);
+            removeUnitRenderer((IUnit) data);
 
         } else if(data instanceof int[]) {
             coords = (int[]) data;
@@ -191,7 +188,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
                 if(model.isTileOccupied(coords[0], coords[1])){
                     // add a unit renderer to a newly deployed unit
-                    Unit unit = model.getUnit(coords[0], coords[1]);
+                    IUnit unit = model.getUnit(coords[0], coords[1]);
                     if(isUnitRendererCreated(unit)){
                         BattleUnitRenderer bur = getUnitRenderer(unit);
                         bur.setX(coords[1]);
@@ -224,7 +221,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 path.removeIndex(0);
                 int[] unitCoords = path.get(path.size - 1);
                 if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
-                    Unit unit = model.getUnit(unitCoords[0], unitCoords[1]);
+                    IUnit unit = model.getUnit(unitCoords[0], unitCoords[1]);
                     getUnitRenderer(unit).displayWalk(path);
                 }
 

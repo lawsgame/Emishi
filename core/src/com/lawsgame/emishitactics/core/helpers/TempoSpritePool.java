@@ -30,9 +30,8 @@ public class TempoSpritePool {
     private HashMap<Data.AnimationId, TextureRegion> unitSprites;
     private HashMap<Data.AnimationId, TextureRegion> foeSprites;
     private TextureRegion unitDoneSprite;
-    private HashMap<Data.Weapon, TextureRegion> weaponSprites;
+    private HashMap<Data.WeaponType, TextureRegion> weaponSprites;
     private HashMap<Data.Orientation, TextureRegion> orientationSprites;
-    private HashMap<Data.Ability, TextureRegion> offensiveAbilitySprites;
     private TextureRegion shieldSprite;
     private TextureRegion mountedSprite;
     private TextureRegion bridgeInConstruction;
@@ -59,9 +58,8 @@ public class TempoSpritePool {
         this.uiSprites = new HashMap<Data.AreaType, TextureRegion>();
         this.unitSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.foeSprites = new HashMap<Data.AnimationId, TextureRegion>();
-        this.weaponSprites = new HashMap<Data.Weapon, TextureRegion>();
+        this.weaponSprites = new HashMap<Data.WeaponType, TextureRegion>();
         this.orientationSprites = new HashMap<Data.Orientation, TextureRegion>();
-        this.offensiveAbilitySprites = new HashMap<Data.Ability, TextureRegion>();
         shieldSprite = null;
         mountedSprite = null;
         unitDoneSprite = null;
@@ -133,15 +131,12 @@ public class TempoSpritePool {
 
                 unitDoneSprite = unitRegions[0][6];
 
-                weaponSprites.put(Data.Weapon.KATANA, iconRegions[0][12]);
-                weaponSprites.put(Data.Weapon.WARABITE, iconRegions[0][12]);
-                weaponSprites.put(Data.Weapon.YARI, iconRegions[0][13]);
-                weaponSprites.put(Data.Weapon.SAI, iconRegions[0][14]);
-                weaponSprites.put(Data.Weapon.KANABO, iconRegions[0][15]);
-                weaponSprites.put(Data.Weapon.BO, iconRegions[1][12]);
-                weaponSprites.put(Data.Weapon.YUMI, iconRegions[1][13]);
-                weaponSprites.put(Data.Weapon.NODACHI, iconRegions[1][14]);
-                weaponSprites.put(Data.Weapon.NAGINATA, iconRegions[1][15]);
+                weaponSprites.put(Data.WeaponType.SWORD, iconRegions[0][12]);
+                weaponSprites.put(Data.WeaponType.POLEARM, iconRegions[0][13]);
+                weaponSprites.put(Data.WeaponType.FIST, iconRegions[0][14]);
+                weaponSprites.put(Data.WeaponType.MACE, iconRegions[0][15]);
+                weaponSprites.put(Data.WeaponType.AXE, iconRegions[1][12]);
+                weaponSprites.put(Data.WeaponType.BOW, iconRegions[1][13]);
 
                 shieldSprite = iconRegions[2][12];
                 mountedSprite = iconRegions[2][13];
@@ -150,18 +145,6 @@ public class TempoSpritePool {
                 orientationSprites.put(Data.Orientation.EAST, iconRegions[3][13]);
                 orientationSprites.put(Data.Orientation.WEST, iconRegions[3][14]);
                 orientationSprites.put(Data.Orientation.SOUTH, iconRegions[3][15]);
-
-                offensiveAbilitySprites.put(Data.Ability.FOCUSED_BLOW,    offabbRegions[0][8]);
-                offensiveAbilitySprites.put(Data.Ability.CRIPPLING_BLOW,  offabbRegions[1][8]);
-                offensiveAbilitySprites.put(Data.Ability.SWIRLING_BLOW,   offabbRegions[2][8]);
-                offensiveAbilitySprites.put(Data.Ability.SWIFT_BLOW,      offabbRegions[3][8]);
-                offensiveAbilitySprites.put(Data.Ability.HEAVY_BLOW,      offabbRegions[4][8]);
-                offensiveAbilitySprites.put(Data.Ability.CRUNCHING_BLOW,  offabbRegions[5][8]);
-                offensiveAbilitySprites.put(Data.Ability.WAR_CRY,         offabbRegions[6][8]);
-                offensiveAbilitySprites.put(Data.Ability.POISONOUS_ATTACK, offabbRegions[7][8]);
-                offensiveAbilitySprites.put(Data.Ability.HARASS,          offabbRegions[8][8]);
-                offensiveAbilitySprites.put(Data.Ability.LINIENT_BLOW,    offabbRegions[9][8]);
-                offensiveAbilitySprites.put(Data.Ability.FURY,            offabbRegions[10][8]);
             }
 
             if(asm.isLoaded(Assets.ATLAS_UI)) {
@@ -259,9 +242,9 @@ public class TempoSpritePool {
         return shieldSprite;
     }
 
-    public TextureRegion getUnitSprite(Data.AnimationId animationId, boolean ally){
+    public TextureRegion getUnitSprite(Data.AnimationId animationId, Data.Allegeance allegeance){
         TextureRegion res;
-        if(ally){
+        if(allegeance == Data.Allegeance.ALLY){
             res = unitSprites.get(animationId);
         }else{
             res = foeSprites.get(animationId);
@@ -271,16 +254,12 @@ public class TempoSpritePool {
 
     public TextureRegion getDoneUnitSprite(){ return unitDoneSprite;}
 
-    public TextureRegion getWeaponSprite(Data.Weapon weapon){
-        return weaponSprites.get(weapon);
+    public TextureRegion getWeaponSprite(Data.WeaponType weaponType){
+        return weaponSprites.get(weaponType);
     }
 
     public TextureRegion getOrientationSprite(Data.Orientation orientation) {
         return orientationSprites.get(orientation);
-    }
-
-    public TextureRegion getOffensiveAbbSprite(Data.Ability offensiveAbility){
-        return offensiveAbilitySprites.get(offensiveAbility);
     }
 
     public TextureRegion getBridgeInConstruction() {

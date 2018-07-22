@@ -7,8 +7,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.LinkedList;
-
 import static org.junit.Assert.assertTrue;
 
 public class UtilsTest {
@@ -28,7 +26,11 @@ public class UtilsTest {
     @Before
     public void before(){
         bf = new Battlefield(9,9);
-        bf.setAsPlain();
+        for(int r = 0; r < 9; r++){
+            for(int c = 0; c < 9; c++){
+                bf.getTiles()[r][c] = Data.TileType.PLAIN;
+            }
+        }
     }
 
     @Test

@@ -2,13 +2,13 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.engine.rendering.Renderer;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.GameElement;
+import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
-public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameElement {
+public abstract class BattleUnitRenderer extends Renderer<IUnit> implements GameElement {
 
-    public BattleUnitRenderer(Unit model) {
+    public BattleUnitRenderer(IUnit model) {
         super(model);
     }
 

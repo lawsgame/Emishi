@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Battles>
     <Battle battlefieldId = "0">
-        <Army ally = "false">
+        <Army allegeance = "ENEMY">
             <Squad>
-                <Unit row = "5" col = "7" standardBearer = "false" template = "EMISHI" level ="5" ethinicity = "AINU" primaryWeapon= "WARABITE" secondaryWeapon = "NONE" homogeneousLevels = "true">
-                    <Attribute id = "behaviour" value="PASSIVE"/>
-                    <Attribute id = "orientation" value="SOUTH"/>
+                <Unit row = "5" col = "7" name = "" job="SOLAR_KNIGHT" level="6" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
+                    <Attribute id = "weapon" value="BROADSWORD"/>
+                    <Attribute id = "weapon" value="FIST"/>
                     <Attribute id = "right handed" value="true"/>
-                    <Attribute id = "offensive ability" value ="NONE"/>
+                    <Attribute id = "item" value ="NONE"/>
+                    <Attribute id = "item" value ="NONE"/>
+                    <Attribute id = "stealable 1" value ="true"/>
+                    <Attribute id = "stealable 2" value ="false"/>
                     <Attribute id = "passive ability" value ="NONE"/>
                     <Attribute id = "suppott ability" value ="NONE"/>
-                    <Attribute id = "item" value ="NONE"/>
-                    <Attribute id = "item" value ="NONE"/>
-                    <Attribute id = "stealable" value ="false"/>
                     <Attribute id = "banner sign" value ="NONE"/>
                     <Attribute id = "banner sign" value ="NONE"/>
                     <Attribute id = "banner sign" value ="NONE"/>
+                    <Attribute id = "orientation" value="SOUTH"/>
+                    <Attribute id = "behaviour" value="PASSIVE"/>
                 </Unit>
             </Squad>
         </Army>

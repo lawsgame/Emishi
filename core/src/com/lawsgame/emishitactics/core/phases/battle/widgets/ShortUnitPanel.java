@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 
@@ -39,11 +39,11 @@ public class ShortUnitPanel extends UnitPanel {
     @Override
     public void set(Battlefield bf, int rowUnit, int colUnit) {
         if(bf.isTileOccupied(rowUnit, colUnit)) {
-            Unit unit = bf.getUnit(rowUnit, colUnit);
+            IUnit unit = bf.getUnit(rowUnit, colUnit);
             builder = new StringBuilder("");
             builder.append("Name : " + unit.getName());
             builder.append("\nLevel : " + unit.getLevel());
-            builder.append("\nJob : " + unit.getJobName());
+            builder.append("\nJob : " + unit.getJob().name().toLowerCase());
 
             if (unit.isWarlord()) {
                 builder.append("\nPosition : warlord");
@@ -55,10 +55,10 @@ public class ShortUnitPanel extends UnitPanel {
                 }
             }
 
-            builder.append("\nMoral (HP) : " + unit.getCurrentMoral() + "/" + unit.getAppMoral() + " (" + unit.getCurrentHitpoints() + ")");
-            builder.append("\nAO bar (uses) : " + unit.getOAChargingBar() + " (" + unit.getNumberOfOAUses() + ")");
-            builder.append("\nWeapons : " + unit.getPrimaryWeapon().name().toLowerCase() + " ");
-            builder.append(unit.isPromoted() ? " & " + unit.getSecondaryWeapon().name().toLowerCase() : "");
+            builder.append("\nHP  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
+            builder.append("\nMoral  : " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
+            builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().name().toLowerCase() + " ");
+            builder.append("\nCharging ability bar : " + unit.getOAChargingBarPoints()+ "/"+Data.OA_CHARGING_BAR_MAX_VALUE);
         }
     }
 
