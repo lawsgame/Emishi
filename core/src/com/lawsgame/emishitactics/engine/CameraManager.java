@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
+import java.lang.annotation.Target;
+
 import static com.lawsgame.emishitactics.engine.GamePhase.getAspRatio;
 
 public class CameraManager extends Observable implements GameUpdatableEntity {
@@ -19,14 +21,14 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
     private Viewport viewport;              // defines the dimension of the frame through the player see the level
     private Rectangle clipBounds;           // specific
 
+    // smooth camera variables
     private Vector vTarget;
     private Vector vFrom;
-    private Vector gamma; // velocity factor
-    private  float alpha; // slope or transition time factor
+    private Vector gamma;                   // base velocity factor
+    private  float alpha;                   // slope or transition intensity factor
     private  Vector dl;
     private boolean cameraMoving;
-    private boolean reachWorldBoundaries;
-    private float time;
+    private float intensity;
 
     public CameraManager(float worldWidth, float worldHeight, float portWidth){
         this.worldHeight = worldHeight;
@@ -47,8 +49,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.gamma = new Vector(0,0);
         this.dl = new Vector(0,0);
         this.cameraMoving = false;
-        this.reachWorldBoundaries = false;
-        this.time = 0;
+        this.intensity = 0;
 
     }
 
@@ -83,8 +84,15 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
 
     private void set(float xTarget, float yTarget){
         if(!cameraMoving){
+
+            //set xTarget & yTarget, add change it if too clase to the camera frame borders
             vTarget.x = xTarget;
             vTarget.y = yTarget;
+            if(0 > xTarget - getPortWidth()/2)          vTarget.x = getPortWidth()/2f;
+            if(xTarget + getPortWidth()/2 > worldWidth) vTarget.x = worldWidth - getPortWidth()/2f;
+            if(0 > yTarget - getPortHeight()/2)          vTarget.y = getPortHeight()/2f;
+            if(yTarget + getPortHeight()/2 > worldHeight) vTarget.y = worldHeight - getPortHeight()/2f;
+
             vFrom.x = camera.position.x;
             vFrom.y = camera.position.y;
             gamma.x = (vTarget.x - vFrom.x);
@@ -92,40 +100,40 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
             alpha = CAM_SLOPE_FACTOR*gamma.length();
             gamma.multiply(CAM_VELOCITY);
             cameraMoving = true;
-            reachWorldBoundaries = false;
-            time = 0;
+            intensity = 0;
         }
     }
 
+    /**
+     *
+     * @param dt
+     */
     @Override
     public void update(float dt) {
         if(cameraMoving){
-            if( (vTarget.x == camera.position.x && vTarget.y == camera.position.y) || this.reachWorldBoundaries){
+            if( (vTarget.x == camera.position.x && vTarget.y == camera.position.y)){
                 cameraMoving = false;
             }else{
+                // calculate how much the camera shall move during each tick
                 if(Math.abs(vTarget.x - camera.position.x) < Math.abs(vFrom.x - camera.position.x)){
-                    time += dt;
+                    intensity += dt;
                 }else{
-                    time -=dt;
+                    intensity -=dt;
                 }
-
-                float f = (float) ((1 - 2*Math.exp(time/(2*alpha))) + Math.exp(time/alpha));
+                float f = (float) ((1 - 2*Math.exp(intensity /(2*alpha))) + Math.exp(intensity /alpha));
                 dl.x = gamma.x*f*dt;
                 dl.y = gamma.y*f*dt;
 
-                if(0 < dl.x && vTarget.x < dl.x + camera.position.x){
-                    dl.x = vTarget.x - camera.position.x;
-                }
-                if(dl.x < 0 && vTarget.x > dl.x + camera.position.x){
-                    dl.x = vTarget.x - camera.position.x;
-                }
-                if(0 < dl.y && vTarget.y < dl.y + camera.position.y){
-                    dl.y = vTarget.y - camera.position.y;
-                }
-                if(dl.y < 0 && vTarget.y > dl.y + camera.position.y){
-                    dl.y = vTarget.y - camera.position.y;
-                }
-                reachWorldBoundaries = !translateCam(dl.x, dl.y);
+                //fix the camera ultimate translation to perfectly fit the target position
+                if(0 < dl.x && vTarget.x < dl.x + camera.position.x)    dl.x = vTarget.x - camera.position.x;
+                if(dl.x < 0 && vTarget.x > dl.x + camera.position.x)    dl.x = vTarget.x - camera.position.x;
+                if(0 < dl.y && vTarget.y < dl.y + camera.position.y)    dl.y = vTarget.y - camera.position.y;
+                if(dl.y < 0 && vTarget.y > dl.y + camera.position.y)    dl.y = vTarget.y - camera.position.y;
+
+                camera.translate(dl.x, dl.y);
+                camera.update();
+                clipBounds.x += dl.x;
+                clipBounds.y += dl.y;
             }
         }
     }

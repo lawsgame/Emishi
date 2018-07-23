@@ -15,10 +15,6 @@ import java.util.HashMap;
 
 
 /*
- *  TODO:
- * 2) solve the requiredRange issue on the following methods
- *      - getActionArea
- *      - getShortestPathToAttack
  *
  *
  *
@@ -867,7 +863,11 @@ public class Battlefield extends Observable {
         return coveredAreas;
     }
 
+
+
+
     //----------------- NODE HELPER CLASSES -------------------
+
 
 
 
@@ -912,7 +912,6 @@ public class Battlefield extends Observable {
 
     }
 
-
     public static class PathNode extends Node<PathNode>{
         protected int distTarget;
         protected PathNode parent;
@@ -952,18 +951,24 @@ public class Battlefield extends Observable {
     }
 
 
+
+
     // --------------- BUILD NOTIFICATION -------------------------------------
 
-    public static class BuildMessage {
+
+
+
+
+    public static class BuildNotif {
         public int row;
         public int col;
         public TileType tile;
 
-        private static BuildMessage msg = new BuildMessage();
+        private static BuildNotif msg = new BuildNotif();
 
-        private BuildMessage(){ }
+        private BuildNotif(){ }
 
-        public static BuildMessage get(int row, int col, TileType tile){
+        public static BuildNotif get(int row, int col, TileType tile){
             msg.row = row;
             msg.col = col;
             msg.tile = tile;

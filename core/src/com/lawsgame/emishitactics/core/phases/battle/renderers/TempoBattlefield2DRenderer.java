@@ -8,7 +8,7 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Battlefield.BuildMessage;
+import com.lawsgame.emishitactics.core.models.Battlefield.BuildNotif;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -226,8 +226,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 }
 
             }
-        }else if(data instanceof BuildMessage){
-            BuildMessage msg = (BuildMessage)data;
+        }else if(data instanceof BuildNotif){
+            BuildNotif msg = (BuildNotif)data;
             addTileRenderer(msg.row , msg.col);
         }else if(data instanceof Area){
             Area area = (Area)data;
