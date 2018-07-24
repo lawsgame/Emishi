@@ -48,18 +48,13 @@ public class Battlefield extends Observable {
 
         this.guardedAreas = new HashMap<Allegeance, Array<UnitArea>>();
         this.coveredAreas = new HashMap<Allegeance, Array<UnitArea>>();
-        this.recruits = new HashMap<Integer, IUnit>();
-        this.tombItems = new HashMap<Integer, Item>();
-    }
-
-    public void addAllegeance(Allegeance a){
-        if(!guardedAreas.keySet().contains(a)) {
+        for(Allegeance a: Allegeance.values()){
             this.guardedAreas.put(a, new Array<UnitArea>());
             this.coveredAreas.put(a, new Array<UnitArea>());
         }
-
+        this.recruits = new HashMap<Integer, IUnit>();
+        this.tombItems = new HashMap<Integer, Item>();
     }
-
 
     public int getNbRows() {
         if(getTiles() != null)
@@ -334,7 +329,6 @@ public class Battlefield extends Observable {
 
     public void randomlyDeployArmy(IArmy army){
         if(army != null) {
-            addAllegeance(army.getAllegeance());
 
             Array<IUnit> mobilizedTroops = army.getMobilizedUnits();
             Array<int[]> deploymentsTile = getDeploymentArea();
@@ -738,15 +732,16 @@ public class Battlefield extends Observable {
      *
      * @return an array like that {[row, col]} representing the shortest path from one tile to another
      */
-    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance){
+    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance, boolean avoidCoveredArea){
         Array<int[]> res = new Array<int[]>();
 
-        if(isTileAvailable(rowf, colf, pathfinder)) {
+        if(isTileAvailable(rowf, colf, pathfinder) && allegeance != null) {
+
             Array<PathNode> path = new Array<PathNode>();
             Array<PathNode> opened = new Array<PathNode>();
             Array<PathNode> closed = new Array<PathNode>();
             opened.add(new PathNode(rowI, colI, rowf, colf, null, this));
-            PathNode current = opened.get(0);
+            PathNode current;
             Array<PathNode> neighbours;
             while (true) {
 
@@ -809,7 +804,6 @@ public class Battlefield extends Observable {
                         opened.add(node);
                     }
                     isNotInOpened = true;
-
                 }
             }
 

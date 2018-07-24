@@ -335,6 +335,10 @@ public class Data {
         public WeaponArt getArt() {
             return art;
         }
+
+        public boolean isMelee() { return rangeMin == 1;}
+
+        public boolean isRange() { return rangeMax > 1; }
     }
 
     public enum Behaviour{
@@ -738,7 +742,7 @@ public class Data {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        WALK                (RangedBasedType.MOVE, new int[0][0]),
+        MOVE                (RangedBasedType.MOVE, new int[0][0]),
         SWITCH_WEAPON       (RangedBasedType.ONESELF, new int[0][0]),
         SWITCH_POSITION     (1, 1, new int[0][0]),
         PUSH                (1, 1, new int[0][0]),
@@ -748,7 +752,8 @@ public class Data {
         BUILD               (1, 1, new int[0][0]),
         COVER               (RangedBasedType.ONESELF, new int[0][0]),
         ATTACK              (RangedBasedType.WEAPON, new int[0][0]),
-        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF, new int[0][0]);
+        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF, new int[0][0]),
+        END_TURN            (RangedBasedType.ONESELF, new int[0][0]);
 
 
         // RANGE REQUIREMENT
@@ -786,6 +791,7 @@ public class Data {
         public int getRangeMin() {
             return rangeMin;
         }
+
 
         /*
                                         NORTH (standard):
@@ -857,7 +863,6 @@ public class Data {
             }
             return orientedArea;
         }
-
 
 
         public int getImpactAreaSize(){

@@ -31,7 +31,7 @@ public abstract class IArmy extends Observable{
     public abstract Banner getSquadBanner(IUnit unit);
     public abstract int getBannerRange();
     public abstract int getBuildingResources();
-    public abstract boolean remainBuildingResources();
+    public abstract boolean isThereStillbuildingResources();
     public abstract void decrementBuildingResources();
     public abstract void resetBuildingResources();
 

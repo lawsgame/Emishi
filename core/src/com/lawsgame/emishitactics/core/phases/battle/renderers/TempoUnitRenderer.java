@@ -10,7 +10,6 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.Unit.DamageNotification;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -122,7 +121,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
                 } else if (query instanceof Command){
                     Command customQuery = (Command)query;
-                    customQuery.execute();
+                    customQuery.apply();
 
                 } else {
                     launchNextAnimation();
@@ -383,7 +382,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     animationQueue.offer(new SimpleCommand() {
 
                         @Override
-                        public void execute() {
+                        public void apply() {
                             setVisible(true);
                         }
                     });

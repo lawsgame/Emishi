@@ -130,7 +130,6 @@ public class BattlefieldLoader {
                                 allegeance = a;
                             }
                         }
-                        bf.addAllegeance(allegeance);
                         army = new Army(allegeance, false);
 
                         // IF: an amry with the relevant battlefield ID
@@ -160,11 +159,8 @@ public class BattlefieldLoader {
                                 if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
                                     bf.deployUnit(rowUnit, colUnit, unit);
                                 }
-
-
                             }
                         }
-
                     }
                 }
             }
@@ -194,8 +190,9 @@ public class BattlefieldLoader {
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
         boolean standardbearer = unitElt.getBoolean("standardBearer");
         boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
-
-        if(name == "") name = NAME_DICTIONARY.get(Data.rand(NAME_DICTIONARY.size));
+        if(name.equals("noname")){
+            name = NAME_DICTIONARY.get(Data.rand(NAME_DICTIONARY.size));
+        }
         for(Job j: Job.values()){
             if(j.name().equals(unitElt.get("job"))){
                 job = j;
@@ -203,7 +200,7 @@ public class BattlefieldLoader {
             }
         }
         for(WeaponType wt: WeaponType.values()){
-            if(wt.name().equals(unitElt.get("job"))){
+            if(wt.name().equals(unitElt.get("weaponType"))){
                 weaponType = wt;
                 continue;
             }
@@ -216,72 +213,72 @@ public class BattlefieldLoader {
         for(int k = 0; k < unitElt.getChildCount(); k++){
             attributeElt = unitElt.getChild(k);
 
-            if(attributeElt.get("id") == "weapon") {
+            if(attributeElt.get("id").equals("weapon")) {
                 for (Weapon value : Weapon.values()) {
-                    if (value.name().equals(attributeElt.get("weapon"))) {
+                    if (value.name().equals(attributeElt.get("value"))) {
                         unit.addWeapon(value);
                         continue;
                     }
                 }
             }
 
-            if(attributeElt.get("id") == "right handed")
-                unit.setRightHanded(attributeElt.getBoolean("right handed"));
+            if(attributeElt.get("id").equals("right handed"))
+                unit.setRightHanded(attributeElt.getBoolean("value"));
 
-            if(attributeElt.get("id") == "item") {
+            if(attributeElt.get("id").equals("item")) {
                 for (Item value : Item.values()) {
-                    if (value.name().equals(attributeElt.get("item"))) {
+                    if (value.name().equals(attributeElt.get("value"))) {
                         unit.addItem(value);
                         continue;
                     }
                 }
             }
 
-            if(attributeElt.get("id") == "stealable 1")
-                unit.setItem1Stealable(attributeElt.getBoolean("stealable 1"));
+            if(attributeElt.get("id").equals("stealable 1"))
+                unit.setItem1Stealable(attributeElt.getBoolean("value"));
 
-            if(attributeElt.get("id") == "stealable 2")
-                unit.setItem1Stealable(attributeElt.getBoolean("stealable 2"));
+            if(attributeElt.get("id").equals("stealable 2"))
+                unit.setItem1Stealable(attributeElt.getBoolean("value"));
 
-            if(attributeElt.get("id") == "passive ability") {
+            if(attributeElt.get("id").equals("passive ability")) {
                 for (PassiveAbility value : PassiveAbility.values()) {
-                    if (value.name().equals(attributeElt.get("passive ability"))) {
+                    if (value.name().equals(attributeElt.get("value"))) {
                         unit.setPassiveAbility(value);
                         continue;
                     }
                 }
             }
 
-            if(attributeElt.get("id") == "support ability") {
+            if(attributeElt.get("id").equals("support ability")) {
                 for (SupportAbility value : SupportAbility.values()) {
-                    if (value.name().equals(attributeElt.get("support ability"))) {
+                    if (value.name().equals(attributeElt.get("value"))) {
                         unit.setSupportAbility(value);
                         continue;
                     }
                 }
             }
 
-            if(attributeElt.get("id") == "banner sign") {
+            if(attributeElt.get("id").equals("banner sign")) {
                 for (BannerSign value : BannerSign.values()) {
-                    if (value.name().equals(attributeElt.get("banner sign"))) {
+                    if (value.name().equals(attributeElt.get("value"))) {
                         unit.getBanner().addSign(value);
                         continue;
                     }
                 }
             }
 
-            if(attributeElt.get("id") == "Orientation") {
+            if(attributeElt.get("id").equals("Orientation")) {
                 for (Orientation value : Orientation.values()) {
-                    if (value.name().equals(attributeElt.get("orientation"))) {
+                    if (value.name().equals(attributeElt.get("value"))) {
                         unit.setOrientation(value);
                         continue;
                     }
                 }
             }
 
-            if(attributeElt.get("id") == "behaviour") {
+            if(attributeElt.get("id").equals("behaviour")) {
                 for (Behaviour value : Behaviour.values()) {
-                    if (value.name().equals(attributeElt.get("behaviour"))) {
+                    if (value.name().equals(attributeElt.get("value"))) {
                         unit.setBehaviour(value);
                         continue;
                     }

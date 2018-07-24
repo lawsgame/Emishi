@@ -433,6 +433,7 @@ public class Unit extends IUnit{
     public void switchWeapon() {
         if(isPromoted()){
             this.weapon1Equipped = !weapon1Equipped;
+            notifyAllObservers(null);
         }
     }
 
@@ -983,6 +984,7 @@ public class Unit extends IUnit{
     @Override
     public void setOrientation(Data.Orientation orientation) {
         this.orientation = orientation;
+        notifyAllObservers(null);
     }
 
     @Override

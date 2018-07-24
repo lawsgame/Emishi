@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -21,6 +22,7 @@ public class BattleCommandManager {
          add BC entries here :
           : commandPool.put(command.getActionChoice(), command);
           */
+        commandPool.put(Data.ActionChoice.MOVE, new MoveCommand(battlefieldRenderer));
 
         setBattlefield(battlefieldRenderer);
     }
@@ -53,6 +55,7 @@ public class BattleCommandManager {
 
     /**
      * there is 3 types of requirements for an action to be performable by an actor
+     *  - history type: if unit has already moved or acted
      *  - abiility type
      *  - equipement type (weapon mainly)
      *  - target  type (checked by the method: BattleCommand.atActionRange() and Battlefield.isTargetValid())
@@ -60,23 +63,25 @@ public class BattleCommandManager {
      * @return whether or not an action can be performed by the actor regardless the actor's history or target availability.
      */
     public boolean canActionbePerformedBy(IUnit actor, Data.ActionChoice choice){
+        boolean actionPerformable = false;
         // check ABILITY REQUIREMENTS
         switch (choice){
-            case WALK:                  break;
-            case SWITCH_WEAPON:         if(!actor.isPromoted()) return false; break;
-            case SWITCH_POSITION:       break;
-            case PUSH:                  if(actor.isHorseman()) return false; break;
-            case HEAL:                  if(!actor.has(Data.SupportAbility.HEAL)) return false; break;
-            case GUARD:                 if(!actor.has(Data.SupportAbility.GUARD)) return false; break;
-            case STEAL:                 if(!actor.has(Data.SupportAbility.STEAL)) return false; break;
-            case BUILD:                 if(!actor.has(Data.SupportAbility.BUILD) && actor.isMobilized() && actor.getArmy().remainBuildingResources()) return false; break;
-            case COVER:                 if(!(actor.getCurrentWeapon().getRangeMax() > 1)) return false; break;
-            case ATTACK:                break;
-            case CHOOSE_ORIENTATION:    break;
-            default: return false;
+            case MOVE:                  if(!actor.hasMoved()) actionPerformable = true; break;
+            case SWITCH_WEAPON:         if(!actor.hasActed() && actor.isPromoted()) actionPerformable = true; break;
+            case SWITCH_POSITION:       actionPerformable = true; break;
+            case PUSH:                  if(!actor.hasActed() && !actor.isHorseman()) actionPerformable = true; break;
+            case HEAL:                  if(!actor.hasActed() && actor.has(Data.SupportAbility.HEAL)) actionPerformable = true; break;
+            case GUARD:                 if(!actor.hasActed() && actor.has(Data.SupportAbility.GUARD)) actionPerformable = true; break;
+            case STEAL:                 if(!actor.hasActed() && actor.has(Data.SupportAbility.STEAL)) actionPerformable = true; break;
+            case BUILD:                 if(!actor.hasActed() && actor.has(Data.SupportAbility.BUILD) && actor.isMobilized() && actor.getArmy().isThereStillbuildingResources()) actionPerformable = true; break;
+            case COVER:                 if(!actor.hasActed() && actor.getCurrentWeapon().isRange()) return false; break;
+            case ATTACK:                if(!actor.hasActed()) actionPerformable = true; break;
+            case CHOOSE_ORIENTATION:    actionPerformable = true; break;
+            case END_TURN:              actionPerformable = true; break;
+            default:
         }
 
-        return true;
+        return actionPerformable;
     }
 
 }

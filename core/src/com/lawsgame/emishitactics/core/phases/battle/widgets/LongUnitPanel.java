@@ -19,7 +19,7 @@ public class LongUnitPanel extends UnitPanel {
     private static float X_TEXT_OFFSET_3_COL = 408f;
     private static float Y_TEXT_OFFSET = 8f;
     private static float PANEL_WIDTH = 650f;
-    private static float PANEL_HEIGHT = 500;
+    private static float PANEL_HEIGHT = 400;
 
     private String mainDescription;
     private String equipDescription;
@@ -75,6 +75,7 @@ public class LongUnitPanel extends UnitPanel {
             builder.setLength(0);
 
             builder.append("    EQUIPEMENT\n");
+            builder.append("\nweapon type : "+ unit.getWeaponType());
             Array<Data.Weapon> weapons = unit.getWeapons();
             for(int i = 0; i < weapons.size ; i++){
                 builder.append("\nweapon "+i+" : "+weapons.get(i).name().toLowerCase());
@@ -114,8 +115,9 @@ public class LongUnitPanel extends UnitPanel {
 
             builder.append("\n\nAttack might : "+unit.getAppAttackMight());
             builder.append("\nAttack accuracy : "+unit.getAppAttackAccuracy());
+            builder.append("\nAvoidance : "+unit.getAppAvoidance());
             builder.append("\nRange : ("+unit.getAppWeaponRangeMin()+", "+unit.getAppWeaponRangeMax()+")");
-            builder.append("\nDODGE ABILITY : "+unit.getAppAvoidance());
+
 
 
             statDescription = builder.toString();

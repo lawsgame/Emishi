@@ -3,8 +3,8 @@
     <Battle battlefieldId = "0">
         <Army allegeance = "ENEMY">
             <Squad>
-                <Unit row = "5" col = "7" name = "" job="SOLAR_KNIGHT" level="6" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
-                    <Attribute id = "weapon" value="BROADSWORD"/>
+                <Unit row = "5" col = "7" name = "noname" job="SOLAR_KNIGHT" level="6" weaponType="BOW" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
+                    <Attribute id = "weapon" value="HUNTING_BOW"/>
                     <Attribute id = "weapon" value="FIST"/>
                     <Attribute id = "right handed" value="true"/>
                     <Attribute id = "item" value ="NONE"/>

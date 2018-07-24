@@ -203,7 +203,7 @@ public class Army extends IArmy{
     }
 
     @Override
-    public boolean remainBuildingResources() {
+    public boolean isThereStillbuildingResources() {
         return buildingResources > 0;
     }
 
@@ -496,7 +496,7 @@ public class Army extends IArmy{
 
     private void updateMobilizedTroopMoral(){
         for(int i = 0; i < mobilizedTroups.size; i++){
-            for(int j = 0; j < mobilizedTroups.get(0).size; j++){
+            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
                 mobilizedTroups.get(i).get(j).resetCurrentMoral();
             }
         }

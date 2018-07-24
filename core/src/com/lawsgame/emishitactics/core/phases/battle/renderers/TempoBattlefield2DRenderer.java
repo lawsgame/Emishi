@@ -43,13 +43,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         // set up area renderers
         this.areaRenderers = new Array<AreaRenderer>();
         for(Data.Allegeance a : Data.Allegeance.values()){
-            if(model.getCoveredAreas().keySet().contains(a)) {
-                for (int i = 0; i < model.getCoveredAreas().get(a).size; i++) {
-                    addaAreaRenderer(model.getCoveredAreas().get(a).get(i));
-                }
-                for (int i = 0; i < model.getGuardedAreas().get(a).size; i++) {
-                    addaAreaRenderer(model.getGuardedAreas().get(a).get(i));
-                }
+            for (int i = 0; i < model.getCoveredAreas().get(a).size; i++) {
+                addaAreaRenderer(model.getCoveredAreas().get(a).get(i));
+            }
+            for (int i = 0; i < model.getGuardedAreas().get(a).size; i++) {
+                addaAreaRenderer(model.getGuardedAreas().get(a).get(i));
             }
         }
     }

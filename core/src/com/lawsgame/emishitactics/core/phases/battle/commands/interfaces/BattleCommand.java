@@ -11,6 +11,33 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPa
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 
+/**
+ *
+ * I - Battle command usage
+ *
+ *  command.update(dt);
+ *
+ *  ActionChoice choice = ...;
+ *  if(bcm.canActionBePerformed(...){
+ *      BattleCommand command = bcm.get(...); OR new XCommand(...);
+ *      if(command != null && command.setActor(...)){
+ *          command.setTarget(...);
+ *          if(command.isTargetValid()){
+ *              command.apply();
+ *          }
+ *      }
+ *  }
+ *
+ *  II - battle command flow
+ *
+ *  1 - get the command initialized
+ *  2 - set actor and target
+ *  3 - validate the target availability
+ *  4 - execute the command
+ *  5 - undo it if required
+ *
+ * no need to put back the command in the BCM
+ */
 public abstract class BattleCommand implements Command, GameUpdatableEntity{
     protected Battlefield battlefield;
     protected BattlefieldRenderer battlefieldRenderer;
@@ -19,22 +46,31 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
     protected int colActor;
     protected int rowTarget;
     protected int colTarget;
+    protected boolean validate;
 
 
     public BattleCommand(BattlefieldRenderer bfr, Data.ActionChoice choice){
         this.battlefieldRenderer = bfr;
         this.battlefield = bfr.getModel();
         this.choice = choice;
+        this.validate = false;
     }
 
+    /**
+     * you need to valid the inputs : actor as well as target before execute the command.
+     */
+    public void apply(){
+        if(validate){
+            execute();
+        }
+    }
 
     public abstract void init();                                       // called when a command is fetched
+    protected abstract void execute();                                 //
     public abstract boolean isUndoable();                              // can be deleted afterwards
-    public abstract boolean isFree();                                  // does not set Unit.acted as true
     public abstract boolean isEndTurnCommandOnly();                    // is only callable when the unit turn is ending
     public abstract boolean isExecuting();
     public abstract boolean isExecutionCompleted();
-    public abstract int getExperienceGaineduponSuccess();              // get the exp obtained by performing successfully the given action
 
     /**
      * PLAYER ORIENTED METHOD
@@ -44,7 +80,9 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public boolean isTargetValid() {
-        return isTargetValid(rowTarget, colActor, rowTarget, colTarget);
+        if(!validate)
+            validate = isTargetValid(rowActor, colActor, rowTarget, colTarget);
+        return validate;
     }
 
     /*
@@ -70,7 +108,7 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
 
     /**
      *
-     * @return fetch all tiles where the given unit is at range to perform the action chosen
+     * @return fetch all tiles where the given unit is at range to perform the chosen action
      */
     public Array<int[]> getActionArea() {
         Array<int[]> actionArea = new Array<int[]>();
@@ -159,10 +197,10 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
     }
 
     public boolean setActor(int rowActor, int colActor) {
-
         if(battlefield.isTileOccupied(rowActor, colActor)) {
             this.rowActor = rowActor;
             this.colActor = colActor;
+            validate = false;
             return true;
         }
         return false;
@@ -172,8 +210,7 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
         if(battlefield.isTileExisted(rowTarget, colTarget)){
             this.rowTarget = rowTarget;
             this.colTarget = colTarget;
+            validate = false;
         }
     }
-
-    public abstract ActionPanel getActionPanel(Viewport UIViewport);
 }
