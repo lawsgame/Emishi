@@ -84,7 +84,7 @@ public class LongUnitPanel extends UnitPanel {
             for(int i = 0; i < items.size ; i++){
                 builder.append("\nitems "+i+" : "+items.get(i).name().toLowerCase());
             }
-            builder.append("\nSupport ability : "+unit.getSupportAbility().name().toLowerCase());
+            builder.append("\nSupport ability : "+unit.getActiveAbility().name().toLowerCase());
             builder.append("\nPassive ability : "+unit.getPassiveAbility().name().toLowerCase());
             builder.append("\n\nCURRENT WEAPONS\n");
             builder.append("\nName : "+unit.getCurrentWeapon().name().toLowerCase());

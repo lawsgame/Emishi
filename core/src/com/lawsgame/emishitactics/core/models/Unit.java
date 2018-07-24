@@ -45,7 +45,7 @@ public class Unit extends IUnit{
     protected boolean item1Stealable = false;
     protected boolean item2Stealable = false;
     protected PassiveAbility passiveAbility = PassiveAbility.NONE;
-    protected SupportAbility supportAbility = SupportAbility.NONE;
+    protected ActiveAbility activeAbility = ActiveAbility.NONE;
     protected final Banner banner = new Banner();
 
     /**
@@ -622,8 +622,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public boolean has(Data.SupportAbility ability) {
-        return ability == supportAbility;
+    public boolean has(ActiveAbility ability) {
+        return ability == activeAbility;
     }
 
     @Override
@@ -632,8 +632,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setSupportAbility(Data.SupportAbility ability) {
-        this.supportAbility = ability;
+    public void setActiveAbility(ActiveAbility ability) {
+        this.activeAbility = ability;
     }
 
     @Override
@@ -642,8 +642,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public Data.SupportAbility getSupportAbility() {
-        return supportAbility;
+    public ActiveAbility getActiveAbility() {
+        return activeAbility;
     }
 
     @Override

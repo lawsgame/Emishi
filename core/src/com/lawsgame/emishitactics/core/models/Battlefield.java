@@ -290,15 +290,13 @@ public class Battlefield extends Observable {
 
     public boolean isTileCovered(int row, int col, Allegeance alliedAllegeance){
         boolean res = false;
-        if(isTileExisted(row, col)){
-            for(Allegeance a : Allegeance.values()) {
-                if(a != alliedAllegeance) {
-                    Array<Area.UnitArea> foeCoveredArea = coveredAreas.get(alliedAllegeance);
-                    for (int i = 0; i < foeCoveredArea.size; i++) {
-                        if (foeCoveredArea.get(i).contains(row, col)) {
-                            res = true;
-                            continue;
-                        }
+        for(Allegeance a : Allegeance.values()) {
+            if(a != alliedAllegeance) {
+                Array<Area.UnitArea> foeCoveredArea = coveredAreas.get(a);
+                for (int i = 0; i < foeCoveredArea.size; i++) {
+                    if (foeCoveredArea.get(i).contains(row, col)) {
+                        res = true;
+                        continue;
                     }
                 }
             }
@@ -308,13 +306,11 @@ public class Battlefield extends Observable {
 
     public boolean isTileGuarded(int row, int col, Allegeance alliedAllegeance){
         boolean res = false;
-        if(isTileExisted(row, col)){
-            Array<Area.UnitArea> allyGuardedArea = coveredAreas.get(alliedAllegeance);
-            for(int i = 0; i < allyGuardedArea.size; i++){
-                if(allyGuardedArea.get(i).contains(row, col)){
-                    res = true;
-                    continue;
-                }
+        Array<Area.UnitArea> allyGuardedArea = coveredAreas.get(alliedAllegeance);
+        for(int i = 0; i < allyGuardedArea.size; i++){
+            if(allyGuardedArea.get(i).contains(row, col)){
+                res = true;
+                continue;
             }
         }
         return res;
@@ -763,25 +759,33 @@ public class Battlefield extends Observable {
                 // get available neighbor nodes which are not yet in the closed list
                 PathNode node;
                 neighbours = new Array<PathNode>();
-                if (isTileReachable(current.row + 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)) {
+                if (isTileReachable(current.row + 1, current.col, pathfinder)
+                        && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)
+                        && (!avoidCoveredArea || !isTileCovered(current.row + 1, current.col, allegeance))) {
                     node = new PathNode(current.row + 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (isTileReachable(current.row, current.col + 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)) {
+                if (isTileReachable(current.row, current.col + 1, pathfinder)
+                        && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)
+                        && (!avoidCoveredArea || !isTileCovered(current.row, current.col + 1, allegeance))) {
                     node = new PathNode(current.row, current.col + 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (isTileReachable(current.row - 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)) {
+                if (isTileReachable(current.row - 1, current.col, pathfinder)
+                        && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)
+                        && (!avoidCoveredArea || !isTileCovered(current.row - 1, current.col, allegeance))) {
                     node = new PathNode(current.row - 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (isTileReachable(current.row, current.col - 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)) {
+                if (isTileReachable(current.row, current.col - 1, pathfinder)
+                        && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)
+                        && (!avoidCoveredArea || !isTileCovered(current.row, current.col - 1, allegeance))) {
                     node = new PathNode(current.row, current.col - 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
@@ -810,8 +814,7 @@ public class Battlefield extends Observable {
             if (closed.get(closed.size - 1).getRow() == rowf && closed.get(closed.size - 1).getCol() == colf) {
                 path = closed.get(closed.size - 1).getPath();
             }
-
-            for (int i = 0; i < path.size; i++) {
+            for (int i = 1; i < path.size; i++) {
                 res.add(new int[]{path.get(i).getRow(), path.get(i).getCol()});
             }
         }

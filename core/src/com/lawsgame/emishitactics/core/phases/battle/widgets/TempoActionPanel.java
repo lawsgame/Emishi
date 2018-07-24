@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 
@@ -64,5 +65,23 @@ public abstract class TempoActionPanel extends ActionPanel{
 
     public StringBuilder getBuilder() {
         return builder;
+    }
+
+    public static class AttackPanel extends TempoActionPanel{
+        protected int damage;
+        protected int hitrate;
+
+        public AttackPanel(Viewport stageViewport, int damage, int hitrate) {
+            super(stageViewport);
+            this.damage = damage;
+            this.hitrate = hitrate;
+        }
+
+        @Override
+        public void set() {
+            builder = new StringBuilder();
+            builder.append("Damage : "+ damage);
+            builder.append("\nHit rate : "+ hitrate);
+        }
     }
 }

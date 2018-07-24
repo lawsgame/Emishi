@@ -216,7 +216,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }else if(data instanceof Array){
             if(((Array)data).size > 0 && ((Array)data).get(0) instanceof int[]){
                 Array<int[]> path = (Array<int[]>) data;
-                path.removeIndex(0);
                 int[] unitCoords = path.get(path.size - 1);
                 if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
                     IUnit unit = model.getUnit(unitCoords[0], unitCoords[1]);

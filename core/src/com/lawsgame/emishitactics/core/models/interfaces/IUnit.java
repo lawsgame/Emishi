@@ -85,11 +85,11 @@ public abstract class IUnit extends Observable {
 
     //ITEMS & ABILITIES
     public abstract boolean has(Data.PassiveAbility ability);
-    public abstract boolean has(Data.SupportAbility ability);
+    public abstract boolean has(Data.ActiveAbility ability);
     public abstract void setPassiveAbility(Data.PassiveAbility ability);
-    public abstract void setSupportAbility(Data.SupportAbility ability);
+    public abstract void setActiveAbility(Data.ActiveAbility ability);
     public abstract Data.PassiveAbility getPassiveAbility();
-    public abstract Data.SupportAbility getSupportAbility();
+    public abstract Data.ActiveAbility getActiveAbility();
     public abstract boolean has(Item item);
     public abstract boolean addItem(Item item);
     public abstract Item setItem1(Item item);

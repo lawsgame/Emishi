@@ -250,9 +250,9 @@ public class BattlefieldLoader {
             }
 
             if(attributeElt.get("id").equals("support ability")) {
-                for (SupportAbility value : SupportAbility.values()) {
+                for (ActiveAbility value : ActiveAbility.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
-                        unit.setSupportAbility(value);
+                        unit.setActiveAbility(value);
                         continue;
                     }
                 }

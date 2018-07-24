@@ -8,18 +8,22 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoActionPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 
-import java.util.LinkedList;
 import java.util.Stack;
 
 public class TestBIS extends BattleInteractionState {
     Unit warlord;
     Unit warchief;
     Unit soldier;
+    IUnit foe;
+    ActionPanel panel;
 
     Stack<BattleCommand> historic = new Stack<BattleCommand>();
 
@@ -47,6 +51,16 @@ public class TestBIS extends BattleInteractionState {
         bim.battlefield.deployUnit(6,8,warchief);
         bim.battlefield.deployUnit(6,9,soldier);
 
+        foe = bim.battlefield.getUnit(5, 9);
+        bim.battlefield.addCoveredArea(5, 9);
+
+        //UI
+        panel = new TempoActionPanel.AttackPanel(bim.UIStage.getViewport(), 3, 80);
+        panel.set();
+        bim.UIStage.addActor(panel);
+        panel.hide();
+
+
     }
 
     @Override
@@ -58,40 +72,56 @@ public class TestBIS extends BattleInteractionState {
     public void handleTouchInput(int row, int col) {
         // command test
 
-
-
-
         int[] unitPos = bim.battlefield.getUnitPos(warlord);
+
+
         /*
         if(bim.battlefield.isTileAvailable(row, col, warlord.has(Data.PassiveAbility.PATHFINDER))){
-            Array<int[]> path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], row, col, warlord.has(Data.PassiveAbility.PATHFINDER), warlord.getAllegeance());
+            Array<int[]> path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], row, col,
+                    warlord.has(Data.PassiveAbility.PATHFINDER), warlord.getAllegeance(), true);
             bim.battlefield.moveUnit(unitPos[0], unitPos[1], row, col);
             System.out.println(path.size);
             bim.bfr.getNotification(path);
         }
         */
 
+
+        //System.out.println(bim.battlefield.isTileCovered(row, col, Data.Allegeance.ALLY));
+
+
+
         BattleCommand command = new MoveCommand(bim.bfr);
         if(command.setActor(unitPos[0], unitPos[1])){
            command.setTarget(row, col);
            if(command.isTargetValid()){
                command.apply();
-               historic.add(command);
+               historic.push(command);
            }
        }
-
-
 
     }
 
     @Override
     public void update60(float dt) {
+
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
             BattleCommand command = historic.peek();
             if(command.isUndoable()){
                 command.undo();
                 historic.pop();
             }
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
+            bim.battlefield.removeCoveredArea(foe);
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
+            panel.show();
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)){
+            panel.hide();
         }
     }
 
