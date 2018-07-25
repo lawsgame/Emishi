@@ -1,13 +1,11 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 
@@ -104,7 +102,13 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
      * @return whether or not ANY TARGET is at range by the actor performing the given action if one's is standing the tile (row, col)
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public abstract boolean atActionRange(int row, int col);
+    public abstract boolean atActionRange(int row, int col, IUnit actor);
+
+    public boolean atActionRange(){
+        if(battlefield.isTileOccupied(rowActor, colActor))
+            return atActionRange(rowActor, colActor, battlefield.getUnit(rowActor, colActor));
+        return false;
+    }
 
     /**
      *
@@ -213,4 +217,6 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
             validate = false;
         }
     }
+
+
 }

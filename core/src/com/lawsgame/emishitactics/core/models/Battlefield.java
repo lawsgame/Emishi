@@ -468,6 +468,16 @@ public class Battlefield extends Observable {
         return unit;
     }
 
+    public void removeDeadUnits() {
+        for(int r= 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileOccupied(r, c) && getUnit(r, c).isOut()){
+                    removeUnit(r, c);
+                }
+            }
+        }
+    }
+
     public IUnit getUnitByName(String name) {
         IUnit target = null;
         for(int r = getNbRows()-1; r > -1 ; r--){
@@ -481,15 +491,14 @@ public class Battlefield extends Observable {
     }
 
     public int[] getUnitPos(IUnit unit){
-        int[] pos = null;
         for(int r = getNbRows()-1; r > -1 ; r--){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileOccupied(r, c) && getUnit(r, c) == unit){
-                    pos = new int[]{r, c};
+                    return new int[]{r, c};
                 }
             }
         }
-        return pos;
+        return null;
     }
 
     /**
@@ -529,6 +538,7 @@ public class Battlefield extends Observable {
 
 
     private static final CheckMoveMap checkmap = new CheckMoveMap();
+
 
     static class CheckMoveMap{
         int rowOrigin;

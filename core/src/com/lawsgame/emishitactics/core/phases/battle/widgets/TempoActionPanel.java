@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 

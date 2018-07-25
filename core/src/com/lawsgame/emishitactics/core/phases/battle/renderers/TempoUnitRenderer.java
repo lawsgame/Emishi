@@ -66,7 +66,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         unitSprite.setY(row);
         unitSprite.setSize(1, 1);
         this.executing = false;
-        this.executing = false;
         this.visible = true;
         this.animationQueue = new LinkedList<Object>();
 
@@ -92,6 +91,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         if(targeted) blinkTime += dt;
 
         handleWalkAnimation(dt);
+
+        // shall be called last to directly launched the next animation if executing = false
         launchNextAnimation();
     }
 
@@ -102,7 +103,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
                 if (query instanceof Unit.DamageNotification) {
                     Unit.DamageNotification notification = (Unit.DamageNotification) query;
-                    displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical);
+                    displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
                 } else if (query instanceof int[]) {
                     int[] array = (int[]) query;
                     if (array.length == 2) {
@@ -119,15 +120,23 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 } else if (query instanceof Data.Orientation) {
                     displayPushed((Data.Orientation) query);
 
-                } else if (query instanceof Command){
-                    Command customQuery = (Command)query;
+                } else if (query instanceof Command) {
+                    Command customQuery = (Command) query;
                     customQuery.apply();
 
+                } else if (query instanceof Boolean){
+                    boolean backstabbed = (Boolean) query;
+                    displayFlee(backstabbed);
+
+                } else if (query instanceof Array) {
+                    if (((Array) query).size > 0 && ((Array) query).get(0) instanceof int[]) {
+                        Array<int[]> path = (Array<int[]>) query;
+                        displayWalk(path);
+                    }
                 } else {
                     launchNextAnimation();
                 }
-            }else if(model.isOut()){
-                //setVisible(false);
+
             }
         }
     }
@@ -199,13 +208,16 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayWalk(Array<int[]> path) {
-        boolean validPath = true;
-        int[] oldCoords = new int[]{(int) unitSprite.getY(), (int) unitSprite.getX()};
-
         /*
         CHECK PATH VALIDITY
-        for the path to be explotable, it is required to collect tile coords of tiles which each of them are neighbours of its predecessor and follower in the list.
+        for the path to be explotable, it is required
+        - to not be EMPTY
+        - to be a collection of TILE COORDS
+        - which each of them are NEIGHBOR of its predecessor.
+        - to start next to the last known position of the unit
          */
+        boolean validPath = path.size > 0;
+        int[] oldCoords = new int[]{(int) unitSprite.getY(), (int) unitSprite.getX()};
         for(int[] coords: path) {
             if(coords.length < 2 || 1 != Utils.dist(oldCoords[0], oldCoords[1], coords[0], coords[1])) {
                 validPath = false;
@@ -213,35 +225,37 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             }
             oldCoords = coords;
         }
+
         if(validPath) {
             this.remainingPath.addAll(path);
+
 
                 /*
             CLEAN PATH
             remove unnecesary entries for the walk position algorithm use in  UnitRenderer.update(dt)
              */
-            if(path.size > 0) {
-                int[] pPreviousEntry;
-                int[] previousEntry;
-                int[] entry;
-                for (int i = 2; i < remainingPath.size; i++) {
-                    entry = remainingPath.get(i);
-                    previousEntry = remainingPath.get(i - 1);
-                    pPreviousEntry = remainingPath.get(i - 2);
+            int[] pPreviousEntry;
+            int[] previousEntry;
+            int[] entry;
+            for (int i = 2; i < remainingPath.size; i++) {
+                entry = remainingPath.get(i);
+                previousEntry = remainingPath.get(i - 1);
+                pPreviousEntry = remainingPath.get(i - 2);
 
-                    if ( (entry[0] == previousEntry[0] && previousEntry [0] == pPreviousEntry[0]) || (entry[1] == previousEntry[1] && previousEntry [1] == pPreviousEntry[1])){
-                        remainingPath.removeIndex(i-1);
-                        i--;
-                    }
-
+                if ( (entry[0] == previousEntry[0] && previousEntry [0] == pPreviousEntry[0]) || (entry[1] == previousEntry[1] && previousEntry [1] == pPreviousEntry[1])){
+                    remainingPath.removeIndex(i-1);
+                    i--;
                 }
 
-                Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
-                model.setOrientation(or);
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
-                executing = true;
-
             }
+
+            Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
+            model.setOrientation(or);
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
+            executing = true;
+
+
+
         }
 
 
@@ -249,8 +263,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical) {
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().getAllegeance()));
+    public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
+        if(backstab){
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.BACKSTABBED, model.getArmy().getAllegeance()));
+        }else{
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().getAllegeance()));
+        }
         countDown.run();
     }
 
@@ -284,20 +302,16 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
+    public void displayFlee(boolean backstabbed) {
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
+        if(!backstabbed)
+            orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation().getOpposite());
+        countDown.run();
+    }
+
+    @Override
     public void display(Data.AnimationId id) {
         switch (id){
-            case WALK:
-            case SWITCH_POSITION:
-            case LEVELUP:
-            case TREATED:
-            case TAKE_HIT:
-            case PUSHED:
-                try{
-                    throw new IllegalArgumentException("the following animation order "+id.name()+" required calling a specific method as it demands extra parameters to be conducted successfully");
-                }catch (IllegalArgumentException e){
-                    e.printStackTrace();
-                }
-                break;
             case ATTACK:
             case PUSH:
             case HEAL:
@@ -306,7 +320,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case GUARD:
             case DIE:
             case DODGE:
-            case BACKSTABBED:
             case COVER:
                 unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, model.getArmy().getAllegeance()));
                 countDown.run();
@@ -315,11 +328,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 break;
             case SWITCH_WEAPON:
                 weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getWeaponType());
-                break;
-            case FLEE:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
-                orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation().getOpposite());
-                countDown.run();
                 break;
             case GUARDED:
                 //TODO:
@@ -335,7 +343,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public boolean isExecuting() {
-        return countDown.isRunning();
+        return executing || animationQueue.size() > 0;
     }
 
     @Override
@@ -377,13 +385,13 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     if (model.isDead()) {
                         animationQueue.offer(Data.AnimationId.DIE);
                     } else if (model.isOut()) {
-                        animationQueue.offer(Data.AnimationId.FLEE);
+                        animationQueue.offer(((Unit.DamageNotification)data).backstab);
                     }
                     animationQueue.offer(new SimpleCommand() {
 
                         @Override
                         public void apply() {
-                            setVisible(true);
+                            setVisible(false);
                         }
                     });
                 }

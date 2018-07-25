@@ -240,24 +240,6 @@ public class BattlefieldLoader {
             if(attributeElt.get("id").equals("stealable 2"))
                 unit.setItem1Stealable(attributeElt.getBoolean("value"));
 
-            if(attributeElt.get("id").equals("passive ability")) {
-                for (PassiveAbility value : PassiveAbility.values()) {
-                    if (value.name().equals(attributeElt.get("value"))) {
-                        unit.setPassiveAbility(value);
-                        continue;
-                    }
-                }
-            }
-
-            if(attributeElt.get("id").equals("support ability")) {
-                for (ActiveAbility value : ActiveAbility.values()) {
-                    if (value.name().equals(attributeElt.get("value"))) {
-                        unit.setActiveAbility(value);
-                        continue;
-                    }
-                }
-            }
-
             if(attributeElt.get("id").equals("banner sign")) {
                 for (BannerSign value : BannerSign.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {

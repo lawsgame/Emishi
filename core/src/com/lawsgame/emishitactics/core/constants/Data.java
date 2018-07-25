@@ -28,6 +28,7 @@ public class Data {
     public static final int DEX_FACTOR_DROP = 2;
     public static final int GUARD_RANGE_MIN = 1;
     public static final int GUARD_RANGE_MAX = 1;
+    public static final int HIT_RATE_BACK_ACC_BONUS = 20;
 
     // RENDER parameters
     public static final float SPEED_WALK = 3f;  //tile/s
@@ -47,12 +48,12 @@ public class Data {
     /**
      * for animation / rendering purposes, use to define:
      *  - ids of animation sprite sets.
-     *  - ids of animations
+     *  - ids of animations (optional)
      */
     public enum AnimationId {
         WALK,
         SWITCH_WEAPON,
-        SWITCH_POSITION,
+        //SWITCH_POSITION,
         PUSH,
         HEAL,
         STEAL,
@@ -69,8 +70,7 @@ public class Data {
         TAKE_HIT,
         FLEE,
         DIE,
-        GUARDED,
-
+        GUARDED
 
     }
 
@@ -211,20 +211,6 @@ public class Data {
         FIST
     }
 
-    public enum WeaponArt{
-        NONE(0);
-
-        private int cost;
-
-        WeaponArt(int cost) {
-            this.cost = cost;
-        }
-
-        public int getCost() {
-            return cost;
-        }
-    }
-
     /**
      * SWORD
      *  - shortsword
@@ -260,7 +246,7 @@ public class Data {
      *  - battle axe
      *  - sagaris
      *  - danish axe
-     *  - Great axe
+     *  - great double-edged axe
      *  - halberd
      *  - bardiche
      *
@@ -282,14 +268,15 @@ public class Data {
      *  - Cable-backed bow
      *  - longbow
      *  - crossbow
+     *  - Great bow
      */
     public enum Weapon{
-        FIST(           1, 100, 1, 1, WeaponType.FIST, DamageType.BLUNT, WeaponArt.NONE),
-        SHORTSWORD(     5,  90, 1, 1, WeaponType.SWORD, DamageType.EDGED, WeaponArt.NONE),
-        LANCE(          4, 100, 1, 1, WeaponType.POLEARM, DamageType.PIERCING, WeaponArt.NONE),
-        BROAD_AXE(      3,  95, 1, 1, WeaponType.AXE, DamageType.EDGED, WeaponArt.NONE),
-        CLUB(           3,  90, 1, 1, WeaponType.MACE, DamageType.BLUNT, WeaponArt.NONE),
-        HUNTING_BOW(    3,  85, 2, 2, WeaponType.BOW, DamageType.PIERCING, WeaponArt.NONE);
+        FIST(           1, 100, 1, 1, WeaponType.FIST, DamageType.BLUNT, ActiveAbility.NONE),
+        SHORTSWORD(     3,  90, 1, 1, WeaponType.SWORD, DamageType.EDGED, ActiveAbility.NONE),
+        LANCE(          3,  95, 1, 1, WeaponType.POLEARM, DamageType.PIERCING, ActiveAbility.NONE),
+        BROAD_AXE(      5,  80, 1, 1, WeaponType.AXE, DamageType.EDGED, ActiveAbility.NONE),
+        CLUB(           4,  85, 1, 1, WeaponType.MACE, DamageType.BLUNT, ActiveAbility.NONE),
+        HUNTING_BOW(    3,  75, 2, 2, WeaponType.BOW, DamageType.PIERCING, ActiveAbility.NONE);
 
         private int damage;
         private int accuracy;
@@ -297,16 +284,16 @@ public class Data {
         private int rangeMax;
         private WeaponType weaponType;
         private DamageType damageType;
-        private WeaponArt art;
+        private ActiveAbility ability;
 
-        Weapon(int damage, int accuracy, int rangeMin, int rangeMax, WeaponType weaponType, DamageType damageType, WeaponArt art) {
+        Weapon(int damage, int accuracy, int rangeMin, int rangeMax, WeaponType weaponType, DamageType damageType, ActiveAbility art) {
             this.damage = damage;
             this.accuracy = accuracy;
             this.rangeMin = rangeMin;
             this.rangeMax = rangeMax;
             this.weaponType = weaponType;
             this.damageType = damageType;
-            this.art = art;
+            this.ability = art;
         }
 
         public WeaponType getWeaponType() {
@@ -333,13 +320,69 @@ public class Data {
             return damageType;
         }
 
-        public WeaponArt getArt() {
-            return art;
+        public ActiveAbility getAbility() {
+            return ability;
         }
 
         public boolean isMelee() { return rangeMin == 1;}
 
         public boolean isRange() { return rangeMax > 1; }
+    }
+
+    public enum Item{
+        NOTHING;
+
+        private PassiveAbility passiveAbility;
+        private ActiveAbility activeAbility;
+
+        Item(PassiveAbility passiveAbility) {
+            this.passiveAbility = passiveAbility;
+            this.activeAbility = ActiveAbility.NONE;
+        }
+
+        Item(ActiveAbility activeAbility){
+            this.passiveAbility = PassiveAbility.NONE;
+            this.activeAbility = activeAbility;
+        }
+
+        Item() {
+            this.passiveAbility = PassiveAbility.NONE;
+            this.activeAbility = ActiveAbility.NONE;
+        }
+
+        public PassiveAbility getPassiveAbility() {
+            return passiveAbility;
+        }
+
+        public ActiveAbility getActiveAbility() {
+            return activeAbility;
+        }
+    }
+
+    public enum PassiveAbility{
+        PATHFINDER,
+        SHADOW,
+        VILIGANT,
+        NONE
+    }
+
+    public enum ActiveAbility {
+        GUARD(0),
+        HEAL(0),
+        STEAL(0),
+        BUILD(0),
+        COVER(0),
+        NONE(0);
+
+        private int cost;
+
+        ActiveAbility(int cost) {
+            this.cost = cost;
+        }
+
+        public int getCost() {
+            return cost;
+        }
     }
 
     public enum Behaviour{
@@ -394,25 +437,6 @@ public class Data {
         public int getMax() {
             return maxSignByBanner;
         }
-    }
-
-    public enum PassiveAbility{
-        PATHFINDER,
-        SHADOW,
-        VILIGANT,
-        NONE
-    }
-
-    public enum ActiveAbility {
-        GUARD,
-        HEAL,
-        STEAL,
-        BUILD,
-        NONE
-    }
-
-    public enum Item{
-        NOTHING
     }
 
     public enum Job {

@@ -56,7 +56,8 @@ public class LongUnitPanel extends UnitPanel {
                     builder.append("\nPosition : soldier");
                 }
             }
-            builder.append("\nMoral (HP) : " + unit.getCurrentMoral() + "/" + unit.getAppMoral() + " (" + unit.getCurrentHP() + ")");
+            builder.append("\nHit points: " + unit.getCurrentHP() + "/"+unit.getAppHitpoints());
+            builder.append("\nMoral: " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
             builder.append("\nAO trigger rate : " + unit.getCurrentOATriggerRate(rowUnit, colUnit, bf));
 
             if (unit.isMobilized()) {
@@ -84,16 +85,22 @@ public class LongUnitPanel extends UnitPanel {
             for(int i = 0; i < items.size ; i++){
                 builder.append("\nitems "+i+" : "+items.get(i).name().toLowerCase());
             }
-            builder.append("\nSupport ability : "+unit.getActiveAbility().name().toLowerCase());
-            builder.append("\nPassive ability : "+unit.getPassiveAbility().name().toLowerCase());
-            builder.append("\n\nCURRENT WEAPONS\n");
+            builder.append("\n\n    CURRENT WEAPONS\n");
             builder.append("\nName : "+unit.getCurrentWeapon().name().toLowerCase());
             builder.append("\nBase damage : "+unit.getCurrentWeapon().getDamage());
             builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getAccuracy());
             builder.append("\nRange : ("+unit.getCurrentWeapon().getRangeMin()+", "+unit.getCurrentWeapon().getRangeMax()+")");
             builder.append("\nWeapon type : "+ unit.getCurrentWeapon().getWeaponType().name().toLowerCase());
             builder.append("\nDamage type : "+unit.getCurrentWeapon().getDamageType().name().toLowerCase());
-            builder.append("\nOffensive Ability : "+unit.getCurrentWeapon().getArt().name().toLowerCase());
+            builder.append("\n\n    ABILITIES\n");
+            Array<Data.ActiveAbility> activeAbilities = unit.getActiveAbilities();
+            for(int i = 0; i < activeAbilities.size ; i++) {
+                builder.append("\nActive ability : " + unit.getActiveAbilities().get(i).name().toLowerCase());
+            }
+            Array<Data.PassiveAbility> passiveAbilities = unit.getPassiveAbilities();
+            for(int i = 0; i < passiveAbilities.size ; i++) {
+                builder.append("\nPassive ability : " + unit.getPassiveAbilities().get(i).name().toLowerCase());
+            }
 
             equipDescription = builder.toString();
             builder.setLength(0);
@@ -118,11 +125,8 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\nAvoidance : "+unit.getAppAvoidance());
             builder.append("\nRange : ("+unit.getAppWeaponRangeMin()+", "+unit.getAppWeaponRangeMax()+")");
 
-
-
             statDescription = builder.toString();
             builder.setLength(0);
-
 
         }
     }
@@ -137,6 +141,8 @@ public class LongUnitPanel extends UnitPanel {
         setVisible(false);
     }
 
+
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
@@ -144,4 +150,6 @@ public class LongUnitPanel extends UnitPanel {
         BattlePhase.testFont.draw(batch, statDescription, getX() + X_TEXT_OFFSET_2_COL, getY() + getHeight() - Y_TEXT_OFFSET);
         BattlePhase.testFont.draw(batch, equipDescription, getX() + X_TEXT_OFFSET_3_COL, getY() + getHeight() - Y_TEXT_OFFSET);
     }
+
+
 }

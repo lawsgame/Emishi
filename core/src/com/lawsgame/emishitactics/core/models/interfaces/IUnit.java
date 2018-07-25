@@ -86,10 +86,8 @@ public abstract class IUnit extends Observable {
     //ITEMS & ABILITIES
     public abstract boolean has(Data.PassiveAbility ability);
     public abstract boolean has(Data.ActiveAbility ability);
-    public abstract void setPassiveAbility(Data.PassiveAbility ability);
-    public abstract void setActiveAbility(Data.ActiveAbility ability);
-    public abstract Data.PassiveAbility getPassiveAbility();
-    public abstract Data.ActiveAbility getActiveAbility();
+    public abstract Array<Data.PassiveAbility> getPassiveAbilities();
+    public abstract Array<Data.ActiveAbility> getActiveAbilities();
     public abstract boolean has(Item item);
     public abstract boolean addItem(Item item);
     public abstract Item setItem1(Item item);
@@ -110,15 +108,10 @@ public abstract class IUnit extends Observable {
     public abstract int getCurrentWeaponRangeMin(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getCurrentWeaponRangeMax(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getAppAttackAccuracy();
-    public abstract int getCurrentAttackAccuracy(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getAppAttackMight();
-    public abstract int getCurrentAttackMight(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getAppDefense(DamageType damageType);
-    public abstract int getCurrentDefense(DamageType damageType, int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getAppAvoidance();
-    public abstract int getCurrentAvoidance(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getAppDropRate();
-    public abstract int getCurrentDropRate(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract void setOAChargingBarPoints(int barProgression);
     public abstract void addOAChargingBarPoints(int points);
     public abstract int getOAChargingBarPoints();

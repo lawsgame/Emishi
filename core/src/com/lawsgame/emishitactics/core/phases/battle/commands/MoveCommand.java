@@ -9,11 +9,10 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 
-
 public class MoveCommand extends BattleCommand{
-    private boolean executed;
-    private BattleUnitRenderer actorRenderer;
-    private Array<int[]> path;
+    protected boolean executed;
+    protected BattleUnitRenderer actorRenderer;
+    protected Array<int[]> path;
 
     public MoveCommand(BattlefieldRenderer bfr) {
         super(bfr, Data.ActionChoice.MOVE);
@@ -93,7 +92,7 @@ public class MoveCommand extends BattleCommand{
     }
 
     @Override
-    public boolean atActionRange(int row, int col) {
+    public boolean atActionRange(int row, int col, IUnit actor) {
         return true;
     }
 

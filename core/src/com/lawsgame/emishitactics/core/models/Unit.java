@@ -44,8 +44,6 @@ public class Unit extends IUnit{
     protected Item item2 = Item.NOTHING;
     protected boolean item1Stealable = false;
     protected boolean item2Stealable = false;
-    protected PassiveAbility passiveAbility = PassiveAbility.NONE;
-    protected ActiveAbility activeAbility = ActiveAbility.NONE;
     protected final Banner banner = new Banner();
 
     /**
@@ -618,32 +616,29 @@ public class Unit extends IUnit{
 
     @Override
     public boolean has(Data.PassiveAbility ability) {
-        return ability == passiveAbility;
+        return item1.getPassiveAbility() == ability || item2.getPassiveAbility() == ability;
     }
 
     @Override
     public boolean has(ActiveAbility ability) {
-        return ability == activeAbility;
+        return item1.getActiveAbility() == ability || item2.getActiveAbility() == ability || getCurrentWeapon().getAbility() == ability;
     }
 
     @Override
-    public void setPassiveAbility(Data.PassiveAbility ability) {
-        this.passiveAbility = ability;
+    public Array<PassiveAbility> getPassiveAbilities() {
+        Array<PassiveAbility> abilities = new Array<PassiveAbility>();
+        abilities.add(item1.getPassiveAbility());
+        abilities.add(item2.getPassiveAbility());
+        return abilities;
     }
 
     @Override
-    public void setActiveAbility(ActiveAbility ability) {
-        this.activeAbility = ability;
-    }
-
-    @Override
-    public Data.PassiveAbility getPassiveAbility() {
-        return passiveAbility;
-    }
-
-    @Override
-    public ActiveAbility getActiveAbility() {
-        return activeAbility;
+    public Array<ActiveAbility> getActiveAbilities() {
+        Array<ActiveAbility> abilities = new Array<ActiveAbility>();
+        abilities.add(item1.getActiveAbility());
+        abilities.add(item2.getActiveAbility());
+        abilities.add(getCurrentWeapon().getAbility());
+        return abilities;
     }
 
     @Override
@@ -782,17 +777,7 @@ public class Unit extends IUnit{
 
     @Override
     public int getAppAttackAccuracy() {
-        return getCurrentWeapon().getAccuracy() + 3 * Data.DEX_FACTOR_ATT_ACC * getAppAgility() + getChiefCharisma();
-    }
-
-    @Override
-    public int getCurrentAttackAccuracy(int rowUnit, int colUnit, Battlefield battlefield) {
-        int attackAcc = getCurrentWeapon().getAccuracy() + 3 * Data.DEX_FACTOR_ATT_ACC * getAppAgility() + getChiefCharisma();
-        if(battlefield.isTileExisted(rowUnit, colUnit)){
-            TileType tileType = battlefield.getTile(rowUnit, colUnit);
-            attackAcc += tileType.getAttackAccBonus();
-        }
-        return attackAcc;
+        return getCurrentWeapon().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + getChiefCharisma();
     }
 
     @Override
@@ -801,30 +786,9 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getCurrentAttackMight(int rowUnit, int colUnit, Battlefield battlefield) {
-        int attackMight = getCurrentWeapon().getDamage() + getAppStrength();
-        if(battlefield.isTileExisted(rowUnit, colUnit)){
-            TileType tileType = battlefield.getTile(rowUnit, colUnit);
-            attackMight += tileType.getAttackMightBonus();
-        }
-        return attackMight;
-    }
-
-    @Override
     public int getAppDefense(DamageType damageType) {
         return getAppArmor(damageType);
     }
-
-    @Override
-    public int getCurrentDefense(DamageType damageType, int rowUnit, int colUnit, Battlefield battlefield) {
-        int armor = getAppArmor(damageType);
-        if(battlefield.isTileExisted(rowUnit, colUnit)){
-            TileType tileType = battlefield.getTile(rowUnit, colUnit);
-            armor += tileType.getDefenseBonus();
-        }
-        return armor;
-    }
-
 
     @Override
     public int getAppAvoidance() {
@@ -832,22 +796,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getCurrentAvoidance(int rowUnit, int colUnit, Battlefield battlefield) {
-        int avoid = Data.DEX_FACTOR_AVO * getAppAgility();
-        if(battlefield.isTileExisted(rowUnit, colUnit)){
-            TileType tileType = battlefield.getTile(rowUnit, colUnit);
-            avoid += tileType.getAvoidBonus();
-        }
-        return avoid;
-    }
-
-    @Override
     public int getAppDropRate() {
-        return getAppDexterity() * Data.DEX_FACTOR_DROP + getChiefCharisma();
-    }
-
-    @Override
-    public int getCurrentDropRate(int rowUnit, int colUnit, Battlefield battlefield) {
         return getAppDexterity() * Data.DEX_FACTOR_DROP + getChiefCharisma();
     }
 
@@ -1097,9 +1046,7 @@ public class Unit extends IUnit{
                 for(int i = 1; i < squad.size; i++){
                     notifications.addAll(squad.get(i).applyDamage(moralDamage, true));
                 }
-
             }
-
         }
         return notifications;
     }
@@ -1112,6 +1059,7 @@ public class Unit extends IUnit{
         public boolean backstab;
 
         public DamageNotification (Unit wounded, boolean moralOnly, int damageTaken, boolean critical, boolean backstab){
+            this.wounded = wounded;
             this.moralOnly = moralOnly;
             this.damageTaken = damageTaken;
             this.critical = critical;
