@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -14,8 +15,8 @@ public class AttackCommand extends BattleCommand {
     private Data.Orientation oldOrientation;
 
 
-    public AttackCommand(BattlefieldRenderer bfr) {
-        super(bfr, Data.ActionChoice.ATTACK);
+    public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
+        super(bfr, Data.ActionChoice.ATTACK, scheduler);
     }
 
     @Override
@@ -29,6 +30,7 @@ public class AttackCommand extends BattleCommand {
         IUnit attacker = battlefield.getUnit(rowActor, colActor);
         IUnit target = battlefield.getUnit(rowTarget, colTarget);
         attacker.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+        attacker.notifyAllObservers(null);
         attacker.notifyAllObservers(Data.AnimationId.ATTACK);
 
         boolean backstabbed = attacker.getOrientation() == target.getOrientation();
@@ -41,6 +43,8 @@ public class AttackCommand extends BattleCommand {
             oldOrientation = notifs.get(0).wounded.getOrientation();
             if(!notifs.get(0).backstab) {
                 notifs.get(0).wounded.setOrientation(attacker.getOrientation().getOpposite());
+                notifs.get(0).wounded.notifyAllObservers(null);
+
             }
             for(int i = 0; i < notifs.size; i++){
                 notifs.get(i).wounded.notifyAllObservers(notifs.get(i));
@@ -112,6 +116,7 @@ public class AttackCommand extends BattleCommand {
         if(!executionCompleted && launched && !battlefieldRenderer.isExecuting()){
             executionCompleted = true;
             battlefield.getUnit(rowTarget, colTarget).setOrientation(oldOrientation);
+            battlefield.getUnit(rowTarget, colTarget).notifyAllObservers(null);
             battlefield.removeDeadUnits();
 
         }

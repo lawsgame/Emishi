@@ -26,6 +26,7 @@ public class Army extends IArmy{
     private Allegeance allegeance;
     private Array<Array<IUnit>> mobilizedTroups;
     private Array<IUnit> nonMobTroups;
+    private boolean ldCondEnabled;
 
     public Army(Allegeance allegeance, boolean playerControlled){
         this.id = ids++;
@@ -33,6 +34,7 @@ public class Army extends IArmy{
         this.playerControlled = playerControlled;
         this.mobilizedTroups = new Array<Array<IUnit>>();
         this.nonMobTroups = new Array<IUnit>();
+        this.ldCondEnabled = false;
     }
 
     @Override
@@ -315,7 +317,9 @@ public class Army extends IArmy{
             if (squadIndex == 0) {
                 appointWarLord(unit);
             } else if(getWarlord() != null){
-                if (0 < squadIndex && squadIndex < mobilizedTroups.size || getNbOfSquads() < getWarlord().getMaxWarChiefs() + 1){
+                if ((0 < squadIndex && squadIndex < mobilizedTroups.size)
+                        || getNbOfSquads() <= getWarlord().getMaxWarChiefs()
+                        || ldCondEnabled){
                     nonMobTroups.removeValue(unit, true);
                     if (0 < squadIndex && squadIndex < mobilizedTroups.size) {
                         //reset an older squad
@@ -383,7 +387,7 @@ public class Army extends IArmy{
                         this.mobilizedTroups.get(squadID).insert(unitID, soldier);
                         nonMobTroups.removeValue(soldier, true);
 
-                    } else if (mobilizedTroups.get(squadID).size < mobilizedTroups.get(squadID).get(0).getMaxSoldiersAs(squadID == 0)) {
+                    } else if (mobilizedTroups.get(squadID).size < mobilizedTroups.get(squadID).get(0).getMaxSoldiersAs(squadID == 0) || !ldCondEnabled) {
                     /*CASE 2 :
                     IF : the squad has a slot available for a new recruit
                      - the newbie is added
@@ -391,7 +395,6 @@ public class Army extends IArmy{
                         this.mobilizedTroups.get(squadID).add(soldier);
                         nonMobTroups.removeValue(soldier, true);
                     }
-
                     updateMobilizedTroopMoral();
 
                 }
@@ -425,6 +428,11 @@ public class Army extends IArmy{
             }
 
         }
+    }
+
+    @Override
+    public void setLeadershipConditionEnabled(boolean enabled) {
+        this.ldCondEnabled = enabled;
     }
 
 

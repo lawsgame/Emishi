@@ -152,7 +152,7 @@ public class BattlefieldLoader {
                                         army.appointWarChief(unit);
                                     }
                                 }else{
-                                    army.appointSoldier(unit, n);
+                                    army.appointSoldier(unit, k);
                                 }
 
                                 // add to the battlefield

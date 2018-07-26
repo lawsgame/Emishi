@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -30,9 +31,10 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public CameraManager gcm;
     public AssetManager asm;
     public InputMultiplexer multiplexer;
+    public AnimationScheduler scheduler;
+
 
     public AreaWidget sltdTile;
-
     public Stage UIStage;
     public TilePanel shortTilePanel;
     public TilePanel longTilePanel;
@@ -45,9 +47,11 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bfr = bfr;
         this.gcm = gcm;
         this.asm = asm;
-        this.bcm = new BattleCommandManager(bfr);
+        this.scheduler = new AnimationScheduler();
+        this.bcm = new BattleCommandManager(bfr, scheduler);
         this.playerArmy = playerArmy;
         this.multiplexer = new InputMultiplexer();
+
 
 
         this.sltdTile = new SimpleAreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);

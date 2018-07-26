@@ -47,7 +47,9 @@ public class BattlePhase extends GamePhase {
         // set the player army
         Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
         warlord.addWeapon(Data.Weapon.SHORTSWORD);
+
         IArmy playerArmy = new Army(Data.Allegeance.ALLY, true);
+        playerArmy.setLeadershipConditionEnabled(true);
         playerArmy.add(warlord);
         playerArmy.appointWarLord(warlord);
 
@@ -83,6 +85,7 @@ public class BattlePhase extends GamePhase {
     public void update60(float dt) {
         bim.getCurrentState().update(dt);
         bim.bfr.update(dt);
+        bim.scheduler.update(dt);
     }
 
     @Override

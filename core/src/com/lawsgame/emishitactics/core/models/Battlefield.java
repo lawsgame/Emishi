@@ -464,6 +464,8 @@ public class Battlefield extends Observable {
     public IUnit removeUnit(int row, int col){
         IUnit unit = this.units[row][col];
         this.units[row][col] = null;
+        removeCoveredArea(unit);
+        removeGuardedArea(unit);
         notifyAllObservers(unit);
         return unit;
     }

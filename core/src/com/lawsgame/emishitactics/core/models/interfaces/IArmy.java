@@ -35,7 +35,6 @@ public abstract class IArmy extends Observable{
     public abstract void decrementBuildingResources();
     public abstract void resetBuildingResources();
 
-
     public abstract boolean add(IUnit unit);
     public abstract void remove(IUnit unit);
     public abstract void appointWarLord(IUnit unit);
@@ -47,4 +46,5 @@ public abstract class IArmy extends Observable{
     public abstract void disbandAllSquads();
 
     public abstract void checkComposition();
+    public abstract void setLeadershipConditionEnabled(boolean enabled);
 }

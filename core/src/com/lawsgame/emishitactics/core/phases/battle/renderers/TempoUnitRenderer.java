@@ -177,7 +177,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     display(Data.AnimationId.REST);
                 } else {
                     model.setOrientation(Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(), remainingPath.get(0)[0], remainingPath.get(0)[1]));
-
+                    getNotification(null);
                 }
             }
         }
@@ -251,6 +251,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
             Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
             model.setOrientation(or);
+            getNotification(null);
             unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
             executing = true;
 
@@ -288,6 +289,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
         model.setOrientation(pushedTowards);
+        getNotification(null);
         unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().getAllegeance()));
         pushed = true;
         int y = (int) getX();
@@ -373,6 +375,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             // update weapon
             weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getWeaponType());
             // update orientation
+            System.out.println(model.getAllegeance()+" "+model.getName()+" "+model.getOrientation());
             orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
             if (model.isHorseman()) {
                 // update soldier mount rendering

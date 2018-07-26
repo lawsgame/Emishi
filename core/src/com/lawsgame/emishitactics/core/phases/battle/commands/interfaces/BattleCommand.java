@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -39,6 +40,7 @@ import com.lawsgame.emishitactics.engine.patterns.command.Command;
 public abstract class BattleCommand implements Command, GameUpdatableEntity{
     protected Battlefield battlefield;
     protected BattlefieldRenderer battlefieldRenderer;
+    protected AnimationScheduler scheduler;
     protected Data.ActionChoice choice;
     protected int rowActor;
     protected int colActor;
@@ -47,10 +49,11 @@ public abstract class BattleCommand implements Command, GameUpdatableEntity{
     protected boolean validate;
 
 
-    public BattleCommand(BattlefieldRenderer bfr, Data.ActionChoice choice){
+    public BattleCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler){
         this.battlefieldRenderer = bfr;
         this.battlefield = bfr.getModel();
         this.choice = choice;
+        this.scheduler = scheduler;
         this.validate = false;
     }
 

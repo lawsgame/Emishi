@@ -32,6 +32,22 @@
                     <Attribute id = "behaviour" value="PASSIVE"/>
                 </Unit>
             </Squad>
+            <Squad>
+                <Unit row = "3" col = "8" name = "noname" job="SOLAR_KNIGHT" level="3" weaponType="AXE" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
+                    <Attribute id = "weapon" value="BROAD_AXE"/>
+                    <Attribute id = "weapon" value="FIST"/>
+                    <Attribute id = "right handed" value="true"/>
+                    <Attribute id = "item" value ="NONE"/>
+                    <Attribute id = "item" value ="NONE"/>
+                    <Attribute id = "stealable 1" value ="true"/>
+                    <Attribute id = "stealable 2" value ="false"/>
+                    <Attribute id = "banner sign" value ="NONE"/>
+                    <Attribute id = "banner sign" value ="NONE"/>
+                    <Attribute id = "banner sign" value ="NONE"/>
+                    <Attribute id = "orientation" value="SOUTH"/>
+                    <Attribute id = "behaviour" value="PASSIVE"/>
+                </Unit>
+            </Squad>
         </Army>
     </Battle>
 </Battles>

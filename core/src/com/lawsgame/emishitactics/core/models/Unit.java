@@ -431,7 +431,6 @@ public class Unit extends IUnit{
     public void switchWeapon() {
         if(isPromoted()){
             this.weapon1Equipped = !weapon1Equipped;
-            notifyAllObservers(null);
         }
     }
 
@@ -872,7 +871,7 @@ public class Unit extends IUnit{
         int maxWC = this.leadership / 6;
         if(maxWC > 3 )
             maxWC = 3;
-        return maxWC;
+        return maxWC + 1;
     }
 
 
@@ -933,7 +932,6 @@ public class Unit extends IUnit{
     @Override
     public void setOrientation(Data.Orientation orientation) {
         this.orientation = orientation;
-        notifyAllObservers(null);
     }
 
     @Override

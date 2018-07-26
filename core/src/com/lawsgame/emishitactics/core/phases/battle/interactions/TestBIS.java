@@ -91,9 +91,9 @@ public class TestBIS extends BattleInteractionState {
 
 
         if(bim.battlefield.isTileOccupied(row, col)){
-            command = new AttackCommand(bim.bfr);
+            command = new AttackCommand(bim.bfr, bim.scheduler);
         } else {
-            command = new MoveCommand(bim.bfr);
+            command = new MoveCommand(bim.bfr, bim.scheduler);
         }
 
         if (command.setActor(unitPos[0], unitPos[1])) {
