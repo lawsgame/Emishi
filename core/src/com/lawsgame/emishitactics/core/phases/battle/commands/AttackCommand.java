@@ -30,21 +30,41 @@ public class AttackCommand extends BattleCommand {
     protected void execute() {
         launched = true;
 
-        IUnit initiator = battlefield.getUnit(rowActor, colActor);
+        performAttack(rowActor, colActor, rowTarget, colTarget);
+        if(!battlefield.getUnit(rowTarget, colTarget).isOutOfAction()
+                && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
+            performAttack(rowTarget, colTarget, rowActor, colActor);
+        }
+
+        Array<IUnit> OOAUnits = battlefield.getOOAUnits();
+        battlefield.removeOOAUnits();
+        Task removeOOAUnitTask = new Task();
+        for(int i = 0; i < OOAUnits.size; i++){
+            removeOOAUnitTask.addThread(new Thread(battlefieldRenderer, battlefieldRenderer, OOAUnits.get(i)));
+        }
+        scheduler.addTask(removeOOAUnitTask);
+
+    }
+
+
+    protected void performAttack(int rowAttacker, int colAttacker, int rowTarget, int colTarget){
+        IUnit initiator = battlefield.getUnit(rowAttacker, colAttacker);
         IUnit target = battlefield.getUnit(rowTarget, colTarget);
 
+        // FIRST ATTACK
+
         Task task = new Task();
-        Thread attackerThread = new Thread(battlefieldRenderer.getUnitRenderer(initiator));
+        Thread initiatorThread = new Thread(battlefieldRenderer.getUnitRenderer(initiator));
         Thread targetThread = new Thread(battlefieldRenderer.getUnitRenderer(target));
         Array<Thread> defendersThreads = new Array<Thread>();
 
-        initiator.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+        initiator.setOrientation(Utils.getOrientationFromCoords(rowAttacker, colAttacker, rowTarget, colTarget));
 
-        attackerThread.addQuery(initiator.getOrientation());
-        attackerThread.addQuery(Data.AnimationId.ATTACK);
+        initiatorThread.addQuery(initiator.getOrientation());
+        initiatorThread.addQuery(Data.AnimationId.ATTACK);
 
         boolean backstabbed = initiator.getOrientation() == target.getOrientation();
-        int hitrate = getAttackAccuracy(rowActor, colActor, rowTarget, colTarget, backstabbed) - getAvoidance(rowActor, colActor, rowTarget, colTarget);
+        int hitrate = getAttackAccuracy(rowAttacker, colAttacker, rowTarget, colTarget, backstabbed) - getAvoidance(rowAttacker, colAttacker, rowTarget, colTarget);
 
         BattleUnitRenderer bur;
         if(Utils.getMean(2,100) < hitrate){
@@ -53,7 +73,7 @@ public class AttackCommand extends BattleCommand {
                 targetThread.addQuery(initiator.getOrientation().getOpposite());
             }
 
-            int dealtdamage = getAttackMight(rowActor, colActor, rowTarget, colTarget) - getDefense(rowActor, colActor, rowTarget, colTarget);
+            int dealtdamage = getAttackMight(rowAttacker, colAttacker, rowTarget, colTarget) - getDefense(rowAttacker, colAttacker, rowTarget, colTarget);
             Array<Unit.DamageNotif> notifs = target.applyDamage(dealtdamage, false);
             for(int i = 0; i < notifs.size; i++){
                 notifs.get(i).critical = false;
@@ -80,27 +100,12 @@ public class AttackCommand extends BattleCommand {
 
         // restore the model and view orientation matching
 
-
-        task.addThread(attackerThread);
+        task.addThread(initiatorThread);
         task.addThread(targetThread);
         task.addllThreads(defendersThreads);
         scheduler.addTask(task);
-
-        /**
-         * IMPORTANT:
-         * the OOA units model are removed about not their renderer counterpart which only remain
-         * invisible until the battlefield renderer is disposed.
-         */
-        Array<IUnit> OOAUnits = battlefield.getOOAUnits();
-        battlefield.removeOOAUnits();
-
-        Task removeOOAUnitTask = new Task();
-        for(int i = 0; i < OOAUnits.size; i++){
-            removeOOAUnitTask.addThread(new Thread(battlefieldRenderer, battlefieldRenderer, OOAUnits.get(i)));
-        }
-        scheduler.addTask(removeOOAUnitTask);
-
     }
+
 
     @Override
     public boolean isUndoable() {
