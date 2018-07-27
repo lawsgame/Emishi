@@ -4,15 +4,17 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class AttackCommand extends BattleCommand {
     private boolean launched;
     private boolean executionCompleted;
-    private Data.Orientation oldOrientation;
 
 
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
@@ -27,31 +29,77 @@ public class AttackCommand extends BattleCommand {
     @Override
     protected void execute() {
         launched = true;
-        IUnit attacker = battlefield.getUnit(rowActor, colActor);
+
+        IUnit initiator = battlefield.getUnit(rowActor, colActor);
         IUnit target = battlefield.getUnit(rowTarget, colTarget);
-        attacker.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-        attacker.notifyAllObservers(null);
-        attacker.notifyAllObservers(Data.AnimationId.ATTACK);
 
-        boolean backstabbed = attacker.getOrientation() == target.getOrientation();
+        Task task = new Task();
+        Thread attackerThread = new Thread(battlefieldRenderer.getUnitRenderer(initiator));
+        Thread targetThread = new Thread(battlefieldRenderer.getUnitRenderer(target));
+        Array<Thread> defendersThreads = new Array<Thread>();
+
+        initiator.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+
+        attackerThread.addQuery(initiator.getOrientation());
+        attackerThread.addQuery(Data.AnimationId.ATTACK);
+
+        boolean backstabbed = initiator.getOrientation() == target.getOrientation();
         int hitrate = getAttackAccuracy(rowActor, colActor, rowTarget, colTarget, backstabbed) - getAvoidance(rowActor, colActor, rowTarget, colTarget);
-        if(Utils.getMean(2,100) < hitrate){
-            int dealtdamage = getAttackMight(rowActor, colActor, rowTarget, colTarget) - getDefense(rowActor, colActor, rowTarget, colTarget);
-            Array<Unit.DamageNotification> notifs = target.applyDamage(dealtdamage, false);
-            notifs.get(0).critical = false;
-            notifs.get(0).backstab = backstabbed;
-            oldOrientation = notifs.get(0).wounded.getOrientation();
-            if(!notifs.get(0).backstab) {
-                notifs.get(0).wounded.setOrientation(attacker.getOrientation().getOpposite());
-                notifs.get(0).wounded.notifyAllObservers(null);
 
+        BattleUnitRenderer bur;
+        if(Utils.getMean(2,100) < hitrate){
+
+            if(!backstabbed){
+                targetThread.addQuery(initiator.getOrientation().getOpposite());
             }
+
+            int dealtdamage = getAttackMight(rowActor, colActor, rowTarget, colTarget) - getDefense(rowActor, colActor, rowTarget, colTarget);
+            Array<Unit.DamageNotif> notifs = target.applyDamage(dealtdamage, false);
             for(int i = 0; i < notifs.size; i++){
-                notifs.get(i).wounded.notifyAllObservers(notifs.get(i));
+                notifs.get(i).critical = false;
+                notifs.get(i).backstab = backstabbed && i == 0;
+                notifs.get(i).fleeingOrientation = initiator.getOrientation();
+                if(i != 0){
+                    bur = battlefieldRenderer.getUnitRenderer(notifs.get(i).wounded);
+
+                    defendersThreads.add(new Thread(bur, bur, notifs.get(i)));
+                }
             }
+
+            targetThread.addQuery(notifs.get(0));
+            if(!backstabbed && !target.isOutOfAction()){
+                targetThread.addQuery(target.getOrientation());
+            }
+
         }else{
-            target.notifyAllObservers(Data.AnimationId.DODGE);
+
+            targetThread.addQuery(initiator.getOrientation().getOpposite());
+            targetThread.addQuery(Data.AnimationId.DODGE);
+            targetThread.addQuery(target.getOrientation());
         }
+
+        // restore the model and view orientation matching
+
+
+        task.addThread(attackerThread);
+        task.addThread(targetThread);
+        task.addllThreads(defendersThreads);
+        scheduler.addTask(task);
+
+        /**
+         * IMPORTANT:
+         * the OOA units model are removed about not their renderer counterpart which only remain
+         * invisible until the battlefield renderer is disposed.
+         */
+        Array<IUnit> OOAUnits = battlefield.getOOAUnits();
+        battlefield.removeOOAUnits();
+
+        Task removeOOAUnitTask = new Task();
+        for(int i = 0; i < OOAUnits.size; i++){
+            removeOOAUnitTask.addThread(new Thread(battlefieldRenderer, battlefieldRenderer, OOAUnits.get(i)));
+        }
+        scheduler.addTask(removeOOAUnitTask);
+
     }
 
     @Override
@@ -109,17 +157,6 @@ public class AttackCommand extends BattleCommand {
             if(targetAtRange) continue;
         }
         return targetAtRange;
-    }
-
-    @Override
-    public void update(float dt) {
-        if(!executionCompleted && launched && !battlefieldRenderer.isExecuting()){
-            executionCompleted = true;
-            battlefield.getUnit(rowTarget, colTarget).setOrientation(oldOrientation);
-            battlefield.getUnit(rowTarget, colTarget).notifyAllObservers(null);
-            battlefield.removeDeadUnits();
-
-        }
     }
 
     @Override

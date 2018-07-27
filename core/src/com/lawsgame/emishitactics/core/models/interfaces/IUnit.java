@@ -159,10 +159,10 @@ public abstract class IUnit extends Observable {
     public abstract void setMoved(boolean moved);
     public abstract boolean isDone();
     public abstract boolean isWounded();
-    public abstract boolean isOut();
+    public abstract boolean isOutOfAction();
     public abstract boolean isDead();
     public abstract boolean treated(int healPower);
-    public abstract Array<Unit.DamageNotification> applyDamage(int damageTaken, boolean moralDamageOnly);
+    public abstract Array<Unit.DamageNotif> applyDamage(int damageTaken, boolean moralDamageOnly);
 
 
 

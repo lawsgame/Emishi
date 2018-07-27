@@ -109,9 +109,6 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void update60(float dt) {
-        if(command != null){
-            command.update(dt);
-        }
 
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
@@ -139,9 +136,12 @@ public class TestBIS extends BattleInteractionState {
         }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.I)){
-            int[] unitPos = bim.battlefield.getUnitPos(warlord);
-            System.out.println("warlord position : "+unitPos[0]+" "+unitPos[1]);
-        }
+            Unit.DamageNotif notif = new Unit.DamageNotif(warlord, false, 8);
+            notif.state = Unit.DamageNotif.State.WOUNDED;
+            notif.backstab = false;
+            notif.critical = false;
+            notif.fleeingOrientation = warlord.getOrientation().getOpposite();
+            warlord.notifyAllObservers(notif);}
 
 
     }

@@ -68,9 +68,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         this.executing = false;
         this.visible = true;
         this.animationQueue = new LinkedList<Object>();
-
+        weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getWeaponType());
+        orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
         display(Data.AnimationId.REST);
-        getNotification(null);
     }
 
 
@@ -101,9 +101,10 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             if(!animationQueue.isEmpty()) {
                 Object query = animationQueue.pop();
 
-                if (query instanceof Unit.DamageNotification) {
-                    Unit.DamageNotification notification = (Unit.DamageNotification) query;
+                if (query instanceof Unit.DamageNotif) {
+                    Unit.DamageNotif notification = (Unit.DamageNotif) query;
                     displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
+
                 } else if (query instanceof int[]) {
                     int[] array = (int[]) query;
                     if (array.length == 2) {
@@ -117,22 +118,36 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 } else if (query instanceof Data.AnimationId) {
                     display((Data.AnimationId) query);
 
-                } else if (query instanceof Data.Orientation) {
-                    displayPushed((Data.Orientation) query);
+                } else if (query instanceof Unit.PushedNotif) {
+                    Unit.PushedNotif notif = (Unit.PushedNotif)query;
+                    displayPushed(notif.orientation);
+
+                } else if (query instanceof Unit.FledNotif) {
+                    Unit.FledNotif notif = (Unit.FledNotif)query;
+                    displayFlee(notif.orientation);
+
+                }else if (query instanceof Data.Orientation) {
+                    orientationTexture = TempoSpritePool.get().getOrientationSprite((Data.Orientation)query);
 
                 } else if (query instanceof Command) {
                     Command customQuery = (Command) query;
                     customQuery.apply();
-
-                } else if (query instanceof Boolean){
-                    boolean backstabbed = (Boolean) query;
-                    displayFlee(backstabbed);
 
                 } else if (query instanceof Array) {
                     if (((Array) query).size > 0 && ((Array) query).get(0) instanceof int[]) {
                         Array<int[]> path = (Array<int[]>) query;
                         displayWalk(path);
                     }
+
+                } else if(query instanceof Data.WeaponType){
+                    weapontTexture = TempoSpritePool.get().getWeaponSprite((Data.WeaponType)query);
+
+                } else if (query instanceof String){
+                    if(query.equals("horseman")) {
+                        if (model.isHorseman())
+                            mountedTexture = TempoSpritePool.get().getMountedSprite();
+                    }
+
                 } else {
                     launchNextAnimation();
                 }
@@ -176,8 +191,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     executing = false;
                     display(Data.AnimationId.REST);
                 } else {
-                    model.setOrientation(Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(), remainingPath.get(0)[0], remainingPath.get(0)[1]));
-                    getNotification(null);
+                    Data.Orientation orientation = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(), remainingPath.get(0)[0], remainingPath.get(0)[1]);
+                    orientationTexture = TempoSpritePool.get().getOrientationSprite(orientation);
                 }
             }
         }
@@ -250,8 +265,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             }
 
             Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
-            model.setOrientation(or);
-            getNotification(null);
+            orientationTexture = TempoSpritePool.get().getOrientationSprite(or);
             unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
             executing = true;
 
@@ -304,10 +318,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public void displayFlee(boolean backstabbed) {
+    public void displayFlee(Data.Orientation fleeingDirection) {
         unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
-        if(!backstabbed)
-            orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation().getOpposite());
+        orientationTexture = TempoSpritePool.get().getOrientationSprite(fleeingDirection);
         countDown.run();
     }
 
@@ -327,9 +340,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 countDown.run();
             case REST:
                 unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, model.getArmy().getAllegeance()));
-                break;
-            case SWITCH_WEAPON:
-                weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getWeaponType());
                 break;
             case GUARDED:
                 //TODO:
@@ -371,33 +381,18 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
      */
     @Override
     public void getNotification(final Object data){
-        if(data == null) {
-            // update weapon
-            weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getWeaponType());
-            // update orientation
-            System.out.println(model.getAllegeance()+" "+model.getName()+" "+model.getOrientation());
-            orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
-            if (model.isHorseman()) {
-                // update soldier mount rendering
-                mountedTexture = TempoSpritePool.get().getMountedSprite();
-            }
-        }else{
-            animationQueue.offer(data);
-            if(data instanceof Unit.DamageNotification){
-                if(model.isOut()) {
-                    if (model.isDead()) {
-                        animationQueue.offer(Data.AnimationId.DIE);
-                    } else if (model.isOut()) {
-                        animationQueue.offer(((Unit.DamageNotification)data).backstab);
+        animationQueue.offer(data);
+        if(data instanceof Unit.DamageNotif){
+            Unit.DamageNotif notif = (Unit.DamageNotif)data;
+            if(notif.state == Unit.DamageNotif.State.DIED) animationQueue.offer(Data.AnimationId.DIE);
+            if(notif.state == Unit.DamageNotif.State.FLED) animationQueue.offer(new Unit.FledNotif(notif.fleeingOrientation));
+            if(notif.state != Unit.DamageNotif.State.WOUNDED){
+                animationQueue.offer(new SimpleCommand() {
+                    @Override
+                    public void apply() {
+                        setVisible(false);
                     }
-                    animationQueue.offer(new SimpleCommand() {
-
-                        @Override
-                        public void apply() {
-                            setVisible(false);
-                        }
-                    });
-                }
+                });
             }
         }
     }

@@ -3,7 +3,10 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -34,9 +37,19 @@ public class MoveCommand extends BattleCommand{
         the order is crucial here.
         As the unit moved is identified by his position, the moment where the unit model is changed accordingly must be taken into consideration
          */
-        battlefield.getUnit(rowActor, colActor).setMoved(true);
+        IUnit actor = battlefield.getUnit(rowActor, colActor);
+
+        actor.setMoved(true);
         battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget);
-        battlefieldRenderer.getNotification(path);
+        scheduler.addTask(new Task(battlefieldRenderer.getUnitRenderer(actor), path));
+
+        Data.Orientation or;
+        if(path.size > 1) {
+            or = Utils.getOrientationFromCoords(path.get(path.size - 2)[0], path.get(path.size - 2)[1], rowTarget, colTarget);
+        }else{
+            or = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
+        }
+        actor.setOrientation(or);
 
     }
 
@@ -98,15 +111,14 @@ public class MoveCommand extends BattleCommand{
     }
 
     @Override
-    public void update(float dt) { }
-
-
-    @Override
     public void undo() {
         if(executed){
             battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor);
             battlefield.getUnit(rowActor, colActor).setMoved(false);
-            battlefieldRenderer.getNotification(new int[]{rowActor, colActor});
+
+            //battlefieldRenderer.getNotification(new int[]{rowActor, colActor});
+            BattleUnitRenderer bur = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowActor, colActor));
+            scheduler.addTask(new Task(battlefieldRenderer, bur, new int[]{rowActor, colActor}));
         }
     }
 

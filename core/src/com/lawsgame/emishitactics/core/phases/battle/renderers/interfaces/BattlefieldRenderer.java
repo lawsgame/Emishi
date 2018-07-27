@@ -14,6 +14,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract void renderTiles(SpriteBatch batch);
     public abstract void renderUnits(SpriteBatch batch);
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
+    public abstract boolean areRenderersUpdated();
 
 
 }

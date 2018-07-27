@@ -39,7 +39,7 @@ public class BattlePhase extends GamePhase {
         super(gsm, Data.GAME_PORT_WIDTH);
         loadRequiredAssets();
 
-        // load and setup the battlefield and its renderer
+        // load and setup the battlefield and its receiver
         Battlefield battlefield = BattlefieldLoader.load(this, battlefieldId);
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);

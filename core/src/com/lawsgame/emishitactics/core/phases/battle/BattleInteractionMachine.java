@@ -81,8 +81,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         Gdx.input.setInputProcessor(multiplexer);
         super.push(bis);
 
-        //TODO: remove test
-        System.out.println(this);
     }
 
     public void rollback(){
@@ -94,8 +92,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
             Gdx.input.setInputProcessor(multiplexer);
             getCurrentState().init();
 
-            //TODO: remove test
-            System.out.println(this);
         }
     }
 

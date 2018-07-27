@@ -59,5 +59,8 @@ public class CountDown implements GameUpdatableEntity {
 	public boolean isFinished() {
 		return finished;
 	}
-	
+
+    public float getValue() {
+        return time;
+    }
 }

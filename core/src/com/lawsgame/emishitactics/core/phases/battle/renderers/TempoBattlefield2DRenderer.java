@@ -13,6 +13,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 /*
  * TODO: clipping
@@ -135,8 +136,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     public boolean isUnitRendererCreated(IUnit unit) {
-        for(BattleUnitRenderer ur : unitRenderers){
-            if(ur.getModel() == unit){
+        for (BattleUnitRenderer ur : unitRenderers) {
+            if (ur.getModel() == unit) {
                 return true;
             }
         }
@@ -150,6 +151,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 return unitRenderers.get(i);
         }
         return null;
+    }
+
+    @Override
+    public boolean areRenderersUpdated() {
+        //TODO:
+
+
+
+
+        return false;
     }
 
     @Override
@@ -177,7 +188,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
      */
     @Override
     public void getNotification(Object data) {
-        int[] coords;
+        final int[] coords;
         if (data instanceof IUnit) {
             // remove the sent unit
             removeUnitRenderer((IUnit) data);
@@ -187,18 +198,25 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             if (coords.length == 2) {
 
                 if(model.isTileOccupied(coords[0], coords[1])){
-                    // add a unit renderer to a newly deployed unit
+                    // add a unit receiver to a newly deployed unit
                     IUnit unit = model.getUnit(coords[0], coords[1]);
                     if(isUnitRendererCreated(unit)){
-                        BattleUnitRenderer bur = getUnitRenderer(unit);
-                        bur.setX(coords[1]);
-                        bur.setY(coords[0]);
+                        final BattleUnitRenderer bur = getUnitRenderer(unit);
+                        bur.getNotification(new SimpleCommand(){
+
+                            @Override
+                            public void apply() {
+                                bur.setX(coords[1]);
+                                bur.setY(coords[0]);
+                            }
+                        });
+
                     }else {
                         addUnitRenderer(coords[0], coords[1]);
                     }
                 }else {
 
-                    // change tile renderer
+                    // change tile receiver
                     addTileRenderer(coords[0], coords[1]);
                 }
             } else if (coords.length == 4) {

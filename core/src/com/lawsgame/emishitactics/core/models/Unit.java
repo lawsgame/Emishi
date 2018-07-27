@@ -965,7 +965,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public boolean isOut() {
+    public boolean isOutOfAction() {
         return currentMoral == 0;
     }
 
@@ -1017,24 +1017,30 @@ public class Unit extends IUnit{
         return false;
     }
 
-    public Array<DamageNotification> applyDamage(int damageTaken, boolean moralDamageOnly){
-        Array<DamageNotification> notifications = new Array<DamageNotification>();
-        DamageNotification notification = new DamageNotification(this, moralDamageOnly, damageTaken, false, false);
+    public Array<DamageNotif> applyDamage(int damageTaken, boolean moralDamageOnly){
+        Array<DamageNotif> notifications = new Array<DamageNotif>();
+        DamageNotif notification = new DamageNotif(this, moralDamageOnly, damageTaken);
         notifications.add(notification);
 
         if(this.currentMoral > damageTaken){
             // the unit survive
             this.currentMoral -= damageTaken;
             if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
+            notification.state = DamageNotif.State.WOUNDED;
 
         }else{
             // the unit dies or flies
             if(this.currentHitPoints > damageTaken){
                 this.currentMoral = 0;
                 if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
+                notification.state = DamageNotif.State.FLED;
             }else{
                 this.currentMoral = 0;
-                if(!moralDamageOnly) this.currentHitPoints = 0;
+                notification.state = DamageNotif.State.FLED;
+                if(!moralDamageOnly){
+                    this.currentHitPoints = 0;
+                    notification.state = DamageNotif.State.DIED;
+                }
             }
 
             // if the unit is a war chief, the consequences deepens
@@ -1042,26 +1048,36 @@ public class Unit extends IUnit{
                 int moralDamage = getChiefMoralBonus();
                 Array<IUnit> squad = getArmy().getSquad(this);
                 for(int i = 1; i < squad.size; i++){
-                    notifications.addAll(squad.get(i).applyDamage(moralDamage, true));
+                    if(!squad.get(i).isOutOfAction())
+                        notifications.addAll(squad.get(i).applyDamage(moralDamage, true));
                 }
             }
         }
         return notifications;
     }
 
-    public static class DamageNotification{
+    //------------------- NOTIFS -----------------------
+
+    public static class DamageNotif {
         public Unit wounded;
         public boolean moralOnly;
         public int damageTaken;
+        public State state;
+
         public boolean critical;
         public boolean backstab;
+        public Orientation fleeingOrientation;
 
-        public DamageNotification (Unit wounded, boolean moralOnly, int damageTaken, boolean critical, boolean backstab){
+        public enum State{
+            WOUNDED,
+            FLED,
+            DIED
+        }
+
+        public DamageNotif(Unit wounded, boolean moralOnly, int damageTaken){
             this.wounded = wounded;
             this.moralOnly = moralOnly;
             this.damageTaken = damageTaken;
-            this.critical = critical;
-            this.backstab = backstab;
         }
 
         public boolean isRelevant(){
@@ -1069,6 +1085,21 @@ public class Unit extends IUnit{
         }
     }
 
+    public static class PushedNotif {
+        public Orientation orientation;
+
+        public PushedNotif(Orientation orientation) {
+            this.orientation = orientation;
+        }
+    }
+
+    public static class FledNotif{
+        public Orientation orientation;
+
+        public FledNotif(Orientation orientation) {
+            this.orientation = orientation;
+        }
+    }
 
 
 }

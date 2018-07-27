@@ -466,18 +466,29 @@ public class Battlefield extends Observable {
         this.units[row][col] = null;
         removeCoveredArea(unit);
         removeGuardedArea(unit);
-        notifyAllObservers(unit);
         return unit;
     }
 
-    public void removeDeadUnits() {
+    public void removeOOAUnits() {
         for(int r= 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
-                if(isTileOccupied(r, c) && getUnit(r, c).isOut()){
+                if(isTileOccupied(r, c) && getUnit(r, c).isOutOfAction()){
                     removeUnit(r, c);
                 }
             }
         }
+    }
+
+    public Array<IUnit> getOOAUnits() {
+        Array<IUnit> OOAUnits = new Array<IUnit>();
+        for(int r= 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileOccupied(r, c) && getUnit(r, c).isOutOfAction()){
+                    OOAUnits.add(units[r][c]);
+                }
+            }
+        }
+        return OOAUnits;
     }
 
     public IUnit getUnitByName(String name) {
@@ -703,7 +714,6 @@ public class Battlefield extends Observable {
                     }
                 }
             }
-            //System.out.println(toString());
             return area;
         }
 

@@ -37,7 +37,7 @@ import com.lawsgame.emishitactics.engine.patterns.command.Command;
  *
  * no need to put back the command in the BCM
  */
-public abstract class BattleCommand implements Command, GameUpdatableEntity{
+public abstract class BattleCommand implements Command{
     protected Battlefield battlefield;
     protected BattlefieldRenderer battlefieldRenderer;
     protected AnimationScheduler scheduler;
