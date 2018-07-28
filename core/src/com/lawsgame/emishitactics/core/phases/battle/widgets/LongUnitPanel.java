@@ -114,7 +114,7 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\n  against piercing : "+unit.getAppArmor(Data.DamageType.PIERCING));
             builder.append("\n  against edged    : "+unit.getAppArmor(Data.DamageType.EDGED));
             builder.append("\n  against blunt    : "+unit.getAppArmor(Data.DamageType.BLUNT));
-            builder.append("\nAGI  : "+ unit.getAppAgility());
+            builder.append("\nAGI  : "+ unit.getAppAgility() +" ("+ unit.getBaseAgility()+")");
             builder.append("\nBRA  : "+unit.getAppBravery() +" ("+ unit.getBaseBravery()+")");
             builder.append("\nCHA  : "+unit.getAppCharisma() +" ("+ unit.getBaseCharisma()+")");
             builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getBaseLeadership()+")");

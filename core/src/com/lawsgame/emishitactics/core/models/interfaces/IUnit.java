@@ -101,22 +101,21 @@ public abstract class IUnit extends Observable {
     public abstract Item removeItem(int index);
     public abstract Item replaceItem(int index, Item item);
 
-
-    //FIGHT RESOLUTION
+    //ENCOUNTER RESOLUTION
     public abstract int getAppWeaponRangeMin();
-    public abstract int getAppWeaponRangeMax();
     public abstract int getCurrentWeaponRangeMin(int rowUnit, int colUnit, Battlefield battlefield);
+    public abstract int getAppWeaponRangeMax();
     public abstract int getCurrentWeaponRangeMax(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getAppAttackAccuracy();
     public abstract int getAppAttackMight();
     public abstract int getAppDefense(DamageType damageType);
     public abstract int getAppAvoidance();
     public abstract int getAppDropRate();
+    public abstract int getAppOATriggerRate();
+    public abstract int getCurrentOATriggerRate(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract void setOAChargingBarPoints(int barProgression);
     public abstract void addOAChargingBarPoints(int points);
     public abstract int getOAChargingBarPoints();
-    public abstract int getAppOATriggerRate();
-    public abstract int getCurrentOATriggerRate(int rowUnit, int colUnit, Battlefield battlefield);
 
 
     //ARMY
@@ -163,7 +162,5 @@ public abstract class IUnit extends Observable {
     public abstract boolean isDead();
     public abstract boolean treated(int healPower);
     public abstract Array<Unit.DamageNotif> applyDamage(int damageTaken, boolean moralDamageOnly);
-
-
 
 }

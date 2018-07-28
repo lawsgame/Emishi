@@ -7,7 +7,6 @@ import java.util.Random;
 
 public class Data {
 
-
     static Random r = new Random();
     public static int rand(int n){
         return r.nextInt(n);
@@ -18,7 +17,7 @@ public class Data {
     public static final int MOBILITY_BONUS_PROMOTED = 1;
     public static final int PROMOTION_LEVEL = 10;
     public static final int MAX_LEVEL = 30;
-    public static final int HEAL_BASE_POWER = 5;
+    public static final int HEAL_BASE_POWER = 3;
     public static final float MAX_UNITS_UNDER_WARLORD = 6; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 5; // including the war chief himself / herself
     public static final int OA_CHARGING_BAR_MAX_VALUE = 100;

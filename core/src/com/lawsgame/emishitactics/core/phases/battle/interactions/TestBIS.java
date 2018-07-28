@@ -11,7 +11,9 @@ import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoActionPanel;
@@ -25,6 +27,9 @@ public class TestBIS extends BattleInteractionState {
     Unit soldier;
     IUnit foe;
     ActionPanel panel;
+    IUnit sltdUnit;
+    int index;
+    boolean switchmode;
 
     Stack<BattleCommand> historic = new Stack<BattleCommand>();
     BattleCommand command = null;
@@ -33,11 +38,11 @@ public class TestBIS extends BattleInteractionState {
         super(bim);
 
         warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.AXE, false, false, false, true);
-        warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.SWORD, false, false, false, true);
+        warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, false, true);
         soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, false, true);
         warlord.addWeapon(Data.Weapon.BROAD_AXE);
         warlord.setLeadership(15);
-        warchief.addWeapon(Data.Weapon.SHORTSWORD);
+        warchief.addWeapon(Data.Weapon.HUNTING_BOW);
         warchief.setLeadership(10);
         soldier.addWeapon(Data.Weapon.CLUB);
 
@@ -62,6 +67,9 @@ public class TestBIS extends BattleInteractionState {
         bim.UIStage.addActor(panel);
         panel.hide();
 
+        sltdUnit = warlord;
+        index = 1;
+        switchmode = false;
 
     }
 
@@ -70,40 +78,39 @@ public class TestBIS extends BattleInteractionState {
 
     }
 
+
     @Override
     public void handleTouchInput(int row, int col) {
         // command test
 
         System.out.println("input : "+row+" "+col);
-        int[] unitPos = bim.battlefield.getUnitPos(warlord);
 
+        if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Allegeance.ALLY)) {
+            sltdUnit = bim.battlefield.getUnit(row, col);
 
-        /*
-        if(bim.battlefield.isTileAvailable(row, col, warlord.has(Data.PassiveAbility.PATHFINDER))){
-            Array<int[]> path = bim.battlefield.getShortestPath(unitPos[0], unitPos[1], row, col,
-                    warlord.has(Data.PassiveAbility.PATHFINDER), warlord.getAllegeance(), true);
-            bim.battlefield.moveUnit(unitPos[0], unitPos[1], row, col);
-            bim.bfr.getNotification(path);
-        }
-        */
+        }else{
+            if(bim.battlefield.isTileOccupied(row, col)){
+                switch (index){
+                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler); break;
+                    case 2 : command = new HealCommand(bim.bfr, bim.scheduler); break;
+                    case 3 : command = new PushCommand(bim.bfr, bim.scheduler); break;
+                    default:
+                        command = new AttackCommand(bim.bfr, bim.scheduler);
+                }
 
-        //System.out.println(bim.battlefield.isTileCovered(row, col, Data.Allegeance.ALLY));
+            } else {
+                command = new MoveCommand(bim.bfr, bim.scheduler);
+            }
 
-
-        if(bim.battlefield.isTileOccupied(row, col)){
-            command = new AttackCommand(bim.bfr, bim.scheduler);
-        } else {
-            command = new MoveCommand(bim.bfr, bim.scheduler);
-        }
-
-        if (command.setActor(unitPos[0], unitPos[1])) {
-            command.setTarget(row, col);
-            if (command.isTargetValid()) {
-                command.apply();
-                historic.push(command);
+            int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
+            if (command.setActor(unitPos[0], unitPos[1])) {
+                command.setTarget(row, col);
+                if (command.isTargetValid()) {
+                    command.apply();
+                    historic.push(command);
+                }
             }
         }
-
 
     }
 
@@ -136,12 +143,29 @@ public class TestBIS extends BattleInteractionState {
         }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.I)){
-            Unit.DamageNotif notif = new Unit.DamageNotif(warlord, false, 8);
-            notif.state = Unit.DamageNotif.State.WOUNDED;
-            notif.backstab = false;
-            notif.critical = false;
-            notif.fleeingOrientation = warlord.getOrientation().getOpposite();
-            warlord.notifyAllObservers(notif);}
+            bim.bfr.getUnitRenderer(warlord).displayPushed(Data.Orientation.NORTH);
+
+        }
+
+
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)){
+            switchmode = !switchmode;
+            System.out.println("switch between units : "+switchmode);
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+            System.out.println("action command : attack");
+            index = 1;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)){
+            System.out.println("action command : heal");
+            index = 2;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
+            System.out.println("action command : push");
+            index = 3;
+        }
 
 
     }

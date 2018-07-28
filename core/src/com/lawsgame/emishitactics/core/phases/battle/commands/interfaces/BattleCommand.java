@@ -47,14 +47,18 @@ public abstract class BattleCommand implements Command{
     protected int rowTarget;
     protected int colTarget;
     protected boolean validate;
+    protected boolean undoable;
+    protected boolean endturnCommandOnly;
 
 
-    public BattleCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler){
+    public BattleCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean endturnCommandOnly){
         this.battlefieldRenderer = bfr;
         this.battlefield = bfr.getModel();
         this.choice = choice;
         this.scheduler = scheduler;
         this.validate = false;
+        this.undoable = undoable;
+        this.endturnCommandOnly = endturnCommandOnly;
     }
 
     /**
@@ -67,11 +71,19 @@ public abstract class BattleCommand implements Command{
     }
 
     public abstract void init();                                       // called when a command is fetched
-    protected abstract void execute();                                 //
-    public abstract boolean isUndoable();                              // can be deleted afterwards
-    public abstract boolean isEndTurnCommandOnly();                    // is only callable when the unit turn is ending
+    protected abstract void execute();
     public abstract boolean isExecuting();
     public abstract boolean isExecutionCompleted();
+
+    // can be deleted afterwards
+    public boolean isUndoable(){
+        return undoable;
+    }
+
+    // is only callable when the unit turn is ending
+    public boolean isEndTurnCommandOnly(){
+        return endturnCommandOnly;
+    }
 
     /**
      * PLAYER ORIENTED METHOD
@@ -186,7 +198,92 @@ public abstract class BattleCommand implements Command{
         return possibleTargetTiles;
     }
 
+    @Override
+    public void undo() { }
 
+    @Override
+    public void redo() { }
+
+
+
+    //------------------- HELPER METHODS -----------------------------
+
+
+
+    public enum TargetType{
+        ALLY,
+        WOUNDED_ALLY,
+        ENEMY
+    }
+
+    protected boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean weaponBasedRange, TargetType targetType){
+        boolean valid = false;
+        if(battlefield.isTileOccupied(rowActor0, colActor0)){
+            IUnit actor = battlefield.getUnit(rowActor0, colActor0);
+            int rangeMin = (weaponBasedRange) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield) : choice.getRangeMin();
+            int rangeMax = (weaponBasedRange) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
+            int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
+            if (rangeMin <= dist && dist <= rangeMax) {
+                switch (targetType){
+                    case ALLY:
+                        if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getAllegeance()))
+                            valid = true;
+                        break;
+                    case WOUNDED_ALLY:
+                        if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getAllegeance())
+                                && battlefield.getUnit(rowTarget0, colTarget0).isWounded())
+                            valid = true;
+                        break;
+                    case ENEMY:
+                        if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getAllegeance()))
+                            valid = true;
+                        break;
+                }
+            }
+        }
+        return valid;
+    }
+
+
+    protected boolean atActionRange(int row, int col, IUnit actor, boolean weaponBasedRange, TargetType targetType){
+        boolean targetAtRange = false;
+        int[] unitPos = battlefield.getUnitPos(actor);
+        int rangeMin = (weaponBasedRange) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
+        int rangeMax = (weaponBasedRange) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
+        int dist;
+        for(int r = row - rangeMin; r <= row + rangeMax; r++ ){
+            for(int c = col - rangeMin; c <= col + rangeMax; c++ ){
+                dist = Utils.dist(row, col, r, c);
+                if(rangeMin <= dist && dist <= rangeMax){
+                    switch (targetType){
+                        case ALLY:
+                            if(battlefield.isTileOccupiedByAlly(r, c, actor.getAllegeance())) {
+                                targetAtRange = true;
+                                continue;
+                            }
+                            break;
+                        case WOUNDED_ALLY:
+                            if(battlefield.isTileOccupiedByAlly(r, c, actor.getAllegeance()) && battlefield.getUnit(r, c).isWounded()) {
+                                targetAtRange = true;
+                                continue;
+                            }
+                            break;
+                        case ENEMY:
+                            if(battlefield.isTileOccupiedByFoe(r, c, actor.getAllegeance())) {
+                                targetAtRange = true;
+                                continue;
+                            }
+                            break;
+                            default:
+                    }
+                }
+            }
+            if(targetAtRange)
+                continue;
+        }
+
+        return targetAtRange;
+    }
 
 
 

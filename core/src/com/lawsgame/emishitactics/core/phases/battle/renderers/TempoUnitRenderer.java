@@ -105,12 +105,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     Unit.DamageNotif notification = (Unit.DamageNotif) query;
                     displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
 
+                } else if(query instanceof Integer) {
+                    displayTreated((Integer)query);
+
                 } else if (query instanceof int[]) {
                     int[] array = (int[]) query;
-                    if (array.length == 2) {
-                        int[] oldHpts = (int[]) query;
-                        displayTreated(oldHpts);
-                    } else if (array.length == 10) {
+                    if (array.length == 10) {
                         int[] gainLvl = (int[]) query;
                         displayLevelup(gainLvl);
                     }
@@ -159,6 +159,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private void handleWalkAnimation(float dt){
         // handle walk animation
         if (remainingPath.size > 0) {
+
             dl = dt * ((pushed) ? SPEED_PUSHED: SPEED_WALK);
             if (unitSprite.getX() == remainingPath.get(0)[1]) {
                 if ((unitSprite.getY() < remainingPath.get(0)[0] && unitSprite.getY() + dl >= remainingPath.get(0)[0])
@@ -181,6 +182,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 } else if (unitSprite.getX() > remainingPath.get(0)[1])
                     setX(unitSprite.getX() - dl);
             }
+
+
 
             if (updatePoint) {
                 updatePoint = false;
@@ -295,22 +298,21 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public void displayTreated(int[] oldHtpsAndMoral) {
+    public void displayTreated(int healedHP) {
         unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().getAllegeance()));
         countDown.run();
     }
 
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
-        model.setOrientation(pushedTowards);
-        getNotification(null);
+        orientationTexture = TempoSpritePool.get().getOrientationSprite(pushedTowards);
         unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().getAllegeance()));
         pushed = true;
-        int y = (int) getX();
-        int x = (int) getY();
+        int x = (int) getX();
+        int y = (int) getY();
         switch (pushedTowards){
             case WEST: remainingPath.add(new int[]{y, x - 1}); break;
-            case NORTH: remainingPath.add(new int[]{y + 1, x}); break;
+            case NORTH: remainingPath.add(new int[]{y + 1, x});break;
             case SOUTH: remainingPath.add(new int[]{y - 1, x}); break;
             case EAST: remainingPath.add(new int[]{y, x + 1}); break;
         }

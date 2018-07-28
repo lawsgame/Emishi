@@ -21,7 +21,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     public abstract void displayWalk(Array<int[]> path);
     public abstract void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab);
     public abstract void displayLevelup(int[] gainlvl);
-    public abstract void displayTreated(int[] oldHtpsAndMoral);
+    public abstract void displayTreated(int healedHP);
     public abstract void displayPushed(Data.Orientation pushedTowards);
     public abstract void displayFlee(Data.Orientation fleeingDirection);
     public abstract void display(Data.AnimationId id);

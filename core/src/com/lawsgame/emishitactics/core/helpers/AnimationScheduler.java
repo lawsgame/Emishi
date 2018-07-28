@@ -164,6 +164,11 @@ public class AnimationScheduler implements GameUpdatableEntity{
             addQuery(receiver, dataBundle);
         }
 
+        public Thread(Renderer renderer, Object dataBundle){
+            this(renderer);
+            addQuery(renderer, dataBundle);
+        }
+
         void init() {
             countDown.run();
         }

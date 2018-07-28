@@ -14,11 +14,10 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class AttackCommand extends BattleCommand {
     private boolean launched;
-    private boolean executionCompleted;
 
 
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, Data.ActionChoice.ATTACK, scheduler);
+        super(bfr, Data.ActionChoice.ATTACK, scheduler, false, false);
     }
 
     @Override
@@ -46,7 +45,6 @@ public class AttackCommand extends BattleCommand {
 
     }
 
-
     protected void performAttack(int rowAttacker, int colAttacker, int rowTarget, int colTarget){
         IUnit initiator = battlefield.getUnit(rowAttacker, colAttacker);
         IUnit target = battlefield.getUnit(rowTarget, colTarget);
@@ -73,7 +71,7 @@ public class AttackCommand extends BattleCommand {
                 targetThread.addQuery(initiator.getOrientation().getOpposite());
             }
 
-            int dealtdamage = getAttackMight(rowAttacker, colAttacker, rowTarget, colTarget) - getDefense(rowAttacker, colAttacker, rowTarget, colTarget);
+            int dealtdamage = getDealtDamage(rowAttacker, colAttacker, rowTarget, colTarget);
             Array<Unit.DamageNotif> notifs = target.applyDamage(dealtdamage, false);
             for(int i = 0; i < notifs.size; i++){
                 notifs.get(i).critical = false;
@@ -106,30 +104,19 @@ public class AttackCommand extends BattleCommand {
         scheduler.addTask(task);
     }
 
-
-    @Override
-    public boolean isUndoable() {
-        return false;
-    }
-
-    @Override
-    public boolean isEndTurnCommandOnly() {
-        return false;
-    }
-
     @Override
     public boolean isExecuting() {
-        return launched &&  !executionCompleted;
+        return launched && battlefieldRenderer.isExecuting();
     }
 
     @Override
     public boolean isExecutionCompleted() {
-        return executionCompleted;
+        return launched && !battlefieldRenderer.isExecuting();
     }
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        boolean validate = false;
+        boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
             IUnit attacker = battlefield.getUnit(rowActor0, colActor0);
             if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, attacker.getAllegeance())) {
@@ -137,11 +124,11 @@ public class AttackCommand extends BattleCommand {
                 int rangeMax = attacker.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield);
                 int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
                 if (rangeMin <= dist && dist <= rangeMax) {
-                    validate = true;
+                    valid = true;
                 }
             }
         }
-        return validate;
+        return valid;
     }
 
     @Override
@@ -151,26 +138,29 @@ public class AttackCommand extends BattleCommand {
         int rangeMin = actor.getCurrentWeaponRangeMin(actorPos[0], actorPos[1], battlefield);
         int rangeMax = actor.getCurrentWeaponRangeMax(actorPos[0], actorPos[1], battlefield);
         int dist;
-        for(int r = row - rangeMin; r <= row + rangeMax; r++ ){
-            for(int c = col - rangeMin; c <= col + rangeMax; c++ ){
+        for(int r = row - rangeMax; r <= row + rangeMax; r++ ){
+            for(int c = col - rangeMax; c <= col + rangeMax; c++ ){
                 dist = Utils.dist(row, col, r, c);
-                if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByFoe(r, c, actor.getAllegeance())){
+                if(rangeMin <= dist
+                        && dist <= rangeMax
+                        && battlefield.isTileOccupiedByFoe(r, c, actor.getAllegeance())){
                     targetAtRange = true;
                     continue;
                 }
             }
-            if(targetAtRange) continue;
+            if(targetAtRange)
+                continue;
         }
         return targetAtRange;
     }
 
-    @Override
-    public void undo() { }
-
-    @Override
-    public void redo() { }
 
     // -------------------- COMODITY BATTLE RESOLUTION METHODS ------------------
+
+    public int getDealtDamage(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
+        int dealtdamage = getAttackMight(rowAttacker0, colAttacker0, rowTarget0, colTarget0) - getDefense(rowAttacker0, colAttacker0, rowTarget0, colTarget0);
+        return (dealtdamage > 0) ? dealtdamage : 0;
+    }
 
 
     public int getAttackMight(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
