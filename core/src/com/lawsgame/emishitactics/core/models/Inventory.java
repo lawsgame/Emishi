@@ -4,13 +4,13 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 
 public class Inventory {
-    private Array<Data.Item> storedItems;
+    private Array<Equipment> storedItems;
 
     public Inventory(){
-        storedItems = new Array<Data.Item>();
+        storedItems = new Array<Equipment>();
     }
 
-    public void storeItem(Data.Item item){
+    public void storeItem(Equipment item){
         storedItems.add(item);
     }
 
@@ -18,7 +18,7 @@ public class Inventory {
         storedItems.clear();
     }
 
-    public Array<Data.Item> getStoredItems() {
+    public Array<Equipment> getStoredItems() {
         return storedItems;
     }
 }

@@ -63,13 +63,13 @@ public class PushCommand extends BattleCommand{
             if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getAllegeance()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
 
                 IUnit pushed = battlefield.getUnit(rowTarget0, colTarget0);
-                if(rowActor0 < rowTarget0 && battlefield.isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.PassiveAbility.PATHFINDER)))
+                if(rowActor0 < rowTarget0 && battlefield.isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
-                if(rowActor0 > rowTarget0 && battlefield.isTileAvailable(rowTarget0 - 1, colTarget0, pushed.has(Data.PassiveAbility.PATHFINDER)))
+                if(rowActor0 > rowTarget0 && battlefield.isTileAvailable(rowTarget0 - 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
-                if(colActor0 < colTarget0 && battlefield.isTileAvailable(rowTarget0, colTarget0 + 1, pushed.has(Data.PassiveAbility.PATHFINDER)))
+                if(colActor0 < colTarget0 && battlefield.isTileAvailable(rowTarget0, colTarget0 + 1, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
-                if(colActor0 > colTarget0 && battlefield.isTileAvailable(rowTarget0, colTarget0 - 1, pushed.has(Data.PassiveAbility.PATHFINDER)))
+                if(colActor0 > colTarget0 && battlefield.isTileAvailable(rowTarget0, colTarget0 - 1, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
             }
         }
@@ -80,18 +80,18 @@ public class PushCommand extends BattleCommand{
     public boolean atActionRange(int row, int col, IUnit actor) {
         boolean targetAtRange = false;
         if(battlefield.isTileOccupiedByAlly(row + 1, col, actor.getAllegeance())
-                && battlefield.isTileAvailable(row + 2, col, actor.has(Data.PassiveAbility.PATHFINDER))){
+                && battlefield.isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER))){
             targetAtRange = true;
         }else{
             if(battlefield.isTileOccupiedByAlly(row - 1, col, actor.getAllegeance())
-                    && battlefield.isTileAvailable(row - 2, col, actor.has(Data.PassiveAbility.PATHFINDER))){
+                    && battlefield.isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))){
                 targetAtRange = true;
             }else{
                 if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getAllegeance())
-                        && battlefield.isTileAvailable(row, col + 2, actor.has(Data.PassiveAbility.PATHFINDER))){
+                        && battlefield.isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))){
                     targetAtRange = true;
                 }else if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getAllegeance())
-                        && battlefield.isTileAvailable(row, col - 2, actor.has(Data.PassiveAbility.PATHFINDER))){
+                        && battlefield.isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))){
                     targetAtRange = true;
                 }
             }

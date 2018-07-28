@@ -7,6 +7,8 @@ import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Equipment;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
@@ -75,31 +77,29 @@ public class LongUnitPanel extends UnitPanel {
             mainDescription = builder.toString();
             builder.setLength(0);
 
-            builder.append("    EQUIPEMENT\n");
-            builder.append("\nweapon type : "+ unit.getWeaponType());
-            Array<Data.Weapon> weapons = unit.getWeapons();
+            builder.append("    ITEMS\n");
+            builder.append("\nWeapon type : "+ unit.getWeaponType()+"\nWeapon : ");
+            Array<Weapon> weapons = unit.getWeapons();
             for(int i = 0; i < weapons.size ; i++){
-                builder.append("\nweapon "+i+" : "+weapons.get(i).name().toLowerCase());
+                builder.append("\n  "+weapons.get(i).getName());
             }
-            Array<Data.Item> items = unit.getItems();
-            for(int i = 0; i < items.size ; i++){
-                builder.append("\nitems "+i+" : "+items.get(i).name().toLowerCase());
+            builder.append("\nEquipments : ");
+            Array<Equipment> equipments = unit.getEquipments();
+            for(int i = 0; i < equipments.size ; i++){
+                builder.append("\n  "+equipments.get(i).getName());
             }
             builder.append("\n\n    CURRENT WEAPONS\n");
-            builder.append("\nName : "+unit.getCurrentWeapon().name().toLowerCase());
-            builder.append("\nBase damage : "+unit.getCurrentWeapon().getDamage());
-            builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getAccuracy());
-            builder.append("\nRange : ("+unit.getCurrentWeapon().getRangeMin()+", "+unit.getCurrentWeapon().getRangeMax()+")");
-            builder.append("\nWeapon type : "+ unit.getCurrentWeapon().getWeaponType().name().toLowerCase());
-            builder.append("\nDamage type : "+unit.getCurrentWeapon().getDamageType().name().toLowerCase());
+            builder.append("\nName : "+unit.getCurrentWeapon().getName());
+            builder.append("\nBase damage : "+unit.getCurrentWeapon().getTemplate().getDamage());
+            builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getTemplate().getAccuracy());
+            builder.append("\nRange : ("+unit.getCurrentWeapon().getTemplate().getRangeMin()+", "+unit.getCurrentWeapon().getTemplate().getRangeMax()+")");
+            builder.append("\nWeapon type : "+ unit.getCurrentWeapon().getTemplate().getWeaponType().name().toLowerCase());
+            builder.append("\nDamage type : "+unit.getCurrentWeapon().getTemplate().getDamageType().name().toLowerCase());
             builder.append("\n\n    ABILITIES\n");
-            Array<Data.ActiveAbility> activeAbilities = unit.getActiveAbilities();
+            builder.append("\nAbilities : \n");
+            Array<Data.Ability> activeAbilities = unit.getAbilities();
             for(int i = 0; i < activeAbilities.size ; i++) {
-                builder.append("\nActive ability : " + unit.getActiveAbilities().get(i).name().toLowerCase());
-            }
-            Array<Data.PassiveAbility> passiveAbilities = unit.getPassiveAbilities();
-            for(int i = 0; i < passiveAbilities.size ; i++) {
-                builder.append("\nPassive ability : " + unit.getPassiveAbilities().get(i).name().toLowerCase());
+                builder.append("\n  " + unit.getAbilities().get(i).name().toLowerCase());
             }
 
             equipDescription = builder.toString();

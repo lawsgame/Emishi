@@ -57,7 +57,7 @@ public class ShortUnitPanel extends UnitPanel {
 
             builder.append("\nHP  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
             builder.append("\nMoral  : " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-            builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().name().toLowerCase() + " ");
+            builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().getName() + " ");
             builder.append("\nCharging ability bar : " + unit.getOAChargingBarPoints()+ "/"+Data.OA_CHARGING_BAR_MAX_VALUE);
         }
     }

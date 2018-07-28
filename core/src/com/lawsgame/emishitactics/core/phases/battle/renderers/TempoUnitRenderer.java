@@ -68,7 +68,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         this.executing = false;
         this.visible = true;
         this.animationQueue = new LinkedList<Object>();
-        weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getWeaponType());
+        weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getTemplate().getWeaponType());
         orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
         display(Data.AnimationId.REST);
     }

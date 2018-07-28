@@ -12,7 +12,9 @@ import com.lawsgame.emishitactics.core.constants.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.BattlePhase;
@@ -185,6 +187,8 @@ public class BattlefieldLoader {
         String name = unitElt.get("name");
         Job job = Job.getStandard();
         int level = unitElt.getInt("level");
+        Weapon weapon;
+        Equipment equipement;
         WeaponType weaponType = WeaponType.FIST;
         boolean horseman = unitElt.getBoolean("horseman");
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
@@ -214,9 +218,11 @@ public class BattlefieldLoader {
             attributeElt = unitElt.getChild(k);
 
             if(attributeElt.get("id").equals("weapon")) {
-                for (Weapon value : Weapon.values()) {
+                for (WeaponTemplate value : WeaponTemplate.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
-                        unit.addWeapon(value);
+                        weapon = new Weapon(value);
+                        weapon.setStealable(attributeElt.getBoolean("stealable"));
+                        unit.addWeapon(weapon);
                         continue;
                     }
                 }
@@ -225,20 +231,15 @@ public class BattlefieldLoader {
             if(attributeElt.get("id").equals("right handed"))
                 unit.setRightHanded(attributeElt.getBoolean("value"));
 
-            if(attributeElt.get("id").equals("item")) {
-                for (Item value : Item.values()) {
+            if(attributeElt.get("id").equals("equipement")) {
+                for (EquipmentTemplate value : EquipmentTemplate.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
-                        unit.addItem(value);
+                        equipement = new Equipment(value, attributeElt.getBoolean("stealable"));
+                        unit.addEquipment(equipement);
                         continue;
                     }
                 }
             }
-
-            if(attributeElt.get("id").equals("stealable 1"))
-                unit.setItem1Stealable(attributeElt.getBoolean("value"));
-
-            if(attributeElt.get("id").equals("stealable 2"))
-                unit.setItem1Stealable(attributeElt.getBoolean("value"));
 
             if(attributeElt.get("id").equals("banner sign")) {
                 for (BannerSign value : BannerSign.values()) {

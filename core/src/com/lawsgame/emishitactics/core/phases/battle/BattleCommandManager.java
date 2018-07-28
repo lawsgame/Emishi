@@ -65,17 +65,20 @@ public class BattleCommandManager {
      */
     public boolean canActionbePerformedBy(IUnit actor, Data.ActionChoice choice){
         boolean actionPerformable = false;
+
         // check ABILITY REQUIREMENTS
+        if(choice.getCost() < actor.getOAChargingBarPoints()) return false;
+
         switch (choice){
             case MOVE:                  if(!actor.hasMoved()) actionPerformable = true; break;
             case SWITCH_WEAPON:         if(!actor.hasActed() && actor.isPromoted()) actionPerformable = true; break;
             case SWITCH_POSITION:       actionPerformable = true; break;
             case PUSH:                  if(!actor.hasActed() && !actor.isHorseman()) actionPerformable = true; break;
-            case HEAL:                  if(!actor.hasActed() && actor.has(Data.ActiveAbility.HEAL)) actionPerformable = true; break;
-            case GUARD:                 if(!actor.hasActed() && actor.has(Data.ActiveAbility.GUARD)) actionPerformable = true; break;
-            case STEAL:                 if(!actor.hasActed() && actor.has(Data.ActiveAbility.STEAL)) actionPerformable = true; break;
-            case BUILD:                 if(!actor.hasActed() && actor.has(Data.ActiveAbility.BUILD) && actor.isMobilized() && actor.getArmy().isThereStillbuildingResources()) actionPerformable = true; break;
-            case COVER:                 if(!actor.hasActed() && actor.has(Data.ActiveAbility.COVER)) return false; break;
+            case HEAL:                  if(!actor.hasActed() && actor.has(Data.Ability.HEAL)) actionPerformable = true; break;
+            case GUARD:                 if(!actor.hasActed() && actor.has(Data.Ability.GUARD)) actionPerformable = true; break;
+            case STEAL:                 if(!actor.hasActed() && actor.has(Data.Ability.STEAL)) actionPerformable = true; break;
+            case BUILD:                 if(!actor.hasActed() && actor.has(Data.Ability.BUILD) && actor.isMobilized() && actor.getArmy().isThereStillbuildingResources()) actionPerformable = true; break;
+            case COVER:                 if(!actor.hasActed() && actor.has(Data.Ability.COVER)) return false; break;
             case ATTACK:                if(!actor.hasActed()) actionPerformable = true; break;
             case CHOOSE_ORIENTATION:    actionPerformable = true; break;
             case END_TURN:              actionPerformable = true; break;

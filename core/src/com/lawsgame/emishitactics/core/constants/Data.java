@@ -14,6 +14,7 @@ public class Data {
 
 
     public static final float GAME_PORT_WIDTH = 15f;
+
     public static final int MOBILITY_BONUS_PROMOTED = 1;
     public static final int PROMOTION_LEVEL = 10;
     public static final int MAX_LEVEL = 30;
@@ -25,9 +26,11 @@ public class Data {
     public static final int DEX_FACTOR_ATT_ACC = 3;
     public static final int DEX_FACTOR_AVO = 4;
     public static final int DEX_FACTOR_DROP = 2;
-    public static final int GUARD_RANGE_MIN = 1;
-    public static final int GUARD_RANGE_MAX = 1;
     public static final int HIT_RATE_BACK_ACC_BONUS = 20;
+    public static final int MAX_WEAPON_CARRIED = 2;
+    public static final int MAX_WEAPON_CARRIED_UPON_PROMOTION = 3;
+    public static final int MAX_ITEM_CARRIED = 1;
+    public static final int MAX_ITEM_CARRIED_UPON_PROMOTION = 2;
 
     // RENDER parameters
     public static final float SPEED_WALK = 3f;  //tile/s
@@ -269,23 +272,25 @@ public class Data {
      *  - crossbow
      *  - Great bow
      */
-    public enum Weapon{
-        FIST(           1, 100, 1, 1, WeaponType.FIST, DamageType.BLUNT, ActiveAbility.NONE),
-        SHORTSWORD(     3,  90, 1, 1, WeaponType.SWORD, DamageType.EDGED, ActiveAbility.NONE),
-        LANCE(          3,  95, 1, 1, WeaponType.POLEARM, DamageType.PIERCING, ActiveAbility.NONE),
-        BROAD_AXE(      5,  80, 1, 1, WeaponType.AXE, DamageType.EDGED, ActiveAbility.NONE),
-        CLUB(           4,  85, 1, 1, WeaponType.MACE, DamageType.BLUNT, ActiveAbility.NONE),
-        HUNTING_BOW(    3,  75, 2, 2, WeaponType.BOW, DamageType.PIERCING, ActiveAbility.NONE);
+    public enum WeaponTemplate{
+        FIST(           1, 100, 1, 1, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
+        SHORTSWORD(     3,  90, 1, 1, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
+        LANCE(          3,  95, 1, 1, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
+        BROAD_AXE(      5,  80, 1, 1, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
+        CLUB(           4,  85, 1, 1, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
+        HUNTING_BOW(    3,  75, 2, 2, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
 
         private int damage;
         private int accuracy;
         private int rangeMin;
         private int rangeMax;
+        private int durabilityMax;
+        private boolean unbreakable;
         private WeaponType weaponType;
         private DamageType damageType;
-        private ActiveAbility ability;
+        private Ability ability;
 
-        Weapon(int damage, int accuracy, int rangeMin, int rangeMax, WeaponType weaponType, DamageType damageType, ActiveAbility art) {
+        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, int durability, WeaponType weaponType, DamageType damageType, Ability art) {
             this.damage = damage;
             this.accuracy = accuracy;
             this.rangeMin = rangeMin;
@@ -293,6 +298,13 @@ public class Data {
             this.weaponType = weaponType;
             this.damageType = damageType;
             this.ability = art;
+            this.durabilityMax = durability;
+            this.unbreakable = false;
+        }
+
+        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, WeaponType weaponType, DamageType damageType, Ability art){
+            this(damage, accuracy, rangeMin, rangeMax, 1, weaponType, damageType, art);
+            this.unbreakable = true;
         }
 
         public WeaponType getWeaponType() {
@@ -319,69 +331,50 @@ public class Data {
             return damageType;
         }
 
-        public ActiveAbility getAbility() {
+        public Ability getAbility() {
             return ability;
         }
 
         public boolean isMelee() { return rangeMin == 1;}
 
         public boolean isRange() { return rangeMax > 1; }
-    }
 
-    public enum Item{
-        NOTHING;
-
-        private PassiveAbility passiveAbility;
-        private ActiveAbility activeAbility;
-
-        Item(PassiveAbility passiveAbility) {
-            this.passiveAbility = passiveAbility;
-            this.activeAbility = ActiveAbility.NONE;
+        public int getDurabilityMax() {
+            return durabilityMax;
         }
 
-        Item(ActiveAbility activeAbility){
-            this.passiveAbility = PassiveAbility.NONE;
-            this.activeAbility = activeAbility;
-        }
-
-        Item() {
-            this.passiveAbility = PassiveAbility.NONE;
-            this.activeAbility = ActiveAbility.NONE;
-        }
-
-        public PassiveAbility getPassiveAbility() {
-            return passiveAbility;
-        }
-
-        public ActiveAbility getActiveAbility() {
-            return activeAbility;
+        public boolean isUnbreakable() {
+            return unbreakable;
         }
     }
 
-    public enum PassiveAbility{
+    public enum EquipmentTemplate{
+        NOTHING(Ability.NONE);
+
+        private Ability ability;
+
+        EquipmentTemplate(Ability passiveAbility) {
+            this.ability = ability;
+        }
+
+        public Ability getAbility() {
+            return ability;
+        }
+    }
+
+    public enum Ability{
+        //Passive
         PATHFINDER,
         SHADOW,
         VILIGANT,
+
+        //Support
+        GUARD,
+        HEAL,
+        STEAL,
+        BUILD,
+        COVER,
         NONE
-    }
-
-    public enum ActiveAbility {
-        GUARD(0),
-        HEAL(0),
-        STEAL(0),
-        BUILD(0),
-        COVER(0),
-        NONE(0);
-
-        private int cost;
-
-        ActiveAbility(int cost) {
-            this.cost = cost;
-        }
-
-        public int getCost() {
-            return cost;
-        }
     }
 
     public enum Behaviour{
@@ -766,31 +759,33 @@ public class Data {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        MOVE                (RangedBasedType.MOVE, new int[0][0]),
-        SWITCH_WEAPON       (RangedBasedType.ONESELF, new int[0][0]),
-        SWITCH_POSITION     (1, 1, new int[0][0]),
-        PUSH                (1, 1, new int[0][0]),
-        HEAL                (RangedBasedType.ONESELF, -1, -1, new int[][]{{1,0}, {-1,0}, {0,1},{0,-1}}),
-        GUARD               (RangedBasedType.ONESELF, new int[0][0]),
-        STEAL               (1, 1, new int[0][0]),
-        BUILD               (1, 1, new int[0][0]),
-        COVER               (RangedBasedType.ONESELF, new int[0][0]),
-        ATTACK              (RangedBasedType.WEAPON, new int[0][0]),
-        CHOOSE_ORIENTATION  (RangedBasedType.ONESELF, new int[0][0]),
-        END_TURN            (RangedBasedType.ONESELF, new int[0][0]);
+        MOVE                (0, RangedBasedType.MOVE, new int[0][0]),
+        SWITCH_WEAPON       (0, RangedBasedType.ONESELF, new int[0][0]),
+        SWITCH_POSITION     (0, 1, 1, new int[0][0]),
+        PUSH                (0, 1, 1, new int[0][0]),
+        HEAL                (0, 1, 1, new int[0][0]),
+        GUARD               (0, RangedBasedType.ONESELF, new int[0][0]),
+        STEAL               (0, 1, 1, new int[0][0]),
+        BUILD               (0, 1, 1, new int[0][0]),
+        COVER               (0, RangedBasedType.ONESELF, new int[0][0]),
+        ATTACK              (0, RangedBasedType.WEAPON, new int[0][0]),
+        CHOOSE_ORIENTATION  (0, RangedBasedType.ONESELF, new int[0][0]),
+        END_TURN            (0, RangedBasedType.ONESELF, new int[0][0]);
 
 
         // RANGE REQUIREMENT
+        private int cost;
         private RangedBasedType rangeType;
         private int rangeMax;
         private int rangeMin;
         private Array<int[]> impactArea; // area on which the action is performed.
 
 
-        ActionChoice(RangedBasedType type, int rangeMin, int rangeMax, int[][] impactArea) {
+        ActionChoice(int cost, RangedBasedType type, int rangeMin, int rangeMax, int[][] impactArea) {
             this.rangeType = type;
             this.rangeMax = rangeMax;
             this.rangeMin = rangeMin;
+            this.cost = cost;
             this.impactArea = new Array<int[]>();
             for(int[] relativeTileCoordinates : impactArea){
                 this.impactArea.add(relativeTileCoordinates);
@@ -798,12 +793,12 @@ public class Data {
 
         }
 
-        ActionChoice(int rangeMin, int rangeMax, int[][] impactArea){
-            this(RangedBasedType.SPECIFIC, rangeMax, rangeMin, impactArea);
+        ActionChoice(int cost, int rangeMin, int rangeMax, int[][] impactArea){
+            this(cost, RangedBasedType.SPECIFIC, rangeMax, rangeMin, impactArea);
         }
 
-        ActionChoice(RangedBasedType type, int[][] impactArea) {
-            this(type, -1, -1 ,impactArea);
+        ActionChoice(int cost, RangedBasedType type, int[][] impactArea) {
+            this(cost, type, -1, -1 ,impactArea);
         }
 
         public RangedBasedType getRangeType() { return rangeType; }
@@ -814,6 +809,10 @@ public class Data {
 
         public int getRangeMin() {
             return rangeMin;
+        }
+
+        public int getCost(){
+            return cost;
         }
 
 

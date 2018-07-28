@@ -2,9 +2,15 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.constants.Data.*;
+import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
+import com.lawsgame.emishitactics.core.constants.Data.DamageType;
+import com.lawsgame.emishitactics.core.constants.Data.Job;
+import com.lawsgame.emishitactics.core.constants.Data.Orientation;
+import com.lawsgame.emishitactics.core.constants.Data.TileType;
+import com.lawsgame.emishitactics.core.constants.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.interfaces.Item;
 
 public class Unit extends IUnit{
 
@@ -16,9 +22,8 @@ public class Unit extends IUnit{
     protected boolean horsemanUponPromotion;
     protected boolean standardBearer;
 
-    protected Weapon weapon1 = Weapon.FIST;
-    protected Weapon weapon2 = Weapon.FIST;
-    protected boolean weapon1Equipped = true;
+    protected Array<Weapon> weapons;
+    private int currentWeaponIndex;
     protected int experience = 0;
     protected int commandmentExperience = 0;
     protected boolean rightHanded = true;
@@ -40,10 +45,7 @@ public class Unit extends IUnit{
     protected int currentMoral;
     protected int currentHitPoints;
 
-    protected Item item1 = Item.NOTHING;
-    protected Item item2 = Item.NOTHING;
-    protected boolean item1Stealable = false;
-    protected boolean item2Stealable = false;
+    protected Array<Equipment> equipments;
     protected final Banner banner = new Banner();
 
     /**
@@ -62,7 +64,7 @@ public class Unit extends IUnit{
      * - weapons
      * - battle and leadership experience
      * - right handed
-     * - items (and whether each is stealable or not)
+     * - equipments (and whether each is stealable or not)
      * - abilities
      * - banner signs
      * - orientation
@@ -87,6 +89,7 @@ public class Unit extends IUnit{
             boolean horsemanUponPromotion,
             boolean standardBearer,
             boolean homogeneousLevelsup){
+
         this.name = name;
         this.job = job;
         this.level = job.getStartingLevel();
@@ -107,6 +110,11 @@ public class Unit extends IUnit{
         this.agility = job.getBaseAg();
         this.skill = job.getBaseSk();
         this.bravery = job.getBaseBr();
+
+        this.weapons = new Array<Weapon>();
+        this.weapons.add(Weapon.FIST);
+        this.currentWeaponIndex = 0;
+        this.equipments = new Array<Equipment>();
 
         if(homogeneousLevelsup) {
             growup(level);
@@ -362,14 +370,14 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public boolean addWeapon(Data.Weapon weapon) {
+    public boolean addWeapon(Weapon weapon) {
         boolean weaponAdded = false;
-        if(weapon.getWeaponType() == weaponType) {
-            if (weapon1 == Weapon.FIST) {
-                weapon1 = weapon;
-                weaponAdded = true;
-            } else if (weapon2 == Weapon.FIST && isPromoted()) {
-                weapon2  = weapon;
+        if(weapon.getTemplate().getWeaponType() == weaponType) {
+            if(weapons.contains(Weapon.FIST, true)){
+                weapons.removeValue(Weapon.FIST, true);
+            }
+            if(weapons.size < ((isPromoted()) ? Data.MAX_WEAPON_CARRIED_UPON_PROMOTION : Data.MAX_WEAPON_CARRIED)){
+                weapons.add(weapon);
                 weaponAdded = true;
             }
         }
@@ -380,57 +388,46 @@ public class Unit extends IUnit{
     @Override
     public Weapon removeWeapon(int index) {
         Weapon weaponToreturn = null;
-        if(index == 1) {
-            weaponToreturn = weapon1;
-            weapon1 = Weapon.FIST;
-        }
-        if(index == 2){
-            weaponToreturn = weapon2;
-            weapon2 = Weapon.FIST;
-        }
+        if(0 <= index && index < weapons.size)
+            weaponToreturn = weapons.removeIndex(index);
+        if(weapons.size == 0)
+            weapons.add(Weapon.FIST);
         return weaponToreturn;
     }
 
     @Override
-    public Weapon replace(int index, Data.Weapon weapon) {
+    public Weapon replace(int index, Weapon weapon) {
         Weapon weaponToreturn = null;
-        if(weapon.getWeaponType() == this.weaponType){
-            if(index == 1){
-                weaponToreturn = weapon1;
-                weapon1 = weapon;
-            }
-            if(index == 2 && isPromoted()){
-                weaponToreturn = weapon2;
-                weapon2 = weapon;
+        if(weapon.getTemplate().getWeaponType() == this.weaponType){
+            if(0 <= index && index < weapons.size) {
+                weaponToreturn = weapons.removeIndex(index);
+                weapons.insert(index, weapon);
             }
         }
-
         return weaponToreturn;
     }
 
     @Override
-    public void removeAllWeapons() {
-        weapon1 = Weapon.FIST;
-        weapon2 = Weapon.FIST;
+    public Array<Weapon> removeAllWeapons() {
+        Array<Weapon> removedWeapons = weapons;
+        weapons = new Array<Weapon>();
+        return removedWeapons;
     }
 
     @Override
-    public Array<Data.Weapon> getWeapons() {
-        Array<Weapon> weapons = new Array<Weapon>();
-        weapons.add(weapon1);
-        if(isPromoted()) weapons.add(weapon2);
+    public Array<Weapon> getWeapons() {
         return weapons;
     }
 
     @Override
-    public Data.Weapon getCurrentWeapon() {
-        return (weapon1Equipped) ? weapon1 : weapon2;
+    public Weapon getCurrentWeapon() {
+        return weapons.get(currentWeaponIndex);
     }
 
     @Override
-    public void switchWeapon() {
-        if(isPromoted()){
-            this.weapon1Equipped = !weapon1Equipped;
+    public void switchWeapon(int index) {
+        if(0 <= index && index < weapons.size){
+            this.currentWeaponIndex = index;
         }
     }
 
@@ -614,157 +611,165 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public boolean has(Data.PassiveAbility ability) {
-        return item1.getPassiveAbility() == ability || item2.getPassiveAbility() == ability;
-    }
-
-    @Override
-    public boolean has(ActiveAbility ability) {
-        return item1.getActiveAbility() == ability || item2.getActiveAbility() == ability || getCurrentWeapon().getAbility() == ability;
-    }
-
-    @Override
-    public Array<PassiveAbility> getPassiveAbilities() {
-        Array<PassiveAbility> abilities = new Array<PassiveAbility>();
-        abilities.add(item1.getPassiveAbility());
-        abilities.add(item2.getPassiveAbility());
-        return abilities;
-    }
-
-    @Override
-    public Array<ActiveAbility> getActiveAbilities() {
-        Array<ActiveAbility> abilities = new Array<ActiveAbility>();
-        abilities.add(item1.getActiveAbility());
-        abilities.add(item2.getActiveAbility());
-        abilities.add(getCurrentWeapon().getAbility());
-        return abilities;
-    }
-
-    @Override
-    public boolean has(Data.Item item) {
-        return this.item1 == item || this.item2 == item;
-    }
-
-    @Override
-    public boolean addItem(Data.Item item) {
-        boolean itemAdded = false;
-        if(this.item1 == Item.NOTHING){
-            this.item1 = item;
-            itemAdded = true;
+    public boolean has(Data.Ability ability) {
+        boolean hasAbility = false;
+        for(int i = 0; i < equipments.size; i++){
+            if(equipments.get(i).getTemplate().getAbility() == ability){
+                hasAbility = true;
+                continue;
+            }
         }
-        if(this.item2 == Item.NOTHING){
-            this.item2 = item;
+        if(!hasAbility){
+            for(int i = 0; i < weapons.size; i++){
+                if(weapons.get(i).getTemplate().getAbility() == ability){
+                    hasAbility = true;
+                    continue;
+                }
+            }
+        }
+        return hasAbility;
+    }
+
+    @Override
+    public Array<Data.Ability> getAbilities() {
+        Array<Data.Ability> abilities = new Array<Data.Ability>();
+        for(int i = 0; i < equipments.size; i++){
+            if(equipments.get(i).getTemplate().getAbility() != Data.Ability.NONE){
+                abilities.add(equipments.get(i).getTemplate().getAbility());
+            }
+        }
+        for(int i = 0; i < weapons.size; i++){
+            if(weapons.get(i).getTemplate().getAbility() == Data.Ability.NONE){
+               abilities.add(weapons.get(i).getTemplate().getAbility());
+            }
+        }
+
+        return abilities;
+    }
+
+    @Override
+    public boolean has(Equipment item) {
+        return equipments.contains(item, true);
+    }
+
+    @Override
+    public boolean addEquipment(Equipment item) {
+        boolean itemAdded = false;
+        if(!equipments.contains(item, true) && equipments.size < ((isPromoted()) ? Data.MAX_ITEM_CARRIED_UPON_PROMOTION: Data.MAX_ITEM_CARRIED)){
+            equipments.add(item);
             itemAdded = true;
         }
         return itemAdded;
     }
 
     @Override
-    public Item setItem1(Item item) {
-        Item oldItem = this.item1;
-        this.item1 = item;
-        return oldItem;
+    public Array<Equipment> disequipAllEquipment() {
+        Array<Equipment> removedItems = equipments;
+        this.equipments = new Array<Equipment>();
+        return removedItems;
     }
 
     @Override
-    public Item setItem2(Item item) {
-        Item oldItem = this.item2;
-        this.item2 = item;
-        return oldItem;
+    public Array<Equipment> getEquipments() {
+        return equipments;
     }
 
     @Override
-    public void setItem1Stealable(boolean stealable) {
-        this.item1Stealable = stealable;
-    }
-
-    @Override
-    public void setitem2Stealable(boolean stealable) {
-        this.item2Stealable = stealable;
-    }
-
-    @Override
-    public boolean isItem1Stealable() {
-        return item1Stealable;
-    }
-
-    @Override
-    public boolean isItem2Stealable() {
-        return item2Stealable;
-    }
-
-    @Override
-    public Array<Item> disequipAllItem() {
-        Array<Item> items = new Array<Item>();
-        if(this.item1 != Item.NOTHING){
-            items.add(item1);
-            this.item1 = Item.NOTHING;
-        }
-        if(this.item2 != Item.NOTHING){
-            items.add(item2);
-            this.item2 = Item.NOTHING;
-        }
-        return items;
-    }
-
-    @Override
-    public Array<Data.Item> getItems() {
-        Array<Item> items = new Array<Item>();
-        if(this.item1 != Item.NOTHING){
-            items.add(item1);
-        }
-        if(this.item2 != Item.NOTHING){
-            items.add(item2);
-        }
-        return items;
-    }
-
-    @Override
-    public Item removeItem(int index) {
-        Item item = null;
-        if(index == 0 && this.item1 != Item.NOTHING){
-            item = this.item1;
-            this.item1 = Item.NOTHING;
-        }
-        if(index == 1 && this.item2 != Item.NOTHING){
-            item = this.item2;
-            this.item2 = Item.NOTHING;
+    public Equipment removeEquipment(int index) {
+        Equipment item = null;
+        if(0 <= index && index < equipments.size ){
+            item = equipments.removeIndex(index);
         }
         return item;
     }
 
     @Override
-    public Item replaceItem(int index, Data.Item item) {
-        Item olditem = null;
-        if(index == 0){
-            olditem = this.item1;
-            this.item1 = item;
-        }
-        if(index == 1){
-            olditem = this.item2;
-            this.item2 = item;
+    public Equipment replaceEquipment(int index, Equipment item) {
+        Equipment olditem = null;
+        if(0 <= index && index < equipments.size ){
+            olditem = equipments.removeIndex(index);
+            equipments.insert(index, item);
         }
         return olditem;
     }
 
     @Override
+    public void setStealable(boolean weapon, int index, boolean stealable) {
+        if(weapon){
+            if(0 <= index && index < weapons.size){
+                weapons.get(index).setStealable(stealable);
+            }
+        }else{
+            if(0 <= index && index < weapons.size){
+                equipments.get(index).setStealable(stealable);
+            }
+        }
+    }
+
+    @Override
+    public boolean isStealable() {
+        boolean stealable = false;
+        for(int i = 0; i < equipments.size; i++){
+            if(equipments.get(i).isStealable()){
+                stealable = true;
+                continue;
+            }
+        }
+        if(!stealable){
+            for(int i = 0; i < weapons.size; i++){
+                if(weapons.get(i).isStealable()){
+                    stealable = true;
+                    continue;
+                }
+            }
+        }
+        return stealable;
+    }
+
+    @Override
+    public Item getStealable() {
+        Array<Item> items = new Array<Item>();
+        Item stolenItem = null;
+        for(int i = 0; i < equipments.size; i++){
+            if(equipments.get(i).isStealable()){
+                items.add(equipments.get(i));
+            }
+        }
+        for(int i = 0; i < weapons.size; i++){
+            if(weapons.get(i).isStealable()){
+                items.add(weapons.get(i));
+            }
+        }
+
+        stolenItem = items.random();
+
+        if(stolenItem instanceof Equipment) {
+            equipments.removeValue((Equipment)stolenItem, true);
+        }else if(stolenItem instanceof Weapon){
+            weapons.removeValue((Weapon)stolenItem, true);
+        }
+
+        return stolenItem;
+    }
+
+    @Override
     public int getAppWeaponRangeMin() {
-        return getCurrentWeapon().getRangeMin();
+        return getCurrentWeapon().getTemplate().getRangeMin();
     }
 
     @Override
     public int getAppWeaponRangeMax() {
-        return getCurrentWeapon().getRangeMax();
+        return getCurrentWeapon().getTemplate().getRangeMax();
     }
 
     @Override
     public int getCurrentWeaponRangeMin(int rowUnit, int colUnit, Battlefield battlefield) {
-        return getCurrentWeapon().getRangeMin();
+        return getCurrentWeapon().getTemplate().getRangeMin();
     }
 
     @Override
     public int getCurrentWeaponRangeMax(int rowUnit, int colUnit, Battlefield battlefield) {
-        int rangeMax = getCurrentWeapon().getRangeMax();
+        int rangeMax = getCurrentWeapon().getTemplate().getRangeMax();
         if(battlefield.isTileExisted(rowUnit, colUnit)){
             if(rangeMax > 1) {
                 TileType tileType = battlefield.getTile(rowUnit, colUnit);
@@ -776,12 +781,12 @@ public class Unit extends IUnit{
 
     @Override
     public int getAppAttackAccuracy() {
-        return getCurrentWeapon().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + getChiefCharisma();
+        return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + getChiefCharisma();
     }
 
     @Override
     public int getAppAttackMight() {
-        return getCurrentWeapon().getDamage() + getAppStrength();
+        return getCurrentWeapon().getTemplate().getDamage() + getAppStrength();
     }
 
     @Override

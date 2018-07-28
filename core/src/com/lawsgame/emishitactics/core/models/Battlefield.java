@@ -3,12 +3,12 @@ package com.lawsgame.emishitactics.core.models;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
-import com.lawsgame.emishitactics.core.constants.Data.Item;
 import com.lawsgame.emishitactics.core.constants.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.Area.UnitArea;
+import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.HashMap;
@@ -192,7 +192,7 @@ public class Battlefield extends Observable {
         if(isTileOccupied(rowActor, colActor)) {
             IUnit actor = getUnit(rowActor, colActor);
             if(actor.isMobilized()) {
-                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.GUARD_RANGE_MIN, Data.GUARD_RANGE_MAX);
+                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.ActionChoice.GUARD.getRangeMin(), Data.ActionChoice.GUARD.getRangeMax());
                 Area.UnitArea area = new Area.UnitArea(this, Data.AreaType.GUARD_RANGE, tiles, actor);
                 this.guardedAreas.get(actor.getAllegeance()).add(area);
                 notifyAllObservers(area);
@@ -367,7 +367,7 @@ public class Battlefield extends Observable {
                 continue;
             }
         }
-        if(isTileAvailable(row, col, unit.has(Data.PassiveAbility.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
+        if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
             this.units[row][col] = unit;
             notifyAllObservers(new int[]{row, col});
         }
@@ -388,7 +388,7 @@ public class Battlefield extends Observable {
         if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2)){
             IUnit unit1 = getUnit(rowUnit1, colUnit1);
             IUnit unit2 = getUnit(rowUnit2, colUnit2);
-            if(isTileReachable(rowUnit1, colUnit1, unit2.has(Data.PassiveAbility.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(Data.PassiveAbility.PATHFINDER)))){
+            if(isTileReachable(rowUnit1, colUnit1, unit2.has(Data.Ability.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(Data.Ability.PATHFINDER)))){
                 removeCoveredArea(unit1);
                 removeCoveredArea(unit2);
                 removeGuardedArea(unit1);
@@ -404,7 +404,7 @@ public class Battlefield extends Observable {
     public boolean moveUnit(int rowI, int colI, int rowf, int colf){
         if(isTileOccupied(rowI, colI)) {
             IUnit unit = getUnit(rowI, colI);
-            if(isTileAvailable(rowf, colf, unit.has(Data.PassiveAbility.PATHFINDER))){
+            if(isTileAvailable(rowf, colf, unit.has(Data.Ability.PATHFINDER))){
                 removeCoveredArea(unit);
                 removeGuardedArea(unit);
                 this.units[rowf][colf] = unit;
@@ -582,7 +582,7 @@ public class Battlefield extends Observable {
             if(bf.isTileOccupied(rowActor, colActor)) {
                 // get actor relevant pieces of information
                 IUnit actor = bf.getUnit(rowActor, colActor);
-                this.pathfinder = actor.has(Data.PassiveAbility.PATHFINDER);
+                this.pathfinder = actor.has(Data.Ability.PATHFINDER);
                 this.moveRange = actor.hasMoved() ? 0 : actor.getAppMobility();
                 this.allegeance = actor.getAllegeance();
                 this.battlefield = bf;

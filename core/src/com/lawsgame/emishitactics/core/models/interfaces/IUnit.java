@@ -2,18 +2,18 @@ package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
+import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
+import com.lawsgame.emishitactics.core.constants.Data.DamageType;
+import com.lawsgame.emishitactics.core.constants.Data.Job;
+import com.lawsgame.emishitactics.core.constants.Data.Orientation;
+import com.lawsgame.emishitactics.core.constants.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
-import com.lawsgame.emishitactics.core.constants.Data.Weapon;
-import com.lawsgame.emishitactics.core.constants.Data.Item;
-import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
-import com.lawsgame.emishitactics.core.constants.Data.DamageType;
-import com.lawsgame.emishitactics.core.constants.Data.Orientation;
-import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
-import com.lawsgame.emishitactics.core.constants.Data.Job;
-import com.lawsgame.emishitactics.core.constants.Data.WeaponType;
 
 public abstract class IUnit extends Observable {
 
@@ -42,10 +42,10 @@ public abstract class IUnit extends Observable {
     public abstract boolean addWeapon(Weapon weapon);
     public abstract Weapon removeWeapon(int index);
     public abstract Weapon replace(int index, Weapon weapon);
-    public abstract void removeAllWeapons();
+    public abstract Array<Weapon> removeAllWeapons();
     public abstract Array<Weapon> getWeapons();
     public abstract Weapon getCurrentWeapon();
-    public abstract void switchWeapon();
+    public abstract void switchWeapon(int index);
 
 
     // STAT related
@@ -84,22 +84,17 @@ public abstract class IUnit extends Observable {
 
 
     //ITEMS & ABILITIES
-    public abstract boolean has(Data.PassiveAbility ability);
-    public abstract boolean has(Data.ActiveAbility ability);
-    public abstract Array<Data.PassiveAbility> getPassiveAbilities();
-    public abstract Array<Data.ActiveAbility> getActiveAbilities();
-    public abstract boolean has(Item item);
-    public abstract boolean addItem(Item item);
-    public abstract Item setItem1(Item item);
-    public abstract Item setItem2(Item item);
-    public abstract void setItem1Stealable(boolean stealable);
-    public abstract void setitem2Stealable(boolean stealable);
-    public abstract boolean isItem1Stealable();
-    public abstract boolean isItem2Stealable();
-    public abstract Array<Item>  disequipAllItem();
-    public abstract Array<Item> getItems();
-    public abstract Item removeItem(int index);
-    public abstract Item replaceItem(int index, Item item);
+    public abstract boolean has(Data.Ability ability);
+    public abstract Array<Data.Ability> getAbilities();
+    public abstract boolean has(Equipment item);
+    public abstract boolean addEquipment(Equipment item);
+    public abstract Array<Equipment> disequipAllEquipment();
+    public abstract Array<Equipment> getEquipments();
+    public abstract Equipment removeEquipment(int index);
+    public abstract Equipment replaceEquipment(int index, Equipment item);
+    public abstract void setStealable(boolean weapon, int index, boolean stealable);
+    public abstract boolean isStealable();
+    public abstract Item getStealable();
 
     //ENCOUNTER RESOLUTION
     public abstract int getAppWeaponRangeMin();

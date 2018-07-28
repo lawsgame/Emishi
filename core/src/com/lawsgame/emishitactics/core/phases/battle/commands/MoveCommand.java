@@ -75,11 +75,11 @@ public class MoveCommand extends BattleCommand{
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
             IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.PassiveAbility.PATHFINDER), actor.getAllegeance(), true);
+            path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance(), true);
             if(path.size > 0 && path.size <= actor.getAppMobility()){
                 valid = true;
             }else{
-                path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.PassiveAbility.PATHFINDER), actor.getAllegeance(), false);
+                path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance(), false);
                 if(path.size > 0 && path.size <= actor.getAppMobility()){
                     valid = true;
                 }else{

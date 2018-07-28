@@ -157,6 +157,8 @@ public class AttackCommand extends BattleCommand {
 
     // -------------------- COMODITY BATTLE RESOLUTION METHODS ------------------
 
+
+
     public int getDealtDamage(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
         int dealtdamage = getAttackMight(rowAttacker0, colAttacker0, rowTarget0, colTarget0) - getDefense(rowAttacker0, colAttacker0, rowTarget0, colTarget0);
         return (dealtdamage > 0) ? dealtdamage : 0;
@@ -167,7 +169,7 @@ public class AttackCommand extends BattleCommand {
         int attackMight = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowTarget0, colTarget0)){
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            attackMight += attacker.getCurrentWeapon().getDamage();
+            attackMight += attacker.getCurrentWeapon().getTemplate().getDamage();
             attackMight += attacker.getAppStrength();
             attackMight += battlefield.getTile(rowAttacker0, colAttacker0).getAttackMightBonus();
         }
@@ -178,7 +180,7 @@ public class AttackCommand extends BattleCommand {
         int attackAccuracy = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowTarget0, colTarget0)){
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            attackAccuracy += attacker.getCurrentWeapon().getAccuracy() ;
+            attackAccuracy += attacker.getCurrentWeapon().getTemplate().getAccuracy() ;
             attackAccuracy += attacker.getAppDexterity() * Data.DEX_FACTOR_ATT_ACC;
             attackAccuracy += battlefield.getTile(rowAttacker0, colAttacker0).getAttackAccBonus();
             attackAccuracy += Data.HIT_RATE_BACK_ACC_BONUS;
@@ -192,7 +194,7 @@ public class AttackCommand extends BattleCommand {
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowTarget0, colTarget0)){
             IUnit target = battlefield.getUnit(rowTarget0, colTarget0);
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            defense += target.getAppDefense(attacker.getCurrentWeapon().getDamageType());
+            defense += target.getAppDefense(attacker.getCurrentWeapon().getTemplate().getDamageType());
             defense += battlefield.getTile(rowTarget0, colTarget0).getDefenseBonus();
         }
         return defense;

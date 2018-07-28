@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
@@ -40,11 +41,11 @@ public class TestBIS extends BattleInteractionState {
         warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.AXE, false, false, false, true);
         warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, false, true);
         soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, false, true);
-        warlord.addWeapon(Data.Weapon.BROAD_AXE);
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setLeadership(15);
-        warchief.addWeapon(Data.Weapon.HUNTING_BOW);
+        warchief.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warchief.setLeadership(10);
-        soldier.addWeapon(Data.Weapon.CLUB);
+        soldier.addWeapon(new Weapon(Data.WeaponTemplate.CLUB));
 
         IArmy army = new Army(Data.Allegeance.ALLY, true);
         army.add(warlord);

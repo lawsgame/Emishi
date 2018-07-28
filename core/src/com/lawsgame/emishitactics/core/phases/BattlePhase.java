@@ -9,6 +9,7 @@ import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.TestBIS;
@@ -46,7 +47,7 @@ public class BattlePhase extends GamePhase {
 
         // set the player army
         Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
-        warlord.addWeapon(Data.Weapon.SHORTSWORD);
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
         IArmy playerArmy = new Army(Data.Allegeance.ALLY, true);
         playerArmy.setLeadershipConditionEnabled(true);

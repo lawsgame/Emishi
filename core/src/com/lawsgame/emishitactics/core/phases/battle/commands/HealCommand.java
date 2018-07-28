@@ -65,6 +65,7 @@ public class HealCommand extends BattleCommand {
                 }
             }
         }
+        System.out.println(valid);
         return valid;
     }
 
