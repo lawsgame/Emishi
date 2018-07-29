@@ -5,7 +5,10 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.constants.StringKeys;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -32,7 +35,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public AssetManager asm;
     public InputMultiplexer multiplexer;
     public AnimationScheduler scheduler;
-
+    public I18NBundle mainStringBundle;
 
     public AreaWidget sltdTile;
     public Stage UIStage;
@@ -51,8 +54,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bcm = new BattleCommandManager(bfr, scheduler);
         this.playerArmy = playerArmy;
         this.multiplexer = new InputMultiplexer();
-
-
+        this.mainStringBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
 
         this.sltdTile = new SimpleAreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
         this.sltdTile.setVisible(false);

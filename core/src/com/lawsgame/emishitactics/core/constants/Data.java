@@ -251,6 +251,7 @@ public class Data {
      *  - great double-edged axe
      *  - halberd
      *  - bardiche
+     *  - Lochhaber axe
      *
      *  MACE & HAMMER
      *  - club
@@ -366,7 +367,7 @@ public class Data {
         //Passive
         PATHFINDER,
         SHADOW,
-        VILIGANT,
+        VIGILANT,
 
         //Support
         GUARD,
@@ -790,7 +791,6 @@ public class Data {
             for(int[] relativeTileCoordinates : impactArea){
                 this.impactArea.add(relativeTileCoordinates);
             }
-
         }
 
         ActionChoice(int cost, int rangeMin, int rangeMax, int[][] impactArea){

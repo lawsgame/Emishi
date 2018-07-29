@@ -1,8 +1,10 @@
 package com.lawsgame.emishitactics.core.phases;
 
+import com.badlogic.gdx.assets.loaders.I18NBundleLoader;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
@@ -19,6 +21,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
 
+import java.util.Locale;
 
 
 public class BattlePhase extends GamePhase {
@@ -32,6 +35,7 @@ public class BattlePhase extends GamePhase {
         asm.load(Assets.ATLAS_TILES, TextureAtlas.class);
         asm.load(Assets.ATLAS_UI, TextureAtlas.class);
         asm.load(Assets.ATLAS_UNITS, TextureAtlas.class);
+        asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
         asm.finishLoading();
 
     }

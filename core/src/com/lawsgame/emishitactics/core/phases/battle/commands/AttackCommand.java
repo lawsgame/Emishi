@@ -62,7 +62,7 @@ public class AttackCommand extends BattleCommand {
         initiatorThread.addQuery(Data.AnimationId.ATTACK);
 
         boolean backstabbed = initiator.getOrientation() == target.getOrientation();
-        int hitrate = getAttackAccuracy(rowAttacker, colAttacker, rowTarget, colTarget, backstabbed) - getAvoidance(rowAttacker, colAttacker, rowTarget, colTarget);
+        int hitrate = getAttackAccuracy(rowAttacker, colAttacker, rowTarget, colTarget) - getAvoidance(rowAttacker, colAttacker, rowTarget, colTarget);
 
         BattleUnitRenderer bur;
         if(Utils.getMean(2,100) < hitrate){
@@ -159,13 +159,13 @@ public class AttackCommand extends BattleCommand {
 
 
 
-    public int getDealtDamage(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
+    protected int getDealtDamage(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
         int dealtdamage = getAttackMight(rowAttacker0, colAttacker0, rowTarget0, colTarget0) - getDefense(rowAttacker0, colAttacker0, rowTarget0, colTarget0);
         return (dealtdamage > 0) ? dealtdamage : 0;
     }
 
 
-    public int getAttackMight(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
+    protected int getAttackMight(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
         int attackMight = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowTarget0, colTarget0)){
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
@@ -176,20 +176,21 @@ public class AttackCommand extends BattleCommand {
         return attackMight;
     }
 
-    public int getAttackAccuracy(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0, boolean backstab){
+    protected int getAttackAccuracy(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
         int attackAccuracy = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowTarget0, colTarget0)){
+            IUnit defender = battlefield.getUnit(rowTarget0, colAttacker0);
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
             attackAccuracy += attacker.getCurrentWeapon().getTemplate().getAccuracy() ;
             attackAccuracy += attacker.getAppDexterity() * Data.DEX_FACTOR_ATT_ACC;
             attackAccuracy += battlefield.getTile(rowAttacker0, colAttacker0).getAttackAccBonus();
-            attackAccuracy += Data.HIT_RATE_BACK_ACC_BONUS;
+            if(attacker.getOrientation() == defender.getOrientation()) attackAccuracy += Data.HIT_RATE_BACK_ACC_BONUS;
             if(attackAccuracy > 100) attackAccuracy = 100;
         }
         return attackAccuracy;
     }
 
-    public int getDefense(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
+    protected int getDefense(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
         int defense = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowTarget0, colTarget0)){
             IUnit target = battlefield.getUnit(rowTarget0, colTarget0);
@@ -200,7 +201,7 @@ public class AttackCommand extends BattleCommand {
         return defense;
     }
 
-    public int getAvoidance(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
+    protected int getAvoidance(int rowAttacker0, int colAttacker0, int rowTarget0, int colTarget0){
         int avoidance = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowTarget0, colTarget0)){
             IUnit target = battlefield.getUnit(rowTarget0, colTarget0);

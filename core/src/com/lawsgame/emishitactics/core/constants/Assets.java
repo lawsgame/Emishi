@@ -2,10 +2,19 @@ package com.lawsgame.emishitactics.core.constants;
 
 public class Assets {
 
+    // STRING
+
+    public static final String STRING_BUNDLE_MAIN = "string/MainBundle";
+
+
+
     //XML
 
     public static final String XML_NAME_DB = "xml/name_db.xml";
     public static final String XML_UNITS_DEPLOYMENT = "xml/units.xml";
+
+
+
 
     //TEXTURES
 
@@ -33,7 +42,13 @@ public class Assets {
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
 
+
+
+
     //FONT
 
 
+
+
+    //SHADERS
 }
