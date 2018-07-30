@@ -1,7 +1,5 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.lawsgame.emishitactics.core.constants.Data;
-
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -54,7 +53,7 @@ public  class Area extends Observable {
     public void set(Array<int[]> tiles){
 
         if(tiles.size > 0) {
-            // set checkmap size and row & col init
+            // addExpGained checkmap size and row & col init
             this.rowInit = battlefield.getNbRows();
             this.colInit = battlefield.getNbColumns();
             int rowEnd = 0;

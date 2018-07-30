@@ -1,21 +1,21 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class AttackCommand extends BattleCommand {
     private boolean launched;
+    Array<Array<Unit.DamageNotif>> notifBundles;
 
 
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
@@ -26,18 +26,22 @@ public class AttackCommand extends BattleCommand {
     public void init() {
         super.init();
         launched = false;
+
     }
 
     @Override
     protected void execute() {
         launched = true;
+        notifBundles = new Array<Array<Unit.DamageNotif>>();
 
-        performAttack(rowActor, colActor, rowTarget, colTarget);
-        if(!battlefield.getUnit(rowTarget, colTarget).isOutOfAction()
-                && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
-            performAttack(rowTarget, colTarget, rowActor, colActor);
+        notifBundles.add(performAttack(rowActor, colActor, rowTarget, colTarget));
+        if(!battlefield.getUnit(rowTarget, colTarget).isOutOfAction() && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
+            notifBundles.add(performAttack(rowTarget, colTarget, rowActor, colActor));
         }
 
+        setOutcome();
+
+        // remove OoA units
         Array<IUnit> OOAUnits = battlefield.getOOAUnits();
         battlefield.removeOOAUnits();
         Task removeOOAUnitTask = new Task();
@@ -48,63 +52,87 @@ public class AttackCommand extends BattleCommand {
 
     }
 
-    protected void performAttack(int rowAttacker, int colAttacker, int rowDefender, int colDefender){
-        IUnit initiator = battlefield.getUnit(rowAttacker, colAttacker);
-        IUnit target = battlefield.getUnit(rowDefender, colDefender);
+
+    protected Array<Unit.DamageNotif> performAttack(int rowAttacker, int colAttacker, int rowDefender, int colDefender){
+        IUnit attacker = battlefield.getUnit(rowAttacker, colAttacker);
+        IUnit defender = battlefield.getUnit(rowDefender, colDefender);
+        Array<Unit.DamageNotif> notifs = new Array<Unit.DamageNotif>();
 
         // FIRST ATTACK
 
         Task task = new Task();
-        Thread initiatorThread = new Thread(battlefieldRenderer.getUnitRenderer(initiator));
-        Thread targetThread = new Thread(battlefieldRenderer.getUnitRenderer(target));
+        Thread initiatorThread = new Thread(battlefieldRenderer.getUnitRenderer(attacker));
+        Thread targetThread = new Thread(battlefieldRenderer.getUnitRenderer(defender));
         Array<Thread> defendersThreads = new Array<Thread>();
 
-        initiator.setOrientation(Utils.getOrientationFromCoords(rowAttacker, colAttacker, rowDefender, colDefender));
+        attacker.setOrientation(Utils.getOrientationFromCoords(rowAttacker, colAttacker, rowDefender, colDefender));
 
-        initiatorThread.addQuery(initiator.getOrientation());
+        initiatorThread.addQuery(attacker.getOrientation());
         initiatorThread.addQuery(Data.AnimationId.ATTACK);
 
-        boolean backstabbed = initiator.getOrientation() == target.getOrientation();
-        int hitrate = getHitRate(rowAttacker, colAttacker, rowDefender, colDefender);
+        boolean backstabbed = attacker.getOrientation() == defender.getOrientation();
+        int hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowDefender, colDefender, battlefield);
 
         BattleUnitRenderer bur;
         if(Utils.getMean(2,100) < hitrate){
 
-            if(!backstabbed){
-                targetThread.addQuery(initiator.getOrientation().getOpposite());
-            }
+            // model-wise changes
+            int dealtdamage = Formulas.getDealtDamage(rowAttacker, colAttacker, rowDefender, colDefender, battlefield);
+            notifs = defender.applyDamage(dealtdamage, false);
 
-            int dealtdamage = getDealtDamage(rowAttacker, colAttacker, rowDefender, colDefender);
-            Array<Unit.DamageNotif> notifs = target.applyDamage(dealtdamage, false);
+            // view-wise scheduling
+            if(!backstabbed){
+                targetThread.addQuery(attacker.getOrientation().getOpposite());
+            }
             for(int i = 0; i < notifs.size; i++){
                 notifs.get(i).critical = false;
                 notifs.get(i).backstab = backstabbed && i == 0;
-                notifs.get(i).fleeingOrientation = initiator.getOrientation();
+                notifs.get(i).fleeingOrientation = attacker.getOrientation();
                 if(i != 0){
                     bur = battlefieldRenderer.getUnitRenderer(notifs.get(i).wounded);
 
                     defendersThreads.add(new Thread(bur, bur, notifs.get(i)));
                 }
             }
-
             targetThread.addQuery(notifs.get(0));
-            if(!backstabbed && !target.isOutOfAction()){
-                targetThread.addQuery(target.getOrientation());
+            if(!backstabbed && !defender.isOutOfAction()){
+                targetThread.addQuery(defender.getOrientation());
             }
+
+
+            //set up outcome
 
         }else{
 
-            targetThread.addQuery(initiator.getOrientation().getOpposite());
+            targetThread.addQuery(attacker.getOrientation().getOpposite());
             targetThread.addQuery(Data.AnimationId.DODGE);
-            targetThread.addQuery(target.getOrientation());
+            targetThread.addQuery(defender.getOrientation());
         }
-
-        // restore the model and view orientation matching
 
         task.addThread(initiatorThread);
         task.addThread(targetThread);
         task.addllThreads(defendersThreads);
         scheduler.addTask(task);
+
+        return notifs;
+    }
+
+    protected void setOutcome(){
+        IUnit initiator =  battlefield.getUnit(rowActor, colActor);
+        IUnit target = battlefield.getUnit(rowTarget, colTarget);
+
+        IUnit winner;
+        IUnit loser;
+        Array<Unit.DamageNotif> notifs;
+        if(initiator.isOutOfAction() == !target.isOutOfAction()){
+            winner = (initiator.isOutOfAction()) ? target : initiator;
+            loser = (initiator.isOutOfAction()) ? initiator : target;
+            notifs = notifBundles.get(initiator.isOutOfAction() ? 1 : 0);
+
+
+            //TODO:
+
+        }
     }
 
     @Override
@@ -161,83 +189,24 @@ public class AttackCommand extends BattleCommand {
     // -------------------- COMODITY BATTLE RESOLUTION METHODS ------------------
 
     public int getHitRate(boolean ofInitiator){
-        return (ofInitiator) ? getHitRate(rowActor, colActor, rowTarget, colTarget) : getHitRate(rowTarget, colTarget, rowActor, colActor);
+        return (ofInitiator) ?
+                Formulas.getHitRate(rowActor, colActor, rowTarget, colTarget, battlefield) :
+                Formulas.getHitRate(rowTarget, colTarget, rowActor, colActor, battlefield);
     }
 
     public int getDealtDamage(boolean ofInitiator){
-        return (ofInitiator) ? getDealtDamage(rowActor, colActor, rowTarget, colTarget) : getDealtDamage(rowTarget, colTarget, rowActor, colActor);
+        return (ofInitiator) ?
+                Formulas.getDealtDamage(rowActor, colActor, rowTarget, colTarget, battlefield) :
+                Formulas.getDealtDamage(rowTarget, colTarget, rowActor, colActor, battlefield);
     }
 
     public int getDropRate(boolean ofInitiator){
-        return (ofInitiator) ? getDropRate(rowActor, colActor, rowTarget, colTarget) : getDropRate(rowTarget, colTarget, rowActor, colActor);
-    }
-
-    public int getHitRate(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0){
-        int hitrate = getAttackAccuracy(rowAttacker0, colAttacker0, rowDefender0, colDefender0) - getAvoidance(rowAttacker0, colAttacker0, rowDefender0, colDefender0);
-        return (hitrate > 0) ? hitrate : 0;
-    }
-
-    public int getDealtDamage(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0){
-        int dealtdamage = getAttackMight(rowAttacker0, colAttacker0, rowDefender0, colDefender0) - getDefense(rowAttacker0, colAttacker0, rowDefender0, colDefender0);
-        return (dealtdamage > 0) ? dealtdamage : 0;
-    }
-
-    public int getDropRate(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0){
-        int dropRate = 0;
-        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
-            IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            IUnit defender = battlefield.getUnit(rowDefender0, colDefender0);
-            dropRate = defender.getCurrentWeapon().getTemplate().getDropRate() + attacker.getAppDexterity()/2 + attacker.getChiefCharisma()/2;
-        }
-        return dropRate;
+        return (ofInitiator) ?
+                Formulas.getDropRate(rowActor, colActor, rowTarget, colTarget, battlefield) :
+                Formulas.getDropRate(rowTarget, colTarget, rowActor, colActor, battlefield);
     }
 
 
-    protected int getAttackMight(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0){
-        int attackMight = 0;
-        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
-            IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            attackMight += attacker.getCurrentWeapon().getTemplate().getDamage();
-            attackMight += attacker.getAppStrength();
-            attackMight += battlefield.getTile(rowAttacker0, colAttacker0).getAttackMightBonus();
-        }
-        return attackMight;
-    }
-
-    protected int getAttackAccuracy(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0){
-        int attackAccuracy = 0;
-        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
-            IUnit defender = battlefield.getUnit(rowDefender0, colAttacker0);
-            IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            attackAccuracy += attacker.getCurrentWeapon().getTemplate().getAccuracy() ;
-            attackAccuracy += attacker.getAppDexterity() * Data.DEX_FACTOR_ATT_ACC;
-            attackAccuracy += battlefield.getTile(rowAttacker0, colAttacker0).getAttackAccBonus();
-            if(attacker.getOrientation() == defender.getOrientation()) attackAccuracy += Data.HIT_RATE_BACK_ACC_BONUS;
-            if(attackAccuracy > 100) attackAccuracy = 100;
-        }
-        return attackAccuracy;
-    }
-
-    protected int getDefense(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0){
-        int defense = 0;
-        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
-            IUnit target = battlefield.getUnit(rowDefender0, colDefender0);
-            IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            defense += target.getAppDefense(attacker.getCurrentWeapon().getTemplate().getDamageType());
-            defense += battlefield.getTile(rowDefender0, colDefender0).getDefenseBonus();
-        }
-        return defense;
-    }
-
-    protected int getAvoidance(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0){
-        int avoidance = 0;
-        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
-            IUnit target = battlefield.getUnit(rowDefender0, colDefender0);
-            avoidance += target.getAppAvoidance();
-            avoidance += battlefield.getTile(rowDefender0, colDefender0).getAvoidBonus();
-        }
-        return avoidance;
-    }
 
 
 

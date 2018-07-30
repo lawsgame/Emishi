@@ -1,5 +1,7 @@
 package com.lawsgame.emishitactics.core.constants;
 
+import com.lawsgame.emishitactics.core.models.Data;
+
 public class Assets {
 
     // STRING

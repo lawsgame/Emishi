@@ -1,13 +1,12 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
-import com.lawsgame.emishitactics.core.constants.Data.DamageType;
-import com.lawsgame.emishitactics.core.constants.Data.Job;
-import com.lawsgame.emishitactics.core.constants.Data.Orientation;
-import com.lawsgame.emishitactics.core.constants.Data.TileType;
-import com.lawsgame.emishitactics.core.constants.Data.WeaponType;
+import com.lawsgame.emishitactics.core.models.Data.Behaviour;
+import com.lawsgame.emishitactics.core.models.Data.DamageType;
+import com.lawsgame.emishitactics.core.models.Data.Job;
+import com.lawsgame.emishitactics.core.models.Data.Orientation;
+import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -60,7 +59,7 @@ public class Unit extends IUnit{
 
     /**
      *
-     * Can be set as well:
+     * Can be addExpGained as well:
      * - weapons
      * - battle and leadership experience
      * - right handed
@@ -486,14 +485,6 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getExpGained(int levelOpponent, boolean stillFigthing) {
-        double expGained = 50 + (100 / Math.PI) * Math.atan((levelOpponent - level - Data.EXP_LVL_GAP_FACTOR_2)/Data.EXP_LVL_GAP_FACTOR_1) - level;
-        if(expGained < 0) expGained = 0;
-        if(stillFigthing) expGained *= Data.EXP_WOUNDED_ONLY_FACTOR;
-        return (int)expGained;
-    }
-
-    @Override
     public int getLeadershipExperience() {
         return commandmentExperience;
     }
@@ -886,8 +877,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public Array<IUnit> getSquad() {
-        return (army != null) ? army.getSquad(this) : null;
+    public Array<IUnit> getSquad(boolean stillFighting) {
+        return (army != null) ? army.getSquad(this, stillFighting) : null;
     }
 
     @Override
@@ -898,7 +889,7 @@ public class Unit extends IUnit{
     @Override
     public boolean sameSquadAs(IUnit unit) {
         if(army != null){
-            Array<IUnit> squad =  army.getSquad(unit);
+            Array<IUnit> squad =  army.getSquad(unit, false);
             for(int i = 0; i < squad.size; i++){
                 if(squad.get(i) == this){
                     return true;
@@ -1046,7 +1037,7 @@ public class Unit extends IUnit{
             // if the unit is a war chief, the consequences deepens
             if(isWarChief()){
                 int moralDamage = getChiefMoralBonus();
-                Array<IUnit> squad = getArmy().getSquad(this);
+                Array<IUnit> squad = getArmy().getSquad(this, true);
                 for(int i = 1; i < squad.size; i++){
                     if(!squad.get(i).isOutOfAction())
                         notifications.addAll(squad.get(i).applyDamage(moralDamage, true));

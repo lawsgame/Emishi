@@ -1,13 +1,13 @@
 package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
-import com.lawsgame.emishitactics.core.constants.Data.Behaviour;
-import com.lawsgame.emishitactics.core.constants.Data.DamageType;
-import com.lawsgame.emishitactics.core.constants.Data.Job;
-import com.lawsgame.emishitactics.core.constants.Data.Orientation;
-import com.lawsgame.emishitactics.core.constants.Data.WeaponType;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.Allegeance;
+import com.lawsgame.emishitactics.core.models.Data.Behaviour;
+import com.lawsgame.emishitactics.core.models.Data.DamageType;
+import com.lawsgame.emishitactics.core.models.Data.Job;
+import com.lawsgame.emishitactics.core.models.Data.Orientation;
+import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Equipment;
@@ -58,7 +58,6 @@ public abstract class IUnit extends Observable {
     public abstract int getExperience();
     public abstract void setExperience(int experience);
     public abstract int[] addExpPoints(int exp);
-    public abstract int getExpGained(int levelOpponent, boolean onlyWounded);
     public abstract int getLeadershipExperience();
     public abstract void setLeadershipExperience(int experience);
     public abstract boolean addLdExpPoints(int exp);
@@ -132,7 +131,7 @@ public abstract class IUnit extends Observable {
      * @return true if ally, false if foe
      */
     public abstract boolean isAllyWith(Allegeance allegeance);
-    public abstract Array<IUnit> getSquad();
+    public abstract Array<IUnit> getSquad(boolean stillFighting);
     public abstract IArmy getArmy();
     public abstract boolean sameSquadAs(IUnit unit);
     public abstract boolean sameArmyAs(IUnit unit);

@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
 
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 
 public abstract class TilePanel extends Panel {
 

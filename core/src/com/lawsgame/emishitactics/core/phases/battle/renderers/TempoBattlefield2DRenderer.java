@@ -4,7 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -40,7 +40,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             }
         }
 
-        // set up area renderers
+        // addExpGained up area renderers
         this.areaRenderers = new Array<AreaRenderer>();
         for(Data.Allegeance a : Data.Allegeance.values()){
             for (int i = 0; i < model.getCoveredAreas().get(a).size; i++) {
@@ -198,7 +198,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             if (coords.length == 2) {
 
                 if(model.isTileOccupied(coords[0], coords[1])){
-                    // add a unit receiver to a newly deployed unit
+                    // addExpGained a unit receiver to a newly deployed unit
                     IUnit unit = model.getUnit(coords[0], coords[1]);
                     if(isUnitRendererCreated(unit)){
                         final BattleUnitRenderer bur = getUnitRenderer(unit);

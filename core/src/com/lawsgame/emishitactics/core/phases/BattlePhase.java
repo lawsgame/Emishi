@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -49,7 +49,7 @@ public class BattlePhase extends GamePhase {
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
-        // set the player army
+        // addExpGained the player army
         Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
@@ -58,7 +58,7 @@ public class BattlePhase extends GamePhase {
         playerArmy.add(warlord);
         playerArmy.appointWarLord(warlord);
 
-        // set the initial BattleInteractionState
+        // addExpGained the initial BattleInteractionState
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
         BattleInteractionState initBIS = new TestBIS(bim);
         //BattleInteractionState initBIS = new SceneBIS(bim);

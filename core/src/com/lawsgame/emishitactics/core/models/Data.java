@@ -1,7 +1,6 @@
-package com.lawsgame.emishitactics.core.constants;
+package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 
 import java.util.Random;
 
@@ -778,7 +777,6 @@ public class Data {
         ATTACK              (0, RangedBasedType.WEAPON, new int[0][0]),
         CHOOSE_ORIENTATION  (0, RangedBasedType.ONESELF, new int[0][0]),
         END_TURN            (0, RangedBasedType.ONESELF, new int[0][0]),
-
         TEST                (0, RangedBasedType.WEAPON, new int[][]{{1,0},{2,0}});
 
 

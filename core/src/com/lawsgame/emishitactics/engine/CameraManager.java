@@ -85,7 +85,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
     private void set(float xTarget, float yTarget){
         if(!cameraMoving){
 
-            //set xTarget & yTarget, add change it if too clase to the camera frame borders
+            //addExpGained xTarget & yTarget, addExpGained change it if too clase to the camera frame borders
             vTarget.x = xTarget;
             vTarget.y = yTarget;
             if(0 > xTarget - getPortWidth()/2)          vTarget.x = getPortWidth()/2f;

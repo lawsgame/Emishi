@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.constants.Data.*;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -78,7 +78,7 @@ public class BattlefieldLoader {
                 colorKey = layoutPixmap.getPixel(c, r);
                 if(r % 2 == 0){
                     if(c % 2 == 0){
-                        // set the tile type
+                        // addExpGained the tile type
                         fieldType = colorToFieldTypeMap.get(colorKey);
                         if(fieldType == null){
                             fieldType = TileType.PLAIN;
@@ -145,7 +145,7 @@ public class BattlefieldLoader {
                                 int rowUnit = unitElt.getInt("row");
                                 int colUnit = unitElt.getInt("col");
 
-                                // add to the army composition
+                                // addExpGained to the army composition
                                 army.add(unit);
                                 if(n == 0){
                                     if(k == 0){
@@ -157,7 +157,7 @@ public class BattlefieldLoader {
                                     army.appointSoldier(unit, k);
                                 }
 
-                                // add to the battlefield
+                                // addExpGained to the battlefield
                                 if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
                                     bf.deployUnit(rowUnit, colUnit, unit);
                                 }

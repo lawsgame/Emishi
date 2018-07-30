@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import java.util.HashMap;
 
 /*
- * add a command ? => see the constructor below
+ * addExpGained a command ? => see the constructor below
  */
 public class BattleCommandManager {
     private HashMap<Data.ActionChoice, BattleCommand> commandPool;
@@ -20,7 +20,7 @@ public class BattleCommandManager {
         commandPool = new HashMap<Data.ActionChoice, BattleCommand>();
 
         /*
-         add BC entries here :
+         addExpGained BC entries here :
           : commandPool.put(command.getActionChoice(), command);
           */
         commandPool.put(Data.ActionChoice.MOVE, new MoveCommand(battlefieldRenderer, scheduler));

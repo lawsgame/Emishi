@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -67,7 +67,7 @@ public class LongUnitPanel extends UnitPanel {
                 builder.append("\n\n    ARMY\n");
                 builder.append("\nWarlord : " + army.getWarlord().getName());
                 builder.append("\nWar chief : " + army.getWarchief(unit).getName());
-                Banner banner = army.getSquadBanner(unit);
+                Banner banner = army.getSquadBanner(unit, false);
                 builder.append("\nBanner");
                 builder.append("\n  sign :"+((banner != null && banner.getSign1() != Data.BannerSign.NONE) ? banner.getSign1().name(): ""));
                 builder.append("\n  sign :"+((banner != null && banner.getSign2() != Data.BannerSign.NONE) ? banner.getSign2().name(): ""));

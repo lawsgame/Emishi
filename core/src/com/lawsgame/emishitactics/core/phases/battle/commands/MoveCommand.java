@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
@@ -62,7 +62,7 @@ public class MoveCommand extends BattleCommand{
 
     /**
      *
-     * set up the path if the tile targeted is a valid choice to move to
+     * addExpGained up the path if the tile targeted is a valid choice to move to
      *
      * @param rowActor0
      * @param colActor0

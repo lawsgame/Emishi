@@ -4,8 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.models.Area;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
@@ -19,7 +18,6 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.TestCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoActionPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
@@ -33,10 +31,11 @@ public class TestBIS extends BattleInteractionState {
     Unit soldier;
     IUnit foe;
     ActionPanel panel;
+    AreaWidget areaWidget;
+
     IUnit sltdUnit;
     int index;
     boolean switchmode;
-    AreaWidget areaWidget;
 
     Stack<BattleCommand> historic = new Stack<BattleCommand>();
     BattleCommand command = null;
@@ -50,7 +49,7 @@ public class TestBIS extends BattleInteractionState {
         warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.AXE, false, false, false, true);
         warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, false, true);
         soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, false, true);
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.TEST_AXE));
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setLeadership(15);
         warchief.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warchief.setLeadership(10);
@@ -69,7 +68,7 @@ public class TestBIS extends BattleInteractionState {
         bim.battlefield.deployUnit(6,9,soldier);
 
         foe = bim.battlefield.getUnit(5, 9);
-        //bim.battlefield.addCoveredArea(5, 9);
+        bim.battlefield.addCoveredArea(5, 9);
 
         //UI
         panel = new TempoActionPanel.AttackPanel(bim.UIStage.getViewport(), 3, 80);
@@ -97,7 +96,7 @@ public class TestBIS extends BattleInteractionState {
 
 
         //TEST 1
-
+        /*
         command = new MoveCommand(bim.bfr, bim.scheduler);
         int[] unitPos = bim.battlefield.getUnitPos( warlord);
         if (command.setActor(unitPos[0], unitPos[1])) {
@@ -112,9 +111,11 @@ public class TestBIS extends BattleInteractionState {
         Array<int[]> actionTiles = new Array<int[]>();
         command = new TestCommand(bim.bfr, bim.scheduler);
         unitPos = bim.battlefield.getUnitPos( warlord);
-        /*if(command.atActionRange(unitPos[0], unitPos[1], warlord)){
+
+        if(command.atActionRange(unitPos[0], unitPos[1], warlord)){
             actionTiles.add(unitPos);
-        }*/
+        }
+
         for (int r = 0; r < bim.battlefield.getNbRows(); r++) {
             for (int c = 0; c < bim.battlefield.getNbColumns(); c++) {
                 if (command.isTargetValid(unitPos[0], unitPos[1], r, c)){
@@ -124,7 +125,7 @@ public class TestBIS extends BattleInteractionState {
             }
         }
         areaWidget.setTiles(actionTiles);
-
+        */
 
         //TEST 2
         /*
@@ -136,9 +137,9 @@ public class TestBIS extends BattleInteractionState {
         */
 
 
+        System.out.println(warlord.getArmy().getSquadSize(warlord, true));
 
 
-        /*
         // TEST 3
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Allegeance.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
@@ -171,7 +172,7 @@ public class TestBIS extends BattleInteractionState {
             }
 
         }
-        */
+
     }
 
     @Override

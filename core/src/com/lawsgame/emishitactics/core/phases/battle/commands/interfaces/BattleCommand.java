@@ -1,10 +1,11 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -19,7 +20,7 @@ import com.lawsgame.emishitactics.engine.patterns.command.Command;
  *
  *  ActionChoice choice = ...;
  *  if(bcm.canActionBePerformed(...){
- *      BattleCommand command = bcm.get(...); OR new XCommand(...);
+ *      BattleCommand command = bcm.get(...); /OR new XCommand(...);
  *      if(command != null && command.setActor(...)){
  *          command.setTarget(...);
  *          if(command.isTargetValid()){
@@ -30,11 +31,12 @@ import com.lawsgame.emishitactics.engine.patterns.command.Command;
  *
  *  II - battle command flow
  *
- *  1 - get the command initialized
+ *  1 - get the command
  *  2 - set actor and target
- *  3 - commandReady the target availability
- *  4 - execute the command
- *  5 - undo it if required
+ *  3 - call isTargetValid
+ *          a. initialize the command
+ *          b. set the command as ready or not according to the target nature
+ *  4 - execute the command => command ready = false, to be executed once more isTargetValid shall be call once again
  *
  * no need to put back the command in the BCM
  */
@@ -47,21 +49,27 @@ public abstract class BattleCommand implements Command{
     protected int colActor;
     protected int rowTarget;
     protected int colTarget;
-    protected boolean commandReady;                     // true when a target and a actor has been chosen AND the target choice has been checked.
     protected boolean undoable;
     protected boolean endturnCommandOnly;
     protected EncounterOutcome outcome;
+
+    protected boolean commandReady;                     // true when a target and a actor has been chosen AND the target choice has been checked.
 
 
     public BattleCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean endturnCommandOnly){
         this.battlefieldRenderer = bfr;
         this.battlefield = bfr.getModel();
-        this.choice = choice;
         this.scheduler = scheduler;
+        this.choice = choice;
+        this.rowActor = -1;
+        this.colActor = -1;
+        this.rowTarget = -1;
+        this.colTarget = -1;
         this.commandReady = false;
         this.undoable = undoable;
         this.endturnCommandOnly = endturnCommandOnly;
         this.outcome = new EncounterOutcome();
+
     }
 
     /**
@@ -69,6 +77,7 @@ public abstract class BattleCommand implements Command{
      */
     public void apply(){
         if(commandReady){
+            commandReady = false;
             execute();
         }
     }
@@ -77,7 +86,7 @@ public abstract class BattleCommand implements Command{
      * called upon target validation
       */
     public void init(){
-        outcome.clear();
+        outcome.reset();
     }
 
 
@@ -206,7 +215,9 @@ public abstract class BattleCommand implements Command{
 
     /**
      *
-     * For weapon based / specific range based commands
+     * For :
+     *  - weapon based / specific range based action
+     *  - targeting only one specific target tile
      *
      * @param rowActor0
      * @param colActor0
@@ -224,7 +235,6 @@ public abstract class BattleCommand implements Command{
             int rangeMax = (choice.getRangeType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                System.out.println("HE = "+rowTarget0+" "+colTarget0);;
                 switch (targetType){
                     case ALLY:
                         if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getAllegeance()))
@@ -351,39 +361,36 @@ public abstract class BattleCommand implements Command{
         return outcome;
     }
 
+
+
+
+
+
+
     // ----------------- Encounter outcome CLASS -----------------
 
     public static class EncounterOutcome {
         public Array<IUnit> receivers;
         public Array<Integer> experienceGained;
-        public Array<Item> stolenItems;
+        public Array<Item> droppedItems;
 
         public EncounterOutcome() {
-            clear();
+            reset();
         }
 
-        public void set(IUnit attacker, Array<Unit.DamageNotif> notifs){
-            //TODO:
-
-
-
-
-
-        }
-
-        public void set(IUnit receiver, int experience){
-            receivers.add(receiver);
-            experienceGained.add(experience);
-        }
-
-        public void addStolenItem(Item item){
-            stolenItems.add(item);
-        }
-
-        public void clear(){
+        public void reset(){
             this.receivers = new Array<IUnit>();
             this.experienceGained = new Array<Integer>();
-            this.stolenItems = new Array<Item>();
+            this.droppedItems = new Array<Item>();
+
+        }
+
+        public boolean isExperienceGainedHandled(){
+            return receivers.size == 0;
+        }
+
+        public boolean isHandled(){
+            return receivers.size == 0 && droppedItems.size == 0;
         }
 
         public String toSring(){
@@ -391,8 +398,8 @@ public abstract class BattleCommand implements Command{
             for(int i = 0; i < receivers.size; i++){
                 str += "\nReceiver : "+receivers.get(i)+", experience gained : "+experienceGained.get(i);
             }
-            for(int i = 0; i < stolenItems.size; i++){
-                str += "\nStolen item : "+stolenItems.get(i);
+            for(int i = 0; i < droppedItems.size; i++){
+                str += "\nStolen item : "+ droppedItems.get(i);
             }
             return str+"\n";
         }

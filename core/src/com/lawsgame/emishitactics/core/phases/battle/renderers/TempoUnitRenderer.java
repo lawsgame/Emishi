@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -17,8 +17,8 @@ import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 import java.util.LinkedList;
 
-import static com.lawsgame.emishitactics.core.constants.Data.SPEED_PUSHED;
-import static com.lawsgame.emishitactics.core.constants.Data.SPEED_WALK;
+import static com.lawsgame.emishitactics.core.models.Data.SPEED_PUSHED;
+import static com.lawsgame.emishitactics.core.models.Data.SPEED_WALK;
 
 public class TempoUnitRenderer extends BattleUnitRenderer {
 

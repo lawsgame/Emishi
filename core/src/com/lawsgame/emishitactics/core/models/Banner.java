@@ -1,6 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.lawsgame.emishitactics.core.constants.Data.BannerSign;
+import com.lawsgame.emishitactics.core.models.Data.BannerSign;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Banner extends Observable{

@@ -1,9 +1,8 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
-import com.lawsgame.emishitactics.core.constants.Data.Allegeance;
-import com.lawsgame.emishitactics.core.constants.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.Allegeance;
+import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -73,14 +72,14 @@ public class Battlefield extends Observable {
     // ---------------- TILE MANAGEMENT ------------------------------------
     /*
      ADD A TILE:
-     1) add a TileType
-     2) add the texture in the tiles atlas
+     1) addExpGained a TileType
+     2) addExpGained the texture in the tiles atlas
      30) (checking) check the correspondance between its texture name and its TileType name
-     31) (optional) add specific rules...
+     31) (optional) addExpGained specific rules...
 
     TILE METHODS HIERARCHY
 
-     > set
+     > addExpGained
      -> setTileAs
      -> plunderTile
      */
@@ -94,7 +93,7 @@ public class Battlefield extends Observable {
             tombItems.remove(_getLootId(r, c));
             looted[r][c] = false;
 
-            //set tile
+            //addExpGained tile
             tiles[r][c] = type;
             notifyAllObservers(new int[]{r, c});
             return true;
@@ -289,19 +288,17 @@ public class Battlefield extends Observable {
     }
 
     public boolean isTileCovered(int row, int col, Allegeance alliedAllegeance){
-        boolean res = false;
         for(Allegeance a : Allegeance.values()) {
             if(a != alliedAllegeance) {
                 Array<Area.UnitArea> foeCoveredArea = coveredAreas.get(a);
                 for (int i = 0; i < foeCoveredArea.size; i++) {
                     if (foeCoveredArea.get(i).contains(row, col)) {
-                        res = true;
-                        continue;
+                        return true;
                     }
                 }
             }
         }
-        return res;
+        return false;
     }
 
     public boolean isTileGuarded(int row, int col, Allegeance alliedAllegeance){
@@ -326,7 +323,7 @@ public class Battlefield extends Observable {
     public void randomlyDeployArmy(IArmy army){
         if(army != null) {
 
-            Array<IUnit> mobilizedTroops = army.getMobilizedUnits();
+            Array<IUnit> mobilizedTroops = army.getMobilizedUnits(true);
             Array<int[]> deploymentsTile = getDeploymentArea();
             IUnit unit;
             int[] coords;
@@ -356,15 +353,14 @@ public class Battlefield extends Observable {
 
     public void deployUnit(int row, int col, IUnit unit){
         boolean alreadyDeployed = false;
-        for(int r = 0; r < getNbRows(); r++){
-            for(int c = 0; c < getNbRows(); c++){
-                if(this.units[r][c] == unit){
-                    alreadyDeployed = true;
-                    continue;
+        loop:{
+            for (int r = 0; r < getNbRows(); r++) {
+                for (int c = 0; c < getNbRows(); c++) {
+                    if (this.units[r][c] == unit) {
+                        alreadyDeployed = true;
+                        break loop;
+                    }
                 }
-            }
-            if(alreadyDeployed){
-                continue;
             }
         }
         if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
@@ -587,7 +583,7 @@ public class Battlefield extends Observable {
                 this.allegeance = actor.getAllegeance();
                 this.battlefield = bf;
 
-                // set the check map dimensions and origin point
+                // addExpGained the check map dimensions and origin point
                 int rows;
                 int colunms;
                 if(moveAreaOnly) {

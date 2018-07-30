@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Data;
 
 public class Inventory {
     private Array<Equipment> storedItems;

@@ -19,7 +19,7 @@ import java.util.LinkedList;
  *
  * features added:
  *  - use a queue to handle actions one after another
- *  - allow to set the position of the widget without knowing the UI viewport dimensions
+ *  - allow to addExpGained the position of the widget without knowing the UI viewport dimensions
  *
  *
  */

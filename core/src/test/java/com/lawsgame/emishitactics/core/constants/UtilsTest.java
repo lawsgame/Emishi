@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.constants;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -15,7 +16,6 @@ public class UtilsTest {
     @BeforeClass
     public static void beforeAll(){
 
-        System.out.println("\n---+++$$$ Utils TEST $$$+++---\n");
     }
 
     @BeforeClass
