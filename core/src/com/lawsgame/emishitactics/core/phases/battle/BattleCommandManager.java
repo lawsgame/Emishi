@@ -41,7 +41,6 @@ public class BattleCommandManager {
     public BattleCommand get(Data.ActionChoice choice){
         BattleCommand command = commandPool.get(choice);
         if(command != null) {
-            command.init();
             return command;
         }
         return null;

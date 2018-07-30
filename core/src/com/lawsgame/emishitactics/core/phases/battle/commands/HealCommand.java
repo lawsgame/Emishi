@@ -19,6 +19,7 @@ public class HealCommand extends BattleCommand {
 
     @Override
     public void init() {
+        super.init();
         launched = false;
     }
 
@@ -65,7 +66,6 @@ public class HealCommand extends BattleCommand {
                 }
             }
         }
-        System.out.println(valid);
         return valid;
     }
 

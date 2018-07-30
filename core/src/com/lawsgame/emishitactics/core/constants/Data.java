@@ -25,7 +25,6 @@ public class Data {
     public static final int NB_BUILDING_MAX = 2;
     public static final int DEX_FACTOR_ATT_ACC = 3;
     public static final int DEX_FACTOR_AVO = 4;
-    public static final int DEX_FACTOR_DROP = 2;
     public static final int HIT_RATE_BACK_ACC_BONUS = 20;
     public static final int MAX_WEAPON_CARRIED = 2;
     public static final int MAX_WEAPON_CARRIED_UPON_PROMOTION = 3;
@@ -274,24 +273,26 @@ public class Data {
      *  - Great bow
      */
     public enum WeaponTemplate{
-        FIST(           1, 100, 1, 1, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
-        SHORTSWORD(     3,  90, 1, 1, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
-        LANCE(          3,  95, 1, 1, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
-        BROAD_AXE(      5,  80, 1, 1, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
-        CLUB(           4,  85, 1, 1, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
-        HUNTING_BOW(    3,  75, 2, 2, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
+        FIST(           1, 100, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
+        SHORTSWORD(     3,  90, 1, 1, 10, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
+        LANCE(          3,  95, 1, 1, 10, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
+        BROAD_AXE(      5,  80, 1, 1, 10, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
+        CLUB(           4,  85, 1, 1, 10, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
+        HUNTING_BOW(    3,  75, 2, 2, 10, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE),
+        TEST_AXE(    10,  100, 2, 3, 100, 100, WeaponType.AXE, DamageType.PIERCING, Ability.NONE);
 
         private int damage;
         private int accuracy;
         private int rangeMin;
         private int rangeMax;
+        private int dropRate;
         private int durabilityMax;
         private boolean unbreakable;
         private WeaponType weaponType;
         private DamageType damageType;
         private Ability ability;
 
-        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, int durability, WeaponType weaponType, DamageType damageType, Ability art) {
+        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, int dropRate, int durability, WeaponType weaponType, DamageType damageType, Ability art) {
             this.damage = damage;
             this.accuracy = accuracy;
             this.rangeMin = rangeMin;
@@ -299,13 +300,18 @@ public class Data {
             this.weaponType = weaponType;
             this.damageType = damageType;
             this.ability = art;
+            this.dropRate = dropRate;
             this.durabilityMax = durability;
             this.unbreakable = false;
         }
 
-        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, WeaponType weaponType, DamageType damageType, Ability art){
-            this(damage, accuracy, rangeMin, rangeMax, 1, weaponType, damageType, art);
+        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, int dropRate, WeaponType weaponType, DamageType damageType, Ability art){
+            this(damage, accuracy, rangeMin, rangeMax, dropRate,1, weaponType, damageType, art);
             this.unbreakable = true;
+        }
+
+        public int getDropRate() {
+            return dropRate;
         }
 
         public WeaponType getWeaponType() {
@@ -771,7 +777,9 @@ public class Data {
         COVER               (0, RangedBasedType.ONESELF, new int[0][0]),
         ATTACK              (0, RangedBasedType.WEAPON, new int[0][0]),
         CHOOSE_ORIENTATION  (0, RangedBasedType.ONESELF, new int[0][0]),
-        END_TURN            (0, RangedBasedType.ONESELF, new int[0][0]);
+        END_TURN            (0, RangedBasedType.ONESELF, new int[0][0]),
+
+        TEST                (0, RangedBasedType.WEAPON, new int[][]{{1,0},{2,0}});
 
 
         // RANGE REQUIREMENT

@@ -105,7 +105,6 @@ public abstract class IUnit extends Observable {
     public abstract int getAppAttackMight();
     public abstract int getAppDefense(DamageType damageType);
     public abstract int getAppAvoidance();
-    public abstract int getAppDropRate();
     public abstract int getAppOATriggerRate();
     public abstract int getCurrentOATriggerRate(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract void setOAChargingBarPoints(int barProgression);

@@ -800,11 +800,6 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getAppDropRate() {
-        return getAppDexterity() * Data.DEX_FACTOR_DROP + getChiefCharisma();
-    }
-
-    @Override
     public void setOAChargingBarPoints(int barProgression) {
         this.OAChargingBar = barProgression % Data.OA_CHARGING_BAR_MAX_VALUE;
     }

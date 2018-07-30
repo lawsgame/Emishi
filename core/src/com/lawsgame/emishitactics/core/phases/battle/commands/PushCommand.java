@@ -19,6 +19,7 @@ public class PushCommand extends BattleCommand{
 
     @Override
     public void init() {
+        super.init();
         launched = false;
     }
 
