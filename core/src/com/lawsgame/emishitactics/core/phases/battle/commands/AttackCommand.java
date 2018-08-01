@@ -9,46 +9,32 @@ import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class AttackCommand extends BattleCommand {
-    private boolean launched;
-    Array<Array<Unit.DamageNotif>> notifBundles;
-
 
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
         super(bfr, Data.ActionChoice.ATTACK, scheduler, false, false);
     }
 
     @Override
-    public void init() {
-        super.init();
-        launched = false;
-
-    }
-
-    @Override
     protected void execute() {
-        launched = true;
-        notifBundles = new Array<Array<Unit.DamageNotif>>();
+        IUnit attacker = battlefield.getUnit(rowActor, colActor);
 
-        notifBundles.add(performAttack(rowActor, colActor, rowTarget, colTarget));
+        Array<Unit.DamageNotif> notifBundleActor;
+        Array<Unit.DamageNotif> notifBundleTarget;
+        notifBundleActor = performAttack(rowActor, colActor, rowTarget, colTarget);
         if(!battlefield.getUnit(rowTarget, colTarget).isOutOfAction() && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
-            notifBundles.add(performAttack(rowTarget, colTarget, rowActor, colActor));
+            notifBundleTarget = performAttack(rowTarget, colTarget, rowActor, colActor);
+            setOutcome(rowTarget, colTarget, notifBundleTarget);
         }
+        setOutcome(rowActor, colActor, notifBundleActor);
+        removeOutOfActionUnits();
 
-        setOutcome();
-
-        // remove OoA units
-        Array<IUnit> OOAUnits = battlefield.getOOAUnits();
-        battlefield.removeOOAUnits();
-        Task removeOOAUnitTask = new Task();
-        for(int i = 0; i < OOAUnits.size; i++){
-            removeOOAUnitTask.addThread(new Thread(battlefieldRenderer, battlefieldRenderer, OOAUnits.get(i)));
-        }
-        scheduler.addTask(removeOOAUnitTask);
+        attacker.setActed(true);
 
     }
 
@@ -99,11 +85,8 @@ public class AttackCommand extends BattleCommand {
                 targetThread.addQuery(defender.getOrientation());
             }
 
-
-            //set up outcome
-
         }else{
-
+            // view-wise scheduling
             targetThread.addQuery(attacker.getOrientation().getOpposite());
             targetThread.addQuery(Data.AnimationId.DODGE);
             targetThread.addQuery(defender.getOrientation());
@@ -117,72 +100,81 @@ public class AttackCommand extends BattleCommand {
         return notifs;
     }
 
-    protected void setOutcome(){
-        IUnit initiator =  battlefield.getUnit(rowActor, colActor);
-        IUnit target = battlefield.getUnit(rowTarget, colTarget);
 
-        IUnit winner;
-        IUnit loser;
-        Array<Unit.DamageNotif> notifs;
-        if(initiator.isOutOfAction() == !target.isOutOfAction()){
-            winner = (initiator.isOutOfAction()) ? target : initiator;
-            loser = (initiator.isOutOfAction()) ? initiator : target;
-            notifs = notifBundles.get(initiator.isOutOfAction() ? 1 : 0);
+    protected void setOutcome(int rowReceiver, int colReceiver, Array<Unit.DamageNotif> notifs){
+        IUnit receiver =  battlefield.getUnit(rowReceiver, colReceiver);
 
+        int experience;
+        int lootRate;
+        int dicesResult;
+        Item droppedItem;
+        if(!receiver.isOutOfAction()) {
+            if (notifs.size == 1 && notifs.get(0).isRelevant()) {
 
-            //TODO:
+                IUnit target = notifs.get(0).wounded;
+                experience = Formulas.getGainedExperience(receiver.getLevel(), target.getLevel(), !target.isOutOfAction());
+                outcome.receivers.add(receiver);
+                outcome.experienceGained.add(experience);
+                lootRate = Formulas.getLootRate(rowReceiver, colReceiver, battlefield);
+                dicesResult = Utils.getMean(1, 100);
+                if(dicesResult < lootRate){
+                    droppedItem = target.getDroppableItem();
+                    outcome.droppedItems.add(droppedItem);
+                }
+            } else if (notifs.size > 1){
 
+                //get all wounded opponents
+                Array<IUnit> squad = new Array<IUnit>();
+                for(int i = 0; i < notifs.size; i++){
+                    if(notifs.get(i).isRelevant())
+                        squad.add(notifs.get(i).wounded);
+                }
+
+                // calculate the experience points obtained
+                experience = Formulas.getGainedExperienceFoeEachSquadMember(receiver, squad);
+
+                // fetch dropped items
+                for(int i = 0; i < squad.size; i++) {
+                    if(squad.get(i).isOutOfAction()) {
+                        lootRate = Formulas.getLootRate(rowReceiver, colReceiver, battlefield);
+                        if (Utils.getMean(1, 100) < lootRate) {
+                            droppedItem = squad.get(i).getDroppableItem();
+                            outcome.droppedItems.add(droppedItem);
+                        }
+                    }
+                }
+
+                // add experience points
+                squad = receiver.getSquad(true);
+                for(int i = 0; i < squad.size; i++) {
+                    outcome.experienceGained.add(experience);
+                    outcome.receivers.add(squad.get(i));
+                }
+
+            }
         }
+
+
     }
 
-    @Override
-    public boolean isExecuting() {
-        return launched && battlefieldRenderer.isExecuting();
-    }
 
-    @Override
-    public boolean isExecutionCompleted() {
-        return launched && !battlefieldRenderer.isExecuting();
+    protected void removeOutOfActionUnits(){
+        Array<IUnit> OOAUnits = battlefield.getOOAUnits();
+        battlefield.removeOOAUnits();
+        Task removeOOAUnitTask = new Task();
+        for(int i = 0; i < OOAUnits.size; i++)
+            removeOOAUnitTask.addThread(new Thread(battlefieldRenderer, battlefieldRenderer, OOAUnits.get(i)));
+        scheduler.addTask(removeOOAUnitTask);
     }
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        boolean valid = false;
-        if(battlefield.isTileOccupied(rowActor0, colActor0)){
-            IUnit attacker = battlefield.getUnit(rowActor0, colActor0);
-            if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, attacker.getAllegeance())) {
-                int rangeMin = attacker.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield);
-                int rangeMax = attacker.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield);
-                int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
-                if (rangeMin <= dist && dist <= rangeMax) {
-                    valid = true;
-                }
-            }
-        }
-        return valid;
+        return isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0);
     }
 
     @Override
     public boolean atActionRange(int row, int col, IUnit actor) {
-        boolean targetAtRange = false;
-        int[] actorPos = battlefield.getUnitPos(actor);
-        int rangeMin = actor.getCurrentWeaponRangeMin(actorPos[0], actorPos[1], battlefield);
-        int rangeMax = actor.getCurrentWeaponRangeMax(actorPos[0], actorPos[1], battlefield);
-        int dist;
-        for(int r = row - rangeMax; r <= row + rangeMax; r++ ){
-            for(int c = col - rangeMax; c <= col + rangeMax; c++ ){
-                dist = Utils.dist(row, col, r, c);
-                if(rangeMin <= dist
-                        && dist <= rangeMax
-                        && battlefield.isTileOccupiedByFoe(r, c, actor.getAllegeance())){
-                    targetAtRange = true;
-                    continue;
-                }
-            }
-            if(targetAtRange)
-                continue;
-        }
-        return targetAtRange;
+        return isEnemyAtActionRange(row, col, actor);
     }
 
 
@@ -200,10 +192,10 @@ public class AttackCommand extends BattleCommand {
                 Formulas.getDealtDamage(rowTarget, colTarget, rowActor, colActor, battlefield);
     }
 
-    public int getDropRate(boolean ofInitiator){
+    public int getLootRate(boolean ofInitiator){
         return (ofInitiator) ?
-                Formulas.getDropRate(rowActor, colActor, rowTarget, colTarget, battlefield) :
-                Formulas.getDropRate(rowTarget, colTarget, rowActor, colActor, battlefield);
+                Formulas.getLootRate(rowActor, colActor, battlefield) :
+                Formulas.getLootRate(rowTarget, colTarget, battlefield);
     }
 
 

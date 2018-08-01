@@ -30,6 +30,11 @@ public class Equipment extends Observable implements Item{
     }
 
     @Override
+    public int getDropRate() {
+        return template.getDropRate();
+    }
+
+    @Override
     public String getName() {
         return template.name().toLowerCase();
     }

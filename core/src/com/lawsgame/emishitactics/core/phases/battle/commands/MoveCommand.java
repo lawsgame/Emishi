@@ -13,7 +13,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 
 public class MoveCommand extends BattleCommand{
-    protected BattleUnitRenderer actorRenderer;
+    protected BattleUnitRenderer walkerRenderer;
     protected Array<int[]> path;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
@@ -23,41 +23,24 @@ public class MoveCommand extends BattleCommand{
     @Override
     public void init() {
         super.init();
-        actorRenderer = null;
+        walkerRenderer = null;
         path = null;
     }
 
     @Override
     protected void execute() {
-        IUnit actor = battlefield.getUnit(rowActor, colActor);
-        actorRenderer = battlefieldRenderer.getUnitRenderer(actor);
+        IUnit walker = battlefield.getUnit(rowActor, colActor);
+        walkerRenderer = battlefieldRenderer.getUnitRenderer(walker);
 
-        /*
-        the order is crucial here.
-        As the unit moved is identified by his position, the moment where the unit model is changed accordingly must be taken into consideration
-         */
-        actor.setMoved(true);
         battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget);
-        scheduler.addTask(new Task(battlefieldRenderer.getUnitRenderer(actor), path));
+        scheduler.addTask(new Task(battlefieldRenderer, battlefieldRenderer.getUnitRenderer(walker), path));
 
-        Data.Orientation or;
-        if(path.size > 1) {
-            or = Utils.getOrientationFromCoords(path.get(path.size - 2)[0], path.get(path.size - 2)[1], rowTarget, colTarget);
-        }else {
-            or = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
-        }
-        actor.setOrientation(or);
+        Data.Orientation or = (path.size > 1) ?
+                Utils.getOrientationFromCoords(path.get(path.size - 2)[0], path.get(path.size - 2)[1], rowTarget, colTarget) :
+                Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
+        walker.setOrientation(or);
 
-    }
-
-    @Override
-    public boolean isExecuting() {
-        return isLaunched() && actorRenderer.isExecuting();
-    }
-
-    @Override
-    public boolean isExecutionCompleted() {
-        return isLaunched() && !actorRenderer.isExecuting();
+        walker.setMoved(true);
     }
 
     /**
@@ -97,15 +80,14 @@ public class MoveCommand extends BattleCommand{
 
     @Override
     public void undo() {
-        if(isLaunched()){
-            battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor);
-            battlefield.getUnit(rowActor, colActor).setMoved(false);
-            scheduler.addTask(new Task(battlefieldRenderer, actorRenderer, new int[]{rowActor, colActor}));
+        if(battlefield.isTileOccupied(rowTarget, colTarget) && walkerRenderer != null){
+            IUnit actor = battlefield.getUnit(rowTarget, colActor);
+            if(actor == walkerRenderer.getModel()) {
+                battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor);
+                actor.setMoved(false);
+                scheduler.addTask(new Task(battlefieldRenderer, walkerRenderer, new int[]{rowActor, colActor}));
+            }
         }
-    }
-
-    protected boolean isLaunched(){
-        return actorRenderer != null;
     }
 
 }

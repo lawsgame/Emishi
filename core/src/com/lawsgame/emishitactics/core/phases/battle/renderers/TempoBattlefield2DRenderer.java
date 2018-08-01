@@ -114,6 +114,19 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
+    public void removeAreaRenderersAssociatedWith(IUnit unit){
+        Area.UnitArea areaModel;
+        for(int i = 0; i < areaRenderers.size; i++){
+            if(areaRenderers.get(i).getModel() instanceof Area.UnitArea){
+                areaModel = (Area.UnitArea)areaRenderers.get(i).getModel();
+                if(areaModel.getActor() == unit){
+                    areaRenderers.removeIndex(i);
+                    i--;
+                }
+            }
+        }
+    }
+
     public void addUnitRenderer(int r, int c) {
         if(model.isTileOccupied(r,c)) {
             IUnit unit = model.getUnit(r, c);
@@ -128,6 +141,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             for(int i = 0; i< unitRenderers.size; i++){
                 if(unitRenderers.get(i).getModel() == unit){
                     unit.detach(unitRenderers.get(i));
+                    removeAreaRenderersAssociatedWith(unit);
                     return unitRenderers.removeValue(unitRenderers.get(i), true);
                 }
             }
@@ -208,6 +222,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                             public void apply() {
                                 bur.setX(coords[1]);
                                 bur.setY(coords[0]);
+                                removeAreaRenderersAssociatedWith(bur.getModel());
                             }
                         });
 
@@ -223,14 +238,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 //switch units position or move unit
                 Array<int[]> path = new Array<int[]>();
                 if (model.isTileOccupied(coords[0], coords[1]) && model.isTileOccupied(coords[2], coords[3])) {
-                    BattleUnitRenderer ur1 = getUnitRenderer(model.getUnit(coords[0], coords[1]));
-                    BattleUnitRenderer ur2 = getUnitRenderer(model.getUnit(coords[2], coords[3]));
-                    if(ur1 != null && ur2 != null) {
+                    BattleUnitRenderer bur1 = getUnitRenderer(model.getUnit(coords[0], coords[1]));
+                    BattleUnitRenderer bur2 = getUnitRenderer(model.getUnit(coords[2], coords[3]));
+                    if(bur1 != null && bur2 != null) {
+                        removeAreaRenderersAssociatedWith(bur1.getModel());
+                        removeAreaRenderersAssociatedWith(bur2.getModel());
                         path.add(new int[]{coords[2], coords[3]});
-                        ur1.displayWalk(path);
+                        bur1.displayWalk(path);
                         path.clear();
                         path.add(new int[]{coords[0], coords[1]});
-                        ur2.displayWalk(path);
+                        bur2.displayWalk(path);
                     }
                 }
             }
@@ -242,6 +259,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
                     IUnit unit = model.getUnit(unitCoords[0], unitCoords[1]);
                     unit.notifyAllObservers(path);
+                    removeAreaRenderersAssociatedWith(unit);
                 }
 
             }

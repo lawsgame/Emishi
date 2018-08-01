@@ -52,9 +52,11 @@ public abstract class IUnit extends Observable {
     public abstract int getBaseHitpoints();
     public abstract int getAppHitpoints();
     public abstract int getCurrentHP();
+    public abstract void setCurrentHitPoints(int hitPoints);
     public abstract void resetCurrentMoral();
     public abstract int getAppMoral();
     public abstract int getCurrentMoral();
+    public abstract void setCurrentMoral(int moral);
     public abstract int getExperience();
     public abstract void setExperience(int experience);
     public abstract int[] addExpPoints(int exp);
@@ -94,6 +96,7 @@ public abstract class IUnit extends Observable {
     public abstract void setStealable(boolean weapon, int index, boolean stealable);
     public abstract boolean isStealable();
     public abstract Item getStealable();
+    public abstract Item getDroppableItem();
 
     //ENCOUNTER RESOLUTION
     public abstract int getAppWeaponRangeMin();

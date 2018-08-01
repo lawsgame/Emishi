@@ -15,17 +15,6 @@ public class Formulas {
         return (dealtdamage > 0) ? dealtdamage : 0;
     }
 
-    public static int getDropRate(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
-        int dropRate = 0;
-        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
-            IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            IUnit defender = battlefield.getUnit(rowDefender0, colDefender0);
-            dropRate = defender.getCurrentWeapon().getTemplate().getDropRate() + attacker.getAppDexterity()/2 + attacker.getChiefCharisma()/2;
-        }
-        return dropRate;
-    }
-
-
     public static int getCurrentAttackMight(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
         int attackMight = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
@@ -73,7 +62,7 @@ public class Formulas {
     }
 
     public static int getGainedExperience(int levelActor, int levelTarget, boolean stillFigthing) {
-        double expGained = 50 + (100 / Math.PI) * Math.atan((levelTarget - levelActor - Data.EXP_LVL_GAP_FACTOR_2)/Data.EXP_LVL_GAP_FACTOR_1) - levelActor;
+        double expGained = 50 + (100 / Math.PI) * Math.atan((levelTarget - levelActor - Data.EXP_LVL_GAP_FACTOR) * Data.EXP_ALPHA) - levelActor;
         if(expGained < 0) expGained = 0;
         if(stillFigthing) expGained *= Data.EXP_WOUNDED_ONLY_FACTOR;
         return (int)expGained;
@@ -83,10 +72,10 @@ public class Formulas {
     /**
      *
      * @param attacker
-     * @param fallens
+     * @param targetedSquad, still fighting members of the opponent squad before the attack
      * @return
      */
-    public static int getGainedExperiencePerSquadMemberUponDesertions(IUnit attacker, Array<IUnit> fallens){
+    public static int getGainedExperienceFoeEachSquadMember(IUnit attacker, Array<IUnit> targetedSquad){
         int expPerSquadMember = 0;
         if(attacker.isMobilized()) {
 
@@ -101,8 +90,8 @@ public class Formulas {
 
             // get the sum of the exp gain for the fallen untis
             int sum = 0;
-            for(int i = 0 ; i < fallens.size; i++){
-                sum += getGainedExperience(levelmean, fallens.get(i).getLevel(), false);
+            for(int i = 0 ; i < targetedSquad.size; i++){
+                sum += getGainedExperience(levelmean, targetedSquad.get(i).getLevel(), !targetedSquad.get(i).isOutOfAction());
             }
             expPerSquadMember = 1 + sum/victoriousSquad.size;
             if(expPerSquadMember > 100) expPerSquadMember = 100;
@@ -110,6 +99,14 @@ public class Formulas {
         return expPerSquadMember;
     }
 
-
+    public static int getLootRate(int rowAttacker0, int colAttacker0, Battlefield battlefield){
+        int lootRate = 0;
+        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0)){
+            IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
+            if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled())
+                lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharisma()/2;
+        }
+        return lootRate;
+    }
 
 }

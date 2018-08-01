@@ -10,6 +10,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -55,6 +56,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private boolean updatePoint = false;
     private boolean pushed = false;
     private Array<int[]> remainingPath = new Array<int[]>(); // array of (r, c) <=> (y, x)
+    private boolean showNumbers = false;
+    private String numbersToShow = "";
 
     private LinkedList<Object> animationQueue;
 
@@ -82,6 +85,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         countDown.update(dt);
         if (countDown.isFinished()) {
             offabbTexture = null;
+            showNumbers = false;
             countDown.reset();
             if(animationQueue.isEmpty())
                 display(Data.AnimationId.REST);
@@ -213,6 +217,10 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             batch.draw(orientationTexture, getX() + 0.75f, getY() + 0.75f, 0.25f, 0.25f);
             if (mountedTexture != null) batch.draw(mountedTexture, getX() + 0.75f, getY() + 0f, 0.25f, 0.25f);
             if (offabbTexture != null) batch.draw(offabbTexture, getX(), getY() + 1, 1, 0.25f);
+            if(showNumbers) {
+                //BattlePhase.testFont.getData().setScale(0.07f);
+                //BattlePhase.testFont.draw(batch, numbersToShow, getX(), getY());
+            }
         }
     }
 
@@ -287,6 +295,10 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         }else{
             unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().getAllegeance()));
         }
+        showNumbers = true;
+        numbersToShow = ""+damageTaken+" ";
+        numbersToShow += (moralOnly) ? "m" : "";
+        numbersToShow += (critical) ? "c" : "";
         countDown.run();
     }
 
@@ -300,6 +312,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTreated(int healedHP) {
         unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().getAllegeance()));
+        showNumbers = true;
+        numbersToShow = "+"+healedHP;
         countDown.run();
     }
 

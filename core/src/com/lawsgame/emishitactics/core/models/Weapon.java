@@ -42,4 +42,9 @@ public class Weapon extends Observable implements Item{
     public boolean isStealable() {
         return stealable;
     }
+
+    @Override
+    public int getDropRate() {
+        return template.getDropRate();
+    }
 }

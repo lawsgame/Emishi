@@ -6,14 +6,10 @@ import java.util.Random;
 
 public class Data {
 
-    static Random r = new Random();
-    public static int rand(int n){
-        return r.nextInt(n);
-    }
-
 
     public static final float GAME_PORT_WIDTH = 15f;
 
+    //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;
     public static final int PROMOTION_LEVEL = 10;
     public static final int MAX_LEVEL = 30;
@@ -29,21 +25,28 @@ public class Data {
     public static final int MAX_WEAPON_CARRIED_UPON_PROMOTION = 3;
     public static final int MAX_ITEM_CARRIED = 1;
     public static final int MAX_ITEM_CARRIED_UPON_PROMOTION = 2;
+    public static final int BASE_DROP_RATE = 5;
+    public static final int GUARD_REACTION_RANGE_MIN = 1;
+    public static final int GUARD_REACTION_RANGE_MAX = 1;
 
     // RENDER parameters
     public static final float SPEED_WALK = 3f;  //tile/s
     public static final float SPEED_PUSHED = 8f;
 
     // EXP parameter
-    public static final double EXP_LVL_GAP_FACTOR_1 = 0.35;
-    public static final double EXP_LVL_GAP_FACTOR_2 = 5;
-    public static final double EXP_WOUNDED_ONLY_FACTOR = 1.0/3.0;
+    public static final double EXP_ALPHA = 0.15;
+    public static final double EXP_LVL_GAP_FACTOR = 3;
+    public static final double EXP_WOUNDED_ONLY_FACTOR = 0.33333;
     public static final int EXP_REQUIRED_LEVEL_UP = 100;
     public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
 
+    static Random r = new Random();
+    public static int rand(int n){
+        return r.nextInt(n);
+    }
 
     /**
      * for animation / rendering purposes, use to define:
@@ -273,12 +276,12 @@ public class Data {
      */
     public enum WeaponTemplate{
         FIST(           1, 100, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
-        SHORTSWORD(     3,  90, 1, 1, 10, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
-        LANCE(          3,  95, 1, 1, 10, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
-        BROAD_AXE(      5,  80, 1, 1, 10, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
-        CLUB(           4,  85, 1, 1, 10, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
-        HUNTING_BOW(    3,  75, 2, 2, 10, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE),
-        TEST_AXE(    10,  100, 2, 3, 100, 100, WeaponType.AXE, DamageType.PIERCING, Ability.NONE);
+        SHORTSWORD(     3,  90, 1, 1, 20, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
+        LANCE(          3,  95, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
+        BROAD_AXE(      5,  80, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
+        CLUB(           4,  85, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
+        HUNTING_BOW(    3,  75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE),
+        TEST_AXE(       10,  100, 2, 3, 100, 100, WeaponType.AXE, DamageType.PIERCING, Ability.NONE);
 
         private int damage;
         private int accuracy;
@@ -355,16 +358,22 @@ public class Data {
     }
 
     public enum EquipmentTemplate{
-        NOTHING(Ability.NONE);
+        ;
 
         private Ability ability;
+        private int dropRate;
 
-        EquipmentTemplate(Ability passiveAbility) {
+        EquipmentTemplate(int dropRate, Ability passiveAbility) {
+            this.dropRate = dropRate;
             this.ability = ability;
         }
 
         public Ability getAbility() {
             return ability;
+        }
+
+        public int getDropRate() {
+            return dropRate;
         }
     }
 
@@ -438,7 +447,7 @@ public class Data {
     }
 
     public enum Job {
-        SOLAR_KNIGHT(1, "Solar knight", 4, 5,
+        SOLAR_KNIGHT(1, "Solar knight", 4, 5, new Ability[0],
                 3, 1, 45, 9, 3, 5, 11, 7, 8, 3, 5,
                 0.10f, 0.05f, 0.55f, 0.35f, 0.20f, 0.10f, 0.10f, 0.10f, 0.15f, 0.25f, 0.45f,
                 1, 4, 10, 2, 1, 0, 3, 1, 1, 3, 3,
@@ -448,6 +457,7 @@ public class Data {
         private String name;
         private int footmanMob;
         private int horsemanMob;
+        private Ability[] nativeAbilities;
 
         private int baseCha;
         private int baseLd;
@@ -497,11 +507,12 @@ public class Data {
         private float proGrowthSk;
         private float proGrowthBr;
 
-        Job(int startingLevel, String name, int footmanMob, int horsemanMob, int baseCha, int baseLd, int baseHP, int baseStr, int baseDex, int baseAg, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseSk, int baseBr, float growthCha, float growthLd, float growthHP, float growthStr, float growthDex, float growthAg, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthSk, float growthBr, int proBoCha, int proBoLd, int proBoHP, int proBoStr, int proBoDex, int proBoAg, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoSk, int proBoBr, float proGrowthCha, float proGrowthLd, float getProGrowthHP, float proGrowthStr, float proGrowthDex, float proGrowthAg, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthSk, float proGrowthBr) {
+        Job(int startingLevel, String name, int footmanMob, int horsemanMob, Ability[] nativeAbilities, int baseCha, int baseLd, int baseHP, int baseStr, int baseDex, int baseAg, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseSk, int baseBr, float growthCha, float growthLd, float growthHP, float growthStr, float growthDex, float growthAg, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthSk, float growthBr, int proBoCha, int proBoLd, int proBoHP, int proBoStr, int proBoDex, int proBoAg, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoSk, int proBoBr, float proGrowthCha, float proGrowthLd, float getProGrowthHP, float proGrowthStr, float proGrowthDex, float proGrowthAg, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthSk, float proGrowthBr) {
             this.startingLevel = startingLevel;
             this.name = name;
             this.footmanMob = footmanMob;
             this.horsemanMob = horsemanMob;
+            this.nativeAbilities = nativeAbilities;
             this.baseCha = baseCha;
             this.baseLd = baseLd;
             this.baseHP = baseHP;
@@ -563,6 +574,8 @@ public class Data {
         public int getHorsemanMob() {
             return horsemanMob;
         }
+
+        public Ability[] getNativeAbilities() { return nativeAbilities; }
 
         public int getBaseCha() {
             return baseCha;
@@ -749,7 +762,6 @@ public class Data {
     public enum RangedBasedType{
         MOVE,
         WEAPON,
-        ONESELF,
         SPECIFIC
     }
 
@@ -765,46 +777,48 @@ public class Data {
      * (-1, 0) = in the back of targeted tile
      */
     public enum ActionChoice {
-        MOVE                (0, RangedBasedType.MOVE, new int[0][0]),
-        SWITCH_WEAPON       (0, RangedBasedType.ONESELF, new int[0][0]),
-        SWITCH_POSITION     (0, 1, 1, new int[0][0]),
-        PUSH                (0, 1, 1, new int[0][0]),
-        HEAL                (0, 1, 1, new int[0][0]),
-        GUARD               (0, RangedBasedType.ONESELF, new int[0][0]),
-        STEAL               (0, 1, 1, new int[0][0]),
-        BUILD               (0, 1, 1, new int[0][0]),
-        COVER               (0, RangedBasedType.ONESELF, new int[0][0]),
-        ATTACK              (0, RangedBasedType.WEAPON, new int[0][0]),
-        CHOOSE_ORIENTATION  (0, RangedBasedType.ONESELF, new int[0][0]),
-        END_TURN            (0, RangedBasedType.ONESELF, new int[0][0]),
-        TEST                (0, RangedBasedType.WEAPON, new int[][]{{1,0},{2,0}});
+        MOVE                (0, 0, RangedBasedType.MOVE, new int[0][0]),
+        SWITCH_WEAPON       (0, 0, 0, 0, new int[0][0]),
+        SWITCH_POSITION     (0, 0, 1, 1, new int[0][0]),
+        PUSH                (0, 0, 1, 1, new int[0][0]),
+        HEAL                (0, 10, 1, 1, new int[0][0]),
+        GUARD               (0, 0, 0, 0, new int[0][0]),
+        STEAL               (0, 10, 1, 1, new int[0][0]),
+        BUILD               (0, 10, 1, 1, new int[0][0]),
+        COVER               (0, 0, 0, 0, new int[0][0]),
+        ATTACK              (0, 0, RangedBasedType.WEAPON, new int[0][0]),
+        CHOOSE_ORIENTATION  (0, 0, 0, 0, new int[0][0]),
+        END_TURN            (0, 0, 0, 0, new int[0][0]),
+        TEST                (0, 0, RangedBasedType.WEAPON, new int[][]{{1,0},{2,0}});
 
 
         // RANGE REQUIREMENT
         private int cost;
+        private int experience;
         private RangedBasedType rangeType;
         private int rangeMax;
         private int rangeMin;
         private Array<int[]> impactArea; // area on which the action is performed.
 
 
-        ActionChoice(int cost, RangedBasedType type, int rangeMin, int rangeMax, int[][] impactArea) {
+        ActionChoice(int cost, int experience, RangedBasedType type, int rangeMin, int rangeMax, int[][] impactArea) {
             this.rangeType = type;
             this.rangeMax = rangeMax;
             this.rangeMin = rangeMin;
             this.cost = cost;
+            this.experience = experience;
             this.impactArea = new Array<int[]>();
             for(int[] relativeTileCoordinates : impactArea){
                 this.impactArea.add(relativeTileCoordinates);
             }
         }
 
-        ActionChoice(int cost, int rangeMin, int rangeMax, int[][] impactArea){
-            this(cost, RangedBasedType.SPECIFIC, rangeMax, rangeMin, impactArea);
+        ActionChoice(int cost, int experience, int rangeMin, int rangeMax, int[][] impactArea){
+            this(cost, experience, RangedBasedType.SPECIFIC, rangeMax, rangeMin, impactArea);
         }
 
-        ActionChoice(int cost, RangedBasedType type, int[][] impactArea) {
-            this(cost, type, -1, -1 ,impactArea);
+        ActionChoice(int cost, int experience, RangedBasedType type, int[][] impactArea) {
+            this(cost, experience, type, -1, -1 ,impactArea);
         }
 
         public RangedBasedType getRangeType() { return rangeType; }
@@ -821,34 +835,37 @@ public class Data {
             return cost;
         }
 
+        public int getExperience() {
+            return experience;
+        }
 
         /*
-                                        NORTH (standard):
-                                                         ( 1, 0)
-                                         ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
+                                                NORTH (standard):
+                                                                 ( 1, 0)
+                                                 ( 0,-2) ( 0,-1) ( 0, 0) ( 0, 1)
 
-                                                         (-2, 0)
+                                                                 (-2, 0)
 
-                                         SOUTH: rowf = -r colf = -c
-                                                          ( 2, 0)
+                                                 SOUTH: rowf = -r colf = -c
+                                                                  ( 2, 0)
 
-                                                 ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
-                                                          (-1, 0)
+                                                         ( 0, -1) ( 0, 0) ( 0, 1)( 0, 2)
+                                                                  (-1, 0)
 
-                                         EAST: rowf = -c colf = r
-                                                             ( 2, 0)
-                                                             ( 1, 0)
-                                                  ( 0,-2)    ( 0, 0) ( 0, 1)
-                                                             (-1, 0)
+                                                 EAST: rowf = -c colf = r
+                                                                     ( 2, 0)
+                                                                     ( 1, 0)
+                                                          ( 0,-2)    ( 0, 0) ( 0, 1)
+                                                                     (-1, 0)
 
-                                         WEST: rowf = -c colf = -r
-                                                    ( 1, 0)
-                                             ( 0,-1)( 0, 0)     ( 0, 2)
-                                                    (-1, 0)
-                                                    ( 2, 0)
+                                                 WEST: rowf = -c colf = -r
+                                                            ( 1, 0)
+                                                     ( 0,-1)( 0, 0)     ( 0, 2)
+                                                            (-1, 0)
+                                                            ( 2, 0)
 
 
-        //VALIDATED                     */
+                //VALIDATED                     */
         public Array<int[]> getOrientedImpactArea(Data.Orientation orientation) {
             Array<int[]> orientedArea = new Array<int[]>();
             switch (orientation){

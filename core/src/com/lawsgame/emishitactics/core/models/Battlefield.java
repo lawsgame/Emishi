@@ -158,59 +158,61 @@ public class Battlefield extends Observable {
         return c + getNbColumns() * r;
     }
 
-    public boolean addCoveredArea(int rowActor, int colActor){
+    public UnitArea addCoveredArea(int rowActor, int colActor){
+        UnitArea area = null;
         if(isTileOccupied(rowActor, colActor)) {
             IUnit actor = getUnit(rowActor, colActor);
             if(actor.isMobilized()) {
                 int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, this);
                 int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, this);
                 Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, rangeMin, rangeMax);
-                Area.UnitArea area = new Area.UnitArea(this, Data.AreaType.COVERING_FIRE, tiles, actor);
+                area = new Area.UnitArea(this, Data.AreaType.COVERING_FIRE, tiles, actor);
                 this.coveredAreas.get(actor.getAllegeance()).add(area);
-                notifyAllObservers(area);
-                return true;
             }
         }
-        return false;
+        return area;
     }
 
-    public void removeCoveredArea(IUnit actor){
+    public UnitArea removeCoveredArea(IUnit actor){
+        UnitArea area= null;
         if(actor != null && actor.isMobilized()){
             Array<Area.UnitArea> areas = this.coveredAreas.get(actor.getAllegeance());
             for (int i = 0; i < areas.size; i++) {
                 if (areas.get(i).getActor() == actor) {
-                    Area.UnitArea area = areas.removeIndex(i);
-                    notifyAllObservers(area);
+                    area = areas.removeIndex(i);
+                    continue;
                 }
             }
-
         }
+        return area;
     }
 
-    public boolean addGuardedArea(int rowActor, int colActor){
+    public UnitArea addGuardedArea(int rowActor, int colActor){
+        Area.UnitArea area = null;
         if(isTileOccupied(rowActor, colActor)) {
             IUnit actor = getUnit(rowActor, colActor);
             if(actor.isMobilized()) {
-                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.ActionChoice.GUARD.getRangeMin(), Data.ActionChoice.GUARD.getRangeMax());
-                Area.UnitArea area = new Area.UnitArea(this, Data.AreaType.GUARD_RANGE, tiles, actor);
+                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX);
+                area = new Area.UnitArea(this, Data.AreaType.GUARD_RANGE, tiles, actor);
                 this.guardedAreas.get(actor.getAllegeance()).add(area);
-                notifyAllObservers(area);
-                return true;
+
             }
         }
-        return false;
+        return area;
     }
 
-    public void removeGuardedArea(IUnit actor){
+    public UnitArea removeGuardedArea(IUnit actor){
+        UnitArea area = null;
         if(actor != null && actor.isMobilized()){
             Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getAllegeance());
             for (int i = 0; i < areas.size; i++) {
                 if (areas.get(i).getActor() == actor) {
-                    notifyAllObservers(areas.removeIndex(i));
+                    area = areas.removeIndex(i);
+                    continue;
                 }
             }
-
         }
+        return area;
     }
 
 

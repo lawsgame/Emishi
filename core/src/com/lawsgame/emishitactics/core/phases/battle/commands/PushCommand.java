@@ -11,21 +11,13 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleC
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class PushCommand extends BattleCommand{
-    protected boolean launched;
 
     public PushCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
         super(bfr, Data.ActionChoice.PUSH, scheduler, false, false);
     }
 
     @Override
-    public void init() {
-        super.init();
-        launched = false;
-    }
-
-    @Override
     protected void execute() {
-        launched = true;
 
         IUnit actor = battlefield.getUnit(rowActor, colActor);
         IUnit pushed = battlefield.getUnit(rowTarget, colTarget);
@@ -43,16 +35,10 @@ public class PushCommand extends BattleCommand{
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.PUSH));
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(pushed), new Unit.PushedNotif(pushOr)));
         scheduler.addTask(task);
-    }
 
-    @Override
-    public boolean isExecuting() {
-        return launched && battlefieldRenderer.isExecuting();
-    }
+        actor.setActed(true);
 
-    @Override
-    public boolean isExecutionCompleted() {
-        return launched && !battlefieldRenderer.isExecuting();
+
     }
 
     @Override

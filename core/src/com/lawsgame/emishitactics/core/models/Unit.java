@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
+import com.lawsgame.emishitactics.core.models.Data.Ability;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Job;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
@@ -446,6 +447,13 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public void setCurrentHitPoints(int hitPoints) {
+        if(0<= hitPoints && hitPoints <= getAppHitpoints()){
+            this.currentHitPoints = hitPoints;
+        }
+    }
+
+    @Override
     public void resetCurrentMoral() {
         this.currentMoral = getAppMoral();
     }
@@ -458,6 +466,13 @@ public class Unit extends IUnit{
     @Override
     public int getCurrentMoral() {
         return currentMoral;
+    }
+
+    @Override
+    public void setCurrentMoral(int moral) {
+        if(0 <= moral && moral <= getAppMoral()){
+            this.currentMoral = moral;
+        }
     }
 
     @Override
@@ -618,23 +633,40 @@ public class Unit extends IUnit{
                 }
             }
         }
+        if(!hasAbility){
+            for(int i = 0; i < job.getNativeAbilities().length; i++){
+                if(job.getNativeAbilities()[i] == ability){
+                    hasAbility = true;
+                    continue;
+                }
+            }
+        }
         return hasAbility;
     }
 
     @Override
     public Array<Data.Ability> getAbilities() {
         Array<Data.Ability> abilities = new Array<Data.Ability>();
+        Data.Ability ability;
         for(int i = 0; i < equipments.size; i++){
             if(equipments.get(i).getTemplate().getAbility() != Data.Ability.NONE){
-                abilities.add(equipments.get(i).getTemplate().getAbility());
+                ability = equipments.get(i).getTemplate().getAbility();
+                if(!abilities.contains(ability, true))
+                    abilities.add(ability);
             }
         }
         for(int i = 0; i < weapons.size; i++){
             if(weapons.get(i).getTemplate().getAbility() == Data.Ability.NONE){
-               abilities.add(weapons.get(i).getTemplate().getAbility());
+                ability = weapons.get(i).getTemplate().getAbility();
+                if(!abilities.contains(ability, true))
+                    abilities.add(ability);
             }
         }
-
+        for(int i = 0; i < job.getNativeAbilities().length; i++){
+            ability = job.getNativeAbilities()[i];
+            if(!abilities.contains(ability, true))
+                abilities.add(ability);
+        }
         return abilities;
     }
 
@@ -741,6 +773,42 @@ public class Unit extends IUnit{
         }
 
         return stolenItem;
+    }
+
+    @Override
+    public Item getDroppableItem() {
+        Item droppedItem = null;
+
+        if(!weapons.contains(Weapon.FIST, true)|| equipments.size > 0) {
+            int dropRange = 0;
+            for (int i = 0; i < weapons.size; i++) {
+                dropRange += weapons.get(i).getDropRate();
+            }
+            for (int i = 0; i < equipments.size; i++) {
+                dropRange += equipments.get(i).getDropRate();
+            }
+
+            int pick = 1 + Data.rand(dropRange);
+            dropRange = 0;
+            for (int i = 0; i < weapons.size; i++) {
+                dropRange += weapons.get(i).getDropRate();
+                if(pick <= dropRange) {
+                    droppedItem = removeWeapon(i);
+
+                    continue;
+                }
+            }
+            if(droppedItem == null) {
+                for (int i = 0; i < equipments.size; i++) {
+                    dropRange += equipments.get(i).getDropRate();
+                    if(pick <= dropRange) {
+                        droppedItem = removeEquipment(i);
+                        continue;
+                    }
+                }
+            }
+        }
+        return droppedItem;
     }
 
     @Override

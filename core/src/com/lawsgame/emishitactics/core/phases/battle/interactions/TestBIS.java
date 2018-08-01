@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -12,6 +13,8 @@ import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.CoverCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
@@ -68,7 +71,8 @@ public class TestBIS extends BattleInteractionState {
         bim.battlefield.deployUnit(6,9,soldier);
 
         foe = bim.battlefield.getUnit(5, 9);
-        bim.battlefield.addCoveredArea(5, 9);
+        Area.UnitArea area = bim.battlefield.addCoveredArea(5, 9);
+        bim.bfr.getNotification(area);
 
         //UI
         panel = new TempoActionPanel.AttackPanel(bim.UIStage.getViewport(), 3, 80);
@@ -137,32 +141,28 @@ public class TestBIS extends BattleInteractionState {
         */
 
 
-        System.out.println(warlord.getArmy().getSquadSize(warlord, true));
-
-
         // TEST 3
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Allegeance.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
 
         }else{
             if(bim.battlefield.isTileOccupied(row, col)){
-
-
                 switch (index){
                     case 1 : command = new AttackCommand(bim.bfr, bim.scheduler); break;
                     case 2 : command = new HealCommand(bim.bfr, bim.scheduler); break;
                     case 3 : command = new PushCommand(bim.bfr, bim.scheduler); break;
-                    default:
-                        command = new AttackCommand(bim.bfr, bim.scheduler);
+                    case 4 : command = new CoverCommand(bim.bfr, bim.scheduler); break;
+                    case 5 : command = new GuardCommand(bim.bfr, bim.scheduler); break;
+                    default: command = new AttackCommand(bim.bfr, bim.scheduler);
                 }
-
 
             } else {
                 command = new MoveCommand(bim.bfr, bim.scheduler);
+
             }
 
-
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
+            command.init();
             if (command.setActor(unitPos[0], unitPos[1])) {
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
@@ -186,14 +186,6 @@ public class TestBIS extends BattleInteractionState {
             }
         }
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)){
-            bim.battlefield.removeCoveredArea(foe);
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
-            int[] unitPos = bim.battlefield.getUnitPos(foe);
-            bim.battlefield.addCoveredArea(unitPos[0], unitPos[1]);
-        }
-
         if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
             panel.show();
         }
@@ -201,12 +193,6 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)){
             panel.hide();
         }
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.I)){
-            bim.bfr.getUnitRenderer(warlord).displayPushed(Data.Orientation.NORTH);
-
-        }
-
 
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)){
@@ -225,6 +211,14 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
             System.out.println("action command : push");
             index = 3;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)){
+            System.out.println("action command : cover");
+            index = 4;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)){
+            System.out.println("action command : guard");
+            index = 5;
         }
 
 
