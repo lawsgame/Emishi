@@ -16,6 +16,8 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
@@ -29,7 +31,6 @@ public class TestBIS extends BattleInteractionState {
     Unit warlord;
     Unit warchief;
     Unit soldier;
-    IUnit foe;
     ActionPanel panel;
     AreaWidget areaWidget;
 
@@ -63,9 +64,9 @@ public class TestBIS extends BattleInteractionState {
         army.appointSoldier(soldier, 0);
         army.appointWarChief(warchief);
 
-        bim.battlefield.deployUnit(6,7,warlord);
-        bim.battlefield.deployUnit(6,8,warchief);
-        bim.battlefield.deployUnit(6,9,soldier);
+        bim.battlefield.deployUnit(6,7,warlord, true);
+        bim.battlefield.deployUnit(6,8,warchief, true);
+        bim.battlefield.deployUnit(6,9,soldier, true);
 
         Area.UnitArea area = bim.battlefield.addGuardedArea(4, 8);
         bim.bfr.getNotification(area);
@@ -123,19 +124,20 @@ public class TestBIS extends BattleInteractionState {
 
         }else{
             if(bim.battlefield.isTileOccupied(row, col)){
+
                 switch (index){
                     case 1 : command = new AttackCommand(bim.bfr, bim.scheduler, true); break;
                     case 2 : command = new HealCommand(bim.bfr, bim.scheduler); break;
                     case 3 : command = new PushCommand(bim.bfr, bim.scheduler); break;
+                    case 4 : command = new SwitchPositionCommand(bim.bfr, bim.scheduler); break;
                     case 5 : command = new GuardCommand(bim.bfr, bim.scheduler); break;
+                    case 6 : command = new StealCommand(bim.bfr, bim.scheduler); break;
                     default: command = new AttackCommand(bim.bfr, bim.scheduler, true);
                 }
-
             } else {
+
                 command = new MoveCommand(bim.bfr, bim.scheduler);
-
             }
-
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
             if (command.setActor(unitPos[0], unitPos[1])) {
@@ -146,10 +148,7 @@ public class TestBIS extends BattleInteractionState {
                     historic.push(command);
                 }
             }
-
-
         }
-
     }
 
     @Override
@@ -189,9 +188,17 @@ public class TestBIS extends BattleInteractionState {
             System.out.println("action command : push");
             index = 3;
         }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)){
+            System.out.println("action command : switch");
+            index = 4;
+        }
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)){
             System.out.println("action command : guard");
             index = 5;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)){
+            System.out.println("action command : steal");
+            index = 6;
         }
 
 

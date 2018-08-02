@@ -111,4 +111,19 @@ public class Formulas {
         return lootRate;
     }
 
+    public static int getStealRate(int rowRobber, int colRobber, int rowStolen, int colStolen, Battlefield battlefield){
+        int stealRate = 0;
+        if(battlefield.isTileOccupied(rowRobber, colRobber) && battlefield.isTileOccupied(rowStolen, colStolen)){
+
+            IUnit stolen = battlefield.getUnit(rowStolen, colStolen);
+            if(stolen.isStealable()) {
+
+                IUnit robber = battlefield.getUnit(rowRobber, colRobber);
+                stealRate = 100 + 10 * (stolen.getAppAgility() - robber.getAppDexterity());
+                if (stealRate > 100) stealRate = 100;
+            }
+        }
+        return stealRate;
+    }
+
 }

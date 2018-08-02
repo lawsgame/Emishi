@@ -31,12 +31,17 @@ public class TempoAreaRenderer extends AreaRenderer {
 
     @Override
     public Battlefield getBattlefield() {
-        return model.getBattlefield();
+        return getModel().getBattlefield();
     }
 
     @Override
     public boolean isExecuting() {
         return false;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return visible;
     }
 
     @Override
@@ -61,13 +66,13 @@ public class TempoAreaRenderer extends AreaRenderer {
     public void build(){
         spriteRefs.clear();
         spriteCoords.clear();
-        if(model.getCheckmap() != null){
-            boolean[][] checkmap = model.getCheckmap();
-            Data.AreaType areaType = model.getType();
-            for(int r = model.getRowInit(); r < model.getRowInit() + checkmap.length ; r++){
-                for(int c = model.getColInit(); c < model.getColInit() + checkmap[0].length ; c++){
+        if(getModel().getCheckmap() != null){
+            boolean[][] checkmap = getModel().getCheckmap();
+            Data.AreaType areaType = getModel().getType();
+            for(int r = getModel().getRowInit(); r < getModel().getRowInit() + checkmap.length ; r++){
+                for(int c = getModel().getColInit(); c < getModel().getColInit() + checkmap[0].length ; c++){
                     //for each tile to highlight
-                    if(checkmap[r - model.getRowInit()][c - model.getColInit()]){
+                    if(checkmap[r - getModel().getRowInit()][c - getModel().getColInit()]){
 
 
                         boolean utc, rtc, otc, ltc, dtc;
@@ -76,9 +81,9 @@ public class TempoAreaRenderer extends AreaRenderer {
 
                         spriteCoords.add(new float[]{c  + 0.25f, r + 0.25f});
 
-                        otc = model.contains(r-1, c-1);   // opposite tile covered
-                        ltc = model.contains(r, c-1);          // left ...
-                        dtc = model.contains(r-1, c);          // down ...
+                        otc = getModel().contains(r-1, c-1);   // opposite tile covered
+                        ltc = getModel().contains(r, c-1);          // left ...
+                        dtc = getModel().contains(r-1, c);          // down ...
 
 
 
@@ -106,9 +111,9 @@ public class TempoAreaRenderer extends AreaRenderer {
 
                         spriteCoords.add(new float[]{c  + 0.25f, r + 0.75f});
 
-                        otc = model.contains(r+1, c-1);
-                        ltc = model.contains(r, c-1);
-                        utc = model.contains(r+1, c); // up ...
+                        otc = getModel().contains(r+1, c-1);
+                        ltc = getModel().contains(r, c-1);
+                        utc = getModel().contains(r+1, c); // up ...
 
                         if(!ltc && !utc){
                             spriteRefs.add(TempoSpritePool.get().topLeftCorner.get(areaType));
@@ -133,9 +138,9 @@ public class TempoAreaRenderer extends AreaRenderer {
 
                         spriteCoords.add(new float[]{c  + 0.75f, r + 0.25f});
 
-                        otc = model.contains(r-1, c+1); // opposite tile covered
-                        rtc = model.contains(r, c+1); // right ...
-                        dtc = model.contains(r-1, c); // down ...
+                        otc = getModel().contains(r-1, c+1); // opposite tile covered
+                        rtc = getModel().contains(r, c+1); // right ...
+                        dtc = getModel().contains(r-1, c); // down ...
 
                         if(!rtc && !dtc){
                             spriteRefs.add(TempoSpritePool.get().bottomRightCorner.get(areaType));
@@ -158,9 +163,9 @@ public class TempoAreaRenderer extends AreaRenderer {
 
                         spriteCoords.add(new float[]{c  + 0.75f, r + 0.75f});
 
-                        otc = model.contains(r+1, c+1); // opposite tile covered
-                        rtc = model.contains(r, c+1); // right ...
-                        utc = model.contains(r+1, c); // up ...
+                        otc = getModel().contains(r+1, c+1); // opposite tile covered
+                        rtc = getModel().contains(r, c+1); // right ...
+                        utc = getModel().contains(r+1, c); // up ...
 
                         if(!rtc && !utc){
                             spriteRefs.add(TempoSpritePool.get().topRightCorner.get(areaType));

@@ -213,7 +213,7 @@ public abstract class BattleCommand implements Command{
         return valid;
     }
 
-    protected final boolean isEnemyTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0){
+    protected final boolean isEnemyTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)
                 && (choice.getRangeType() ==  Data.RangedBasedType.WEAPON || choice.getRangeType() == Data.RangedBasedType.SPECIFIC)){
@@ -222,7 +222,8 @@ public abstract class BattleCommand implements Command{
             int rangeMax = (choice.getRangeType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getAllegeance())) {
+                if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getAllegeance())
+                        && (!stealableRequired || battlefield.getUnit(rowTarget0, colTarget0).isStealable())) {
                     valid = true;
                 }
             }
@@ -256,7 +257,7 @@ public abstract class BattleCommand implements Command{
         return targetAtRange;
     }
 
-    protected final boolean isEnemyAtActionRange(int row, int col, IUnit actor){
+    protected final boolean isEnemyAtActionRange(int row, int col, IUnit actor, boolean stealableRequired){
         boolean targetAtRange = false;
         if(choice.getRangeType() ==  Data.RangedBasedType.WEAPON || choice.getRangeType() == Data.RangedBasedType.SPECIFIC) {
             int[] unitPos = battlefield.getUnitPos(actor);
@@ -270,7 +271,8 @@ public abstract class BattleCommand implements Command{
                         dist = Utils.dist(row, col, r, c);
                         if (rangeMin <= dist
                                 && dist <= rangeMax
-                                && battlefield.isTileOccupiedByFoe(r, c, actor.getAllegeance())) {
+                                && battlefield.isTileOccupiedByFoe(r, c, actor.getAllegeance())
+                                && (!stealableRequired || battlefield.getUnit(r, c).isStealable())) {
                             targetAtRange = true;
                             break loop;
                         }
@@ -374,10 +376,11 @@ public abstract class BattleCommand implements Command{
             return receivers.size == 0 && droppedItems.size == 0;
         }
 
-        public String toSring(){
+        @Override
+        public String toString(){
             String str = "\nOUTCOME\n";
             for(int i = 0; i < receivers.size; i++){
-                str += "\nReceiver : "+receivers.get(i).getName()+", experience gained : "+experienceGained.get(i);
+                str += "\nReceiver : "+receivers.get(i).getName()+" => experience gained : "+experienceGained.get(i);
             }
             for(int i = 0; i < droppedItems.size; i++){
                 str += "\nStolen item : "+ droppedItems.get(i).getName();

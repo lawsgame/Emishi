@@ -15,7 +15,7 @@ public class GuardCommand extends StandCommand {
     protected IUnit actor;
 
     public GuardCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, Data.ActionChoice.GUARD, scheduler);
+        super(bfr, Data.ActionChoice.GUARD, scheduler, true, false);
     }
 
     @Override

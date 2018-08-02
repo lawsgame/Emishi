@@ -9,9 +9,6 @@ public abstract class AreaRenderer extends Renderer<Area> implements GameRendera
     public AreaRenderer(Area model) {
         super(model);
     }
-
-    public abstract void setVisible(boolean visible);
     public abstract Battlefield getBattlefield();
-
 
 }

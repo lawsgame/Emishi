@@ -86,7 +86,7 @@ public class Battlefield extends Observable {
 
 
 
-    public boolean setTile(int r, int c, TileType type){
+    public boolean setTile(int r, int c, TileType type, boolean notifyObservers){
         if(checkIndexes(r,c) && type != null){
             //reset tile
             recruits.remove(_getLootId(r, c));
@@ -95,19 +95,20 @@ public class Battlefield extends Observable {
 
             //addExpGained tile
             tiles[r][c] = type;
-            notifyAllObservers(new int[]{r, c});
+            if(notifyObservers)
+                notifyAllObservers( new Notification.SetTile(r, c, type));
             return true;
         }
         return false;
     }
 
-    public void setTileAs(int r, int c, TileType type, Object obj){
+    public void setTileAs(int r, int c, TileType type, Object obj, boolean notifyObservers){
         if(obj != null && type != null){
-            if(obj instanceof IUnit && type == TileType.VILLAGE && setTile(r,c, type)){
+            if(obj instanceof IUnit && type == TileType.VILLAGE && setTile(r,c, type, notifyObservers)){
                 recruits.put(_getLootId(r,c), (Unit)obj);
                 this.looted[r][c] = true;
             }
-            if(obj instanceof Item && type == TileType.ANCIENT_SITE && setTile(r,c, type)){
+            if(obj instanceof Item && type == TileType.ANCIENT_SITE && setTile(r,c, type, notifyObservers)){
                 tombItems.put(_getLootId(r, c), (Item)obj);
                 this.looted[r][c] = true;
             }
@@ -130,9 +131,9 @@ public class Battlefield extends Observable {
         return tiles;
     }
 
-    public boolean plunderTile(int r, int c){
+    public boolean plunderTile(int r, int c, boolean notifyObservers){
         if(isTilePlunderable(r,c)){
-            setTile(r, c, TileType.RUINS);
+            setTile(r, c, TileType.RUINS, notifyObservers);
             return true;
         }
         return false;
@@ -376,13 +377,13 @@ public class Battlefield extends Observable {
             while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
                 coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
                 unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
-                deployUnit(coords[0], coords[1], unit);
+                deployUnit(coords[0], coords[1], unit, true);
             }
 
         }
     }
 
-    public void deployUnit(int row, int col, IUnit unit){
+    public void deployUnit(int row, int col, IUnit unit, boolean notifyObservers){
         boolean alreadyDeployed = false;
         loop:{
             for (int r = 0; r < getNbRows(); r++) {
@@ -396,7 +397,8 @@ public class Battlefield extends Observable {
         }
         if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
             this.units[row][col] = unit;
-            notifyAllObservers(new int[]{row, col});
+            if(notifyObservers)
+                notifyAllObservers(new  Notification.SetUnit(row, col, unit));
         }
     }
 
@@ -993,33 +995,6 @@ public class Battlefield extends Observable {
             return row+" "+col+" "+" cost: "+ (distSource + distTarget);
         }
 
-
-    }
-
-
-
-
-    // --------------- BUILD NOTIFICATION -------------------------------------
-
-
-
-
-
-    public static class BuildNotif {
-        public int row;
-        public int col;
-        public TileType tile;
-
-        private static BuildNotif msg = new BuildNotif();
-
-        private BuildNotif(){ }
-
-        public static BuildNotif get(int row, int col, TileType tile){
-            msg.row = row;
-            msg.col = col;
-            msg.tile = tile;
-            return msg;
-        }
 
     }
 

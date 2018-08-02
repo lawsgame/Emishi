@@ -77,7 +77,6 @@ public class BattleCommandManager {
             case GUARD:                 if(!actor.hasActed() && actor.has(Data.Ability.GUARD)) actionPerformable = true; break;
             case STEAL:                 if(!actor.hasActed() && actor.has(Data.Ability.STEAL)) actionPerformable = true; break;
             case BUILD:                 if(!actor.hasActed() && actor.has(Data.Ability.BUILD) && actor.isMobilized() && actor.getArmy().isThereStillbuildingResources()) actionPerformable = true; break;
-            case COVER:                 if(!actor.hasActed() && actor.has(Data.Ability.COVER)) return false; break;
             case ATTACK:                if(!actor.hasActed()) actionPerformable = true; break;
             case CHOOSE_ORIENTATION:    actionPerformable = true; break;
             case END_TURN:              actionPerformable = true; break;

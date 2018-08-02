@@ -2,11 +2,11 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Area.UnitArea;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -34,7 +34,7 @@ public class MoveCommand extends BattleCommand{
         walkerRenderer = battlefieldRenderer.getUnitRenderer(walker);
 
         battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget);
-        scheduler.addTask(new Task(battlefieldRenderer, battlefieldRenderer.getUnitRenderer(walker), path));
+        scheduler.addTask(new Task(battlefieldRenderer, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, path)));
 
         Data.Orientation or = (path.size > 1) ?
                 Utils.getOrientationFromCoords(path.get(path.size - 2)[0], path.get(path.size - 2)[1], rowTarget, colTarget) :

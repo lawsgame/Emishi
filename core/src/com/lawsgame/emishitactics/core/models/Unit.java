@@ -387,8 +387,10 @@ public class Unit extends IUnit{
     @Override
     public Weapon removeWeapon(int index) {
         Weapon weaponToreturn = null;
-        if(0 <= index && index < weapons.size)
+        if(0 <= index && index < weapons.size) {
+            if(currentWeaponIndex == index) currentWeaponIndex = 0;
             weaponToreturn = weapons.removeIndex(index);
+        }
         if(weapons.size == 0)
             weapons.add(Weapon.FIST);
         return weaponToreturn;
@@ -410,6 +412,9 @@ public class Unit extends IUnit{
     public Array<Weapon> removeAllWeapons() {
         Array<Weapon> removedWeapons = weapons;
         weapons = new Array<Weapon>();
+        weapons.add(Weapon.FIST);
+        currentWeaponIndex = 0;
+        weapons.removeValue(Weapon.FIST, true);
         return removedWeapons;
     }
 
@@ -716,7 +721,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setStealable(boolean weapon, int index, boolean stealable) {
+    public void setItemAsStealable(boolean weapon, int index, boolean stealable) {
         if(weapon){
             if(0 <= index && index < weapons.size){
                 weapons.get(index).setStealable(stealable);
@@ -749,28 +754,17 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public Item getStealable() {
-        Array<Item> items = new Array<Item>();
+    public Item getStealableItem() {
         Item stolenItem = null;
-        for(int i = 0; i < equipments.size; i++){
-            if(equipments.get(i).isStealable()){
-                items.add(equipments.get(i));
+        int index = Data.rand(equipments.size + weapons.size);
+        if(index >= equipments.size){
+            index -= equipments.size;
+            if(!weapons.contains(Weapon.FIST, true)){
+                stolenItem = removeWeapon(index);
             }
+        }else{
+            stolenItem = removeEquipment(index);
         }
-        for(int i = 0; i < weapons.size; i++){
-            if(weapons.get(i).isStealable()){
-                items.add(weapons.get(i));
-            }
-        }
-
-        stolenItem = items.random();
-
-        if(stolenItem instanceof Equipment) {
-            equipments.removeValue((Equipment)stolenItem, true);
-        }else if(stolenItem instanceof Weapon){
-            weapons.removeValue((Weapon)stolenItem, true);
-        }
-
         return stolenItem;
     }
 
@@ -793,7 +787,6 @@ public class Unit extends IUnit{
                 dropRange += weapons.get(i).getDropRate();
                 if(pick <= dropRange) {
                     droppedItem = removeWeapon(i);
-
                     continue;
                 }
             }

@@ -785,11 +785,9 @@ public class Data {
         GUARD               (0, 0, 0, 0, new int[0][0]),
         STEAL               (0, 10, 1, 1, new int[0][0]),
         BUILD               (0, 10, 1, 1, new int[0][0]),
-        COVER               (0, 0, 0, 0, new int[0][0]),
         ATTACK              (0, 0, RangedBasedType.WEAPON, new int[0][0]),
         CHOOSE_ORIENTATION  (0, 0, 0, 0, new int[0][0]),
-        END_TURN            (0, 0, 0, 0, new int[0][0]),
-        TEST                (0, 0, RangedBasedType.WEAPON, new int[][]{{1,0},{2,0}});
+        END_TURN            (0, 0, 0, 0, new int[0][0]);
 
 
         // RANGE REQUIREMENT

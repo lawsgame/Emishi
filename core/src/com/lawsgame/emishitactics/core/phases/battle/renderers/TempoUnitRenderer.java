@@ -9,7 +9,6 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Notification.*;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
@@ -59,7 +58,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private boolean showNumbers = false;
     private String numbersToShow = "";
 
-    private LinkedList<Object> animationQueue;
+    private LinkedList<Object> notificationQueue;
 
 
     public TempoUnitRenderer(int row, int col, IUnit model) {
@@ -70,7 +69,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         unitSprite.setSize(1, 1);
         this.executing = false;
         this.visible = true;
-        this.animationQueue = new LinkedList<Object>();
+        this.notificationQueue = new LinkedList<Object>();
         weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getTemplate().getWeaponType());
         orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
         display(Data.AnimationId.REST);
@@ -87,7 +86,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             offabbTexture = null;
             showNumbers = false;
             countDown.reset();
-            if(animationQueue.isEmpty())
+            if(notificationQueue.isEmpty())
                 display(Data.AnimationId.REST);
 
         }
@@ -102,8 +101,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     public void launchNextAnimation(){
         if(executing == false){
-            if(!animationQueue.isEmpty()) {
-                Object query = animationQueue.pop();
+            if(!notificationQueue.isEmpty()) {
+                Object query = notificationQueue.pop();
 
                 if (query instanceof ApplyDamage) {
                     ApplyDamage notification = (ApplyDamage) query;
@@ -146,12 +145,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 } else if(query instanceof Data.WeaponType){
                     weapontTexture = TempoSpritePool.get().getWeaponSprite((Data.WeaponType)query);
 
-                } else if (query instanceof String){
-                    if(query.equals("horseman")) {
-                        if (model.isHorseman())
-                            mountedTexture = TempoSpritePool.get().getMountedSprite();
+                } else if (query instanceof HorsemanUpdate){
+                    if (((HorsemanUpdate)query).horseman){
+                        mountedTexture = TempoSpritePool.get().getMountedSprite();
+                    }else{
+                        mountedTexture = null;
                     }
-
                 } else {
                     launchNextAnimation();
                 }
@@ -277,7 +276,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
             Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
             orientationTexture = TempoSpritePool.get().getOrientationSprite(or);
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, getModel().getArmy().getAllegeance()));
             executing = true;
 
 
@@ -291,9 +290,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
         if(backstab){
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.BACKSTABBED, model.getArmy().getAllegeance()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.BACKSTABBED, getModel().getArmy().getAllegeance()));
         }else{
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, model.getArmy().getAllegeance()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TAKE_HIT, getModel().getArmy().getAllegeance()));
         }
         showNumbers = true;
         numbersToShow = ""+damageTaken+" ";
@@ -305,13 +304,13 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayLevelup(int[] gainlvl) {
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.LEVELUP, model.getArmy().getAllegeance()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.LEVELUP, getModel().getArmy().getAllegeance()));
         countDown.run();
     }
 
     @Override
     public void displayTreated(int healedHP) {
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TREATED, model.getArmy().getAllegeance()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.TREATED, getModel().getArmy().getAllegeance()));
         showNumbers = true;
         numbersToShow = "+"+healedHP;
         countDown.run();
@@ -320,7 +319,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
         orientationTexture = TempoSpritePool.get().getOrientationSprite(pushedTowards);
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.PUSHED, model.getArmy().getAllegeance()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.PUSHED, getModel().getArmy().getAllegeance()));
         pushed = true;
         int x = (int) getX();
         int y = (int) getY();
@@ -335,7 +334,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayFlee(Data.Orientation fleeingDirection) {
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, model.getArmy().getAllegeance()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.AnimationId.WALK, getModel().getArmy().getAllegeance()));
         orientationTexture = TempoSpritePool.get().getOrientationSprite(fleeingDirection);
         countDown.run();
     }
@@ -352,11 +351,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case GUARDED:
             case DIE:
             case DODGE:
+            case TAKE_HIT:
             case COVER:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, model.getArmy().getAllegeance()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, getModel().getArmy().getAllegeance()));
                 countDown.run();
             case REST:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, model.getArmy().getAllegeance()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, getModel().getArmy().getAllegeance()));
                 break;
                 default:
         }
@@ -369,18 +369,13 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public boolean isExecuting() {
-        return executing || animationQueue.size() > 0;
+        return executing || notificationQueue.size() > 0;
     }
 
     @Override
     public void setTargeted(boolean targeted) {
         this.targeted = targeted;
         blinkTime = 0;
-    }
-
-    @Override
-    public boolean isTargeted() {
-        return targeted;
     }
 
     @Override
@@ -395,13 +390,13 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
      */
     @Override
     public void getNotification(final Object data){
-        animationQueue.offer(data);
+        notificationQueue.offer(data);
         if(data instanceof ApplyDamage){
             ApplyDamage notif = (ApplyDamage)data;
-            if(notif.state == ApplyDamage.State.DIED) animationQueue.offer(Data.AnimationId.DIE);
-            if(notif.state == ApplyDamage.State.FLED) animationQueue.offer(new Fled(notif.fleeingOrientation));
+            if(notif.state == ApplyDamage.State.DIED) notificationQueue.offer(Data.AnimationId.DIE);
+            if(notif.state == ApplyDamage.State.FLED) notificationQueue.offer(new Fled(notif.fleeingOrientation));
             if(notif.state != ApplyDamage.State.WOUNDED){
-                animationQueue.offer(new SimpleCommand() {
+                notificationQueue.offer(new SimpleCommand() {
                     @Override
                     public void apply() {
                         setVisible(false);

@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.helpers;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
@@ -57,6 +56,10 @@ public class AnimationScheduler implements GameUpdatableEntity{
         return str;
     }
 
+
+    /**
+     * task class
+     */
     public static class Task {
         protected Array<Thread> parallelThreads;
         protected boolean initiazed = false;
@@ -140,6 +143,11 @@ public class AnimationScheduler implements GameUpdatableEntity{
         }
     }
 
+
+
+    /**
+     * thread class
+     */
     public static class Thread {
         protected Renderer executer;
         protected LinkedList<Renderer> receivers;
@@ -188,11 +196,8 @@ public class AnimationScheduler implements GameUpdatableEntity{
         }
 
         void update(float dt) {
-            //if(executer.getModel() instanceof Unit) System.out.println(((Unit) executer.getModel()).getName());
             countDown.update(dt);
-            if(countDown.isFinished()
-                    && !bundles.isEmpty()
-                    && !executer.isExecuting()){
+            if(countDown.isFinished() && !bundles.isEmpty() && !executer.isExecuting()){
                 receivers.pop().getNotification(bundles.pop());
             }
         }

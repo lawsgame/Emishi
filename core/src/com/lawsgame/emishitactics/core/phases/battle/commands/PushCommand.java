@@ -39,7 +39,6 @@ public class PushCommand extends BattleCommand{
 
         actor.setActed(true);
 
-
     }
 
     @Override

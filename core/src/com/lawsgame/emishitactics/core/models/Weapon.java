@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Weapon extends Observable implements Item{
 
-    public static final Weapon FIST = new Weapon(WeaponTemplate.FIST);
+    public static final Weapon FIST = new Weapon(WeaponTemplate.FIST, false);
 
     protected int durability;
     protected boolean stealable;

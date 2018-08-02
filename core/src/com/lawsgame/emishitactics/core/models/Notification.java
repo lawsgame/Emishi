@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
@@ -76,4 +77,48 @@ public class Notification {
             this.mode = mode;
         }
     }
+    public static class SetTile {
+        public int row;
+        public int col;
+        public Data.TileType tile;
+
+        public SetTile(int row, int col, Data.TileType tile){
+            this.row = row;
+            this.col = col;
+            this.tile = tile;
+        }
+    }
+
+    public static class Walk {
+        public IUnit unit;
+        public Array<int[]> path;
+
+        public Walk(IUnit unit, Array<int[]> path){
+            this.unit = unit;
+            this.path = path;
+        }
+    }
+
+    public static class SetUnit {
+        public int row;
+        public int col;
+        public IUnit unitModel;
+
+        public SetUnit(int row, int col, IUnit unitModel){
+            this.row = row;
+            this.col = col;
+            this.unitModel = unitModel;
+        }
+    }
+
+
+    public static class HorsemanUpdate{
+        public boolean horseman;
+
+        public HorsemanUpdate(boolean horseman) {
+            this.horseman = horseman;
+        }
+    }
+
+
 }

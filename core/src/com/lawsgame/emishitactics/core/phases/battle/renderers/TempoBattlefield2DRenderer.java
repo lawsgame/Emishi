@@ -6,10 +6,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
+import com.lawsgame.emishitactics.core.models.Notification.SetUnit;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
+import com.lawsgame.emishitactics.core.models.Notification.SetTile;
+import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Battlefield.BuildNotif;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -36,19 +38,21 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         this.tileRenderers = new TextureRegion[battlefield.getNbRows()][battlefield.getNbColumns()];
         for (int r = 0; r < battlefield.getNbRows(); r++) {
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
-                addTileRenderer(r, c);
-                addUnitRenderer(r, c);
+                addTileRenderer(r, c, getModel().getTile(r, c));
+                if(battlefield.isTileOccupied(r, c)) {
+                    addUnitRenderer(r, c, getModel().getUnit(r, c));
+                }
             }
         }
 
         // addExpGained up area renderers
         this.areaRenderers = new Array<AreaRenderer>();
         for(Data.Allegeance a : Data.Allegeance.values()){
-            for (int i = 0; i < model.getCoveredAreas().get(a).size; i++) {
-                addaAreaRenderer(model.getCoveredAreas().get(a).get(i));
+            for (int i = 0; i < getModel().getCoveredAreas().get(a).size; i++) {
+                addaAreaRenderer(getModel().getCoveredAreas().get(a).get(i));
             }
-            for (int i = 0; i < model.getGuardedAreas().get(a).size; i++) {
-                addaAreaRenderer(model.getGuardedAreas().get(a).get(i));
+            for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
+                addaAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
             }
         }
     }
@@ -56,9 +60,9 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void renderTiles(SpriteBatch batch) {
-        for (int r = 0; r < model.getNbRows(); r++) {
-            for (int c = 0; c < model.getNbColumns(); c++) {
-                if (model.isTileExisted(r, c)) {
+        for (int r = 0; r < getModel().getNbRows(); r++) {
+            for (int c = 0; c < getModel().getNbColumns(); c++) {
+                if (getModel().isTileExisted(r, c)) {
                     batch.draw(tileRenderers[r][c], c, r, 1, 1);
                 }
             }
@@ -84,16 +88,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     }
 
-    private void addTileRenderer(int r, int c){
+    private void addTileRenderer(int r, int c, Data.TileType tileType){
         TextureRegion tileTR;
         try{
-            if (model.isTileExisted(r, c)) {
-                tileTR = sprite2DPool.getTileSprite(model.getTile(r, c));
+            if (getModel().isTileExisted(r, c)) {
+                tileTR = sprite2DPool.getTileSprite(tileType);
                 if (tileTR != null) {
                     tileRenderers[r][c] = tileTR;
                 } else {
                     tileRenderers[r][c] = sprite2DPool.getTileSprite(Data.TileType.PLAIN);
-                    throw new BFRendererException("expected tile type can not be rendered :"+model.getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
+                    throw new BFRendererException("expected tile type can not be rendered :"+getModel().getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
                 }
             }
         }catch (BFRendererException e){
@@ -128,13 +132,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
-    public void addUnitRenderer(int r, int c) {
-        if(model.isTileOccupied(r,c)) {
-            IUnit unit = model.getUnit(r, c);
-            if(!isUnitRendererCreated(unit)) {
-                unitRenderers.add(new TempoUnitRenderer(r, c, unit));
-            }
+    public void addUnitRenderer(int r, int c, IUnit unit) {
+        if(!isUnitRendererCreated(unit)) {
+            unitRenderers.add(new TempoUnitRenderer(r, c, unit));
         }
+
     }
 
     private boolean removeUnitRenderer(IUnit unit) {
@@ -169,16 +171,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public boolean areRenderersUpdated() {
-        //TODO:
-
-
-
-
-        return false;
-    }
-
-    @Override
     public boolean isExecuting() {
         for(int i = 0; i < unitRenderers.size; i++){
             if(unitRenderers.get(i).isExecuting()){
@@ -203,43 +195,32 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
      */
     @Override
     public void getNotification(Object data) {
-        final int[] coords;
         if (data instanceof IUnit) {
 
             // remove the sent unit
             removeUnitRenderer((IUnit) data);
-        } else if(data instanceof int[]) {
+        }  else if(data instanceof SetUnit){
 
-            coords = (int[]) data;
-            if (coords.length == 2) {
-                if (model.isTileOccupied(coords[0], coords[1])) {
-                    // addExpGained a unit receiver to a newly deployed unit
-                    IUnit unit = model.getUnit(coords[0], coords[1]);
-                    if (isUnitRendererCreated(unit)) {
-                        final BattleUnitRenderer bur = getUnitRenderer(unit);
-                        bur.getNotification(new SimpleCommand() {
+            final SetUnit notif = (SetUnit)data;
+            if (isUnitRendererCreated(notif.unitModel)) {
+                final BattleUnitRenderer bur = getUnitRenderer(notif.unitModel);
+                bur.getNotification(new SimpleCommand() {
 
-                            @Override
-                            public void apply() {
-                                bur.setX(coords[1]);
-                                bur.setY(coords[0]);
-                                removeAreaRenderersAssociatedWith(bur.getModel());
-                            }
-                        });
-
-                    } else {
-                        addUnitRenderer(coords[0], coords[1]);
+                    @Override
+                    public void apply() {
+                        bur.setX(notif.col);
+                        bur.setY(notif.row);
+                        removeAreaRenderersAssociatedWith(bur.getModel());
                     }
-                } else {
-                    // change tile receiver
-                    addTileRenderer(coords[0], coords[1]);
-                }
+                });
+            }else{
+                addUnitRenderer(notif.row, notif.col, notif.unitModel);
             }
-        }else if (data instanceof SwitchPosition) {
+        } else if (data instanceof SwitchPosition) {
 
-            final SwitchPosition switchPos = (SwitchPosition)data;
-            final BattleUnitRenderer bur1 = getUnitRenderer(switchPos.unit1);
-            final BattleUnitRenderer bur2 = getUnitRenderer(switchPos.unit2);
+            final SwitchPosition notif = (SwitchPosition)data;
+            final BattleUnitRenderer bur1 = getUnitRenderer(notif.unit1);
+            final BattleUnitRenderer bur2 = getUnitRenderer(notif.unit2);
 
 
             if(bur1 != null && bur2 != null) {
@@ -250,7 +231,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                     public void apply() {
                         removeAreaRenderersAssociatedWith(bur1.getModel());
                         Array<int[]> path = new Array<int[]>();
-                        path.add(new int[]{switchPos.rowUnit1, switchPos.colUnit1});
+                        path.add(new int[]{notif.rowUnit2, notif.colUnit2});
                         bur1.displayWalk(path);
                     }
                 });
@@ -260,33 +241,26 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                     public void apply() {
                         removeAreaRenderersAssociatedWith(bur2.getModel());
                         Array<int[]> path = new Array<int[]>();
-                        path.add(new int[]{switchPos.rowUnit2, switchPos.colUnit2});
+                        path.add(new int[]{notif.rowUnit1, notif.colUnit1});
                         bur2.displayWalk(path);
                     }
                 });
             }
+        }else if(data instanceof Walk){
 
-        }else if(data instanceof Array){
-
-            if(((Array)data).size > 0 && ((Array)data).get(0) instanceof int[]){
-                final Array<int[]> path = (Array<int[]>) data;
-                int[] unitCoords = path.get(path.size - 1);
-                if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
-                    final BattleUnitRenderer bur = getUnitRenderer(model.getUnit(unitCoords[0], unitCoords[1]));
-                    bur.getNotification(new SimpleCommand() {
-                        @Override
-                        public void apply() {
-                            bur.displayWalk(path);
-                            removeAreaRenderersAssociatedWith(bur.getModel());
-                        }
-                    });
+            final Walk notif = (Walk)data;
+            final BattleUnitRenderer bur = getUnitRenderer(notif.unit);
+            bur.getNotification(new SimpleCommand() {
+                @Override
+                public void apply() {
+                    bur.displayWalk(notif.path);
+                    removeAreaRenderersAssociatedWith(bur.getModel());
                 }
+            });
+        }else if(data instanceof SetTile){
 
-            }
-        }else if(data instanceof BuildNotif){
-
-            BuildNotif msg = (BuildNotif)data;
-            addTileRenderer(msg.row , msg.col);
+            SetTile notif = (SetTile)data;
+            addTileRenderer(notif.row , notif.col, notif.tile);
         }else if(data instanceof Area){
 
             Area area = (Area)data;
@@ -298,13 +272,21 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                     continue;
                 }
             }
-
             if(!areaRemoved){
                 addaAreaRenderer(area);
             }
         }
     }
 
+    @Override
+    public boolean isVisible() {
+        return false;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+
+    }
 
 
     public static class BFRendererException extends Exception{

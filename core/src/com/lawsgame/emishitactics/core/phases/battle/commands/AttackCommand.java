@@ -126,7 +126,6 @@ public class AttackCommand extends BattleCommand {
                 defender = guardian;
                 this.scheduler.addTask(new Task(
                         battlefieldRenderer,
-                        battlefieldRenderer.getUnitRenderer(guardian),
                         new SwitchPosition(guarded, guardian, SwitchPosition.Mode.GUARDIAN, battlefield)));
             }else{
                 defender = battlefield.getUnit(rowDefender, colDefender);
@@ -142,13 +141,15 @@ public class AttackCommand extends BattleCommand {
             int[] guardianPos = battlefield.getUnitPos(guardian);
             int[] guardedPos = battlefield.getUnitPos(guarded);
             this.battlefield.switchUnitPositions(guardedPos[0], guardedPos[1], guardianPos[0], guardianPos[1]);
-            Area.UnitArea area = battlefield.addGuardedArea(guardedPos[0], guardedPos[1]);
 
             this.scheduler.addTask(new Task(
                     battlefieldRenderer,
-                    battlefieldRenderer.getUnitRenderer(guardian),
                     new SwitchPosition(guarded, guardian, SwitchPosition.Mode.GUARDIAN, battlefield)));
-            this.scheduler.addTask(new Task(battlefieldRenderer, area));
+
+            if(!guardian.isOutOfAction()) {
+                Area.UnitArea area = battlefield.addGuardedArea(guardedPos[0], guardedPos[1]);
+                this.scheduler.addTask(new Task(battlefieldRenderer, area));
+            }
 
             guarded = null;
             guardian = null;
@@ -223,12 +224,12 @@ public class AttackCommand extends BattleCommand {
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0);
+        return isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0, false);
     }
 
     @Override
     public boolean atActionRange(int row, int col, IUnit actor) {
-        return isEnemyAtActionRange(row, col, actor);
+        return isEnemyAtActionRange(row, col, actor, false);
     }
 
 

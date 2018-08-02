@@ -83,7 +83,7 @@ public class BattlefieldLoader {
                         if(fieldType == null){
                             fieldType = TileType.PLAIN;
                         }
-                        bf.setTile(rowTile, colTile, fieldType);
+                        bf.setTile(rowTile, colTile, fieldType, true);
 
                     }else{
 
@@ -159,7 +159,7 @@ public class BattlefieldLoader {
 
                                 // addExpGained to the battlefield
                                 if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
-                                    bf.deployUnit(rowUnit, colUnit, unit);
+                                    bf.deployUnit(rowUnit, colUnit, unit, true);
                                 }
                             }
                         }

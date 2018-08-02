@@ -7,8 +7,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public abstract class StandCommand extends BattleCommand{
 
-    public StandCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler) {
-        super(bfr, choice, scheduler, false, true);
+    public StandCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean endturnCommandOnly) {
+        super(bfr, choice, scheduler, undoable, endturnCommandOnly);
     }
 
     @Override

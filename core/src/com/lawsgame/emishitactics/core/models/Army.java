@@ -19,10 +19,10 @@ public class Army extends IArmy{
 
     private static int ids = 0;
 
-    private int id;
+    private final int id;
+    private final boolean playerControlled;
+    private final Allegeance allegeance;
     private int buildingResources;
-    private boolean playerControlled;
-    private Allegeance allegeance;
     private Array<Array<IUnit>> mobilizedTroups;
     private Array<IUnit> nonMobTroups;
     private boolean ldCondEnabled;
