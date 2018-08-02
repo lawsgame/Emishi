@@ -5,6 +5,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -33,7 +34,7 @@ public class PushCommand extends BattleCommand{
 
         Task task = new Task();
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.PUSH));
-        task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(pushed), new Unit.PushedNotif(pushOr)));
+        task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(pushed), new Notification.Pushed(pushOr)));
         scheduler.addTask(task);
 
         actor.setActed(true);

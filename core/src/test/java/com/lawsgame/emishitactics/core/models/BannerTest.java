@@ -11,11 +11,6 @@ public class BannerTest {
 
     public BannerTest(){}
 
-    @BeforeClass
-    public static void beforeAll(){
-        System.out.println("\n---+++$$$ Banner TEST $$$+++---\n");
-    }
-
     @Before
     public void beforeTest(){
         banner1 = new Banner();

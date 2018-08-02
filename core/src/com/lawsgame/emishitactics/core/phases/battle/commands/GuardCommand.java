@@ -31,7 +31,7 @@ public class GuardCommand extends StandCommand {
         int rangeMin = Data.GUARD_REACTION_RANGE_MIN;
         int rangeMax = Data.GUARD_REACTION_RANGE_MAX;
         for(int r = rowActor - rangeMax; r <= rowActor + rangeMax; r++){
-            for(int c = rowActor - rangeMax; c <= rowActor + rangeMax; c++){
+            for(int c = colActor - rangeMax; c <= colActor + rangeMax; c++){
                 dist = Utils.dist(rowActor, colActor, r, c);
                 if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, actor.getAllegeance())){
                     guardedUnit = battlefield.getUnit(r,c);

@@ -29,13 +29,15 @@ public class Formulas {
     public static int getCurrentAttackAccuracy(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
         int attackAccuracy = 0;
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
-            IUnit defender = battlefield.getUnit(rowDefender0, colAttacker0);
+            IUnit defender = battlefield.getUnit(rowDefender0, colDefender0);
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
             attackAccuracy += attacker.getCurrentWeapon().getTemplate().getAccuracy() ;
             attackAccuracy += attacker.getAppDexterity() * Data.DEX_FACTOR_ATT_ACC;
             attackAccuracy += battlefield.getTile(rowAttacker0, colAttacker0).getAttackAccBonus();
-            if(attacker.getOrientation() == defender.getOrientation()) attackAccuracy += Data.HIT_RATE_BACK_ACC_BONUS;
-            if(attackAccuracy > 100) attackAccuracy = 100;
+            if(attacker.getOrientation() == defender.getOrientation())
+                attackAccuracy += Data.HIT_RATE_BACK_ACC_BONUS;
+            if(attackAccuracy > 100)
+                attackAccuracy = 100;
         }
         return attackAccuracy;
     }

@@ -1,8 +1,8 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
-import com.lawsgame.emishitactics.core.models.Data.Ability;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Job;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
@@ -56,7 +56,6 @@ public class Unit extends IUnit{
     protected int OAChargingBar = 0;
     protected boolean moved = false;
     protected boolean acted = false;
-
 
     /**
      *
@@ -1076,29 +1075,29 @@ public class Unit extends IUnit{
         return false;
     }
 
-    public Array<DamageNotif> applyDamage(int damageTaken, boolean moralDamageOnly){
-        Array<DamageNotif> notifications = new Array<DamageNotif>();
-        DamageNotif notification = new DamageNotif(this, moralDamageOnly, damageTaken);
+    public Array<ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly){
+        Array<ApplyDamage> notifications = new Array<ApplyDamage>();
+        ApplyDamage notification = new ApplyDamage(this, moralDamageOnly, damageTaken);
         notifications.add(notification);
 
         if(this.currentMoral > damageTaken){
             // the unit survive
             this.currentMoral -= damageTaken;
             if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
-            notification.state = DamageNotif.State.WOUNDED;
+            notification.state = ApplyDamage.State.WOUNDED;
 
         }else{
             // the unit dies or flies
             if(this.currentHitPoints > damageTaken){
                 this.currentMoral = 0;
                 if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
-                notification.state = DamageNotif.State.FLED;
+                notification.state = ApplyDamage.State.FLED;
             }else{
                 this.currentMoral = 0;
-                notification.state = DamageNotif.State.FLED;
+                notification.state = ApplyDamage.State.FLED;
                 if(!moralDamageOnly){
                     this.currentHitPoints = 0;
-                    notification.state = DamageNotif.State.DIED;
+                    notification.state = ApplyDamage.State.DIED;
                 }
             }
 
@@ -1114,51 +1113,5 @@ public class Unit extends IUnit{
         }
         return notifications;
     }
-
-    //------------------- NOTIFS -----------------------
-
-    public static class DamageNotif {
-        public Unit wounded;
-        public boolean moralOnly;
-        public int damageTaken;
-        public State state;
-
-        public boolean critical;
-        public boolean backstab;
-        public Orientation fleeingOrientation;
-
-        public enum State{
-            WOUNDED,
-            FLED,
-            DIED
-        }
-
-        public DamageNotif(Unit wounded, boolean moralOnly, int damageTaken){
-            this.wounded = wounded;
-            this.moralOnly = moralOnly;
-            this.damageTaken = damageTaken;
-        }
-
-        public boolean isRelevant(){
-            return damageTaken > 0;
-        }
-    }
-
-    public static class PushedNotif {
-        public Orientation orientation;
-
-        public PushedNotif(Orientation orientation) {
-            this.orientation = orientation;
-        }
-    }
-
-    public static class FledNotif{
-        public Orientation orientation;
-
-        public FledNotif(Orientation orientation) {
-            this.orientation = orientation;
-        }
-    }
-
 
 }

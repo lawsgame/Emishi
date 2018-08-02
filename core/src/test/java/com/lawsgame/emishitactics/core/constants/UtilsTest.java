@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.constants;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -17,6 +18,8 @@ public class UtilsTest {
     public static void beforeAll(){
 
     }
+
+
 
     @BeforeClass
     public static void testOnfly(){

@@ -17,11 +17,6 @@ public class BattlefieldTest {
         }
     }
 
-    @BeforeClass
-    public static void beforeAll(){
-        System.out.println("\n---+++$$$ Battlefield TEST $$$+++---\n");
-    }
-
     /**
      * for on-the-fly tests
      */

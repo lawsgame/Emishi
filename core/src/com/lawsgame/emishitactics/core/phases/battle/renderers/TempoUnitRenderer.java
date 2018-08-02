@@ -5,12 +5,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
+import com.lawsgame.emishitactics.core.models.Notification.*;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -105,8 +105,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             if(!animationQueue.isEmpty()) {
                 Object query = animationQueue.pop();
 
-                if (query instanceof Unit.DamageNotif) {
-                    Unit.DamageNotif notification = (Unit.DamageNotif) query;
+                if (query instanceof ApplyDamage) {
+                    ApplyDamage notification = (ApplyDamage) query;
                     displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
 
                 } else if(query instanceof Integer) {
@@ -122,12 +122,12 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 } else if (query instanceof Data.AnimationId) {
                     display((Data.AnimationId) query);
 
-                } else if (query instanceof Unit.PushedNotif) {
-                    Unit.PushedNotif notif = (Unit.PushedNotif)query;
+                } else if (query instanceof Pushed) {
+                    Pushed notif = (Pushed)query;
                     displayPushed(notif.orientation);
 
-                } else if (query instanceof Unit.FledNotif) {
-                    Unit.FledNotif notif = (Unit.FledNotif)query;
+                } else if (query instanceof Fled) {
+                    Fled notif = (Fled)query;
                     displayFlee(notif.orientation);
 
                 }else if (query instanceof Data.Orientation) {
@@ -349,6 +349,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case STEAL:
             case BUILD:
             case GUARD:
+            case GUARDED:
             case DIE:
             case DODGE:
             case COVER:
@@ -356,9 +357,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 countDown.run();
             case REST:
                 unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(id, model.getArmy().getAllegeance()));
-                break;
-            case GUARDED:
-                //TODO:
                 break;
                 default:
         }
@@ -398,11 +396,11 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void getNotification(final Object data){
         animationQueue.offer(data);
-        if(data instanceof Unit.DamageNotif){
-            Unit.DamageNotif notif = (Unit.DamageNotif)data;
-            if(notif.state == Unit.DamageNotif.State.DIED) animationQueue.offer(Data.AnimationId.DIE);
-            if(notif.state == Unit.DamageNotif.State.FLED) animationQueue.offer(new Unit.FledNotif(notif.fleeingOrientation));
-            if(notif.state != Unit.DamageNotif.State.WOUNDED){
+        if(data instanceof ApplyDamage){
+            ApplyDamage notif = (ApplyDamage)data;
+            if(notif.state == ApplyDamage.State.DIED) animationQueue.offer(Data.AnimationId.DIE);
+            if(notif.state == ApplyDamage.State.FLED) animationQueue.offer(new Fled(notif.fleeingOrientation));
+            if(notif.state != ApplyDamage.State.WOUNDED){
                 animationQueue.offer(new SimpleCommand() {
                     @Override
                     public void apply() {

@@ -11,6 +11,7 @@ import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Equipment;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -157,6 +158,6 @@ public abstract class IUnit extends Observable {
     public abstract boolean isOutOfAction();
     public abstract boolean isDead();
     public abstract boolean treated(int healPower);
-    public abstract Array<Unit.DamageNotif> applyDamage(int damageTaken, boolean moralDamageOnly);
+    public abstract Array<Notification.ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly);
 
 }

@@ -109,6 +109,7 @@ public class TempoSpritePool {
                 unitSprites.put(Data.AnimationId.TAKE_HIT, unitRegions[13][0]);
                 unitSprites.put(Data.AnimationId.DIE, unitRegions[14][0]);
                 unitSprites.put(Data.AnimationId.GUARD, unitRegions[15][0]);
+                unitSprites.put(Data.AnimationId.GUARDED, unitRegions[15][0]);
                 unitSprites.put(Data.AnimationId.COVER, unitRegions[2][0]);
                 unitSprites.put(Data.AnimationId.REST, unitRegions[0][0]);
 
@@ -126,6 +127,7 @@ public class TempoSpritePool {
                 foeSprites.put(Data.AnimationId.TAKE_HIT, unitRegions[13][4]);
                 foeSprites.put(Data.AnimationId.DIE, unitRegions[14][4]);
                 foeSprites.put(Data.AnimationId.GUARD, unitRegions[15][4]);
+                foeSprites.put(Data.AnimationId.GUARDED, unitRegions[10][4]);
                 foeSprites.put(Data.AnimationId.COVER, unitRegions[2][4]);
                 foeSprites.put(Data.AnimationId.REST, unitRegions[0][4]);
 

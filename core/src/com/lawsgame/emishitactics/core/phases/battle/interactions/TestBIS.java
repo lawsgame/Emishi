@@ -3,7 +3,6 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Army;
@@ -13,12 +12,10 @@ import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.CoverCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.TestCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
@@ -70,8 +67,7 @@ public class TestBIS extends BattleInteractionState {
         bim.battlefield.deployUnit(6,8,warchief);
         bim.battlefield.deployUnit(6,9,soldier);
 
-        foe = bim.battlefield.getUnit(5, 9);
-        Area.UnitArea area = bim.battlefield.addCoveredArea(5, 9);
+        Area.UnitArea area = bim.battlefield.addGuardedArea(4, 8);
         bim.bfr.getNotification(area);
 
         //UI
@@ -98,37 +94,16 @@ public class TestBIS extends BattleInteractionState {
 
         System.out.println("input : "+row+" "+col);
 
+        //TEST 0
+        //System.out.println(bim.battlefield.isTileGuarded(row, col, Data.Allegeance.ENEMY));
 
         //TEST 1
         /*
-        command = new MoveCommand(bim.bfr, bim.scheduler);
-        int[] unitPos = bim.battlefield.getUnitPos( warlord);
-        if (command.setActor(unitPos[0], unitPos[1])) {
-            command.setTarget(row, col);
-            if (command.isTargetValid()) {
-                command.apply();
-                historic.push(command);
-            }
+        Array<IUnit> coverers = bim.battlefield.getUnitsCoveringTile(row, col, Data.Allegeance.ENEMY);
+        System.out.println("COVERERS : ");
+        for(int i = 0; i <  coverers.size; i++){
+            System.out.println(coverers.get(i).getName());
         }
-
-
-        Array<int[]> actionTiles = new Array<int[]>();
-        command = new TestCommand(bim.bfr, bim.scheduler);
-        unitPos = bim.battlefield.getUnitPos( warlord);
-
-        if(command.atActionRange(unitPos[0], unitPos[1], warlord)){
-            actionTiles.add(unitPos);
-        }
-
-        for (int r = 0; r < bim.battlefield.getNbRows(); r++) {
-            for (int c = 0; c < bim.battlefield.getNbColumns(); c++) {
-                if (command.isTargetValid(unitPos[0], unitPos[1], r, c)){
-                    actionTiles.add(new int[]{r, c});
-                }
-
-            }
-        }
-        areaWidget.setTiles(actionTiles);
         */
 
         //TEST 2
@@ -142,18 +117,18 @@ public class TestBIS extends BattleInteractionState {
 
 
         // TEST 3
+
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Allegeance.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
 
         }else{
             if(bim.battlefield.isTileOccupied(row, col)){
                 switch (index){
-                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler); break;
+                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler, true); break;
                     case 2 : command = new HealCommand(bim.bfr, bim.scheduler); break;
                     case 3 : command = new PushCommand(bim.bfr, bim.scheduler); break;
-                    case 4 : command = new CoverCommand(bim.bfr, bim.scheduler); break;
                     case 5 : command = new GuardCommand(bim.bfr, bim.scheduler); break;
-                    default: command = new AttackCommand(bim.bfr, bim.scheduler);
+                    default: command = new AttackCommand(bim.bfr, bim.scheduler, true);
                 }
 
             } else {
@@ -161,15 +136,17 @@ public class TestBIS extends BattleInteractionState {
 
             }
 
+
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
-            command.init();
             if (command.setActor(unitPos[0], unitPos[1])) {
                 command.setTarget(row, col);
+                command.init();
                 if (command.isTargetValid()) {
                     command.apply();
                     historic.push(command);
                 }
             }
+
 
         }
 
@@ -211,10 +188,6 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
             System.out.println("action command : push");
             index = 3;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)){
-            System.out.println("action command : cover");
-            index = 4;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)){
             System.out.println("action command : guard");

@@ -82,6 +82,13 @@ public abstract class BattleCommand implements Command{
             execute();
     }
 
+    protected void apply(int rowActor, int colActor, int rowTarget, int colTarget){
+        init();
+        setActor(rowActor, colActor);
+        setTarget(rowTarget, colTarget);
+        apply();
+    }
+
     protected abstract void execute();
 
     // can be deleted afterwards

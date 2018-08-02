@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
+import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Battlefield.BuildNotif;
@@ -204,19 +205,19 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     public void getNotification(Object data) {
         final int[] coords;
         if (data instanceof IUnit) {
+
             // remove the sent unit
             removeUnitRenderer((IUnit) data);
-
         } else if(data instanceof int[]) {
+
             coords = (int[]) data;
             if (coords.length == 2) {
-
-                if(model.isTileOccupied(coords[0], coords[1])){
+                if (model.isTileOccupied(coords[0], coords[1])) {
                     // addExpGained a unit receiver to a newly deployed unit
                     IUnit unit = model.getUnit(coords[0], coords[1]);
-                    if(isUnitRendererCreated(unit)){
+                    if (isUnitRendererCreated(unit)) {
                         final BattleUnitRenderer bur = getUnitRenderer(unit);
-                        bur.getNotification(new SimpleCommand(){
+                        bur.getNotification(new SimpleCommand() {
 
                             @Override
                             public void apply() {
@@ -226,49 +227,69 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                             }
                         });
 
-                    }else {
+                    } else {
                         addUnitRenderer(coords[0], coords[1]);
                     }
-                }else {
-
+                } else {
                     // change tile receiver
                     addTileRenderer(coords[0], coords[1]);
                 }
-            } else if (coords.length == 4) {
-                //switch units position or move unit
-                Array<int[]> path = new Array<int[]>();
-                if (model.isTileOccupied(coords[0], coords[1]) && model.isTileOccupied(coords[2], coords[3])) {
-                    BattleUnitRenderer bur1 = getUnitRenderer(model.getUnit(coords[0], coords[1]));
-                    BattleUnitRenderer bur2 = getUnitRenderer(model.getUnit(coords[2], coords[3]));
-                    if(bur1 != null && bur2 != null) {
+            }
+        }else if (data instanceof SwitchPosition) {
+
+            final SwitchPosition switchPos = (SwitchPosition)data;
+            final BattleUnitRenderer bur1 = getUnitRenderer(switchPos.unit1);
+            final BattleUnitRenderer bur2 = getUnitRenderer(switchPos.unit2);
+
+
+            if(bur1 != null && bur2 != null) {
+
+                bur1.getNotification(new SimpleCommand() {
+
+                    @Override
+                    public void apply() {
                         removeAreaRenderersAssociatedWith(bur1.getModel());
-                        removeAreaRenderersAssociatedWith(bur2.getModel());
-                        path.add(new int[]{coords[2], coords[3]});
+                        Array<int[]> path = new Array<int[]>();
+                        path.add(new int[]{switchPos.rowUnit1, switchPos.colUnit1});
                         bur1.displayWalk(path);
-                        path.clear();
-                        path.add(new int[]{coords[0], coords[1]});
+                    }
+                });
+                bur2.getNotification(new SimpleCommand() {
+
+                    @Override
+                    public void apply() {
+                        removeAreaRenderersAssociatedWith(bur2.getModel());
+                        Array<int[]> path = new Array<int[]>();
+                        path.add(new int[]{switchPos.rowUnit2, switchPos.colUnit2});
                         bur2.displayWalk(path);
                     }
-                }
+                });
             }
 
         }else if(data instanceof Array){
+
             if(((Array)data).size > 0 && ((Array)data).get(0) instanceof int[]){
-                Array<int[]> path = (Array<int[]>) data;
+                final Array<int[]> path = (Array<int[]>) data;
                 int[] unitCoords = path.get(path.size - 1);
                 if(unitCoords.length >= 2 && model.isTileOccupied(unitCoords[0], unitCoords[1])){
-                    IUnit unit = model.getUnit(unitCoords[0], unitCoords[1]);
-                    unit.notifyAllObservers(path);
-                    removeAreaRenderersAssociatedWith(unit);
+                    final BattleUnitRenderer bur = getUnitRenderer(model.getUnit(unitCoords[0], unitCoords[1]));
+                    bur.getNotification(new SimpleCommand() {
+                        @Override
+                        public void apply() {
+                            bur.displayWalk(path);
+                            removeAreaRenderersAssociatedWith(bur.getModel());
+                        }
+                    });
                 }
 
             }
         }else if(data instanceof BuildNotif){
+
             BuildNotif msg = (BuildNotif)data;
             addTileRenderer(msg.row , msg.col);
         }else if(data instanceof Area){
-            Area area = (Area)data;
 
+            Area area = (Area)data;
             boolean areaRemoved = false;
             for(int i = 0; i < areaRenderers.size; i++){
                 if(area == areaRenderers.get(i).getModel()){
