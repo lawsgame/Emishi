@@ -1,14 +1,15 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public abstract class StandCommand extends BattleCommand{
 
-    public StandCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean endturnCommandOnly) {
-        super(bfr, choice, scheduler, undoable, endturnCommandOnly);
+    public StandCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean undoable) {
+        super(bfr, choice, scheduler, undoable);
     }
 
     @Override

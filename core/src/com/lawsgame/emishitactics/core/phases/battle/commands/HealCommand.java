@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
@@ -13,7 +14,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class HealCommand extends BattleCommand {
 
     public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, Data.ActionChoice.HEAL, scheduler, false, false);
+        super(bfr, ActionChoice.HEAL, scheduler, false);
     }
 
 

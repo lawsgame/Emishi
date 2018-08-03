@@ -4,6 +4,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -14,7 +15,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class StealCommand extends BattleCommand{
 
     public StealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, Data.ActionChoice.STEAL, scheduler, false, false);
+        super(bfr, ActionChoice.STEAL, scheduler, false);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
@@ -14,7 +15,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class PushCommand extends BattleCommand{
 
     public PushCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, Data.ActionChoice.PUSH, scheduler, false, false);
+        super(bfr, ActionChoice.PUSH, scheduler, false);
     }
 
     @Override

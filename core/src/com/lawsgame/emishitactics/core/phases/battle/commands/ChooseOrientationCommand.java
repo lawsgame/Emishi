@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.StandCommand;
@@ -18,7 +19,7 @@ public class ChooseOrientationCommand extends StandCommand {
     }
 
     public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.Orientation newOrientation) {
-        super(bfr, Data.ActionChoice.CHOOSE_ORIENTATION, scheduler, true, true);
+        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, true);
         this.newOrientation = newOrientation;
     }
 

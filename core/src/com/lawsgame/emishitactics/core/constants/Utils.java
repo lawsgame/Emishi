@@ -50,6 +50,14 @@ public class Utils {
         return false;
     }
 
+    public static<T> boolean arrayContainsAtLeastOneElementOf(Array<T> checkedArray, Array<T> initialContainer, boolean identity){
+        boolean contains = false;
+        for (int j = 0; j < initialContainer.size; j++) {
+            checkedArray.contains(initialContainer.get(j), identity);
+        }
+        return contains;
+    }
+
     public static boolean arrayContains(Array<int[]> intArray, int r, int c){
         if(intArray != null) {
             for (int i = 0; i < intArray.size; i++) {

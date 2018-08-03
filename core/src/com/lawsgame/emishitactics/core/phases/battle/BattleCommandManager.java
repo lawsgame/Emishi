@@ -1,89 +1,111 @@
 package com.lawsgame.emishitactics.core.phases.battle;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import java.util.HashMap;
 
+
 /*
  */
 public class BattleCommandManager {
-    private HashMap<Data.ActionChoice, BattleCommand> commandPool;
+    private HashMap<ActionChoice, Array<BattleCommand>> commandPool;
 
-    public BattleCommandManager(BattlefieldRenderer battlefieldRenderer, AnimationScheduler scheduler){
-        commandPool = new HashMap<Data.ActionChoice, BattleCommand>();
+    public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler){
+        commandPool = new HashMap<ActionChoice, Array<BattleCommand>>();
 
-        /*
-         addExpGained BC entries here :
-          : commandPool.put(command.getActionChoice(), command);
-          */
-        commandPool.put(Data.ActionChoice.MOVE, new MoveCommand(battlefieldRenderer, scheduler));
+        setChoice(new AttackCommand(bfr, scheduler));
+        setChoice(new BattleCommand[]{
+                new BuildCommand(bfr, scheduler, Data.TileType.WATCH_TOWER),
+                new BuildCommand(bfr, scheduler, Data.TileType.BRIDGE)
+        });
+        setChoice(new BattleCommand[]{
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.NORTH),
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.SOUTH),
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.EAST),
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.WEST),
+        });
+        setChoice(new GuardCommand(bfr, scheduler));
+        setChoice(new HealCommand(bfr, scheduler));
+        setChoice(new MoveCommand(bfr, scheduler));
+        setChoice(new PushCommand(bfr, scheduler));
+        setChoice(new StealCommand(bfr, scheduler));
+        setChoice(new SwitchPositionCommand(bfr, scheduler));
 
-        setBattlefield(battlefieldRenderer);
+        Array<BattleCommand>  commands = new Array<BattleCommand>();
+        for(int i = 1; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
+            commands.add(new SwitchWeaponCommand(bfr, scheduler, i));
+            if(commands.get(0) != null)
+                commandPool.put(commands.get(0).getActionChoice(), commands);
+        }
+
     }
 
-    public Array<Data.ActionChoice> getChoices(IUnit actor, Array<BattleCommand> history){
-        Array<Data.ActionChoice> choices = new Array<Data.ActionChoice>();
-        for (Data.ActionChoice choice : commandPool.keySet()) {
-            if (!commandPool.get(choice).isEndTurnCommandOnly() && !history.contains(commandPool.get(choice), true) && canActionbePerformedBy(actor, choice)) {
+
+    private void setChoice(BattleCommand command){
+        Array<BattleCommand>  commands = new Array<BattleCommand>();
+        commands.add(command);
+        commandPool.put(command.getActionChoice(), commands);
+    }
+
+    private void setChoice(BattleCommand[] battleCommands){
+        Array<BattleCommand>  commands = new Array<BattleCommand>();
+        commands.addAll(battleCommands);
+        commandPool.put(battleCommands[0].getActionChoice(), commands);
+    }
+
+    public Array<ActionChoice> getAvailableChoices(IUnit actor, Array<BattleCommand> history){
+        Array<ActionChoice> choices = new Array<ActionChoice>();
+        for (ActionChoice choice : commandPool.keySet()) {
+            if (!choice.isEndTurnActionOnly()
+                    && choice.canbePerformedBy(actor)
+                    && Utils.arrayContainsAtLeastOneElementOf(history, commandPool.get(choice), true)) {
                 choices.add(choice);
             }
         }
         return choices;
     }
 
-    public BattleCommand get(Data.ActionChoice choice){
-        BattleCommand command = commandPool.get(choice);
-        if(command != null) {
-            command.init();
-            return command;
+    public boolean isChoiceDiversified(ActionChoice choice){
+        return commandPool.get(choice) != null && commandPool.get(choice).size > 1;
+    }
+
+    public Array<BattleCommand> getAvailableCommands(IUnit actor, ActionChoice choice){
+        Array<BattleCommand> commands = new Array<BattleCommand>();
+        if(commandPool.get(choice) != null) {
+            for(int i = 0; i <commandPool.get(choice).size; i++){
+                if(commandPool.get(choice).get(i).canbePerformedBy(actor)){
+                    commands.add(commandPool.get(choice).get(i));
+                }
+            }
         }
-        return null;
+        return commands;
     }
 
     // optional method
     public void setBattlefield(BattlefieldRenderer battlefieldRenderer){
-        for(Data.ActionChoice choice : commandPool.keySet()){
-            commandPool.get(choice).setBattlefield(battlefieldRenderer);
+        for(ActionChoice choice : commandPool.keySet()){
+            for(int i = 0; i < commandPool.get(choice).size; i++) {
+                commandPool.get(choice).get(i).setBattlefield(battlefieldRenderer);
+            }
         }
     }
 
-    /**
-     * there is 3 types of requirements for an action to be performable by an actor
-     *  - history type: if unit has already moved or acted
-     *  - abiility type
-     *  - equipement type (weapon mainly)
-     *  - target  type (checked by the method: BattleCommand.atActionRange() and Battlefield.isTargetValid())
-     *
-     * @return whether or not an action can be performed by the actor regardless the actor's history or target availability.
-     */
-    public boolean canActionbePerformedBy(IUnit actor, Data.ActionChoice choice){
-        boolean actionPerformable = false;
-
-        // check ABILITY REQUIREMENTS
-        if(choice.getCost() < actor.getOAChargingBarPoints()) return false;
-
-        switch (choice){
-            case MOVE:                  if(!actor.hasMoved()) actionPerformable = true; break;
-            case SWITCH_WEAPON:         if(!actor.hasActed() && actor.isPromoted()) actionPerformable = true; break;
-            case SWITCH_POSITION:       actionPerformable = true; break;
-            case PUSH:                  if(!actor.hasActed() && !actor.isHorseman()) actionPerformable = true; break;
-            case HEAL:                  if(!actor.hasActed() && actor.has(Data.Ability.HEAL)) actionPerformable = true; break;
-            case GUARD:                 if(!actor.hasActed() && actor.has(Data.Ability.GUARD)) actionPerformable = true; break;
-            case STEAL:                 if(!actor.hasActed() && actor.has(Data.Ability.STEAL)) actionPerformable = true; break;
-            case BUILD:                 if(!actor.hasActed() && actor.has(Data.Ability.BUILD) && actor.isMobilized() && actor.getArmy().isThereStillbuildingResources()) actionPerformable = true; break;
-            case ATTACK:                if(!actor.hasActed()) actionPerformable = true; break;
-            case CHOOSE_ORIENTATION:    actionPerformable = true; break;
-            case END_TURN:              actionPerformable = true; break;
-            default:
-        }
-
-        return actionPerformable;
-    }
 
 }

@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
@@ -16,7 +17,7 @@ public class SwitchPositionCommand extends BattleCommand {
     private BattleUnitRenderer targetRenderer;
 
     public SwitchPositionCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, Data.ActionChoice.SWITCH_POSITION, scheduler, true, false);
+        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, true);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.Walk;
@@ -19,7 +20,7 @@ public class MoveCommand extends BattleCommand{
     protected Array<int[]> path;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, Data.ActionChoice.MOVE, scheduler, true, false);
+        super(bfr, ActionChoice.MOVE, scheduler, true);
     }
 
     @Override

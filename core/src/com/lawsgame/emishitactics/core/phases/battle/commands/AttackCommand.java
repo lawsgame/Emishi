@@ -5,6 +5,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
@@ -21,9 +22,14 @@ public class AttackCommand extends BattleCommand {
     protected IUnit guarded;
     protected IUnit guardian;
 
-    public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, boolean retaliationAllowed) {
-        super(bfr, Data.ActionChoice.ATTACK, scheduler, false, false);
+    protected AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, boolean retaliationAllowed) {
+        super(bfr, ActionChoice.ATTACK, scheduler, false);
         this.retaliationAllowed = retaliationAllowed;
+    }
+
+    public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
+        super(bfr, ActionChoice.ATTACK, scheduler, false);
+        this.retaliationAllowed = true;
     }
 
     @Override

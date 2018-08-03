@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.StandCommand;
@@ -12,7 +13,7 @@ public class SwitchWeaponCommand extends StandCommand{
     private BattleUnitRenderer actorRenderer;
 
     public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, int weaponIndex) {
-        super(bfr, Data.ActionChoice.SWITCH_WEAPON, scheduler, true, false);
+        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, true);
         this.weaponIndex = weaponIndex;
     }
 
@@ -23,7 +24,6 @@ public class SwitchWeaponCommand extends StandCommand{
     @Override
     public void init() {
         super.init();
-        weaponIndex = -1;
         actorRenderer = null;
     }
 
@@ -48,5 +48,10 @@ public class SwitchWeaponCommand extends StandCommand{
 
     public void setWeaponIndex(int index){
         this.weaponIndex = index;
+    }
+
+    @Override
+    public boolean canbePerformedBy(IUnit actor) {
+        return super.canbePerformedBy(actor) && weaponIndex < actor.getWeapons().size;
     }
 }

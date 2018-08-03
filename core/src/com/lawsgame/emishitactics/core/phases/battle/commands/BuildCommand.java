@@ -1,15 +1,18 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class BuildCommand extends BattleCommand {
+    protected Data.TileType tileType;
 
-    public BuildCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler ) {
-        super(bfr, Data.ActionChoice.BUILD, scheduler, false, false);
+    public BuildCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.TileType tileType) {
+        super(bfr, ActionChoice.BUILD, scheduler, false);
+        this.tileType = tileType;
     }
 
     @Override
