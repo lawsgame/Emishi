@@ -6,18 +6,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Army;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
@@ -37,6 +40,7 @@ public class TestBIS extends BattleInteractionState {
     IUnit sltdUnit;
     int index;
     boolean switchmode;
+    int weaponTick = 0;
 
     Stack<BattleCommand> historic = new Stack<BattleCommand>();
     BattleCommand command = null;
@@ -51,6 +55,7 @@ public class TestBIS extends BattleInteractionState {
         warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, false, true);
         soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, false, true);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.TEST_AXE));
         warlord.setLeadership(15);
         warchief.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warchief.setLeadership(10);
@@ -116,8 +121,15 @@ public class TestBIS extends BattleInteractionState {
         areaWidget.setTiles(command.getImpactArea());
         */
 
+        //TEST 3
+        /*
+        Notification.Build notif = new Notification.Build(row, col,
+                Data.TileType.WATCH_TOWER,
+                warlord);
+        bim.bfr.getNotification(notif);
+        */
 
-        // TEST 3
+        // TEST FINAL
 
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Allegeance.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
@@ -126,29 +138,34 @@ public class TestBIS extends BattleInteractionState {
             if(bim.battlefield.isTileOccupied(row, col)){
 
                 switch (index){
-                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler, true); break;
-                    case 2 : command = new HealCommand(bim.bfr, bim.scheduler); break;
+                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler, true);break;
+                    case 2 : command = new HealCommand(bim.bfr, bim.scheduler);break;
                     case 3 : command = new PushCommand(bim.bfr, bim.scheduler); break;
-                    case 4 : command = new SwitchPositionCommand(bim.bfr, bim.scheduler); break;
+                    case 4 : command = new SwitchPositionCommand(bim.bfr, bim.scheduler);break;
                     case 5 : command = new GuardCommand(bim.bfr, bim.scheduler); break;
-                    case 6 : command = new StealCommand(bim.bfr, bim.scheduler); break;
+                    case 6 : command = new StealCommand(bim.bfr, bim.scheduler);break;
+                    case 7 : command =  new SwitchWeaponCommand(bim.bfr, bim.scheduler, 1); break;
+                    case 8 : command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, Data.Orientation.NORTH);break;
                     default: command = new AttackCommand(bim.bfr, bim.scheduler, true);
+
                 }
             } else {
 
                 command = new MoveCommand(bim.bfr, bim.scheduler);
+
             }
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
+            command.init();
             if (command.setActor(unitPos[0], unitPos[1])) {
                 command.setTarget(row, col);
-                command.init();
                 if (command.isTargetValid()) {
                     command.apply();
                     historic.push(command);
                 }
             }
         }
+
     }
 
     @Override
@@ -199,6 +216,14 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)){
             System.out.println("action command : steal");
             index = 6;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)){
+            System.out.println("action command : switch weapon => "+(weaponTick%2)+" /"+weaponTick);
+            index = 7;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)){
+            System.out.println("action command : choose orientation => NORTH");
+            index = 8;
         }
 
 

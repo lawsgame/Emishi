@@ -4,19 +4,23 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.Notification.SetUnit;
-import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
-import com.lawsgame.emishitactics.core.models.Notification.SetTile;
-import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification.Build;
+import com.lawsgame.emishitactics.core.models.Notification.SetTile;
+import com.lawsgame.emishitactics.core.models.Notification.SetUnit;
+import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
+import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
+import com.lawsgame.emishitactics.engine.timers.CountDown;
+
+import java.util.LinkedList;
 
 /*
  * TODO: clipping
@@ -28,13 +32,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     protected TextureRegion[][] tileRenderers;
     protected TempoSpritePool sprite2DPool;
 
+    protected CountDown countDown = new CountDown(2f);
+    private LinkedList<SimpleCommand> notificationQueue = new LinkedList<SimpleCommand>();
+
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
         this.unitRenderers = new Array<BattleUnitRenderer>();
         this.sprite2DPool = TempoSpritePool.get();
         this.sprite2DPool.set(asm);
 
-        // pre calculate tile coords and texture region to render to prevent extra calculus each game loop.
+        // pre calculate tileType coords and texture region to render to prevent extra calculus each game loop.
         this.tileRenderers = new TextureRegion[battlefield.getNbRows()][battlefield.getNbColumns()];
         for (int r = 0; r < battlefield.getNbRows(); r++) {
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
@@ -74,7 +81,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void renderUnits(SpriteBatch batch) {
-
         for(int i = 0; i < unitRenderers.size; i++){
             unitRenderers.get(i).render(batch);
         }
@@ -82,22 +88,27 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
-        for(int i = 0; i < unitRenderers.size; i++){
-            unitRenderers.get(i).update(dt);
+        countDown.update(dt);
+        if(!countDown.isRunning() && !notificationQueue.isEmpty()){
+            if(countDown.isFinished())
+                countDown.reset();
+            notificationQueue.pop().apply();
         }
 
+        for(int i = 0; i < unitRenderers.size; i++) {
+            unitRenderers.get(i).update(dt);
+        }
     }
 
     private void addTileRenderer(int r, int c, Data.TileType tileType){
-        TextureRegion tileTR;
         try{
             if (getModel().isTileExisted(r, c)) {
-                tileTR = sprite2DPool.getTileSprite(tileType);
+                TextureRegion tileTR = sprite2DPool.getTileSprite(tileType);
                 if (tileTR != null) {
                     tileRenderers[r][c] = tileTR;
                 } else {
                     tileRenderers[r][c] = sprite2DPool.getTileSprite(Data.TileType.PLAIN);
-                    throw new BFRendererException("expected tile type can not be rendered :"+getModel().getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
+                    throw new BFRendererException("expected tileType type can not be rendered :"+getModel().getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
                 }
             }
         }catch (BFRendererException e){
@@ -172,6 +183,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public boolean isExecuting() {
+        if(countDown.isRunning())
+            return true;
         for(int i = 0; i < unitRenderers.size; i++){
             if(unitRenderers.get(i).isExecuting()){
                 return true;
@@ -259,8 +272,30 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             });
         }else if(data instanceof SetTile){
 
-            SetTile notif = (SetTile)data;
-            addTileRenderer(notif.row , notif.col, notif.tile);
+            if(data instanceof Build){
+
+                final Build notif= (Build)data;
+                notificationQueue.offer(new SimpleCommand() {
+                    @Override
+                    public void apply() {
+                        countDown.run();
+                        TextureRegion tr = TempoSpritePool.get().getBuildInConstructionSprite(notif.tileType);
+                        if(tr != null)
+                            tileRenderers [notif.row][notif.col] = tr;
+                        getUnitRenderer(notif.builder).getNotification(Data.AnimationId.BUILD);
+                    }
+                });
+                notificationQueue.offer(new SimpleCommand() {
+                    @Override
+                    public void apply() {
+                        addTileRenderer(notif.row, notif.col, notif.tileType);
+                    }
+                });
+            }else {
+
+                SetTile notif = (SetTile)data;
+                addTileRenderer(notif.row, notif.col, notif.tileType);
+            }
         }else if(data instanceof Area){
 
             Area area = (Area)data;

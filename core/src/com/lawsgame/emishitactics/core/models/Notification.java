@@ -80,12 +80,21 @@ public class Notification {
     public static class SetTile {
         public int row;
         public int col;
-        public Data.TileType tile;
+        public Data.TileType tileType;
 
-        public SetTile(int row, int col, Data.TileType tile){
+        public SetTile(int row, int col, Data.TileType tileType){
             this.row = row;
             this.col = col;
-            this.tile = tile;
+            this.tileType = tileType;
+        }
+    }
+
+    public static class Build extends  SetTile{
+        public IUnit builder;
+
+        public Build(int row, int col, Data.TileType tile, IUnit builder){
+            super(row, col, tile);
+            this.builder = builder;
         }
     }
 

@@ -264,12 +264,13 @@ public class TempoSpritePool {
         return orientationSprites.get(orientation);
     }
 
-    public TextureRegion getBridgeInConstruction() {
-        return bridgeInConstruction;
-    }
+    public TextureRegion getBuildInConstructionSprite(Data.TileType tile) {
+        switch (tile){
 
-    public TextureRegion getTowerInConstruction() {
-        return towerInConstruction;
+            case WATCH_TOWER: return towerInConstruction;
+             case BRIDGE: return bridgeInConstruction;
+        }
+        return null;
     }
 
     public TextureRegion getBlackBGSprite() {

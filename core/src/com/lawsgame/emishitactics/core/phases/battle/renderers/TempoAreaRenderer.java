@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRe
 
 public class TempoAreaRenderer extends AreaRenderer {
 
-    protected Array<float[]> spriteCoords;          // coordinates to where render the used sprites => 4 sprites = 1 tile
+    protected Array<float[]> spriteCoords;          // coordinates to where render the used sprites => 4 sprites = 1 tileType
     protected Array<Sprite> spriteRefs;             // sprites to render associated with the coordinates above
 
 
@@ -71,7 +71,7 @@ public class TempoAreaRenderer extends AreaRenderer {
             Data.AreaType areaType = getModel().getType();
             for(int r = getModel().getRowInit(); r < getModel().getRowInit() + checkmap.length ; r++){
                 for(int c = getModel().getColInit(); c < getModel().getColInit() + checkmap[0].length ; c++){
-                    //for each tile to highlight
+                    //for each tileType to highlight
                     if(checkmap[r - getModel().getRowInit()][c - getModel().getColInit()]){
 
 
@@ -81,7 +81,7 @@ public class TempoAreaRenderer extends AreaRenderer {
 
                         spriteCoords.add(new float[]{c  + 0.25f, r + 0.25f});
 
-                        otc = getModel().contains(r-1, c-1);   // opposite tile covered
+                        otc = getModel().contains(r-1, c-1);   // opposite tileType covered
                         ltc = getModel().contains(r, c-1);          // left ...
                         dtc = getModel().contains(r-1, c);          // down ...
 
@@ -138,7 +138,7 @@ public class TempoAreaRenderer extends AreaRenderer {
 
                         spriteCoords.add(new float[]{c  + 0.75f, r + 0.25f});
 
-                        otc = getModel().contains(r-1, c+1); // opposite tile covered
+                        otc = getModel().contains(r-1, c+1); // opposite tileType covered
                         rtc = getModel().contains(r, c+1); // right ...
                         dtc = getModel().contains(r-1, c); // down ...
 
@@ -163,7 +163,7 @@ public class TempoAreaRenderer extends AreaRenderer {
 
                         spriteCoords.add(new float[]{c  + 0.75f, r + 0.75f});
 
-                        otc = getModel().contains(r+1, c+1); // opposite tile covered
+                        otc = getModel().contains(r+1, c+1); // opposite tileType covered
                         rtc = getModel().contains(r, c+1); // right ...
                         utc = getModel().contains(r+1, c); // up ...
 

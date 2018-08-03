@@ -6,6 +6,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -46,13 +47,13 @@ public class MoveCommand extends BattleCommand{
 
     /**
      *
-     * addExpGained up the path if the tile targeted is a valid choice to move to
+     * addExpGained up the path if the tileType targeted is a valid choice to move to
      *
      * @param rowActor0
      * @param colActor0
      * @param rowTarget0
      * @param colTarget0
-     * @return true if the target tile if a valid tile to move to.
+     * @return true if the target tileType if a valid tileType to move to.
      */
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
@@ -81,12 +82,12 @@ public class MoveCommand extends BattleCommand{
 
     @Override
     public void undo() {
-        if(battlefield.isTileOccupied(rowTarget, colTarget) && walkerRenderer != null){
-            IUnit actor = battlefield.getUnit(rowTarget, colActor);
+        if(battlefield.isTileOccupied(rowTarget, colTarget)){
+            IUnit actor = battlefield.getUnit(rowTarget, colTarget);
             if(actor == walkerRenderer.getModel()) {
                 battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor);
                 actor.setMoved(false);
-                scheduler.addTask(new Task(battlefieldRenderer, walkerRenderer, new int[]{rowActor, colActor}));
+                scheduler.addTask(new Task(battlefieldRenderer, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
             }
         }
     }

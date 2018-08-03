@@ -30,7 +30,7 @@ public class Data {
     public static final int GUARD_REACTION_RANGE_MAX = 1;
 
     // RENDER parameters
-    public static final float SPEED_WALK = 3f;  //tile/s
+    public static final float SPEED_WALK = 3f;  //tileType/s
     public static final float SPEED_PUSHED = 8f;
 
     // EXP parameter
@@ -770,11 +770,11 @@ public class Data {
      *
      *
      * AreaWidget of impact :
-     * ( 0, 0) = targeted tile
-     * ( 1, 0) = in front of targeted tile
-     * ( 0, 1) = right of targeted tile
-     * ( 0,-1) = left of targeted tile
-     * (-1, 0) = in the back of targeted tile
+     * ( 0, 0) = targeted tileType
+     * ( 1, 0) = in front of targeted tileType
+     * ( 0, 1) = right of targeted tileType
+     * ( 0,-1) = left of targeted tileType
+     * (-1, 0) = in the back of targeted tileType
      */
     public enum ActionChoice {
         MOVE                (0, 0, RangedBasedType.MOVE, new int[0][0]),

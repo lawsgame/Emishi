@@ -82,7 +82,7 @@ public abstract class BattleCommand implements Command{
             execute();
     }
 
-    protected void apply(int rowActor, int colActor, int rowTarget, int colTarget){
+    public final void apply(int rowActor, int colActor, int rowTarget, int colTarget){
         init();
         setActor(rowActor, colActor);
         setTarget(rowTarget, colTarget);
@@ -105,7 +105,7 @@ public abstract class BattleCommand implements Command{
      * PLAYER ORIENTED METHOD
      *
      * TARGET CHECKING
-     * @return whether or not THIS SPECIFIC TARGET is at range by the actor performing the given action if one's is standing the tile (rowActor, colActor)
+     * @return whether or not THIS SPECIFIC TARGET is at range by the actor performing the given action if one's is standing the tileType (rowActor, colActor)
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public final boolean isTargetValid() {
@@ -128,7 +128,7 @@ public abstract class BattleCommand implements Command{
      *
      * @param row
      * @param col
-     * @return whether or not ANY TARGET is at range by the actor performing the given action if one's is standing the tile (row, col)
+     * @return whether or not ANY TARGET is at range by the actor performing the given action if one's is standing the tileType (row, col)
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public abstract boolean atActionRange(int row, int col, IUnit actor);
@@ -166,7 +166,7 @@ public abstract class BattleCommand implements Command{
 
     /**
      * TESTED
-     * @return the relevantly oriented impact area of an action performed by an actor while targeting the tile {rowTarget, colTarget}
+     * @return the relevantly oriented impact area of an action performed by an actor while targeting the tileType {rowTarget, colTarget}
      */
     public final Array<int[]> getImpactArea(){
         Array<int[]> orientedArea = choice.getOrientedImpactArea(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
@@ -287,7 +287,7 @@ public abstract class BattleCommand implements Command{
      *
      * @param rowImpactTile
      * @param colImpactTile
-     * @return get all possible target tile knowing that the given tile is within the impact area
+     * @return get all possible target tileType knowing that the given tileType is within the impact area
      */
     protected final Array<int[]> getTargetFromCollateral(int rowImpactTile, int colImpactTile) {
         Array<int[]> possibleTargetTiles = new Array<int[]>();

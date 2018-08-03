@@ -78,7 +78,7 @@ public class BattlefieldLoader {
                 colorKey = layoutPixmap.getPixel(c, r);
                 if(r % 2 == 0){
                     if(c % 2 == 0){
-                        // addExpGained the tile type
+                        // addExpGained the tileType type
                         fieldType = colorToFieldTypeMap.get(colorKey);
                         if(fieldType == null){
                             fieldType = TileType.PLAIN;
@@ -92,7 +92,7 @@ public class BattlefieldLoader {
                     }
                 }else{
                     if(c % 2 == 0){
-                        // whether or not the tile is to be added to the deployment tile
+                        // whether or not the tileType is to be added to the deployment tileType
                         rgb = Utils.getRGBA(colorKey);
                        if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0 && bf.isTileReachable(rowTile, colTile, false)){
                             bf.addDeploymentTile(rowTile, colTile);

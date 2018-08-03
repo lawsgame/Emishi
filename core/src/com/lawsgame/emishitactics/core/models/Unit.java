@@ -23,7 +23,6 @@ public class Unit extends IUnit{
     protected boolean standardBearer;
 
     protected Array<Weapon> weapons;
-    private int currentWeaponIndex;
     protected int experience = 0;
     protected int commandmentExperience = 0;
     protected boolean rightHanded = true;
@@ -112,7 +111,6 @@ public class Unit extends IUnit{
 
         this.weapons = new Array<Weapon>();
         this.weapons.add(Weapon.FIST);
-        this.currentWeaponIndex = 0;
         this.equipments = new Array<Equipment>();
 
         if(homogeneousLevelsup) {
@@ -383,12 +381,10 @@ public class Unit extends IUnit{
         return weaponAdded;
     }
 
-
     @Override
     public Weapon removeWeapon(int index) {
         Weapon weaponToreturn = null;
         if(0 <= index && index < weapons.size) {
-            if(currentWeaponIndex == index) currentWeaponIndex = 0;
             weaponToreturn = weapons.removeIndex(index);
         }
         if(weapons.size == 0)
@@ -413,7 +409,6 @@ public class Unit extends IUnit{
         Array<Weapon> removedWeapons = weapons;
         weapons = new Array<Weapon>();
         weapons.add(Weapon.FIST);
-        currentWeaponIndex = 0;
         weapons.removeValue(Weapon.FIST, true);
         return removedWeapons;
     }
@@ -425,13 +420,13 @@ public class Unit extends IUnit{
 
     @Override
     public Weapon getCurrentWeapon() {
-        return weapons.get(currentWeaponIndex);
+        return weapons.get(0);
     }
 
     @Override
     public void switchWeapon(int index) {
-        if(0 <= index && index < weapons.size){
-            this.currentWeaponIndex = index;
+        if (0 < index && index < weapons.size) {
+            weapons.swap(0, index);
         }
     }
 

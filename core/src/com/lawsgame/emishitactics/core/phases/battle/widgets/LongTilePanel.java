@@ -36,7 +36,7 @@ public class LongTilePanel extends TilePanel {
         if(tileType.isPlunderable()) builder.append("plunderable ");
         if(tileType.isLootable()) builder.append("lootable ");
         if(tileType.isReachable()) builder.append("reachable "); else builder.append("unreachable ");
-        builder.append("tile");
+        builder.append("tileType");
 
         builder.append("\n\nHeal / turn : "+tileType.getHealPower());
         builder.append("\nStrength bonus : "+tileType.getAttackMightBonus());

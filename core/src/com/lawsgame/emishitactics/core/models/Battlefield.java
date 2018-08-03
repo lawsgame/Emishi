@@ -88,12 +88,12 @@ public class Battlefield extends Observable {
 
     public boolean setTile(int r, int c, TileType type, boolean notifyObservers){
         if(checkIndexes(r,c) && type != null){
-            //reset tile
+            //reset tileType
             recruits.remove(_getLootId(r, c));
             tombItems.remove(_getLootId(r, c));
             looted[r][c] = false;
 
-            //addExpGained tile
+            //addExpGained tileType
             tiles[r][c] = type;
             if(notifyObservers)
                 notifyAllObservers( new Notification.SetTile(r, c, type));
@@ -548,7 +548,7 @@ public class Battlefield extends Observable {
      * @param unit
      * @param row
      * @param col
-     * @return whether or not there is a standard bearer at range if the given unit is standing on the given tile = {row, col}
+     * @return whether or not there is a standard bearer at range if the given unit is standing on the given tileType = {row, col}
      */
     public boolean  isStandardBearerAtRange(IUnit unit, int row, int col){
         int dist;
@@ -775,9 +775,9 @@ public class Battlefield extends Observable {
      *
      * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
      *
-     * get the shortest path of a target tile using the A* algorithm
+     * get the shortest path of a target tileType using the A* algorithm
      *
-     * @return an array like that {[row, col]} representing the shortest path from one tile to another
+     * @return an array like that {[row, col]} representing the shortest path from one tileType to another
      */
     public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance, boolean avoidCoveredArea){
         Array<int[]> res = new Array<int[]>();

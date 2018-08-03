@@ -94,6 +94,7 @@ public abstract class IUnit extends Observable {
     public abstract Array<Equipment> getEquipments();
     public abstract Equipment removeEquipment(int index);
     public abstract Equipment replaceEquipment(int index, Equipment item);
+
     public abstract void setItemAsStealable(boolean weapon, int index, boolean stealable);
     public abstract boolean isStealable();
     public abstract Item getStealableItem();
@@ -159,5 +160,6 @@ public abstract class IUnit extends Observable {
     public abstract boolean isDead();
     public abstract boolean treated(int healPower);
     public abstract Array<Notification.ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly);
+
 
 }

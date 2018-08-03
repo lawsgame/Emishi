@@ -11,7 +11,6 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import java.util.HashMap;
 
 /*
- * addExpGained a command ? => see the constructor below
  */
 public class BattleCommandManager {
     private HashMap<Data.ActionChoice, BattleCommand> commandPool;
@@ -41,6 +40,7 @@ public class BattleCommandManager {
     public BattleCommand get(Data.ActionChoice choice){
         BattleCommand command = commandPool.get(choice);
         if(command != null) {
+            command.init();
             return command;
         }
         return null;
