@@ -13,7 +13,7 @@ public class SwitchWeaponCommand extends StandCommand{
     private BattleUnitRenderer actorRenderer;
 
     public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, int weaponIndex) {
-        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, true);
+        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, true, true, true);
         this.weaponIndex = weaponIndex;
     }
 
@@ -29,9 +29,12 @@ public class SwitchWeaponCommand extends StandCommand{
 
     @Override
     protected void execute() {
+        // update model
         IUnit actor = battlefield.getUnit(rowActor, colActor);
         actorRenderer = battlefieldRenderer.getUnitRenderer(actor);
         actor.switchWeapon(weaponIndex);
+
+        // push render task
         scheduler.addTask(new AnimationScheduler.Task(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
     }
 
@@ -53,5 +56,11 @@ public class SwitchWeaponCommand extends StandCommand{
     @Override
     public boolean canbePerformedBy(IUnit actor) {
         return super.canbePerformedBy(actor) && weaponIndex < actor.getWeapons().size;
+    }
+
+    //------------ GETTERS -------------------------------------
+
+    public int getWeaponIndex() {
+        return weaponIndex;
     }
 }

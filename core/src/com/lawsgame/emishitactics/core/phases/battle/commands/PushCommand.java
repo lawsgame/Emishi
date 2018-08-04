@@ -15,17 +15,17 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class PushCommand extends BattleCommand{
 
     public PushCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.PUSH, scheduler, false);
+        super(bfr, ActionChoice.PUSH, scheduler, false, true, false);
     }
 
     @Override
     protected void execute() {
 
+        // update model
         IUnit actor = battlefield.getUnit(rowActor, colActor);
         IUnit pushed = battlefield.getUnit(rowTarget, colTarget);
         Data.Orientation pushOr = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         pushed.setOrientation(pushOr);
-
         switch(pushOr){
             case WEST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1); break;
             case NORTH: battlefield.moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget);
@@ -33,12 +33,11 @@ public class PushCommand extends BattleCommand{
             case EAST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1); break;
         }
 
+        // push render task
         Task task = new Task();
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.PUSH));
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(pushed), new Notification.Pushed(pushOr)));
         scheduler.addTask(task);
-
-        actor.setActed(true);
 
     }
 

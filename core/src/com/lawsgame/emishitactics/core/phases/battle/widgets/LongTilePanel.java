@@ -36,7 +36,7 @@ public class LongTilePanel extends TilePanel {
         if(tileType.isPlunderable()) builder.append("plunderable ");
         if(tileType.isLootable()) builder.append("lootable ");
         if(tileType.isReachable()) builder.append("reachable "); else builder.append("unreachable ");
-        builder.append("tileType");
+        builder.append("buildingType");
 
         builder.append("\n\nHeal / turn : "+tileType.getHealPower());
         builder.append("\nStrength bonus : "+tileType.getAttackMightBonus());
@@ -61,7 +61,7 @@ public class LongTilePanel extends TilePanel {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
+        batch.draw(TempoSpritePool.getInstance().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
         BattlePhase.testFont.draw(batch, description, getX() + X_TEXT_OFFSET, getY() + getHeight() - Y_TEXT_OFFSET);
     }
 }

@@ -15,38 +15,40 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class StealCommand extends BattleCommand{
 
     public StealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.STEAL, scheduler, false);
+        super(bfr, ActionChoice.STEAL, scheduler, false, true, false);
     }
 
     @Override
     protected void execute() {
+
+        // update model
         IUnit stealer = battlefield.getUnit(rowActor, colActor);
         IUnit stolen = battlefield.getUnit(rowTarget, colTarget);
+        Item stoleItem = null;
+        int stealRate = getStealRate();
+        boolean stealSuccessful = Utils.getMean(1,100) < stealRate;
+        if(stealSuccessful)
+            stoleItem = stolen.getRandomlyStealableItem();
         stealer.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+        stealer.setActed(true);
 
+        // push render taks
         Task task = new Task();
         Thread stealerThread = new Thread(battlefieldRenderer.getUnitRenderer(stealer), stealer.getOrientation());
         stealerThread.addQuery(battlefieldRenderer.getUnitRenderer(stealer), Data.AnimationId.STEAL);
         Thread stolenThread = new Thread(battlefieldRenderer.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
-
-
-        int stealRate = getStealRate();
-        if(Utils.getMean(1,100) < stealRate){
-
-            Item stoleItem = stolen.getStealableItem();
-            outcome.receivers.add(stealer);
-            outcome.experienceGained.add(choice.getExperience());
-            outcome.droppedItems.add(stoleItem);
-            stolenThread.addQuery(battlefieldRenderer.getUnitRenderer(stolen), Data.AnimationId.TAKE_HIT);
-        }else{
-
-            stolenThread.addQuery(battlefieldRenderer.getUnitRenderer(stolen), Data.AnimationId.DODGE);
-        }
-
+        stolenThread.addQuery(battlefieldRenderer.getUnitRenderer(stolen), (stealSuccessful) ? Data.AnimationId.TAKE_HIT : Data.AnimationId.DODGE);
         stolenThread.addQuery(battlefieldRenderer.getUnitRenderer(stolen), stolen.getOrientation());
         task.addThread(stolenThread);
         task.addThread(stealerThread);
         scheduler.addTask(task);
+
+        // set outoome
+        if(stealSuccessful){
+            outcome.receivers.add(stealer);
+            outcome.experienceGained.add(choice.getExperience());
+            outcome.droppedItems.add(stoleItem);
+        }
 
     }
 

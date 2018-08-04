@@ -38,10 +38,10 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
         this.unitRenderers = new Array<BattleUnitRenderer>();
-        this.sprite2DPool = TempoSpritePool.get();
+        this.sprite2DPool = TempoSpritePool.getInstance();
         this.sprite2DPool.set(asm);
 
-        // pre calculate tileType coords and texture region to render to prevent extra calculus each game loop.
+        // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
         this.tileRenderers = new TextureRegion[battlefield.getNbRows()][battlefield.getNbColumns()];
         for (int r = 0; r < battlefield.getNbRows(); r++) {
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
@@ -108,7 +108,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                     tileRenderers[r][c] = tileTR;
                 } else {
                     tileRenderers[r][c] = sprite2DPool.getTileSprite(Data.TileType.PLAIN);
-                    throw new BFRendererException("expected tileType type can not be rendered :"+getModel().getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
+                    throw new BFRendererException("expected buildingType type can not be rendered :"+getModel().getTile(r, c)+", try checking the /textures/tiles files and the ISpritePool implementation used");
                 }
             }
         }catch (BFRendererException e){
@@ -279,7 +279,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                     @Override
                     public void apply() {
                         countDown.run();
-                        TextureRegion tr = TempoSpritePool.get().getBuildInConstructionSprite(notif.tileType);
+                        TextureRegion tr = TempoSpritePool.getInstance().getBuildInConstructionSprite(notif.tileType);
                         if(tr != null)
                             tileRenderers [notif.row][notif.col] = tr;
                         getUnitRenderer(notif.builder).getNotification(Data.AnimationId.BUILD);

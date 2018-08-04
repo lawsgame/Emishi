@@ -20,7 +20,7 @@ public class MoveCommand extends BattleCommand{
     protected Array<int[]> path;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.MOVE, scheduler, true);
+        super(bfr, ActionChoice.MOVE, scheduler, true, false, false);
     }
 
     @Override
@@ -33,28 +33,31 @@ public class MoveCommand extends BattleCommand{
     @Override
     protected void execute() {
         IUnit walker = battlefield.getUnit(rowActor, colActor);
+
+        // register info to rollback to the old state
         walkerRenderer = battlefieldRenderer.getUnitRenderer(walker);
 
+        // update model
         battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget);
-        scheduler.addTask(new Task(battlefieldRenderer, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, path)));
-
         Data.Orientation or = (path.size > 1) ?
                 Utils.getOrientationFromCoords(path.get(path.size - 2)[0], path.get(path.size - 2)[1], rowTarget, colTarget) :
                 Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         walker.setOrientation(or);
 
-        walker.setMoved(true);
+        // push render task
+        scheduler.addTask(new Task(battlefieldRenderer, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, path)));
+
     }
 
     /**
      *
-     * addExpGained up the path if the tileType targeted is a valid choice to move to
+     * addExpGained up the path if the buildingType targeted is a valid choice to move to
      *
      * @param rowActor0
      * @param colActor0
      * @param rowTarget0
      * @param colTarget0
-     * @return true if the target tileType if a valid tileType to move to.
+     * @return true if the target buildingType if a valid buildingType to move to.
      */
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {

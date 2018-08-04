@@ -88,12 +88,12 @@ public class Battlefield extends Observable {
 
     public boolean setTile(int r, int c, TileType type, boolean notifyObservers){
         if(checkIndexes(r,c) && type != null){
-            //reset tileType
+            //reset buildingType
             recruits.remove(_getLootId(r, c));
             tombItems.remove(_getLootId(r, c));
             looted[r][c] = false;
 
-            //addExpGained tileType
+            //addExpGained buildingType
             tiles[r][c] = type;
             if(notifyObservers)
                 notifyAllObservers( new Notification.SetTile(r, c, type));
@@ -234,7 +234,7 @@ public class Battlefield extends Observable {
         return area;
     }
 
-    public Array<IUnit> getAvailableGuardianForTile(int row, int col, Allegeance alleageance){
+    public Array<IUnit> getAvailableGuardian(int row, int col, Allegeance alleageance){
         Array<IUnit> guardians =  new Array<IUnit>();
         for (int k = 0; k < guardedAreas.get(alleageance).size; k++) {
             if (guardedAreas.get(alleageance).get(k).contains(row, col)) {
@@ -282,6 +282,10 @@ public class Battlefield extends Observable {
 
     public boolean isTileExisted(int r, int c){
         return checkIndexes(r,c) && getTile(r,c) != null;
+    }
+
+    public boolean isTileOfType(int r, int c, TileType tileType){
+        return isTileExisted(r,c) && getTile(r,c) == tileType;
     }
 
     public boolean isTilePlunderable(int r, int c){
@@ -548,7 +552,7 @@ public class Battlefield extends Observable {
      * @param unit
      * @param row
      * @param col
-     * @return whether or not there is a standard bearer at range if the given unit is standing on the given tileType = {row, col}
+     * @return whether or not there is a standard bearer at range if the given unit is standing on the given buildingType = {row, col}
      */
     public boolean  isStandardBearerAtRange(IUnit unit, int row, int col){
         int dist;
@@ -609,7 +613,7 @@ public class Battlefield extends Observable {
 
         private void set( Battlefield bf, int rowActor, int colActor, boolean moveAreaOnly){
             if(bf.isTileOccupied(rowActor, colActor)) {
-                // get actor relevant pieces of information
+                // getInstance actor relevant pieces of information
                 IUnit actor = bf.getUnit(rowActor, colActor);
                 this.pathfinder = actor.has(Data.Ability.PATHFINDER);
                 this.moveRange = actor.hasMoved() ? 0 : actor.getAppMobility();
@@ -775,9 +779,9 @@ public class Battlefield extends Observable {
      *
      * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
      *
-     * get the shortest path of a target tileType using the A* algorithm
+     * getInstance the shortest path of a target buildingType using the A* algorithm
      *
-     * @return an array like that {[row, col]} representing the shortest path from one tileType to another
+     * @return an array like that {[row, col]} representing the shortest path from one buildingType to another
      */
     public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance, boolean avoidCoveredArea){
         Array<int[]> res = new Array<int[]>();
@@ -807,7 +811,7 @@ public class Battlefield extends Observable {
                 // path found
                 if (current.getRow() == rowf && current.getCol() == colf) break;
 
-                // get available neighbor nodes which are not yet in the closed list
+                // getInstance available neighbor nodes which are not yet in the closed list
                 PathNode node;
                 neighbours = new Array<PathNode>();
                 if (isTileReachable(current.row + 1, current.col, pathfinder)

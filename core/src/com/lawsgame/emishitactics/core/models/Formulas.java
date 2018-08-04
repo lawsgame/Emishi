@@ -90,7 +90,7 @@ public class Formulas {
             if(victoriousSquad.size > 0)
                 levelmean /= victoriousSquad.size;
 
-            // get the sum of the exp gain for the fallen untis
+            // getInstance the sum of the exp gain for the fallen untis
             int sum = 0;
             for(int i = 0 ; i < targetedSquad.size; i++){
                 sum += getGainedExperience(levelmean, targetedSquad.get(i).getLevel(), !targetedSquad.get(i).isOutOfAction());

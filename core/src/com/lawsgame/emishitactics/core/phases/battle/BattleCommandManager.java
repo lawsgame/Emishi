@@ -86,11 +86,11 @@ public class BattleCommandManager {
         return commandPool.get(choice) != null && commandPool.get(choice).size > 1;
     }
 
-    public Array<BattleCommand> getAvailableCommands(IUnit actor, ActionChoice choice){
+    public Array<BattleCommand> getAvailableCommands(IUnit actor, ActionChoice choice, boolean checkPerformable){
         Array<BattleCommand> commands = new Array<BattleCommand>();
         if(commandPool.get(choice) != null) {
-            for(int i = 0; i <commandPool.get(choice).size; i++){
-                if(commandPool.get(choice).get(i).canbePerformedBy(actor)){
+            for(int i = 0; i < commandPool.get(choice).size; i++){
+                if(!checkPerformable || commandPool.get(choice).get(i).canbePerformedBy(actor)){
                     commands.add(commandPool.get(choice).get(i));
                 }
             }
@@ -107,5 +107,15 @@ public class BattleCommandManager {
         }
     }
 
-
+    public String toString(){
+        String str = "";
+        Array<BattleCommand> commands;
+        for (ActionChoice choice : commandPool.keySet()) {
+            commands = commandPool.get(choice);
+            for(BattleCommand bc : commands){
+                str += "\n"+bc.toString();
+            }
+        }
+        return str+"\n";
+    }
 }

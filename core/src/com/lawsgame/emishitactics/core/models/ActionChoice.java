@@ -35,7 +35,7 @@ public abstract class ActionChoice {
             return !actor.hasActed() && !actor.isHorseman();
         }
     };
-    public static ActionChoice CHOOSE_ORIENTATION = new ActionChoice(0, 0, 0, 0, RangedBasedType.SPECIFIC, true, new int[0][0]) {
+    public static ActionChoice CHOOSE_ORIENTATION = new ActionChoice(0, 0, 0, 0, RangedBasedType.SPECIFIC,  true, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
             return true;
@@ -45,6 +45,13 @@ public abstract class ActionChoice {
     public static ActionChoice GUARD =              new AbilityBasedActionChoice(0, 0, 0, 0, new int[0][0], Data.Ability.GUARD);
     public static ActionChoice STEAL =              new AbilityBasedActionChoice(0, 10, 1, 1, new int[0][0], Data.Ability.STEAL);
     public static ActionChoice BUILD =              new AbilityBasedActionChoice(0, 10, 1, 1, new int[0][0], Data.Ability.BUILD);
+    public static ActionChoice NONE =               new ActionChoice(0, 0, 0, 0, new int[0][0]){
+
+        @Override
+        public boolean canbePerformedBy(IUnit actor) {
+            return false;
+        }
+    };
 
 
     public enum RangedBasedType{
@@ -61,11 +68,11 @@ public abstract class ActionChoice {
     protected boolean endTurnActionOnly;
     /**
      * AreaWidget of impact :
-     * ( 0, 0) = targeted tileType
-     * ( 1, 0) = in front of targeted tileType
-     * ( 0, 1) = right of targeted tileType
-     * ( 0,-1) = left of targeted tileType
-     * (-1, 0) = in the back of targeted tileType
+     * ( 0, 0) = targeted buildingType
+     * ( 1, 0) = in front of targeted buildingType
+     * ( 0, 1) = right of targeted buildingType
+     * ( 0,-1) = left of targeted buildingType
+     * (-1, 0) = in the back of targeted buildingType
      */
     protected Array<int[]> impactArea;
 
@@ -89,7 +96,7 @@ public abstract class ActionChoice {
     }
 
     ActionChoice(int cost, int experience, RangedBasedType type, int[][] impactArea) {
-        this(cost, experience, -1, -1 , type,false, impactArea);
+        this(cost, experience, -1, -1 , type, false, impactArea);
     }
 
     /**
@@ -122,6 +129,10 @@ public abstract class ActionChoice {
 
     public int getRangeMin() {
         return rangeMin;
+    }
+
+    public boolean isActorIsTarget() {
+        return rangeMin == 0 && rangeMax == 0;
     }
 
     public boolean isEndTurnActionOnly() {        return endTurnActionOnly; }

@@ -431,6 +431,15 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public Weapon getWeapon(int index) {
+        Weapon weapon = null;
+        if (0 < index && index < weapons.size) {
+            weapon = weapons.get(index);
+        }
+        return weapon;
+    }
+
+    @Override
     public int getBaseHitpoints() {
         return hitPoints;
     }
@@ -749,7 +758,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public Item getStealableItem() {
+    public Item getRandomlyStealableItem() {
         Item stolenItem = null;
         int index = Data.rand(equipments.size + weapons.size);
         if(index >= equipments.size){
@@ -764,7 +773,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public Item getDroppableItem() {
+    public Item getRandomlyDroppableItem() {
         Item droppedItem = null;
 
         if(!weapons.contains(Weapon.FIST, true)|| equipments.size > 0) {
@@ -796,6 +805,22 @@ public class Unit extends IUnit{
             }
         }
         return droppedItem;
+    }
+
+    @Override
+    public Array<Item> getStealableItems() {
+        Array<Item> stealableItems = new Array<Item>();
+        for(int i =0; i < weapons.size; i++){
+            if(weapons.get(i).isStealable()){
+                stealableItems.add(weapons.get(i));
+            }
+        }
+        for(int i =0; i < equipments.size; i++){
+            if(equipments.get(i).isStealable()){
+                stealableItems.add(equipments.get(i));
+            }
+        }
+        return stealableItems;
     }
 
     @Override
@@ -1036,27 +1061,40 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public int getRecoveredHitPoints(int healPower) {
+        int recoveredHP ;
+        if(healPower + hitPoints > getAppHitpoints()){
+            recoveredHP = getAppHitpoints();
+        }else{
+            recoveredHP = healPower;
+        }
+        return recoveredHP;
+    }
+
+    @Override
+    public int getRecoveredMoralPoints(int healPower) {
+        int recoveredMoralPoints;
+        if(healPower + hitPoints > getAppMoral()){
+            recoveredMoralPoints = getAppMoral();
+        }else{
+            recoveredMoralPoints = healPower;
+        }
+        return recoveredMoralPoints;
+    }
+
+    @Override
     public boolean treated(int healPower) {
         if(isWounded()) {
             if (healPower + hitPoints > getAppHitpoints()) {
                 this.currentHitPoints = getAppHitpoints();
+            }else{
+                this.currentHitPoints += getAppHitpoints();
+            }
+
+            if(healPower + currentMoral > getAppMoral()){
                 this.currentMoral = getAppMoral();
-            } else {
-
-
-                if(currentMoral > 0) {
-                    if (healPower + currentMoral > getAppMoral()) {
-                        currentMoral = getAppMoral();
-                    } else {
-                        currentMoral += healPower;
-                    }
-                }else{
-                    currentMoral = healPower + hitPoints - (getAppHitpoints() - getAppMoral());
-                    if(currentMoral < 0 )
-                        currentMoral = 0;
-                }
-                currentHitPoints += healPower;
-
+            }else{
+                this.currentMoral += healPower;
             }
             return true;
         }

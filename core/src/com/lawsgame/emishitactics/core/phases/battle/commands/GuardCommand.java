@@ -16,14 +16,19 @@ public class GuardCommand extends StandCommand {
     protected IUnit actor;
 
     public GuardCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.GUARD, scheduler, true);
+        super(bfr, ActionChoice.GUARD, scheduler, true, true, false);
     }
 
     @Override
     protected void execute() {
+
+        // register old state
         actor = battlefield.getUnit(rowActor, colActor);
+
+        // update model
         UnitArea area = battlefield.addGuardedArea(rowActor, colActor);
 
+        // push render task
         Task task = new Task();
         task.addThread(new Thread(battlefieldRenderer, area));
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.GUARD));
@@ -42,7 +47,6 @@ public class GuardCommand extends StandCommand {
         }
         scheduler.addTask(task);
 
-        actor.setActed(true);
     }
 
     @Override

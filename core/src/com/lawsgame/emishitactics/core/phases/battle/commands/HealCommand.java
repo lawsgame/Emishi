@@ -2,19 +2,17 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class HealCommand extends BattleCommand {
 
     public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.HEAL, scheduler, false);
+        super(bfr, ActionChoice.HEAL, scheduler, false, true, false);
     }
 
 
@@ -24,17 +22,20 @@ public class HealCommand extends BattleCommand {
         IUnit healer = battlefield.getUnit(rowActor, colActor);
         IUnit patient = battlefield.getUnit(rowTarget, colTarget);
 
+        // update model
         int healPower = getHealPower(rowActor, colActor, rowTarget, colTarget);
         patient.treated(healPower);
-        outcome.receivers.add(healer);
-        outcome.experienceGained.add(choice.getExperience());
 
+        // push render task
         Task task = new Task();
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(patient), healPower));
         task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(healer), Data.AnimationId.HEAL));
         scheduler.addTask(task);
 
-        healer.setActed(true);
+        // set outcome
+        outcome.receivers.add(healer);
+        outcome.experienceGained.add(choice.getExperience());
+
 
     }
 
@@ -51,6 +52,9 @@ public class HealCommand extends BattleCommand {
 
     //-------------------- GETTERS & SETTERS ----------------------
 
+    public int getHealPower(){
+        return getHealPower(rowActor, colActor, rowTarget, colTarget);
+    }
 
     public int getHealPower(int rowActor, int colActor, int rowTarget, int colTarget) {
         int healPower = 0;
@@ -59,6 +63,20 @@ public class HealCommand extends BattleCommand {
             healPower +=Data.HEAL_BASE_POWER + healer.getLevel()/2;
         }
         return healPower;
+    }
+
+    public int getRecoveredHitPoints(){
+        int treatedHP = 0;
+        if(battlefield.isTileOccupied(rowTarget, colTarget))
+            treatedHP = battlefield.getUnit(rowTarget, colTarget).getRecoveredHitPoints(getHealPower());
+        return treatedHP;
+    }
+
+    public int getRecoveredMoralPoints(){
+        int moralPoints = 0;
+        if(battlefield.isTileOccupied(rowTarget, colTarget))
+            moralPoints = battlefield.getUnit(rowTarget, colTarget).getRecoveredMoralPoints(getHealPower());
+        return moralPoints;
     }
 
 }

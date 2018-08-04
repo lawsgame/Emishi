@@ -47,6 +47,7 @@ public abstract class IUnit extends Observable {
     public abstract Array<Weapon> getWeapons();
     public abstract Weapon getCurrentWeapon();
     public abstract void switchWeapon(int index);
+    public abstract Weapon getWeapon(int index);
 
 
     // STAT related
@@ -97,8 +98,9 @@ public abstract class IUnit extends Observable {
 
     public abstract void setItemAsStealable(boolean weapon, int index, boolean stealable);
     public abstract boolean isStealable();
-    public abstract Item getStealableItem();
-    public abstract Item getDroppableItem();
+    public abstract Item getRandomlyStealableItem();
+    public abstract Item getRandomlyDroppableItem();
+    public abstract Array<Item> getStealableItems();
 
     //ENCOUNTER RESOLUTION
     public abstract int getAppWeaponRangeMin();
@@ -158,8 +160,8 @@ public abstract class IUnit extends Observable {
     public abstract boolean isWounded();
     public abstract boolean isOutOfAction();
     public abstract boolean isDead();
+    public abstract int getRecoveredHitPoints(int healPower);
+    public abstract int getRecoveredMoralPoints(int healPower);
     public abstract boolean treated(int healPower);
     public abstract Array<Notification.ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly);
-
-
 }

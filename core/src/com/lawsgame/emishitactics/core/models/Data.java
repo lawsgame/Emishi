@@ -30,7 +30,7 @@ public class Data {
     public static final int GUARD_REACTION_RANGE_MAX = 1;
 
     // RENDER parameters
-    public static final float SPEED_WALK = 3f;  //tileType/s
+    public static final float SPEED_WALK = 3f;  //buildingType/s
     public static final float SPEED_PUSHED = 8f;
 
     // EXP parameter
@@ -280,8 +280,7 @@ public class Data {
         LANCE(          3,  95, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
         BROAD_AXE(      5,  80, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
         CLUB(           4,  85, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
-        HUNTING_BOW(    3,  75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE),
-        TEST_AXE(       10,  100, 2, 3, 100, 100, WeaponType.AXE, DamageType.PIERCING, Ability.NONE);
+        HUNTING_BOW(    3,  75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
 
         private int damage;
         private int accuracy;
@@ -388,7 +387,7 @@ public class Data {
         HEAL,
         STEAL,
         BUILD,
-        COVER,
+
         NONE
     }
 

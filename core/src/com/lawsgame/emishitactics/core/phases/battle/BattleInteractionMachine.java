@@ -32,6 +32,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public BattleCommandManager bcm;
     public CameraManager gcm;
     public AssetManager asm;
+    public ActionPanelPool app;
     public InputMultiplexer multiplexer;
     public AnimationScheduler scheduler;
     public I18NBundle mainStringBundle;
@@ -49,6 +50,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bfr = bfr;
         this.gcm = gcm;
         this.asm = asm;
+        this.app = new ActionPanelPool(stageUI.getViewport());
         this.scheduler = new AnimationScheduler();
         this.bcm = new BattleCommandManager(bfr, scheduler);
         this.playerArmy = playerArmy;
@@ -60,7 +62,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         // UI
         this.UIStage = stageUI;
-
         this.shortTilePanel = new ShortTilePanel(stageUI.getViewport());
         this.shortUnitPanel = new ShortUnitPanel(stageUI.getViewport());
         this.longUnitPanel = new LongUnitPanel(stageUI.getViewport());
@@ -70,7 +71,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         stageUI.addActor(shortUnitPanel);
         stageUI.addActor(longUnitPanel);
         stageUI.addActor(longTilePanel);
-
 
     }
 

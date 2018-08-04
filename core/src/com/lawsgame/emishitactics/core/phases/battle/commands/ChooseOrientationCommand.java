@@ -19,7 +19,7 @@ public class ChooseOrientationCommand extends StandCommand {
     }
 
     public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.Orientation newOrientation) {
-        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, true);
+        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, true, true, true);
         this.newOrientation = newOrientation;
     }
 
@@ -33,8 +33,14 @@ public class ChooseOrientationCommand extends StandCommand {
     protected void execute() {
         IUnit actor = battlefield.getUnit(rowActor, colActor);
         actorRenderer = battlefieldRenderer.getUnitRenderer(actor);
+
+        // register old model state
         oldOrientation = actor.getOrientation();
+
+        // update model
         actor.setOrientation(newOrientation);
+
+        // push render state
         scheduler.addTask(new Task(battlefieldRenderer.getUnitRenderer(actor), newOrientation));
 
     }

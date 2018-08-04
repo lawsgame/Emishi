@@ -18,7 +18,7 @@ public class ShortUnitPanel extends UnitPanel {
     private static float X_TEXT_OFFSET = 8f;
     private static float Y_TEXT_OFFSET = 8f;
     private static float PANEL_WIDTH = 220;
-    private static float PANEL_HEIGHT = 160f;
+    private static float PANEL_HEIGHT = 130f;
 
     private String description;
     private float slideDuration;
@@ -43,7 +43,6 @@ public class ShortUnitPanel extends UnitPanel {
             builder = new StringBuilder("");
             builder.append("Name : " + unit.getName());
             builder.append("\nLevel : " + unit.getLevel());
-            builder.append("\nJob : " + unit.getJob().name().toLowerCase());
 
             if (unit.isWarlord()) {
                 builder.append("\nPosition : warlord");
@@ -57,8 +56,7 @@ public class ShortUnitPanel extends UnitPanel {
 
             builder.append("\nHP  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
             builder.append("\nMoral  : " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-            builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().getName() + " ");
-            builder.append("\nCharging ability bar : " + unit.getOAChargingBarPoints()+ "/"+Data.OA_CHARGING_BAR_MAX_VALUE);
+            builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().toString() + " ");
         }
     }
 
@@ -83,7 +81,7 @@ public class ShortUnitPanel extends UnitPanel {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
+        batch.draw(TempoSpritePool.getInstance().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
         BattlePhase.testFont.draw(batch, description, getX() + X_TEXT_OFFSET, getY() + getHeight() - Y_TEXT_OFFSET);
     }
 }

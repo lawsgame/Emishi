@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases;
 
-import com.badlogic.gdx.assets.loaders.I18NBundleLoader;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -21,8 +20,6 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
 
-import java.util.Locale;
-
 
 public class BattlePhase extends GamePhase {
 
@@ -35,21 +32,25 @@ public class BattlePhase extends GamePhase {
         asm.load(Assets.ATLAS_TILES, TextureAtlas.class);
         asm.load(Assets.ATLAS_UI, TextureAtlas.class);
         asm.load(Assets.ATLAS_UNITS, TextureAtlas.class);
-        asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
+        asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class); //, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
         asm.finishLoading();
+
+
 
     }
 
-    public BattlePhase(GPM gsm, int battlefieldId ){
+    public BattlePhase(GPM gsm, int chapterId ){
         super(gsm, Data.GAME_PORT_WIDTH);
+
+        // load assets
         loadRequiredAssets();
 
         // load and setup the battlefield and its receiver
-        Battlefield battlefield = BattlefieldLoader.load(this, battlefieldId);
+        Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
-        // addExpGained the player army
+        // set the player army
         Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
@@ -58,7 +59,7 @@ public class BattlePhase extends GamePhase {
         playerArmy.add(warlord);
         playerArmy.appointWarLord(warlord);
 
-        // addExpGained the initial BattleInteractionState
+        // set the initial BattleInteractionState
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
         BattleInteractionState initBIS = new TestBIS(bim);
         //BattleInteractionState initBIS = new SceneBIS(bim);

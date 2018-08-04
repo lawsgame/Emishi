@@ -17,7 +17,7 @@ public class SwitchPositionCommand extends BattleCommand {
     private BattleUnitRenderer targetRenderer;
 
     public SwitchPositionCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, true);
+        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, true, false, true);
     }
 
     @Override
@@ -29,9 +29,12 @@ public class SwitchPositionCommand extends BattleCommand {
 
     @Override
     protected void execute() {
+        //update model
         IUnit actor = battlefield.getUnit(rowActor, colActor);
         IUnit target = battlefield.getUnit(rowTarget, colTarget);
         battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
+
+        // push render task
         scheduler.addTask(new Task(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.WALK, battlefield)));
     }
 

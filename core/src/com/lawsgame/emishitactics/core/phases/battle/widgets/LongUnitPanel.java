@@ -81,15 +81,15 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\nWeapon type : "+ unit.getWeaponType()+"\nWeapon : ");
             Array<Weapon> weapons = unit.getWeapons();
             for(int i = 0; i < weapons.size ; i++){
-                builder.append("\n  "+weapons.get(i).getName());
+                builder.append("\n  "+weapons.get(i).toString());
             }
             builder.append("\nEquipments : ");
             Array<Equipment> equipments = unit.getEquipments();
             for(int i = 0; i < equipments.size ; i++){
-                builder.append("\n  "+equipments.get(i).getName());
+                builder.append("\n  "+equipments.get(i).toString());
             }
             builder.append("\n\n    CURRENT WEAPONS\n");
-            builder.append("\nName : "+unit.getCurrentWeapon().getName());
+            builder.append("\nName : "+unit.getCurrentWeapon().toString());
             builder.append("\nBase damage : "+unit.getCurrentWeapon().getTemplate().getDamage());
             builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getTemplate().getAccuracy());
             builder.append("\nRange : ("+unit.getCurrentWeapon().getTemplate().getRangeMin()+", "+unit.getCurrentWeapon().getTemplate().getRangeMax()+")");
@@ -145,7 +145,7 @@ public class LongUnitPanel extends UnitPanel {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
+        batch.draw(TempoSpritePool.getInstance().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
         BattlePhase.testFont.draw(batch, mainDescription, getX() + X_TEXT_OFFSET_1_COL, getY() + getHeight() - Y_TEXT_OFFSET);
         BattlePhase.testFont.draw(batch, statDescription, getX() + X_TEXT_OFFSET_2_COL, getY() + getHeight() - Y_TEXT_OFFSET);
         BattlePhase.testFont.draw(batch, equipDescription, getX() + X_TEXT_OFFSET_3_COL, getY() + getHeight() - Y_TEXT_OFFSET);
