@@ -81,13 +81,15 @@ public abstract class BattleCommand implements Command{
     }
 
     public void init(){
-        this.initialize = true;
-        this.outcome.reset();
+        if(isTargetValid()) {
+            this.initialize = true;
+            this.outcome.reset();
+        }
     }
 
     @Override
     public final void apply() {
-        if(isTargetValid()) {
+        if(initialize) {
             // set as moved or acted if required
             if(!free){
                 if(acted) {
@@ -104,10 +106,13 @@ public abstract class BattleCommand implements Command{
     }
 
     public final void apply(int rowActor, int colActor, int rowTarget, int colTarget){
-        init();
+
         setActor(rowActor, colActor);
         setTarget(rowTarget, colTarget);
-        apply();
+        if(isTargetValid()){
+            init();
+            apply();
+        }
     }
 
     protected abstract void execute();
@@ -129,8 +134,8 @@ public abstract class BattleCommand implements Command{
      * @return whether or not THIS SPECIFIC TARGET is at range by the actor performing the given action if one's is standing the buildingType (rowActor, colActor)
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public final boolean isTargetValid() {
-        return initialize && isTargetValid(rowActor, colActor, rowTarget, colTarget);
+    public boolean isTargetValid() {
+        return isTargetValid(rowActor, colActor, rowTarget, colTarget);
     }
 
     /*

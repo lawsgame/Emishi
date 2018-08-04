@@ -24,14 +24,13 @@ public class SwitchWeaponCommand extends StandCommand{
     @Override
     public void init() {
         super.init();
-        actorRenderer = null;
+        actorRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowActor, colActor));
     }
 
     @Override
     protected void execute() {
         // update model
         IUnit actor = battlefield.getUnit(rowActor, colActor);
-        actorRenderer = battlefieldRenderer.getUnitRenderer(actor);
         actor.switchWeapon(weaponIndex);
 
         // push render task

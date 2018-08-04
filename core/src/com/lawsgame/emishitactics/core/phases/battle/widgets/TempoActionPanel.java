@@ -105,12 +105,12 @@ public abstract class TempoActionPanel extends ActionPanel{
                 AttackCommand currentCommand = (AttackCommand)command;
                 builder = new StringBuilder();
                 builder.append(command.getActor().getName()+" => "+currentCommand.getTargetDefender().getName());
-                builder.append("\nDamage : " + currentCommand.getDealtDamage(true));
-                builder.append("\nHit rate : " + currentCommand.getHitRate(true)+"%");
-                System.out.println("\n"+command.getTarget().getName()+" => "+command.getActor().getName()+"\n");
-                builder.append("\n\n"+command.getTarget().getName()+" => "+currentCommand.getInitiatorDefender().getName());
                 builder.append("\nDamage : " + currentCommand.getDealtDamage(false));
                 builder.append("\nHit rate : " + currentCommand.getHitRate(false)+"%");
+                System.out.println("\n"+command.getTarget().getName()+" => "+command.getActor().getName()+"\n");
+                builder.append("\n\n"+command.getTarget().getName()+" => "+currentCommand.getInitiatorDefender().getName());
+                builder.append("\nDamage : " + currentCommand.getDealtDamage(true));
+                builder.append("\nHit rate : " + currentCommand.getHitRate(true)+"%");
             }
         }
     }

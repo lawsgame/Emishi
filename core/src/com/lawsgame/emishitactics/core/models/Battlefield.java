@@ -779,9 +779,9 @@ public class Battlefield extends Observable {
      *
      * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
      *
-     * getInstance the shortest path of a target buildingType using the A* algorithm
+     * getInstance the shortest validPath of a target buildingType using the A* algorithm
      *
-     * @return an array like that {[row, col]} representing the shortest path from one buildingType to another
+     * @return an array like that {[row, col]} representing the shortest validPath from one buildingType to another
      */
     public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance, boolean avoidCoveredArea){
         Array<int[]> res = new Array<int[]>();
@@ -808,7 +808,7 @@ public class Battlefield extends Observable {
                 opened.removeValue(current, true);
                 closed.add(current);
 
-                // path found
+                // validPath found
                 if (current.getRow() == rowf && current.getCol() == colf) break;
 
                 // getInstance available neighbor nodes which are not yet in the closed list

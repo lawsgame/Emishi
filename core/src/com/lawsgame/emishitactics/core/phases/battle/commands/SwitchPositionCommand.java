@@ -23,8 +23,8 @@ public class SwitchPositionCommand extends BattleCommand {
     @Override
     public void init() {
         super.init();
-        actorRenderer = null;
-        targetRenderer = null;
+        actorRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowActor, colActor));
+        targetRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
     }
 
     @Override

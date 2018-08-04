@@ -167,10 +167,10 @@ public class TestBIS extends BattleInteractionState {
             }
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
-            command.init();
             if (command.setActor(unitPos[0], unitPos[1])) {
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
+                    command.init();
                     command.apply();
                     historic.push(command);
                     if(bim.app.isPanelAvailable(command)){

@@ -26,13 +26,13 @@ public class ChooseOrientationCommand extends StandCommand {
     @Override
     public void init() {
         super.init();
-        actorRenderer = null;
+        actorRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowActor, colActor));
     }
 
     @Override
     protected void execute() {
         IUnit actor = battlefield.getUnit(rowActor, colActor);
-        actorRenderer = battlefieldRenderer.getUnitRenderer(actor);
+
 
         // register old model state
         oldOrientation = actor.getOrientation();

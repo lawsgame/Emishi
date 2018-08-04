@@ -17,7 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class MoveCommand extends BattleCommand{
     protected BattleUnitRenderer walkerRenderer;
-    protected Array<int[]> path;
+    protected Array<int[]> validPath;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
         super(bfr, ActionChoice.MOVE, scheduler, true, false, false);
@@ -26,32 +26,37 @@ public class MoveCommand extends BattleCommand{
     @Override
     public void init() {
         super.init();
-        walkerRenderer = null;
-        path = null;
+
+        // register old state
+        IUnit walker = battlefield.getUnit(rowActor, colActor);
+        walkerRenderer = battlefieldRenderer.getUnitRenderer(walker);
+
+        // set validPath
+        validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, walker.has(Data.Ability.PATHFINDER), walker.getAllegeance(), true);
+        if(validPath.size == 0 || validPath.size > walker.getAppMobility()){
+            validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, walker.has(Data.Ability.PATHFINDER), walker.getAllegeance(), false);
+        }
     }
 
     @Override
     protected void execute() {
         IUnit walker = battlefield.getUnit(rowActor, colActor);
 
-        // register info to rollback to the old state
-        walkerRenderer = battlefieldRenderer.getUnitRenderer(walker);
-
         // update model
         battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget);
-        Data.Orientation or = (path.size > 1) ?
-                Utils.getOrientationFromCoords(path.get(path.size - 2)[0], path.get(path.size - 2)[1], rowTarget, colTarget) :
+        Data.Orientation or = (validPath.size > 1) ?
+                Utils.getOrientationFromCoords(validPath.get(validPath.size - 2)[0], validPath.get(validPath.size - 2)[1], rowTarget, colTarget) :
                 Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         walker.setOrientation(or);
 
         // push render task
-        scheduler.addTask(new Task(battlefieldRenderer, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, path)));
+        scheduler.addTask(new Task(battlefieldRenderer, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, validPath)));
 
     }
 
     /**
      *
-     * addExpGained up the path if the buildingType targeted is a valid choice to move to
+     * addExpGained up the validPath if the buildingType targeted is a valid choice to move to
      *
      * @param rowActor0
      * @param colActor0
@@ -64,15 +69,13 @@ public class MoveCommand extends BattleCommand{
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
             IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance(), true);
+            Array<int[]> path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance(), true);
             if(path.size > 0 && path.size <= actor.getAppMobility()){
                 valid = true;
             }else{
                 path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance(), false);
                 if(path.size > 0 && path.size <= actor.getAppMobility()){
                     valid = true;
-                }else{
-                    path = null;
                 }
             }
         }

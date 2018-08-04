@@ -235,7 +235,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public void displayWalk(Array<int[]> path) {
         /*
         CHECK PATH VALIDITY
-        for the path to be explotable, it is required
+        for the validPath to be explotable, it is required
         - to not be EMPTY
         - to be a collection of TILE COORDS
         - which each of them are NEIGHBOR of its predecessor.
