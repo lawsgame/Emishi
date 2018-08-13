@@ -2,7 +2,9 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
@@ -52,6 +54,7 @@ public class DeploymentBIS extends BattleInteractionState {
         if(bim.battlefield.isTileOccupied(row, col)){
             IUnit touchedUnit = bim.battlefield.getUnit(row, col);
             if (touchedUnit != sltdUnit || !initialized) {
+
                 //touchedUnit become the selected unit
                 initialized = true;
                 this.rowUnit = row;
@@ -62,13 +65,15 @@ public class DeploymentBIS extends BattleInteractionState {
                 && sltdUnit.getArmy().isPlayerControlled()
                 && deploymentAreaWidget.contains(row, col)
                 && bim.battlefield.isTileAvailable(row, col, sltdUnit.has(Data.Ability.PATHFINDER))){
+
             // if the selected unit belongs to the player's army and the buildingType at (row, col) is available and within the deployment area, then redeploy the unit
             bim.battlefield.moveUnit(rowUnit, colUnit, row, col);
-            bim.battlefield.notifyAllObservers(new int[]{row, col});
+            bim.scheduler.addTask(new AnimationScheduler.Task(bim.bfr, new Notification.SetUnit(row, col, sltdUnit)));
             this.rowUnit = row;
             this.colUnit = col;
             init();
         }else{
+
             bim.shortUnitPanel.hide();
             bim.shortTilePanel.hide();
             bim.shortTilePanel.set(bim.battlefield.getTile(row, col));

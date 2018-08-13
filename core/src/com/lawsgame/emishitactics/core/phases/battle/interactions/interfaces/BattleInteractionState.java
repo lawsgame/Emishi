@@ -2,16 +2,15 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.ExhautiveInfoIS;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.InfoBIS;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
 
 public abstract class BattleInteractionState extends InteractionState {
     protected BattleInteractionMachine bim;
 
-    protected boolean battlefieldDisplayed;
-    protected boolean infoDisplayable;
-    protected boolean mapSlidable;
-    protected boolean deploymentSubState = false;
+    private boolean battlefieldDisplayed;             // if true, the battlefield is displayed
+    private boolean infoDisplayable;                  // if true, a long click on a tile while launch the InfoIS
+    private boolean mapSlidable;                      // if true, sliding will allow the player the move around the map
 
 
 
@@ -62,7 +61,7 @@ public abstract class BattleInteractionState extends InteractionState {
     @Override
     public void onLongTouch(float gameX, float gameY) {
         if(infoDisplayable && !bim.gcm.isCameraMoving()){
-            bim.push(new ExhautiveInfoIS(bim, (int)gameY, (int)gameX));
+            bim.push(new InfoBIS(bim, (int)gameY, (int)gameX));
         }
     }
 
@@ -106,7 +105,5 @@ public abstract class BattleInteractionState extends InteractionState {
         this.mapSlidable = mapSlidable;
     }
 
-    public void setDeploymentSubState(boolean deploymentSubState) {
-        this.deploymentSubState = deploymentSubState;
-    }
+
 }

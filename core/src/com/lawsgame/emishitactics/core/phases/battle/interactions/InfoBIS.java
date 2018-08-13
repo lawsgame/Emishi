@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
-public class ExhautiveInfoIS extends BattleInteractionState{
+public class InfoBIS extends BattleInteractionState{
 
-    public ExhautiveInfoIS(BattleInteractionMachine bim, int row, int col) {
+    public InfoBIS(BattleInteractionMachine bim, int row, int col) {
         super(bim, true, false, false);
         if(bim.battlefield.isTileOccupied(row, col)) {
             bim.longUnitPanel.set(bim.battlefield, row, col);

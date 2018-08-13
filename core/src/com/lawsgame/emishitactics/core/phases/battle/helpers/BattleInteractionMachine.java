@@ -37,6 +37,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public I18NBundle mainStringBundle;
 
     public AreaWidget sltdTile;
+
     public Stage uiStage;
     public TilePanel shortTilePanel;
     public TilePanel longTilePanel;
