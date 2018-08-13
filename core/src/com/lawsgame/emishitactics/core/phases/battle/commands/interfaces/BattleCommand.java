@@ -1,11 +1,12 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.ActionChoice.RangedBasedType;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -47,6 +48,7 @@ import com.lawsgame.emishitactics.engine.patterns.command.Command;
  *  3 - set the outcome bundle
  */
 public abstract class BattleCommand implements Command{
+
     protected Battlefield battlefield;
     protected BattlefieldRenderer battlefieldRenderer;
     protected AnimationScheduler scheduler;
@@ -338,6 +340,10 @@ public abstract class BattleCommand implements Command{
 
     //------------------ GETTERS & SETTERS ---------------------------
 
+
+    public String getName(I18NBundle bundle){
+        return choice.getName(bundle);
+    }
 
     public final ActionChoice getActionChoice() {
         return choice;

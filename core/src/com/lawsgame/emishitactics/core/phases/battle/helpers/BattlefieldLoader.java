@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.helpers;
+package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -17,7 +17,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.BattlePhase;
+import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 
 import java.io.IOException;
 import java.util.HashMap;

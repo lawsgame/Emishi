@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.BattlePhase;
+import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;

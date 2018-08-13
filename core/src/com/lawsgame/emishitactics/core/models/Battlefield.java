@@ -167,7 +167,7 @@ public class Battlefield extends Observable {
                 int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, this);
                 int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, this);
                 Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, rangeMin, rangeMax);
-                area = new Area.UnitArea(this, Data.AreaType.COVERING_FIRE, tiles, actor);
+                area = new Area.UnitArea(this, Data.AreaType.DEPLOYMENT_AREA, tiles, actor);
                 this.coveredAreas.get(actor.getAllegeance()).add(area);
             }
         }
@@ -212,7 +212,7 @@ public class Battlefield extends Observable {
             IUnit actor = getUnit(rowActor, colActor);
             if(actor.isMobilized()) {
                 Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX);
-                area = new Area.UnitArea(this, Data.AreaType.GUARD_RANGE, tiles, actor);
+                area = new Area.UnitArea(this, Data.AreaType.GUARD_AREA, tiles, actor);
                 this.guardedAreas.get(actor.getAllegeance()).add(area);
 
             }

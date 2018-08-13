@@ -1,5 +1,5 @@
 package com.lawsgame.emishitactics.core.constants;
 
-public class StringKeys {
+public class StringKey {
 
 }

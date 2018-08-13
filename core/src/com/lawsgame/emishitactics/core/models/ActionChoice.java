@@ -1,51 +1,52 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public abstract class ActionChoice {
 
-    public static ActionChoice ATTACK =             new ActionChoice(0, 0, RangedBasedType.WEAPON, new int[0][0]) {
+    public static ActionChoice ATTACK =             new ActionChoice("ATTACK",          0, 0, RangedBasedType.WEAPON, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
             return !actor.hasActed();
         }
     };
-    public static ActionChoice MOVE =               new ActionChoice(0, 0, RangedBasedType.MOVE, new int[0][0]) {
+    public static ActionChoice MOVE =               new ActionChoice("MOVE",            0, 0, RangedBasedType.MOVE, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
             return !actor.hasMoved();
         }
     };
-    public static ActionChoice SWITCH_WEAPON =      new ActionChoice(0, 0, 0, 0, new int[0][0]) {
+    public static ActionChoice SWITCH_WEAPON =      new ActionChoice("SWITCH_WEAPON",   0, 0, 0, 0, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
             return actor.getWeapons().size > 1;
         }
     };
-    public static ActionChoice SWITCH_POSITION =    new ActionChoice(0, 0, 1, 1, new int[0][0]) {
+    public static ActionChoice SWITCH_POSITION =    new ActionChoice("SWITCH_POSITION", 0, 0, 1, 1, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
             return true;
         }
     };
-    public static ActionChoice PUSH =               new ActionChoice(0, 0, 1, 1, new int[0][0]) {
+    public static ActionChoice PUSH =               new ActionChoice("PUSH",            0, 0, 1, 1, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
             return !actor.hasActed() && !actor.isHorseman();
         }
     };
-    public static ActionChoice CHOOSE_ORIENTATION = new ActionChoice(0, 0, 0, 0, RangedBasedType.SPECIFIC,  true, new int[0][0]) {
+    public static ActionChoice CHOOSE_ORIENTATION = new ActionChoice("CHOOSE_ORIENTATION",0, 0, 0, 0, RangedBasedType.SPECIFIC,  true, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
             return true;
         }
     };
-    public static ActionChoice HEAL =               new AbilityBasedActionChoice(0, 10, 1, 1, new int[0][0], Data.Ability.HEAL);
-    public static ActionChoice GUARD =              new AbilityBasedActionChoice(0, 0, 0, 0, new int[0][0], Data.Ability.GUARD);
-    public static ActionChoice STEAL =              new AbilityBasedActionChoice(0, 10, 1, 1, new int[0][0], Data.Ability.STEAL);
-    public static ActionChoice BUILD =              new AbilityBasedActionChoice(0, 10, 1, 1, new int[0][0], Data.Ability.BUILD);
-    public static ActionChoice NONE =               new ActionChoice(0, 0, 0, 0, new int[0][0]){
+    public static ActionChoice HEAL =               new AbilityBasedAC("HEAL",          0, 10, 1, 1, new int[0][0], Data.Ability.HEAL);
+    public static ActionChoice GUARD =              new AbilityBasedAC("GUARD",         0, 0, 0, 0, new int[0][0], Data.Ability.GUARD);
+    public static ActionChoice STEAL =              new AbilityBasedAC("STEAL",         0, 10, 1, 1, new int[0][0], Data.Ability.STEAL);
+    public static ActionChoice BUILD =              new AbilityBasedAC("BUILD",         0, 10, 1, 1, new int[0][0], Data.Ability.BUILD);
+    public static ActionChoice NONE =               new ActionChoice("NONE",            0, 0, 0, 0, new int[0][0]){
 
         @Override
         public boolean canbePerformedBy(IUnit actor) {
@@ -53,6 +54,23 @@ public abstract class ActionChoice {
         }
     };
 
+    public static ActionChoice[] choices = new ActionChoice[]{
+            ATTACK,
+            MOVE,
+            SWITCH_POSITION,
+            SWITCH_POSITION,
+            PUSH,
+            CHOOSE_ORIENTATION,
+            HEAL,
+            GUARD,
+            STEAL,
+            BUILD,
+            NONE
+    };
+
+    public static ActionChoice[] values(){
+        return choices;
+    }
 
     public enum RangedBasedType{
         MOVE,
@@ -60,6 +78,7 @@ public abstract class ActionChoice {
         SPECIFIC
     }
 
+    protected String key;
     protected int cost;
     protected int experience;
     protected int rangeMin;
@@ -78,7 +97,8 @@ public abstract class ActionChoice {
 
 
 
-    ActionChoice(int cost, int experience, int rangeMin, int rangeMax, RangedBasedType type, boolean endTurnActionOnly, int[][] impactArea) {
+    ActionChoice(String key, int cost, int experience, int rangeMin, int rangeMax, RangedBasedType type, boolean endTurnActionOnly, int[][] impactArea) {
+        this.key = key;
         this.rangedBasedType = type;
         this.rangeMax = rangeMax;
         this.rangeMin = rangeMin;
@@ -91,12 +111,12 @@ public abstract class ActionChoice {
         }
     }
 
-    ActionChoice(int cost, int experience, int rangeMin, int rangeMax, int[][] impactArea){
-        this(cost, experience, rangeMax, rangeMin, RangedBasedType.SPECIFIC, false, impactArea);
+    ActionChoice(String key, int cost, int experience, int rangeMin, int rangeMax, int[][] impactArea){
+        this(key, cost, experience, rangeMax, rangeMin, RangedBasedType.SPECIFIC, false, impactArea);
     }
 
-    ActionChoice(int cost, int experience, RangedBasedType type, int[][] impactArea) {
-        this(cost, experience, -1, -1 , type, false, impactArea);
+    ActionChoice(String key, int cost, int experience, RangedBasedType type, int[][] impactArea) {
+        this(key, cost, experience, -1, -1 , type, false, impactArea);
     }
 
     /**
@@ -111,7 +131,6 @@ public abstract class ActionChoice {
      * @return whether or not an action can be performed by the actor regardless the actor's history or target availability.
      */
     public abstract boolean canbePerformedBy(IUnit actor);
-
 
     public RangedBasedType getRangeType() { return rangedBasedType; }
 
@@ -129,6 +148,14 @@ public abstract class ActionChoice {
 
     public int getRangeMin() {
         return rangeMin;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getName(I18NBundle bundle){
+        return bundle.get(key);
     }
 
     public boolean isActorIsTarget() {
@@ -190,16 +217,16 @@ public abstract class ActionChoice {
 
     //-------------- SUB CLASS of ACTION CHOICE -----------------------------
 
-    static class AbilityBasedActionChoice extends  ActionChoice{
+    static class AbilityBasedAC extends  ActionChoice{
         protected Data.Ability ability;
 
-        AbilityBasedActionChoice(int cost, int experience, int rangeMin, int rangeMax, int[][] impactArea, Data.Ability ability) {
-            super(cost, experience, rangeMin, rangeMax, impactArea);
+        AbilityBasedAC(String key, int cost, int experience, int rangeMin, int rangeMax, int[][] impactArea, Data.Ability ability) {
+            super(key,cost, experience, rangeMin, rangeMax, impactArea);
             this.ability = ability;
         }
 
-        AbilityBasedActionChoice(int cost, int experience, RangedBasedType type, int[][] impactArea, Data.Ability ability) {
-            super(cost, experience, type, impactArea);
+        AbilityBasedAC(String key, int cost, int experience, RangedBasedType type, int[][] impactArea, Data.Ability ability) {
+            super(key, cost, experience, type, impactArea);
             this.ability = ability;
         }
 

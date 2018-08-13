@@ -1,9 +1,9 @@
-package com.lawsgame.emishitactics.core.phases.battle;
+package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoActionPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 
 import java.util.HashMap;

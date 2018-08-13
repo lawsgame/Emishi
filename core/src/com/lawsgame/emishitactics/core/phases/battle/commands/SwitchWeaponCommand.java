@@ -1,6 +1,8 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.core.models.Weapon;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -61,5 +63,17 @@ public class SwitchWeaponCommand extends StandCommand{
 
     public int getWeaponIndex() {
         return weaponIndex;
+    }
+
+    @Override
+    public String getName(I18NBundle bundle) {
+        String str = null;
+        if(battlefield.isTileOccupied(rowActor, colActor)){
+            Weapon weapon = battlefield.getUnit(rowActor, colActor).getWeapon(weaponIndex);
+            if(weapon != null){
+                str = weapon.getName(bundle);
+            }
+        }
+        return (str != null) ? str :super.getName(bundle);
     }
 }

@@ -1,8 +1,8 @@
-package com.lawsgame.emishitactics.core.phases.battle;
+package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -20,12 +20,13 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleC
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 /*
  */
 public class BattleCommandManager {
-    private HashMap<ActionChoice, Array<BattleCommand>> commandPool;
+    private final HashMap<ActionChoice, Array<BattleCommand>> commandPool;
 
     public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler){
         commandPool = new HashMap<ActionChoice, Array<BattleCommand>>();
@@ -48,7 +49,7 @@ public class BattleCommandManager {
         setChoice(new StealCommand(bfr, scheduler));
         setChoice(new SwitchPositionCommand(bfr, scheduler));
 
-        Array<BattleCommand>  commands = new Array<BattleCommand>();
+        final Array<BattleCommand>  commands = new Array<BattleCommand>();
         for(int i = 1; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
             commands.add(new SwitchWeaponCommand(bfr, scheduler, i));
             if(commands.get(0) != null)
@@ -70,12 +71,19 @@ public class BattleCommandManager {
         commandPool.put(battleCommands[0].getActionChoice(), commands);
     }
 
+
+    // -----------------------------------------------------------------------
+
+
+
+
     public Array<ActionChoice> getAvailableChoices(IUnit actor, Array<BattleCommand> history){
         Array<ActionChoice> choices = new Array<ActionChoice>();
         for (ActionChoice choice : commandPool.keySet()) {
             if (!choice.isEndTurnActionOnly()
                     && choice.canbePerformedBy(actor)
-                    && Utils.arrayContainsAtLeastOneElementOf(history, commandPool.get(choice), true)) {
+                    && history != null
+                    && !Utils.arrayContainsAtLeastOneElementOf(history, commandPool.get(choice), true)) {
                 choices.add(choice);
             }
         }
@@ -98,6 +106,20 @@ public class BattleCommandManager {
         return commands;
     }
 
+    public HashMap<ActionChoice, Array<BattleCommand>> getAllCommands(IUnit actor, Array<BattleCommand> history, boolean checkFlavorPerformable) {
+        HashMap<ActionChoice, Array<BattleCommand>> commands = new HashMap<ActionChoice, Array<BattleCommand>>();
+        if(actor != null && history != null) {
+            Array<ActionChoice> availableChoices = getAvailableChoices(actor, history);
+            for (int i = 0; i < availableChoices.size; i++) {
+                commands.put(availableChoices.get(i), getAvailableCommands(actor, availableChoices.get(i), checkFlavorPerformable));
+            }
+        }
+        return commands;
+    }
+
+    //-------------------------  GETTERS & SETTERS ---------------------------
+
+
     // optional method
     public void setBattlefield(BattlefieldRenderer battlefieldRenderer){
         for(ActionChoice choice : commandPool.keySet()){
@@ -107,8 +129,21 @@ public class BattleCommandManager {
         }
     }
 
+    public String toString(IUnit actor, Array<BattleCommand> history, boolean checkFlavorPerformable){
+        HashMap<ActionChoice, Array<BattleCommand>> allcommands = getAllCommands(actor, history, checkFlavorPerformable);
+        String str = "Availables commands : \n";
+        Array<BattleCommand> commands;
+        for (ActionChoice choice : allcommands.keySet()) {
+            commands = allcommands.get(choice);
+            for(BattleCommand bc : commands){
+                str += "\n"+bc.toString();
+            }
+        }
+        return str+"\n";
+    }
+
     public String toString(){
-        String str = "";
+        String str = "command pool : \n";
         Array<BattleCommand> commands;
         for (ActionChoice choice : commandPool.keySet()) {
             commands = commandPool.get(choice);

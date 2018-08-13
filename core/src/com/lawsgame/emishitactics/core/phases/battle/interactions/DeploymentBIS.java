@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
@@ -26,7 +26,7 @@ public class DeploymentBIS extends BattleInteractionState {
         this.colUnit = warlordPos[1];
         highlight(rowUnit, colUnit);
         focusOn(rowUnit, colUnit, true);
-        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.DEPLOYMENT, bim.battlefield.getDeploymentArea());
+        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.FOE_SQUAD_MEMBER, bim.battlefield.getDeploymentArea());
         initialized = false;
 
     }
@@ -34,7 +34,7 @@ public class DeploymentBIS extends BattleInteractionState {
     @Override
     public void init() {
         if(initialized) {
-            this.moveAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.MOVE_RANGE, bim.battlefield.getMoveArea(rowUnit, colUnit));
+            this.moveAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
             focusOn(rowUnit, colUnit, true);
             highlight(rowUnit, colUnit);

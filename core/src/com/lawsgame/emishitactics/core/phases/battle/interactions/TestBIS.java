@@ -3,16 +3,15 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Army;
-import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
@@ -24,11 +23,12 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.TempoActionPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 
 import java.util.Stack;
 
@@ -38,6 +38,7 @@ public class TestBIS extends BattleInteractionState {
     Unit soldier;
     ActionPanel panel;
     AreaWidget areaWidget;
+    TempoChoicePanel choicePanel;
 
     IUnit sltdUnit;
     int index;
@@ -81,6 +82,23 @@ public class TestBIS extends BattleInteractionState {
         sltdUnit = warlord;
         index = 1;
         switchmode = false;
+
+
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
+        warlord.setMoved(true);
+        Array<BattleCommand> historic = new Array<BattleCommand>();
+        Array<ActionChoice> choices = bim.bcm.getAvailableChoices(warlord, historic);
+        System.out.println("Available choices for "+warlord.getName());
+        for(int i = 0; i < choices.size; i++){
+            System.out.println(choices.get(i).getKey());
+        }
+
+        System.out.println(bim.bcm.toString(warlord, new Array<BattleCommand>(), true));
+
+
+
+        //choicePanel = new TempoChoicePanel(bim.asm);
+        //bim.uiStage.addActor(choicePanel);
 
     }
 
@@ -175,10 +193,9 @@ public class TestBIS extends BattleInteractionState {
                     historic.push(command);
                     if(bim.app.isPanelAvailable(command)){
                         panel = bim.app.getPanel(command);
-                        bim.UIStage.addActor(panel);
+                        bim.uiStage.addActor(panel);
                         panel.hide();
                         panel.show();
-
                     }
                 }
             }

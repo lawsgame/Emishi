@@ -25,17 +25,21 @@ public class TempoSpritePool {
     }
 
     private HashMap<Data.TileType, TextureRegion> tileSprites;
-    private HashMap<Data.AreaType, TextureRegion> uiSprites;
-    private TextureRegion blackBGSprite;
+    private TextureRegion bridgeInConstruction = null;
+    private TextureRegion towerInConstruction = null;
+    private HashMap<Data.AreaType, TextureRegion> areaSprites;
+    private TextureRegion blackBGSprite = null;
+    public TextureRegion buttonUp = null;
+    public TextureRegion buttonDown = null;
     private HashMap<Data.AnimationId, TextureRegion> unitSprites;
     private HashMap<Data.AnimationId, TextureRegion> foeSprites;
-    private TextureRegion unitDoneSprite;
+    private TextureRegion unitDoneSprite = null;
     private HashMap<Data.WeaponType, TextureRegion> weaponSprites;
     private HashMap<Data.Orientation, TextureRegion> orientationSprites;
-    private TextureRegion shieldSprite;
-    private TextureRegion mountedSprite;
-    private TextureRegion bridgeInConstruction;
-    private TextureRegion towerInConstruction;
+    private TextureRegion shieldSprite = null;
+    private TextureRegion mountedSprite = null;
+
+
 
     public HashMap<Data.AreaType,Sprite> topLeftCorner = new HashMap<Data.AreaType, Sprite>();
     public HashMap<Data.AreaType,Sprite> topRightCorner = new HashMap<Data.AreaType, Sprite>();
@@ -55,14 +59,11 @@ public class TempoSpritePool {
 
     private TempoSpritePool(){
         this.tileSprites = new HashMap<Data.TileType, TextureRegion>();
-        this.uiSprites = new HashMap<Data.AreaType, TextureRegion>();
+        this.areaSprites = new HashMap<Data.AreaType, TextureRegion>();
         this.unitSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.foeSprites = new HashMap<Data.AnimationId, TextureRegion>();
         this.weaponSprites = new HashMap<Data.WeaponType, TextureRegion>();
         this.orientationSprites = new HashMap<Data.Orientation, TextureRegion>();
-        shieldSprite = null;
-        mountedSprite = null;
-        unitDoneSprite = null;
 
 
     }
@@ -154,10 +155,12 @@ public class TempoSpritePool {
                 for(Data.AreaType id : Data.AreaType.values()){
                     region = atlas.findRegion(Assets.getTileHighlighted(id));
                     if(region != null )
-                        uiSprites.put(id, region);
+                        areaSprites.put(id, region);
                 }
 
                 blackBGSprite = atlas.findRegion(Assets.UI_BLACK_BACKGROUND);
+                buttonDown = atlas.findRegion(Assets.UI_BUTTON_DOWN);
+                buttonUp = atlas.findRegion(Assets.UI_BUTTON_UP);
 
                 // SET AREA COLOR SPRITE
                 Sprite sprite;
@@ -233,7 +236,7 @@ public class TempoSpritePool {
     }
 
     public TextureRegion getUISprite(Data.AreaType id) {
-        return uiSprites.get(id);
+        return areaSprites.get(id);
     }
 
     public TextureRegion getMountedSprite() {

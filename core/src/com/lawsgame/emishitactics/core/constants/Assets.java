@@ -16,6 +16,9 @@ public class Assets {
     public static final String XML_UNITS_DEPLOYMENT = "xml/units.xml";
 
 
+    //SKIN
+
+    public static final String SKIN_UI = "skin/ui_skin.json";
 
 
     //TEXTURES
@@ -23,7 +26,7 @@ public class Assets {
     // atlases
 
     public static String ATLAS_UNITS = "textures/unit_sprites.pack";
-    public static String ATLAS_UI = "textures/ui_assets.pack";
+    public static String ATLAS_UI = "textures/ui_skin.pack";
     public static String ATLAS_MAPS = "textures/maps.pack";
     public static String ATLAS_TILES = "textures/tiles.pack";
 
@@ -41,6 +44,9 @@ public class Assets {
         return id.name().toLowerCase();
     }
     public static String UI_BLACK_BACKGROUND = "black_background";
+    public static String UI_BUTTON_UP = "button_up";
+    public static String UI_BUTTON_DOWN = "button_down";
+
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
 

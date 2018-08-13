@@ -2,9 +2,9 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Thread;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -73,17 +73,17 @@ public class AttackCommand extends BattleCommand {
         IUnit defender = battlefield.getUnit(rowTarget, colTarget);
 
         Task task = new Task();
-        Thread initiatorThread = new Thread(battlefieldRenderer.getUnitRenderer(attacker));
+        Thread attackerThread = new Thread(battlefieldRenderer.getUnitRenderer(attacker));
         Thread targetThread = new Thread(battlefieldRenderer.getUnitRenderer(defender));
         Array<Thread> defendersThreads = new Array<Thread>();
 
         Data.Orientation attackerReorientation = Utils.getOrientationFromCoords(rowAttacker, colAttacker, rowTarget, colTarget);
+        if(!retaliate) attacker.setOrientation(attackerReorientation);
 
-        initiatorThread.addQuery(attacker.getOrientation());
-        initiatorThread.addQuery(Data.AnimationId.ATTACK);
+        attackerThread.addQuery(attackerReorientation);
+        attackerThread.addQuery(Data.AnimationId.ATTACK);
 
-        if(!retaliate)
-            attacker.setOrientation(attackerReorientation);
+
 
         boolean backstabbed = attacker.getOrientation() == defender.getOrientation();
         int hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowTarget, colTarget, battlefield);
@@ -120,7 +120,9 @@ public class AttackCommand extends BattleCommand {
             targetThread.addQuery(defender.getOrientation());
         }
 
-        task.addThread(initiatorThread);
+        if(retaliate) attackerThread.addQuery(attacker.getOrientation());
+
+        task.addThread(attackerThread);
         task.addThread(targetThread);
         task.addllThreads(defendersThreads);
         scheduler.addTask(task);
@@ -247,9 +249,9 @@ public class AttackCommand extends BattleCommand {
     }
 
 
-    // -------------------- COMODITY BATTLE RESOLUTION METHODS ------------------
+    // -------------------- COMODITY BATTLE PANEL METHODS ------------------
 
-    //TODO:!!!!
+
 
     public int getHitRate(boolean retaliation){
         int[] defenderPos = (retaliation) ? battlefield.getUnitPos(targetDefender) : battlefield.getUnitPos(initiatorDefender);

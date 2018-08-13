@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.helpers;
+package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;

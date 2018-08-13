@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -136,7 +137,13 @@ public abstract class GamePhase implements State, GameElement {
 
 	public abstract void preRender(SpriteBatch batch);
 	public abstract void renderWorld(SpriteBatch batch);
-	
+
+
+	@Override
+	public void dispose() {
+		asm.dispose();
+		stageUI.dispose();
+	}
 
 	//-------- SETTERS & GETTERS ---------
 

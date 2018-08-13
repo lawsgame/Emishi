@@ -79,13 +79,13 @@ public class Data {
 
     public enum AreaType {
         SELECTED_UNIT,
-        MOVE_RANGE,
-        ACTION_RANGE,
-        GUARD_RANGE,
-        BANNER_RANGE,
-        COVERING_FIRE,
+        MOVE_AREA,
+        ACTION_AREA,
+        GUARD_AREA,
+        SQUAD_MEMBER,
+        DEPLOYMENT_AREA,
         FOE_ACTION_AREA,
-        DEPLOYMENT
+        FOE_SQUAD_MEMBER
     }
 
     public enum TileType {
@@ -446,7 +446,7 @@ public class Data {
     }
 
     public enum Job {
-        SOLAR_KNIGHT(1, "Solar knight", 4, 5, new Ability[0],
+        SOLAR_KNIGHT(1, "Solar knight", 4, 5, new Ability[]{},
                 3, 1, 45, 9, 3, 5, 11, 7, 8, 3, 5,
                 0.10f, 0.05f, 0.55f, 0.35f, 0.20f, 0.10f, 0.10f, 0.10f, 0.15f, 0.25f, 0.45f,
                 1, 4, 10, 2, 1, 0, 3, 1, 1, 3, 3,

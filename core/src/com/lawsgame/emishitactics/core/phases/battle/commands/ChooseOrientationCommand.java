@@ -1,7 +1,8 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler.Task;
+import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -60,5 +61,10 @@ public class ChooseOrientationCommand extends StandCommand {
 
     public void setOrientation(Data.Orientation orientation){
         newOrientation = orientation;
+    }
+
+    @Override
+    public String getName(I18NBundle bundle) {
+        return (newOrientation != null) ? bundle.get(newOrientation.name()) : super.getName(bundle);
     }
 }

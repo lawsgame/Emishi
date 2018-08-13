@@ -1,18 +1,19 @@
-package com.lawsgame.emishitactics.core.phases;
+package com.lawsgame.emishitactics.core.phases.battle;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.helpers.BattlefieldLoader;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.TestBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoBattlefield2DRenderer;
@@ -33,6 +34,7 @@ public class BattlePhase extends GamePhase {
         asm.load(Assets.ATLAS_UI, TextureAtlas.class);
         asm.load(Assets.ATLAS_UNITS, TextureAtlas.class);
         asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class); //, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
+        //asm.load(Assets.SKIN_UI, Skin.class);
         asm.finishLoading();
 
 
@@ -109,10 +111,7 @@ public class BattlePhase extends GamePhase {
     }
 
 
-    @Override
-    public void dispose() {
-        asm.dispose();
-    }
+
 
     // --------------------- GETTERS & SETTERS ------------------------
 

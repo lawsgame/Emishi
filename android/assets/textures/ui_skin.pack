@@ -1,67 +1,81 @@
 
-ui_assets.png
+ui_skin.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-covering_fire
+action_area
   rotate: false
   xy: 0, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-action_range
+deployment_area
   rotate: false
   xy: 64, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-deployment
+foe_action_area
   rotate: false
   xy: 128, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-foe_action_area
+foe_squad_member
   rotate: false
   xy: 192, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-move_range
+guard_area
   rotate: false
   xy: 256, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-banner_range
+move_area
   rotate: false
   xy: 320, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-guard_range
+selected_unit
   rotate: false
   xy: 384, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_unit
+squad_member
   rotate: false
   xy: 448, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
+button_down
+  rotate: false
+  xy: 512, 40
+  size: 60, 24
+  orig: 60, 24
+  offset: 0, 0
+  index: -1
+button_up
+  rotate: false
+  xy: 512, 16
+  size: 60, 24
+  orig: 60, 24
+  offset: 0, 0
+  index: -1
 black_background
   rotate: false
-  xy: 512, 32
+  xy: 572, 32
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

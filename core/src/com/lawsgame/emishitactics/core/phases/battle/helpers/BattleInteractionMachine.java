@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle;
+package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -8,15 +8,14 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.LongTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.LongUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.ShortTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.ShortUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.LongTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.LongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.ShortTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.ShortUnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
@@ -38,7 +37,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public I18NBundle mainStringBundle;
 
     public AreaWidget sltdTile;
-    public Stage UIStage;
+    public Stage uiStage;
     public TilePanel shortTilePanel;
     public TilePanel longTilePanel;
     public UnitPanel shortUnitPanel;
@@ -61,7 +60,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.sltdTile.setVisible(false);
 
         // UI
-        this.UIStage = stageUI;
+        this.uiStage = stageUI;
         this.shortTilePanel = new ShortTilePanel(stageUI.getViewport());
         this.shortUnitPanel = new ShortUnitPanel(stageUI.getViewport());
         this.longUnitPanel = new LongUnitPanel(stageUI.getViewport());
@@ -78,7 +77,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public void push(BattleInteractionState bis){
         multiplexer.clear();
         multiplexer.addProcessor(new GestureDetector(bis));
-        multiplexer.addProcessor(UIStage);
+        multiplexer.addProcessor(uiStage);
         Gdx.input.setInputProcessor(multiplexer);
         super.push(bis);
 
@@ -89,7 +88,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
             pop();
             multiplexer.clear();
             multiplexer.addProcessor(new GestureDetector(getCurrentState()));
-            multiplexer.addProcessor(UIStage);
+            multiplexer.addProcessor(uiStage);
             Gdx.input.setInputProcessor(multiplexer);
             getCurrentState().init();
 
