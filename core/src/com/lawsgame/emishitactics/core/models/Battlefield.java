@@ -557,7 +557,7 @@ public class Battlefield extends Observable {
     public boolean  isStandardBearerAtRange(IUnit unit, int row, int col){
         int dist;
         if(isTileExisted(row, col)&& unit.isMobilized()) {
-            int bannerRange = unit.getArmy().getBannerRange();
+            int bannerRange = unit.getArmy().getBannerRange(unit);
             for (int r = row - bannerRange; r <= row + bannerRange; r++) {
                 for (int c = col - bannerRange; c <= col + bannerRange; c++) {
                     dist = Utils.dist(row, col, r, c);

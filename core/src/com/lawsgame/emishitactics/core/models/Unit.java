@@ -958,7 +958,7 @@ public class Unit extends IUnit{
 
     @Override
     public Array<IUnit> getSquad(boolean stillFighting) {
-        return (army != null) ? army.getSquad(this, stillFighting) : null;
+        return (army != null) ? army.getSquad(this, stillFighting) : new Array<IUnit>();
     }
 
     @Override
@@ -998,6 +998,25 @@ public class Unit extends IUnit{
     @Override
     public int getChiefMoralBonus() {
         return getChiefCharisma();
+    }
+
+    @Override
+    public int getSquadIndex() {
+        int squadIndex = -1;
+        if(isMobilized()){
+            loop :
+            {
+                for (int i = 0; i < army.getAllSquads().size; i++) {
+                    for (int j = 0; j < army.getAllSquads().get(j).size; j++) {
+                        if (army.getAllSquads().get(i).get(j) == this) {
+                            squadIndex = i;
+                            break loop;
+                        }
+                    }
+                }
+            }
+        }
+        return squadIndex;
     }
 
     @Override

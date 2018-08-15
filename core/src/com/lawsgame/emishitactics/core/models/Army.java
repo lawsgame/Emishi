@@ -94,7 +94,7 @@ public class Army extends IArmy{
             }
         }
         if(squadIndex != -1){
-            for(int i = 0; i < squad.size; i++){
+            for(int i = 0; i < mobilizedTroups.get(squadIndex).size; i++){
                 if(!mobilizedTroups.get(squadIndex).get(i).isOutOfAction() || !stillFighting) {
                     squad.add(mobilizedTroups.get(squadIndex).get(i));
                 }
@@ -235,8 +235,14 @@ public class Army extends IArmy{
     }
 
     @Override
-    public int getBannerRange(){
-        return (int) Math.sqrt(getWarlord().getAppLeadership());
+    public int getBannerRange(int squadIndex){
+        boolean validIndex = 0 <= squadIndex && squadIndex < getNbOfSquads();
+        return (validIndex) ? (int) Math.sqrt(mobilizedTroups.get(squadIndex).get(0).getAppLeadership()) : 0;
+    }
+
+    @Override
+    public int getBannerRange(IUnit unit){
+        return (unit.isMobilized()) ? (int) Math.sqrt(getWarchief(unit).getAppLeadership()) : 0;
     }
 
     @Override

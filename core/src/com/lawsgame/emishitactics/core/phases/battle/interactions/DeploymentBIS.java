@@ -26,9 +26,9 @@ public class DeploymentBIS extends BattleInteractionState {
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
         this.rowUnit = warlordPos[0];
         this.colUnit = warlordPos[1];
-        highlight(rowUnit, colUnit);
-        focusOn(rowUnit, colUnit, true);
-        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.FOE_SQUAD_MEMBER, bim.battlefield.getDeploymentArea());
+        bim.highlight(rowUnit, colUnit, true);
+        bim.focusOn(rowUnit, colUnit, true);
+        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA, bim.battlefield.getDeploymentArea());
         initialized = false;
 
     }
@@ -38,8 +38,8 @@ public class DeploymentBIS extends BattleInteractionState {
         if(initialized) {
             this.moveAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
-            focusOn(rowUnit, colUnit, true);
-            highlight(rowUnit, colUnit);
+            bim.focusOn(rowUnit, colUnit, true);
+            bim.highlight(rowUnit, colUnit, true);
             bim.shortTilePanel.hide();
             bim.shortTilePanel.set(bim.battlefield.getTile(rowUnit, colUnit));
             bim.shortTilePanel.show();

@@ -1,6 +1,8 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.InfoBIS;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
@@ -36,7 +38,7 @@ public abstract class BattleInteractionState extends InteractionState {
 
     @Override
     public void dispose() {
-        bim.sltdTile.setVisible(false);
+        bim.hideHighlightedTiles();
         end();
 
     }
@@ -70,18 +72,6 @@ public abstract class BattleInteractionState extends InteractionState {
         if(mapSlidable && !bim.gcm.isCameraMoving()) {
             bim.gcm.translateCam(gameDX, gameDY);
         }
-    }
-
-    // -------------------- SHARED METHOD -----------------------------
-
-
-    public void focusOn(int row, int col, boolean smoothly){
-        bim.gcm.focusOn(col - 0.5f, row - 0.5f, smoothly);
-    }
-
-    public void highlight(int row, int col){
-        bim.sltdTile.setVisible(true);
-        bim.sltdTile.setTile(row, col);
     }
 
 

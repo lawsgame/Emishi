@@ -45,7 +45,7 @@ move_area
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_unit
+selected_tile
   rotate: false
   xy: 384, 0
   size: 64, 64

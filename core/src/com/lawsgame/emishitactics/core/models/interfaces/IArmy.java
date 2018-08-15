@@ -30,7 +30,8 @@ public abstract class IArmy extends Observable{
     public abstract boolean isPlayerControlled();
     public abstract boolean hasSquadStandardBearer(int squadId, boolean stillFighting);
     public abstract Banner getSquadBanner(IUnit unit, boolean stillFighting);
-    public abstract int getBannerRange();
+    public abstract int getBannerRange(int squadIndex);
+    public abstract int getBannerRange(IUnit unit);
     public abstract int getBuildingResources();
     public abstract boolean isThereStillbuildingResources();
     public abstract void decrementBuildingResources();

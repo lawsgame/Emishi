@@ -45,9 +45,24 @@ public  class Area extends Observable {
         }
     }
 
+    public void set(int row, int col, Data.AreaType type){
+        if(battlefield.isTileExisted(row, col)) {
+            this.checkmap = new boolean[][]{{true}};
+            this.rowInit = row;
+            this.colInit = col;
+            this.type = type;
+            notifyAllObservers(null);
+        }
+    }
+
     public void set(int rCenter, int cCenter, int rangeMin, int rangeMax){
         Array<int[]> tiles = Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax);
         set(tiles);
+    }
+
+    public void set(int rCenter, int cCenter, int rangeMin, int rangeMax, Data.AreaType type){
+        this.type = type;
+        set(rCenter, cCenter, rangeMin, rangeMax);
     }
 
     public void set(Array<int[]> tiles){
@@ -81,6 +96,11 @@ public  class Area extends Observable {
             checkmap = new boolean[1][1];
         }
         notifyAllObservers(null);
+    }
+
+    public void set(Array<int[]> tiles, Data.AreaType type){
+        this.type = type;
+        set(tiles);
     }
 
     public boolean contains(int row, int col){

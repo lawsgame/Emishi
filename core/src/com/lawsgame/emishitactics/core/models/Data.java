@@ -78,7 +78,7 @@ public class Data {
     }
 
     public enum AreaType {
-        SELECTED_UNIT,
+        SELECTED_TILE,
         MOVE_AREA,
         ACTION_AREA,
         GUARD_AREA,

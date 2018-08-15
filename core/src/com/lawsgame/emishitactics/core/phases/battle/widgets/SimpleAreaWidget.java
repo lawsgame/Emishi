@@ -41,10 +41,19 @@ public class SimpleAreaWidget extends AreaWidget {
     }
 
     @Override
+    public void setTile(int row, int col, Data.AreaType type) {
+        model.set(row, col, type);
+    }
+
+    @Override
     public void setTiles(Array<int[]> area) {
         model.set(area);
     }
 
+    @Override
+    public void setTiles(Array<int[]> area, Data.AreaType type) {
+        model.set(area, type);
+    }
 
     @Override
     public boolean contains(int r, int c) {

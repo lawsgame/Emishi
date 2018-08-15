@@ -56,11 +56,21 @@ public class BattlePhase extends GamePhase {
         // set the player army
         Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        Unit soldier1 = new Unit("Taro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        Unit soldier2 = new Unit("Maro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        soldier2.setStandardBearer(true);
+
 
         IArmy playerArmy = new Army(Data.Allegeance.ALLY, true);
-        playerArmy.setLeadershipConditionEnabled(true);
+        playerArmy.setLeadershipConditionEnabled(false);
         playerArmy.add(warlord);
+        playerArmy.add(soldier1);
+        playerArmy.add(soldier2);
         playerArmy.appointWarLord(warlord);
+        playerArmy.appointSoldier(soldier1, 0);
+        playerArmy.appointSoldier(soldier2, 0);
 
         // set the initial BattleInteractionState
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
@@ -106,7 +116,8 @@ public class BattlePhase extends GamePhase {
     public void renderWorld(SpriteBatch batch) {
         if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderTiles(batch);
         bim.getCurrentState().renderBetween(batch);
-        bim.sltdTile.render(batch);
+        for(int i = 0; i < bim.highlightedTiles.size; i++)
+            bim.highlightedTiles.get(i).render(batch);
         if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderUnits(batch);
         bim.getCurrentState().renderAhead(batch);
     }
