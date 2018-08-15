@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
@@ -71,10 +72,10 @@ public class AnimationScheduler implements GameUpdatableEntity{
             parallelThreads.add(thread);
         }
 
-        public Task(Renderer receiver, Renderer executer, Object dataBundle){
+        public Task(Observable sender, Renderer executer, Object dataBundle){
             this();
             Thread thread = new Thread(executer);
-            thread.addQuery(receiver, dataBundle);
+            thread.addQuery(sender, dataBundle);
             parallelThreads.add(thread);
         }
 
@@ -125,7 +126,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
 
                 for (int j = 0; j < parallelThreads.get(i).bundles.size(); j++) {
                     if(parallelThreads.get(i).tag.equals(""))
-                        str += "\n        " + parallelThreads.get(i).bundles.get(j) + " => " + parallelThreads.get(i).receivers.get(j);
+                        str += "\n        " + parallelThreads.get(i).bundles.get(j) + " => " + parallelThreads.get(i).senders.get(j);
                     else
                         str += "\n        "+parallelThreads.get(i).tag;
                 }
@@ -150,7 +151,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
      */
     public static class Thread {
         protected Renderer executer;
-        protected LinkedList<Renderer> receivers;
+        protected LinkedList<Observable> senders;
         protected LinkedList<Object> bundles;
         protected CountDown countDown;
         protected String tag = "";
@@ -159,7 +160,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
             this.executer = executer;
             this.countDown = new CountDown(delay);
             this.bundles = new LinkedList<Object>();
-            this.receivers = new LinkedList<Renderer>();
+            this.senders = new LinkedList<Observable>();
 
         }
         public Thread(Renderer executer){
@@ -167,14 +168,14 @@ public class AnimationScheduler implements GameUpdatableEntity{
 
         }
 
-        public Thread(Renderer executer, Renderer receiver, Object dataBundle){
+        public Thread(Renderer executer, Observable sender, Object dataBundle){
             this(executer);
-            addQuery(receiver, dataBundle);
+            addQuery(sender, dataBundle);
         }
 
         public Thread(Renderer renderer, Object dataBundle){
             this(renderer);
-            addQuery(renderer, dataBundle);
+            addQuery(renderer.getModel(), dataBundle);
         }
 
         void init() {
@@ -185,20 +186,20 @@ public class AnimationScheduler implements GameUpdatableEntity{
             return bundles.isEmpty() && !executer.isExecuting();
         }
 
-        public void addQuery(Renderer receiver, Object dataBundle){
-            receivers.offer(receiver);
+        public void addQuery(Observable receiver, Object dataBundle){
+            senders.offer(receiver);
             bundles.offer(dataBundle);
         }
 
         public void addQuery(Object dataBundle){
-            receivers.offer(executer);
+            senders.offer(executer.getModel());
             bundles.offer(dataBundle);
         }
 
         void update(float dt) {
             countDown.update(dt);
             if(countDown.isFinished() && !bundles.isEmpty() && !executer.isExecuting()){
-                receivers.pop().getNotification(bundles.pop());
+                senders.pop().notifyAllObservers(bundles.pop());
             }
         }
 

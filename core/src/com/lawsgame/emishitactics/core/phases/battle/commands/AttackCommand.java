@@ -105,7 +105,7 @@ public class AttackCommand extends BattleCommand {
                 if(i != 0){
                     bur = battlefieldRenderer.getUnitRenderer(notifs.get(i).wounded);
 
-                    defendersThreads.add(new Thread(bur, bur, notifs.get(i)));
+                    defendersThreads.add(new Thread(bur, notifs.get(i)));
                 }
             }
             targetThread.addQuery(notifs.get(0));
@@ -234,7 +234,7 @@ public class AttackCommand extends BattleCommand {
         battlefield.removeOOAUnits();
         Task removeOOAUnitTask = new Task();
         for(int i = 0; i < OOAUnits.size; i++)
-            removeOOAUnitTask.addThread(new Thread(battlefieldRenderer, battlefieldRenderer, OOAUnits.get(i)));
+            removeOOAUnitTask.addThread(new Thread(battlefieldRenderer, OOAUnits.get(i)));
         scheduler.addTask(removeOOAUnitTask);
     }
 

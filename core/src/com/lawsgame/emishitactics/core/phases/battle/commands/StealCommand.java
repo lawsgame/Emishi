@@ -35,10 +35,10 @@ public class StealCommand extends BattleCommand{
         // push render taks
         Task task = new Task();
         Thread stealerThread = new Thread(battlefieldRenderer.getUnitRenderer(stealer), stealer.getOrientation());
-        stealerThread.addQuery(battlefieldRenderer.getUnitRenderer(stealer), Data.AnimationId.STEAL);
+        stealerThread.addQuery(stealer, Data.AnimationId.STEAL);
         Thread stolenThread = new Thread(battlefieldRenderer.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
-        stolenThread.addQuery(battlefieldRenderer.getUnitRenderer(stolen), (stealSuccessful) ? Data.AnimationId.TAKE_HIT : Data.AnimationId.DODGE);
-        stolenThread.addQuery(battlefieldRenderer.getUnitRenderer(stolen), stolen.getOrientation());
+        stolenThread.addQuery(stolen, (stealSuccessful) ? Data.AnimationId.TAKE_HIT : Data.AnimationId.DODGE);
+        stolenThread.addQuery(stolen, stolen.getOrientation());
         task.addThread(stolenThread);
         task.addThread(stealerThread);
         scheduler.addTask(task);

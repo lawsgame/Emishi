@@ -437,7 +437,7 @@ public abstract class BattleCommand implements Command{
                 receivers.clear();
                 experienceGained.clear();
                 try{
-                    throw new BattleOutcomeException("receivers' and experience' arrays size don't match");
+                    throw new BattleOutcomeException("senders' and experience' arrays size don't match");
                 }catch(Exception e){
                     System.out.println(e.getStackTrace());
                 }
