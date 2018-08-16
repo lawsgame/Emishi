@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -42,7 +43,7 @@ public class BattlePhase extends GamePhase {
 
     }
 
-    public BattlePhase(GPM gsm, int chapterId ){
+    public BattlePhase(GPM gsm, Player player, int chapterId ){
         super(gsm, Data.GAME_PORT_WIDTH);
 
         // load assets
@@ -71,9 +72,11 @@ public class BattlePhase extends GamePhase {
         playerArmy.appointWarLord(warlord);
         playerArmy.appointSoldier(soldier1, 0);
         playerArmy.appointSoldier(soldier2, 0);
+        player.setArmy(playerArmy);
+
 
         // set the initial BattleInteractionState
-        this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, playerArmy);
+        this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, player);
         //BattleInteractionState initBIS = new TestBIS(bim);
         BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
@@ -83,6 +86,11 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void init() { }
+
+    @Override
+    public void end() {
+
+    }
 
     @Override
     public void update1(float dt) {
@@ -114,12 +122,16 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void renderWorld(SpriteBatch batch) {
-        if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderTiles(batch);
-        bim.getCurrentState().renderBetween(batch);
-        for(int i = 0; i < bim.highlightedTiles.size; i++)
-            bim.highlightedTiles.get(i).render(batch);
-        if(bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderUnits(batch);
-        bim.getCurrentState().renderAhead(batch);
+        if(bim.getCurrentState().isBattlefieldDisplayed()) {
+            bim.bfr.renderTiles(batch);
+            bim.bfr.renderAreas(batch);
+            bim.getCurrentState().renderBetween(batch);
+            if (bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderUnits(batch);
+            for (int i = 0; i < bim.highlightedTiles.size; i++) {
+                bim.highlightedTiles.get(i).render(batch);
+            }
+            bim.getCurrentState().renderAhead(batch);
+        }
     }
 
 

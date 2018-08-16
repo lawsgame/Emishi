@@ -46,7 +46,7 @@ public class CountDown implements GameUpdatableEntity {
 		running = false;
 	}
 
-	public void reset(int newdelay){
+	public void reset(float newdelay){
 		time = newdelay;
 		finished = false;
 		running = false;

@@ -75,8 +75,14 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             }
         }
 
-        for(int i = 0; i < areaRenderers.size; i++)
+
+    }
+
+    @Override
+    public void renderAreas(SpriteBatch batch) {
+        for(int i = 0; i < areaRenderers.size; i++) {
             areaRenderers.get(i).render(batch);
+        }
     }
 
     @Override

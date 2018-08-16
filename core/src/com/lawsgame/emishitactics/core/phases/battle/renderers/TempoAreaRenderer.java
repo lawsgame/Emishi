@@ -56,10 +56,12 @@ public class TempoAreaRenderer extends AreaRenderer {
 
     @Override
     public void render(SpriteBatch batch) {
-        for (int i = 0; i < spriteCoords.size; i++) {
-            spriteRefs.get(i).setCenterX(spriteCoords.get(i)[0]);
-            spriteRefs.get(i).setCenterY(spriteCoords.get(i)[1]);
-            spriteRefs.get(i).draw(batch);
+        if(visible) {
+            for (int i = 0; i < spriteCoords.size; i++) {
+                spriteRefs.get(i).setCenterX(spriteCoords.get(i)[0]);
+                spriteRefs.get(i).setCenterY(spriteCoords.get(i)[1]);
+                spriteRefs.get(i).draw(batch);
+            }
         }
     }
 

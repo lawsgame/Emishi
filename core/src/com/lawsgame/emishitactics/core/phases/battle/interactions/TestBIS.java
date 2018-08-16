@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -23,6 +24,8 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
@@ -43,7 +46,6 @@ public class TestBIS extends BattleInteractionState {
     IUnit sltdUnit;
     int index;
     boolean switchmode;
-    int weaponTick = 0;
 
     Stack<BattleCommand> historic = new Stack<BattleCommand>();
     BattleCommand command = null;
@@ -54,7 +56,7 @@ public class TestBIS extends BattleInteractionState {
         areaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
 
 
-        warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.AXE, false, false, false, true);
+        warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 15, Data.WeaponType.AXE, false, false, false, true);
         warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, false, true);
         soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, false, true);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
@@ -79,10 +81,21 @@ public class TestBIS extends BattleInteractionState {
         bim.bfr.getNotification(area);
 
 
+        // SCHEDULER TEST
+        Array<int[]> validPath = bim.battlefield.getShortestPath(6, 7, 8, 9, warlord.has(Data.Ability.PATHFINDER), warlord.getAllegeance(), false);
+
+        bim.shortTilePanel.set(Data.TileType.PLAIN);
+        bim.shortUnitPanel.set(warlord);
+        bim.scheduler.addTask(new Task(bim.showSTP, 0f));
+        bim.scheduler.addTask(new Task(bim.battlefield, bim.bfr.getUnitRenderer(warlord), new Notification.Walk(warlord, validPath)));
+        bim.scheduler.addTask(new Task(bim.showSUP, 0f));
+        System.out.println(bim.scheduler);
+
+
+        // CHOICE TEST
         sltdUnit = warlord;
         index = 1;
         switchmode = false;
-
 
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setMoved(true);
@@ -94,7 +107,6 @@ public class TestBIS extends BattleInteractionState {
         }
 
         System.out.println(bim.bcm.toString(warlord, new Array<BattleCommand>(), true));
-
 
 
         //choicePanel = new TempoChoicePanel(bim.asm);
@@ -115,11 +127,11 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("input : "+row+" "+col);
 
         //TEST 0
-        //System.out.println(bim.battlefield.isTileGuarded(row, col, Data.Allegeance.ENEMY));
+        //System.out.println(bim.battlefield.isTileGuarded(rowInit, colInit, Data.Allegeance.ENEMY));
 
         //TEST 1
         /*
-        Array<IUnit> coverers = bim.battlefield.getUnitsCoveringTile(row, col, Data.Allegeance.ENEMY);
+        Array<IUnit> coverers = bim.battlefield.getUnitsCoveringTile(rowInit, colInit, Data.Allegeance.ENEMY);
         System.out.println("COVERERS : ");
         for(int i = 0; i <  coverers.size; i++){
             System.out.println(coverers.getInstance(i).getName());
@@ -131,13 +143,13 @@ public class TestBIS extends BattleInteractionState {
         command = new TestCommand(bim.bfr, bim.scheduler);
         unitPos = bim.battlefield.getUnitPos( warlord);
         command.setActor(unitPos[0], unitPos[1]);
-        command.setTarget(row, col);
+        command.setTarget(rowInit, colInit);
         areaWidget.setTiles(command.getImpactArea());
         */
 
         //TEST 3
         /*
-        Notification.Build notif = new Notification.Build(row, col,
+        Notification.Build notif = new Notification.Build(rowInit, colInit,
                 Data.TileType.WATCH_TOWER,
                 warlord);
         bim.bfr.getNotification(notif);

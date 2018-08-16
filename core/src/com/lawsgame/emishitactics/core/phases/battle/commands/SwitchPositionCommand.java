@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.ViewThread;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
@@ -48,10 +48,10 @@ public class SwitchPositionCommand extends BattleCommand {
             battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
             Task task = new Task();
-            Thread actorThread = new Thread(battlefieldRenderer, new Notification.SetUnit(rowActor, colActor, actor));
-            Thread targetThread = new Thread(battlefieldRenderer, new Notification.SetUnit(rowTarget, colTarget, target));
-            task.addThread(actorThread);
-            task.addThread(targetThread);
+            ViewThread actorViewThread = new ViewThread(battlefieldRenderer, new Notification.SetUnit(rowActor, colActor, actor));
+            ViewThread targetViewThread = new AnimationScheduler.ViewThread(battlefieldRenderer, new Notification.SetUnit(rowTarget, colTarget, target));
+            task.addThread(actorViewThread);
+            task.addThread(targetViewThread);
             scheduler.addTask(task);
         }
     }

@@ -241,7 +241,7 @@ public class Unit extends IUnit{
         int gainLvl = upto - getLevel();
 
         if(gainLvl > 0){
-            int gainBeforePromotion = Data.PROMOTION_LEVEL - getLevel() - 1;
+            int gainBeforePromotion = (Data.PROMOTION_LEVEL <= upto) ? Data.PROMOTION_LEVEL - getLevel() - 1 : upto - getLevel();
             int gainAfterPromotion = upto - Data.PROMOTION_LEVEL;
 
             float mob = 0;

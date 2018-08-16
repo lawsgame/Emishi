@@ -49,4 +49,6 @@ public abstract class IArmy extends Observable{
 
     public abstract void checkComposition();
     public abstract void setLeadershipConditionEnabled(boolean enabled);
+
+
 }

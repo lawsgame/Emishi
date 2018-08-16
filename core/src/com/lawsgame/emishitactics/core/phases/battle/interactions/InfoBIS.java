@@ -9,7 +9,7 @@ public class InfoBIS extends BattleInteractionState{
     public InfoBIS(BattleInteractionMachine bim, int row, int col) {
         super(bim, true, false, false);
         if(bim.battlefield.isTileOccupied(row, col)) {
-            bim.longUnitPanel.set(bim.battlefield, row, col);
+            bim.longUnitPanel.set(bim.battlefield.getUnit(row, col));
             bim.longUnitPanel.show();
         }else{
             bim.longTilePanel.set(bim.battlefield.getTile(row, col));
@@ -24,6 +24,7 @@ public class InfoBIS extends BattleInteractionState{
 
     @Override
     public void end() {
+        super.end();
         bim.longTilePanel.hide();
         bim.longUnitPanel.hide();
     }

@@ -494,6 +494,18 @@ public class Battlefield extends Observable {
         return activeUnits;
     }
 
+    public int[] getRandomlyStillActiveUnitsCoords(int armyId){
+        Array<int[]> activeUnits = new Array<int[]>();
+        for(int r =0; r<getNbRows();r++){
+            for(int c = 0; c<getNbColumns(); c++){
+                if(isTileOccupied(r, c) && getUnit(r, c).getArmy().getId() == armyId && !getUnit(r, c).isDone()){
+                    activeUnits.add(new int[]{r, c});
+                }
+            }
+        }
+        return activeUnits.random();
+    }
+
     public IUnit removeUnit(int row, int col){
         IUnit unit = this.units[row][col];
         this.units[row][col] = null;

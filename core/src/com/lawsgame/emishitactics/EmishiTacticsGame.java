@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.PerformanceCounter;
 
+import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.engine.GPM;
 
@@ -15,6 +16,7 @@ public class EmishiTacticsGame extends ApplicationAdapter {
 	public static final int SCREEN_PIXEL_HEIGHT = 540;
 	public static final String TITLE = "Emishi Wars";
 
+	private Player player;
 	private SpriteBatch batch;
 	private GPM gpm;
 
@@ -27,7 +29,7 @@ public class EmishiTacticsGame extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
 		gpm = new GPM();
-		gpm.push(new BattlePhase(gpm,0));
+		gpm.push(new BattlePhase(gpm, player, 0));
 
 	}
 

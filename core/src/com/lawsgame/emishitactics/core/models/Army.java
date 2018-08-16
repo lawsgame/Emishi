@@ -205,7 +205,6 @@ public class Army extends IArmy{
     }
 
 
-
     @Override
     public Allegeance getAllegeance() {
         return allegeance;

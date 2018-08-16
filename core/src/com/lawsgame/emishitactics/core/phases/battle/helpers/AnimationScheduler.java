@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
@@ -41,12 +42,15 @@ public class AnimationScheduler implements GameUpdatableEntity{
     }
 
     public boolean isWaiting(){
-        return tasks.isEmpty();
+        return tasks.size() == 0;
     }
 
     public void addTask(Task task){
-        if(!task.isEmpty())
+        System.out.println("TASK REQUIRED");
+        if(!task.isEmpty()) {
+            System.out.println("TASK ADDED");
             tasks.offer(task);
+        }
     }
 
     public String toString(){
@@ -54,7 +58,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
         for(int i = 0; i < tasks.size(); i++){
             str += "\nTask "+i+" : \n"+tasks.get(i).toString();
         }
-        return str;
+        return str+"\n";
     }
 
 
@@ -67,20 +71,25 @@ public class AnimationScheduler implements GameUpdatableEntity{
 
         public Task(Renderer renderer, Object dataBundle){
             this();
-            Thread thread = new Thread(renderer);
-            thread.addQuery(dataBundle);
-            parallelThreads.add(thread);
+            ViewThread viewThread = new ViewThread(renderer);
+            viewThread.addQuery(dataBundle);
+            parallelThreads.add(viewThread);
         }
 
         public Task(Observable sender, Renderer executer, Object dataBundle){
             this();
-            Thread thread = new Thread(executer);
-            thread.addQuery(sender, dataBundle);
-            parallelThreads.add(thread);
+            ViewThread viewThread = new ViewThread(executer);
+            viewThread.addQuery(sender, dataBundle);
+            parallelThreads.add(viewThread);
         }
 
         public Task(){
             parallelThreads = new Array<Thread>();
+        }
+
+        public Task(SimpleCommand command, float delay){
+           this();
+           addThread(new  CommandThread(command, delay));
         }
 
         boolean isCompleted() {
@@ -103,7 +112,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
             parallelThreads.add(thread);
         }
 
-        public void addllThreads(Array<Thread> threads){
+        public <T extends Thread> void addllThreads(Array<T> threads){
             parallelThreads.addAll(threads);
         }
 
@@ -114,29 +123,41 @@ public class AnimationScheduler implements GameUpdatableEntity{
 
         public String toString(){
             String str = "";
+            ViewThread viewThread;
+            CommandThread commandThread;
             for(int i = 0; i < parallelThreads.size; i++) {
 
+                if(parallelThreads.get(i) instanceof ViewThread) {
 
-                if(parallelThreads.get(i).executer != null)
-                    str += "\n    Thread : executer = " + parallelThreads.get(i).executer.toString();
-                else
-                    str += "\n    Thread : executer = null";
-
-
-
-                for (int j = 0; j < parallelThreads.get(i).bundles.size(); j++) {
-                    if(parallelThreads.get(i).tag.equals(""))
-                        str += "\n        " + parallelThreads.get(i).bundles.get(j) + " => " + parallelThreads.get(i).senders.get(j);
+                    viewThread = (ViewThread)parallelThreads.get(i);
+                    if (viewThread.executer != null)
+                        str += "\n    ViewThread : executer = " + viewThread.executer.toString();
                     else
-                        str += "\n        "+parallelThreads.get(i).tag;
+                        str += "\n    ViewThread : executer = null";
+
+
+                    for (int j = 0; j < viewThread.bundles.size(); j++) {
+                        if (viewThread.tag.equals(""))
+                            str += " : " + viewThread.bundles.get(j) + " => " + viewThread.senders.get(j);
+                        else
+                            str += " : " + viewThread.tag;
+                    }
+                } else if(parallelThreads.get(i) instanceof CommandThread){
+                    commandThread = (CommandThread)parallelThreads.get(i);
+                    str +="\n   Command thread : "+commandThread.tag;
                 }
             }
             return str;
         }
 
-        public boolean isEmpty() {
+        /**
+         * convient method
+         * usefull to check if adding that task to the queue is relevant.
+         * @return
+         */
+        boolean isEmpty() {
             for(int i = 0; i < parallelThreads.size; i++){
-                if(parallelThreads.get(i).bundles.size() > 0){
+                if(!parallelThreads.get(i).isEmpty()){
                     return false;
                 }
             }
@@ -144,36 +165,108 @@ public class AnimationScheduler implements GameUpdatableEntity{
         }
     }
 
+    public static abstract class Thread {
+        protected String tag = "";
+
+        abstract void init();
+        abstract boolean isCompleted();
+        abstract boolean isEmpty();
+        abstract void update(float dt);
+
+
+        public void setTag(String tag){
+            this.tag = tag;
+        }
+    }
 
 
     /**
-     * thread class
+     * command thread
      */
-    public static class Thread {
+    public static class CommandThread extends Thread{
+        LinkedList<SimpleCommand> commands;
+        LinkedList<Float> delays;
+        CountDown countDown;
+
+        public CommandThread(){
+            commands = new LinkedList<SimpleCommand>();
+            delays = new LinkedList<Float>();
+            countDown = new CountDown(0);
+        }
+
+        public CommandThread(SimpleCommand command, float delay){
+            this();
+            addQuery(command, delay);
+        }
+
+        public void addQuery(SimpleCommand command, float delay){
+            commands.offer(command);
+            delays.offer(delay);
+        }
+
+        @Override
+        void init() {
+            launch();
+        }
+
+        private void launch(){
+            if(!isEmpty()) {
+                commands.peek().apply();
+                countDown.reset(delays.peek());
+                countDown.run();
+            }
+        }
+
+        @Override
+        boolean isCompleted() {
+            return countDown.isFinished() && commands.size() == 0;
+        }
+
+        @Override
+        boolean isEmpty() {
+            return commands.size() == 0;
+        }
+
+        @Override
+        void update(float dt) {
+            countDown.update(dt);
+            if(countDown.isFinished()){
+                commands.pop();
+                delays.pop();
+                launch();
+            }
+        }
+    }
+
+
+    /**
+     * view thread class
+     */
+    public static class ViewThread extends Thread{
         protected Renderer executer;
         protected LinkedList<Observable> senders;
         protected LinkedList<Object> bundles;
         protected CountDown countDown;
-        protected String tag = "";
 
-        public Thread(Renderer executer, float delay){
+
+        public ViewThread(Renderer executer, float delay){
             this.executer = executer;
             this.countDown = new CountDown(delay);
             this.bundles = new LinkedList<Object>();
             this.senders = new LinkedList<Observable>();
 
         }
-        public Thread(Renderer executer){
+        public ViewThread(Renderer executer){
             this(executer, 0);
 
         }
 
-        public Thread(Renderer executer, Observable sender, Object dataBundle){
+        public ViewThread(Renderer executer, Observable sender, Object dataBundle){
             this(executer);
             addQuery(sender, dataBundle);
         }
 
-        public Thread(Renderer renderer, Object dataBundle){
+        public ViewThread(Renderer renderer, Object dataBundle){
             this(renderer);
             addQuery(renderer.getModel(), dataBundle);
         }
@@ -183,7 +276,12 @@ public class AnimationScheduler implements GameUpdatableEntity{
         }
 
         boolean isCompleted() {
-            return bundles.isEmpty() && !executer.isExecuting();
+            return bundles.size() == 0 && !executer.isExecuting();
+        }
+
+        @Override
+        boolean isEmpty() {
+            return bundles.size() == 0;
         }
 
         public void addQuery(Observable receiver, Object dataBundle){
@@ -198,13 +296,9 @@ public class AnimationScheduler implements GameUpdatableEntity{
 
         void update(float dt) {
             countDown.update(dt);
-            if(countDown.isFinished() && !bundles.isEmpty() && !executer.isExecuting()){
+            if(countDown.isFinished() && !isEmpty() && !executer.isExecuting()){
                 senders.pop().notifyAllObservers(bundles.pop());
             }
-        }
-
-        public void setTag(String tag){
-            this.tag = tag;
         }
     }
 }

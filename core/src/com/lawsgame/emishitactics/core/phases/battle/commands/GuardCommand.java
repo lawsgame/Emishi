@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Thread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.ViewThread;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -30,8 +30,8 @@ public class GuardCommand extends StandCommand {
 
         // push render task
         Task task = new Task();
-        task.addThread(new Thread(battlefieldRenderer, area));
-        task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.GUARD));
+        task.addThread(new ViewThread(battlefieldRenderer, area));
+        task.addThread(new ViewThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.GUARD));
         IUnit guardedUnit;
         int dist;
         int rangeMin = Data.GUARD_REACTION_RANGE_MIN;
@@ -41,7 +41,7 @@ public class GuardCommand extends StandCommand {
                 dist = Utils.dist(rowActor, colActor, r, c);
                 if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, actor.getAllegeance())){
                     guardedUnit = battlefield.getUnit(r,c);
-                    task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(guardedUnit), Data.AnimationId.GUARDED));
+                    task.addThread(new ViewThread(battlefieldRenderer.getUnitRenderer(guardedUnit), Data.AnimationId.GUARDED));
                 }
             }
         }

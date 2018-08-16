@@ -7,10 +7,13 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -24,10 +27,11 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidg
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 import com.lawsgame.emishitactics.engine.CameraManager;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> {
-    public IArmy playerArmy;
+    public Player player;
     public Battlefield battlefield;
 
     public BattlefieldRenderer bfr;
@@ -42,13 +46,18 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public Array<AreaWidget> highlightedTiles;
 
     public Stage uiStage;
-    public TilePanel shortTilePanel;
-    public TilePanel longTilePanel;
-    public UnitPanel shortUnitPanel;
-    public UnitPanel longUnitPanel;
+    public final TilePanel shortTilePanel;
+    public final TilePanel longTilePanel;
+    public final UnitPanel shortUnitPanel;
+    public final UnitPanel longUnitPanel;
+
+    public SimpleCommand showSTP;
+    public SimpleCommand showSUP;
+    public SimpleCommand hideSTP;
+    public SimpleCommand hideSUP;
 
 
-    public BattleInteractionMachine(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, IArmy playerArmy) {
+    public BattleInteractionMachine(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player) {
         this.battlefield = battlefield;
         this.bfr = bfr;
         this.gcm = gcm;
@@ -56,7 +65,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.app = new ActionPanelPool(stageUI.getViewport());
         this.scheduler = new AnimationScheduler();
         this.bcm = new BattleCommandManager(bfr, scheduler);
-        this.playerArmy = playerArmy;
+        this.player = player;
         this.multiplexer = new InputMultiplexer();
         this.mainStringBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
 
@@ -84,28 +93,56 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         stageUI.addActor(longUnitPanel);
         stageUI.addActor(longTilePanel);
 
+        showSTP = new SimpleCommand() {
+            @Override
+            public void apply() {
+                shortTilePanel.show();
+            }
+        };
+        showSUP = new SimpleCommand() {
+            @Override
+            public void apply() {
+                shortUnitPanel.show();
+            }
+        };
+        hideSTP = new SimpleCommand() {
+            @Override
+            public void apply() {
+                shortTilePanel.hide();
+            }
+        };
+        hideSUP = new SimpleCommand() {
+            @Override
+            public void apply() {
+                shortUnitPanel.hide();
+            }
+        };
+
     }
+
 
     @Override
     public void push(BattleInteractionState bis){
-        multiplexer.clear();
-        multiplexer.addProcessor(new GestureDetector(bis));
-        multiplexer.addProcessor(uiStage);
-        Gdx.input.setInputProcessor(multiplexer);
         super.push(bis);
-
+        updateInputHandler();
     }
 
     public void rollback(){
-        if(states.size() > 1){
-            pop();
-            multiplexer.clear();
-            multiplexer.addProcessor(new GestureDetector(getCurrentState()));
-            multiplexer.addProcessor(uiStage);
-            Gdx.input.setInputProcessor(multiplexer);
-            getCurrentState().init();
+        super.rollback();
+        updateInputHandler();
+    }
 
-        }
+    public void replace(BattleInteractionState bis){
+        super.replace(bis);
+        updateInputHandler();
+    }
+
+    private void updateInputHandler(){
+        multiplexer.clear();
+        multiplexer.addProcessor(uiStage);
+        multiplexer.addProcessor(new GestureDetector(getCurrentState()));
+        Gdx.input.setInputProcessor(multiplexer);
+
     }
 
     // -------------------- SHARED METHOD -----------------------------

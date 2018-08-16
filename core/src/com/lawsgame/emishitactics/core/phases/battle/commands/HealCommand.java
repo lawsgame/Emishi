@@ -4,7 +4,6 @@ import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Thread;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -28,8 +27,8 @@ public class HealCommand extends BattleCommand {
 
         // push render task
         Task task = new Task();
-        task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(patient), healPower));
-        task.addThread(new Thread(battlefieldRenderer.getUnitRenderer(healer), Data.AnimationId.HEAL));
+        task.addThread(new AnimationScheduler.ViewThread(battlefieldRenderer.getUnitRenderer(patient), healPower));
+        task.addThread(new AnimationScheduler.ViewThread(battlefieldRenderer.getUnitRenderer(healer), Data.AnimationId.HEAL));
         scheduler.addTask(task);
 
         // set outcome

@@ -8,7 +8,7 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.InfoBIS;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
 
 public abstract class BattleInteractionState extends InteractionState {
-    protected BattleInteractionMachine bim;
+    protected final BattleInteractionMachine bim;
 
     private boolean battlefieldDisplayed;             // if true, the battlefield is displayed
     private boolean infoDisplayable;                  // if true, a long click on a tile while launch the InfoIS
@@ -37,13 +37,12 @@ public abstract class BattleInteractionState extends InteractionState {
     }
 
     @Override
-    public void dispose() {
-        bim.hideHighlightedTiles();
-        end();
+    public void dispose() { }
 
+    public void end(){
+        bim.hideHighlightedTiles();
     }
 
-    public abstract void end();
     public abstract void handleTouchInput(int row, int col);
     public void update1(float dt) {}
     public void update3(float dt) {}
@@ -96,4 +95,11 @@ public abstract class BattleInteractionState extends InteractionState {
     }
 
 
+
+    public static class BISException extends Exception{
+
+        public BISException(String s) {
+            super(s);
+        }
+    }
 }

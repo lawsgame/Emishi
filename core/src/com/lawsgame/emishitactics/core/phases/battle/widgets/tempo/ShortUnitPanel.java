@@ -37,27 +37,25 @@ public class ShortUnitPanel extends UnitPanel {
     }
 
     @Override
-    public void set(Battlefield bf, int rowUnit, int colUnit) {
-        if(bf.isTileOccupied(rowUnit, colUnit)) {
-            IUnit unit = bf.getUnit(rowUnit, colUnit);
-            builder = new StringBuilder("");
-            builder.append("Name : " + unit.getName());
-            builder.append("\nLevel : " + unit.getLevel());
+    public void set(IUnit unit) {
+        builder = new StringBuilder("");
+        builder.append("Name : " + unit.getName());
+        builder.append("\nLevel : " + unit.getLevel());
 
-            if (unit.isWarlord()) {
-                builder.append("\nPosition : warlord");
+        if (unit.isWarlord()) {
+            builder.append("\nPosition : warlord");
+        } else {
+            if (unit.isWarChief()) {
+                builder.append("\nPosition : war chief");
             } else {
-                if (unit.isWarChief()) {
-                    builder.append("\nPosition : war chief");
-                } else {
-                    builder.append("\nPosition : soldier");
-                }
+                builder.append("\nPosition : soldier");
             }
-
-            builder.append("\nHP  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
-            builder.append("\nMoral  : " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-            builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().toString() + " ");
         }
+
+        builder.append("\nHP  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
+        builder.append("\nMoral  : " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
+        builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().toString() + " ");
+
     }
 
     @Override
