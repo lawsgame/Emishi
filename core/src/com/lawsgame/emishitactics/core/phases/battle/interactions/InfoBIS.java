@@ -30,8 +30,9 @@ public class InfoBIS extends BattleInteractionState{
     }
 
     @Override
-    public void handleTouchInput(int row, int col) {
+    public boolean handleTouchInput(int row, int col) {
         bim.rollback();
+        return true;
     }
 
     @Override

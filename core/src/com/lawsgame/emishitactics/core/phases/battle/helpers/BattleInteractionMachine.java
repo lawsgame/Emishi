@@ -147,8 +147,37 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     // -------------------- SHARED METHOD -----------------------------
 
+    /**
+     * convient method which
+     *  - move the camera at the given position
+     *  - highlight relevant tile
+     *  - display relevant short panels
+     *
+     * @param row
+     * @param col
+     * @param moveCamSmoothly
+     * @param squadMembersHighlighted
+     * @param displayPanels
+     */
+    public void focusOn(int row, int col, boolean moveCamSmoothly, boolean squadMembersHighlighted, boolean displayPanels){
+        if(battlefield.isTileExisted(row, col)) {
+            moveCamera(row, col, moveCamSmoothly);
+            highlight(row, col, squadMembersHighlighted);
+            if(displayPanels) {
+                shortTilePanel.hide();
+                shortTilePanel.set(battlefield.getTile(row, col));
+                shortTilePanel.show();
+                shortUnitPanel.hide();
+                if (battlefield.isTileOccupied(row, col)) {
+                    shortUnitPanel.set(battlefield.getUnit(row, col));
+                    shortUnitPanel.show();
+                }
+            }
+        }
 
-    public void focusOn(int row, int col, boolean smoothly){
+    }
+
+    public void moveCamera(int row, int col, boolean smoothly){
         gcm.focusOn(col - 0.5f, row - 0.5f, smoothly);
     }
 
@@ -166,16 +195,12 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
                     if(squad.get(i).isStandardBearer()){
                         highlightedTiles.get(i).setTiles(
                                 Utils.getEreaFromRange(battlefield, squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit)),
-                                Data.AreaType.SELECTED_TILE);
+                                type);
                     }else {
                         highlightedTiles.get(i).setTile(squadMemberPos[0], squadMemberPos[1], type);
                     }
                 }else{
-                    if(squad.get(i).isStandardBearer()){
-                        highlightedTiles.get(i).setTile(row, col, Data.AreaType.SELECTED_TILE);
-                    }else {
-                        highlightedTiles.get(i).setTile(row, col, Data.AreaType.SELECTED_TILE);
-                    }
+                    highlightedTiles.get(i).setTile(row, col, Data.AreaType.SELECTED_TILE);
                 }
                 highlightedTiles.get(i).setVisible(true);
             }

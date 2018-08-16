@@ -13,7 +13,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
@@ -30,22 +30,21 @@ public class DeploymentBIS extends BattleInteractionState {
     boolean initialized;
 
     public DeploymentBIS(final BattleInteractionMachine bim) {
-        super(bim);
+        super(bim, true, true, true);
+        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA, bim.battlefield.getDeploymentArea());
+        this.initialized = false;
+
         bim.battlefield.randomlyDeployArmy(bim.player.getArmy());
+
         this.sltdUnit = bim.player.getArmy().getWarlord();
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
-        this.rowUnit = warlordPos[0];
-        this.colUnit = warlordPos[1];
-        bim.highlight(rowUnit, colUnit, true);
-        bim.focusOn(rowUnit, colUnit, true);
-        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA, bim.battlefield.getDeploymentArea());
-        initialized = false;
+        bim.focusOn(warlordPos[0], warlordPos[1], true, false, false);
 
         startButton = StartButton.create(bim.asm, bim.uiStage.getViewport());
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                bim.replace(new SelectActorBIS(bim));
+                bim.replace(new SelectActorBIS(bim, rowUnit, colUnit));
             }
         });
 
@@ -61,19 +60,12 @@ public class DeploymentBIS extends BattleInteractionState {
         if(initialized) {
             this.moveAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
-            bim.focusOn(rowUnit, colUnit, true);
-            bim.highlight(rowUnit, colUnit, true);
-            bim.shortTilePanel.hide();
-            bim.shortTilePanel.set(bim.battlefield.getTile(rowUnit, colUnit));
-            bim.shortTilePanel.show();
-            bim.shortUnitPanel.hide();
-            bim.shortUnitPanel.set(sltdUnit);
-            bim.shortUnitPanel.show();
+            bim.focusOn(rowUnit, colUnit, true, true, true);
         }
     }
 
     @Override
-    public void handleTouchInput(int row, int col) {
+    public boolean handleTouchInput(int row, int col) {
         if(bim.battlefield.isTileOccupied(row, col)){
             IUnit touchedUnit = bim.battlefield.getUnit(row, col);
             if (touchedUnit != sltdUnit || !initialized) {
@@ -83,6 +75,7 @@ public class DeploymentBIS extends BattleInteractionState {
                 this.rowUnit = row;
                 this.colUnit = col;
                 updateSltdUnit();
+                return true;
             }
         }else if(initialized
                 && sltdUnit.getArmy().isPlayerControlled()
@@ -91,17 +84,13 @@ public class DeploymentBIS extends BattleInteractionState {
 
             // if the selected unit belongs to the player's army and the buildingType at (rowInit, colInit) is available and within the deployment area, then redeploy the unit
             bim.battlefield.moveUnit(rowUnit, colUnit, row, col);
-            bim.scheduler.addTask(new AnimationScheduler.Task(bim.bfr, new Notification.SetUnit(row, col, sltdUnit)));
+            bim.scheduler.addTask(new Task(bim.bfr, new Notification.SetUnit(row, col, sltdUnit)));
             this.rowUnit = row;
             this.colUnit = col;
-            init();
-        }else{
-
-            bim.shortUnitPanel.hide();
-            bim.shortTilePanel.hide();
-            bim.shortTilePanel.set(bim.battlefield.getTile(row, col));
-            bim.shortTilePanel.show();
+            updateSltdUnit();
+            return true;
         }
+        return false;
     }
 
     @Override

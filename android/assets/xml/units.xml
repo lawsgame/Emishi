@@ -3,7 +3,7 @@
     <Battle battlefieldId = "0">
         <Army allegeance = "ENEMY">
             <Squad>
-                <Unit rowInit = "13" col = "9" name = "noname" job="SOLAR_KNIGHT" level="6" weaponType="BOW" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
+                <Unit row = "13" col = "9" name = "noname" job="SOLAR_KNIGHT" level="6" weaponType="BOW" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
                     <Attribute id = "weapon" value="HUNTING_BOW" stealable="true"/>
                     <Attribute id = "right handed" value="true"/>
                     <Attribute id = "equipement" value ="NONE" stealable="false"/>
@@ -13,7 +13,7 @@
                     <Attribute id = "orientation" value="SOUTH"/>
                     <Attribute id = "behaviour" value="PASSIVE"/>
                 </Unit>
-                <Unit rowInit = "13" col = "8" name = "noname" job="SOLAR_KNIGHT" level="3" weaponType="AXE" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
+                <Unit row = "13" col = "8" name = "noname" job="SOLAR_KNIGHT" level="3" weaponType="AXE" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
                     <Attribute id = "weapon" value="BROAD_AXE" stealable="true" />
                     <Attribute id = "right handed" value="true"/>
                     <Attribute id = "banner sign" value ="NONE"/>
@@ -24,7 +24,7 @@
                 </Unit>
             </Squad>
             <Squad>
-                <Unit rowInit = "14" col = "7" name = "noname" job="SOLAR_KNIGHT" level="3" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
+                <Unit row = "14" col = "7" name = "noname" job="SOLAR_KNIGHT" level="3" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" standardBearer="false" homogeneousLevels = "true">
                     <Attribute id = "weapon" value="SHORTSWORD" stealable="true"/>
                     <Attribute id = "right handed" value="true"/>
                     <Attribute id = "banner sign" value ="NONE"/>

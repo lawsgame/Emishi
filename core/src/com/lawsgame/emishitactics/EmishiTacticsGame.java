@@ -27,9 +27,10 @@ public class EmishiTacticsGame extends ApplicationAdapter {
 	public void create () {
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 0f);
 
-		batch = new SpriteBatch();
-		gpm = new GPM();
-		gpm.push(new BattlePhase(gpm, player, 0));
+		this.batch = new SpriteBatch();
+		this.gpm = new GPM();
+		this.player = new Player();
+		this.gpm.push(new BattlePhase(gpm, player, 0));
 
 	}
 

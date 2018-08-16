@@ -46,9 +46,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
     }
 
     public void addTask(Task task){
-        System.out.println("TASK REQUIRED");
         if(!task.isEmpty()) {
-            System.out.println("TASK ADDED");
             tasks.offer(task);
         }
     }

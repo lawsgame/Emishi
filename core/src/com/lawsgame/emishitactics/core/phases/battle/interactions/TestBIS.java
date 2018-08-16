@@ -51,7 +51,7 @@ public class TestBIS extends BattleInteractionState {
     BattleCommand command = null;
 
     public TestBIS(BattleInteractionMachine bim) {
-        super(bim);
+        super(bim, true, true, true);
 
         areaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
 
@@ -121,7 +121,7 @@ public class TestBIS extends BattleInteractionState {
 
 
     @Override
-    public void handleTouchInput(int row, int col) {
+    public boolean handleTouchInput(int row, int col) {
         // command test
 
         System.out.println("input : "+row+" "+col);
@@ -213,6 +213,7 @@ public class TestBIS extends BattleInteractionState {
             }
         }
 
+        return true;
     }
 
     @Override

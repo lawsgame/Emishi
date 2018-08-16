@@ -322,6 +322,10 @@ public class Battlefield extends Observable {
         return isTileOccupied(row, col) && !getUnit(row, col).isAllyWith(allegeance);
     }
 
+    public boolean isTileOccupiedByPlayerControlledUnit(int row, int col) {
+        return isTileOccupied(row, col) && getUnit(row, col).getArmy() != null && getUnit(row, col).getArmy().isPlayerControlled();
+    }
+
     public boolean isTileCovered(int row, int col, Allegeance alliedAllegeance){
         Array<Area.UnitArea> foeCoveredArea;
         for(Allegeance a : Allegeance.values()) {
@@ -388,18 +392,9 @@ public class Battlefield extends Observable {
     }
 
     public void deployUnit(int row, int col, IUnit unit, boolean notifyObservers){
-        boolean alreadyDeployed = false;
-        loop:{
-            for (int r = 0; r < getNbRows(); r++) {
-                for (int c = 0; c < getNbRows(); c++) {
-                    if (this.units[r][c] == unit) {
-                        alreadyDeployed = true;
-                        break loop;
-                    }
-                }
-            }
-        }
-        if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) &&  !alreadyDeployed && unit.getArmy() != null){
+        if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER))
+                && !isUnitAlreadydeployed(unit)
+                && unit.getArmy() != null){
             this.units[row][col] = unit;
             if(notifyObservers)
                 notifyAllObservers(new  Notification.SetUnit(row, col, unit));
@@ -596,6 +591,8 @@ public class Battlefield extends Observable {
 
 
     private static final CheckMoveMap checkmap = new CheckMoveMap();
+
+
 
 
     static class CheckMoveMap{

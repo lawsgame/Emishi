@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.InfoBIS;
@@ -11,23 +11,26 @@ public abstract class BattleInteractionState extends InteractionState {
     protected final BattleInteractionMachine bim;
 
     private boolean battlefieldDisplayed;             // if true, the battlefield is displayed
-    private boolean infoDisplayable;                  // if true, a long click on a tile while launch the InfoIS
+    private boolean longPanelDisplayable;                  // if true, a long click on a tile while launch the InfoIS
     private boolean mapSlidable;                      // if true, sliding will allow the player the move around the map
 
+    // on touch variables
+    private int rowTouch;
+    private int colTouch;
+    private boolean inputNotHandled;
+    private IUnit selectedUnit;
 
-
-    public BattleInteractionState(BattleInteractionMachine bim, boolean BFDisplayable, boolean infoDisplayable, boolean mapSlidable ) {
+    public BattleInteractionState(BattleInteractionMachine bim,
+                                  boolean BFDisplayable,
+                                  boolean longPanelDisplayable,
+                                  boolean mapSlidable) {
         super(bim.gcm.getCamera());
         this.bim = bim;
 
         this.battlefieldDisplayed = BFDisplayable;
-        this.infoDisplayable = infoDisplayable;
+        this.longPanelDisplayable = longPanelDisplayable;
         this.mapSlidable = mapSlidable;
 
-    }
-
-    public BattleInteractionState(BattleInteractionMachine bim){
-        this(bim, true, true, true);
     }
 
 
@@ -43,7 +46,7 @@ public abstract class BattleInteractionState extends InteractionState {
         bim.hideHighlightedTiles();
     }
 
-    public abstract void handleTouchInput(int row, int col);
+    public abstract boolean handleTouchInput(int row, int col);
     public void update1(float dt) {}
     public void update3(float dt) {}
     public void update12(float dt) {}
@@ -52,16 +55,42 @@ public abstract class BattleInteractionState extends InteractionState {
     public abstract void renderBetween(SpriteBatch batch);
     public abstract void renderAhead(SpriteBatch batch);
 
+
     @Override
     public void onTouch(float gameX, float gameY) {
         if(!bim.gcm.isCameraMoving()){
-            handleTouchInput((int)gameY, (int)gameX);
+            rowTouch = (int)gameY;
+            colTouch = (int)gameX;
+            inputNotHandled = !handleTouchInput(rowTouch,colTouch);
+            if(inputNotHandled && bim.battlefield.isTileExisted(rowTouch, colTouch)){
+
+                bim.shortTilePanel.hide();
+                bim.shortTilePanel.set(bim.battlefield.getTile(rowTouch, colTouch));
+                bim.shortTilePanel.show();
+                if(bim.battlefield.isTileOccupied(rowTouch, colTouch)){
+
+                    selectedUnit = bim.battlefield.getUnit(rowTouch, colTouch);
+                    bim.shortUnitPanel.hide();
+                    bim.shortUnitPanel.set(bim.battlefield.getUnit(rowTouch, colTouch));
+                    bim.shortUnitPanel.show();
+                    if(!selectedUnit.isAllyWith(Data.Allegeance.ALLY)){
+
+                        //TODO: add or remove selected foe action area to those of its alleageanca alreadt registered
+
+
+
+
+
+
+                    }
+                }
+            }
         }
     }
 
     @Override
     public void onLongTouch(float gameX, float gameY) {
-        if(infoDisplayable && !bim.gcm.isCameraMoving()){
+        if(longPanelDisplayable && !bim.gcm.isCameraMoving()){
             bim.push(new InfoBIS(bim, (int)gameY, (int)gameX));
         }
     }
@@ -86,8 +115,8 @@ public abstract class BattleInteractionState extends InteractionState {
         this.battlefieldDisplayed = battlefieldDisplayed;
     }
 
-    public void setInfoDisplayable(boolean infoDisplayable) {
-        this.infoDisplayable = infoDisplayable;
+    public void setLongPanelDisplayable(boolean longPanelDisplayable) {
+        this.longPanelDisplayable = longPanelDisplayable;
     }
 
     public void setMapSlidable(boolean mapSlidable) {

@@ -32,8 +32,10 @@ public class SceneBIS extends BattleInteractionState {
     }
 
     @Override
-    public void handleTouchInput(int row, int col) {
+    public boolean handleTouchInput(int row, int col) {
+
         bim.replace(new DeploymentBIS(bim));
+        return true;
     }
 
     @Override

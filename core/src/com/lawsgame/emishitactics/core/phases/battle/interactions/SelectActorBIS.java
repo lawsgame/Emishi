@@ -21,8 +21,8 @@ public class SelectActorBIS extends BattleInteractionState {
 
     @Override
     public void init() {
-        int[] activeUnitPos = null;
-        if(bim.battlefield.isTileOccupied(rowInit, colInit)){
+        int[] activeUnitPos = new int[2];
+        if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(rowInit, colInit)){
             activeUnitPos[0] = rowInit;
             activeUnitPos[1] = colInit;
         }else{
@@ -30,10 +30,8 @@ public class SelectActorBIS extends BattleInteractionState {
         }
 
         if(activeUnitPos != null){
-            bim.focusOn(activeUnitPos[0], activeUnitPos[1], true);
-            bim.highlight(activeUnitPos[0], activeUnitPos[1], false);
+            bim.focusOn(activeUnitPos[0], activeUnitPos[1], true, false, false);
         }else{
-
             try {
                 throw new BISException("push SelectActorBIS while there no active unit left in the player army");
             } catch (BISException e) {
@@ -48,8 +46,9 @@ public class SelectActorBIS extends BattleInteractionState {
     }
 
     @Override
-    public void handleTouchInput(int row, int col) {
+    public boolean handleTouchInput(int row, int col) {
 
+        return false;
     }
 
     @Override
