@@ -7,14 +7,11 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -43,7 +40,9 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public AnimationScheduler scheduler;
     public I18NBundle mainStringBundle;
 
-    public Array<AreaWidget> highlightedTiles;
+    public AreaWidget selectedTile;
+    public AreaWidget touchedTile;
+    public Array<AreaWidget> touchedRelatedTiles;
 
     public Stage uiStage;
     public final TilePanel shortTilePanel;
@@ -70,14 +69,14 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.mainStringBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
 
 
-        this.highlightedTiles = new Array<AreaWidget>();
+        this.selectedTile = new SimpleAreaWidget(battlefield, Data.AreaType.SELECTED_TILE);
+        this.touchedTile = new SimpleAreaWidget(battlefield, Data.AreaType.TOUCHED_TILE);
+        this.touchedRelatedTiles = new Array<AreaWidget>();
         AreaWidget areaWidget;
-        for(int i = 0; i < Data.MAX_UNITS_UNDER_WARLORD; i++){
-            areaWidget = new SimpleAreaWidget(battlefield, (i == 0) ?
-                    Data.AreaType.SELECTED_TILE :
-                    Data.AreaType.SQUAD_MEMBER);
+        for(int i = 1; i < Data.MAX_UNITS_UNDER_WARLORD; i++){
+            areaWidget = new SimpleAreaWidget(battlefield, Data.AreaType.SQUAD_MEMBER );
             areaWidget.setVisible(false);
-            highlightedTiles.add(areaWidget);
+            touchedRelatedTiles.add(areaWidget);
         }
 
 
@@ -156,13 +155,13 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      * @param row
      * @param col
      * @param moveCamSmoothly
-     * @param squadMembersHighlighted
+     * @param highlightAllsquad
      * @param displayPanels
      */
-    public void focusOn(int row, int col, boolean moveCamSmoothly, boolean squadMembersHighlighted, boolean displayPanels){
+    public void focusOn(int row, int col, boolean moveCamSmoothly, boolean highlightAllsquad, boolean displayPanels, boolean targetIsSelected){
         if(battlefield.isTileExisted(row, col)) {
             moveCamera(row, col, moveCamSmoothly);
-            highlight(row, col, squadMembersHighlighted);
+            highlight(row, col, highlightAllsquad, targetIsSelected);
             if(displayPanels) {
                 shortTilePanel.hide();
                 shortTilePanel.set(battlefield.getTile(row, col));
@@ -181,8 +180,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         gcm.focusOn(col - 0.5f, row - 0.5f, smoothly);
     }
 
-    public void highlight(int row, int col, boolean allSquad){
-        hideHighlightedTiles();
+    public void highlight(int row, int col, boolean allSquad, boolean selected){
+        hideHighlightedTiles(true);
         if(allSquad && battlefield.isTileOccupied(row, col)) {
 
             IUnit sltdUnit = battlefield.getUnit(row, col);
@@ -193,26 +192,32 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
                 if(squad.get(i) != sltdUnit){
                     squadMemberPos = battlefield.getUnitPos(squad.get(i));
                     if(squad.get(i).isStandardBearer()){
-                        highlightedTiles.get(i).setTiles(
+                        touchedRelatedTiles.get(i).setTiles(
                                 Utils.getEreaFromRange(battlefield, squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit)),
                                 type);
                     }else {
-                        highlightedTiles.get(i).setTile(squadMemberPos[0], squadMemberPos[1], type);
+                        touchedRelatedTiles.get(i).setTile(squadMemberPos[0], squadMemberPos[1], type);
                     }
-                }else{
-                    highlightedTiles.get(i).setTile(row, col, Data.AreaType.SELECTED_TILE);
+                    touchedRelatedTiles.get(i).setVisible(true);
                 }
-                highlightedTiles.get(i).setVisible(true);
             }
-        }else {
-            highlightedTiles.get(0).setTile(row, col, Data.AreaType.SELECTED_TILE);
-            highlightedTiles.get(0).setVisible(true);
         }
+
+        if(selected){
+            selectedTile.setTile(row, col);
+            selectedTile.setVisible(true);
+        }else {
+            touchedTile.setTile(row, col);
+            touchedTile.setVisible(true);
+        }
+
     }
 
-    public void hideHighlightedTiles(){
-        for(int i = 0; i < highlightedTiles.size; i++){
-            highlightedTiles.get(i).setVisible(false);
+    public void hideHighlightedTiles(boolean exceptSelectedTile){
+        touchedTile.setVisible(false);
+        if(!exceptSelectedTile) selectedTile.setVisible(false);
+        for(int i = 0; i < touchedRelatedTiles.size; i++){
+            touchedRelatedTiles.get(i).setVisible(false);
         }
     }
 

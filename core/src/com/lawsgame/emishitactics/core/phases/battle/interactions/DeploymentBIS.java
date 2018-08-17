@@ -38,7 +38,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
         this.sltdUnit = bim.player.getArmy().getWarlord();
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
-        bim.focusOn(warlordPos[0], warlordPos[1], true, false, false);
+        bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, false);
 
         startButton = StartButton.create(bim.asm, bim.uiStage.getViewport());
         startButton.addListener(new ChangeListener() {
@@ -60,7 +60,7 @@ public class DeploymentBIS extends BattleInteractionState {
         if(initialized) {
             this.moveAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
-            bim.focusOn(rowUnit, colUnit, true, true, true);
+            bim.focusOn(rowUnit, colUnit, true, true, true, true);
         }
     }
 

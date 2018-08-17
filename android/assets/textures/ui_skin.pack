@@ -59,23 +59,30 @@ squad_member
   orig: 64, 64
   offset: 0, 0
   index: -1
+touched_tile
+  rotate: false
+  xy: 512, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 button_down
   rotate: false
-  xy: 512, 40
+  xy: 576, 40
   size: 60, 24
   orig: 60, 24
   offset: 0, 0
   index: -1
 button_up
   rotate: false
-  xy: 512, 16
+  xy: 576, 16
   size: 60, 24
   orig: 60, 24
   offset: 0, 0
   index: -1
 black_background
   rotate: false
-  xy: 572, 32
+  xy: 636, 32
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

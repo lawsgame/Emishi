@@ -18,7 +18,6 @@ public abstract class BattleInteractionState extends InteractionState {
     private int rowTouch;
     private int colTouch;
     private boolean inputNotHandled;
-    private IUnit selectedUnit;
 
     public BattleInteractionState(BattleInteractionMachine bim,
                                   boolean BFDisplayable,
@@ -43,7 +42,7 @@ public abstract class BattleInteractionState extends InteractionState {
     public void dispose() { }
 
     public void end(){
-        bim.hideHighlightedTiles();
+        bim.hideHighlightedTiles(false);
     }
 
     public abstract boolean handleTouchInput(int row, int col);
@@ -63,26 +62,12 @@ public abstract class BattleInteractionState extends InteractionState {
             colTouch = (int)gameX;
             inputNotHandled = !handleTouchInput(rowTouch,colTouch);
             if(inputNotHandled && bim.battlefield.isTileExisted(rowTouch, colTouch)){
-
-                bim.shortTilePanel.hide();
-                bim.shortTilePanel.set(bim.battlefield.getTile(rowTouch, colTouch));
-                bim.shortTilePanel.show();
-                if(bim.battlefield.isTileOccupied(rowTouch, colTouch)){
-
-                    selectedUnit = bim.battlefield.getUnit(rowTouch, colTouch);
-                    bim.shortUnitPanel.hide();
-                    bim.shortUnitPanel.set(bim.battlefield.getUnit(rowTouch, colTouch));
-                    bim.shortUnitPanel.show();
-                    if(!selectedUnit.isAllyWith(Data.Allegeance.ALLY)){
-
+                bim.focusOn(rowTouch, colTouch, true, true, true, false);
+                if(bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, Data.Allegeance.ALLY)){
                         //TODO: add or remove selected foe action area to those of its alleageanca alreadt registered
 
 
 
-
-
-
-                    }
                 }
             }
         }

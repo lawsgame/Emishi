@@ -78,6 +78,7 @@ public class Data {
     }
 
     public enum AreaType {
+        TOUCHED_TILE,
         SELECTED_TILE,
         MOVE_AREA,
         ACTION_AREA,
