@@ -85,27 +85,93 @@ public class DeploymentBIS extends BattleInteractionState {
                 && sltdUnit.getArmy().isPlayerControlled()
                 && bim.battlefield.isTileAvailable(row, col, sltdUnit.has(Data.Ability.PATHFINDER))){
 
-            if(isUnitRedeployedWithinTheSameArea(row, col, sltdUnit)) {
-                // if the selected unit belongs to the player's army and the buildingType at (rowInit, colInit) is available and within the deployment area, then redeploy the unit
+            // if the selected unit belongs to the player's army adn the target tile is available
+            if(isUnitRedeployingWithinTheSameArea(row, col, sltdUnit)) {
+
                 bim.battlefield.moveUnit(rowUnit, colUnit, row, col, true);
                 this.rowUnit = row;
                 this.colUnit = col;
                 updateSltdUnit();
+                return true;
+            }else if(isDeployementAreaAvailable(getDeploymentAreaIndex(row, col))
+                    && sltdUnit.getSquadIndex() != 0){
+
+                redeploySquad(row, col);
                 return true;
             }
         }
         return false;
     }
 
-    private boolean isUnitRedeployedWithinTheSameArea(int rowTargetTile, int colTarget, IUnit unit){
-        /*
+
+    private void redeploySquad(int row, int col) {
+
+        //get the area relevant indexes
+        int areaTargetIndex = getDeploymentAreaIndex(row, col);
+        int areaUnitIndex = getDeploymentAreaIndex(rowUnit, colUnit);
+
+        //fetch all squad member
+        int r;
+        int c;
+        Array<IUnit> squadmembers = new Array<IUnit>();
+        Array<int[]> tiles = bim.battlefield.getDeploymentArea(areaUnitIndex).getTiles();
+        for(int i = 0; i < tiles.size; i++){
+            r = tiles.get(i)[0];
+            c = tiles.get(i)[1];
+            if(bim.battlefield.isTileOccupiedBySameSquad(r, c, sltdUnit) && bim.battlefield.getUnit(r,c) != sltdUnit){
+                squadmembers.add(bim.battlefield.removeUnit(r, c, true));
+            }
+        }
+
+        //TEST
+        System.out.println("sltd unit : "+sltdUnit.getName());
+        for(IUnit unit : squadmembers)
+            System.out.println("others : "+unit.getName());
+
+        // update sltd unit position
+        bim.battlefield.moveUnit(rowUnit, colUnit, row, col, true);
+        this.rowUnit = row;
+        this.colUnit = col;
+
+        // redeploy the other squad members in the new deployment area
+        bim.battlefield.randomlyDeploy(squadmembers, areaTargetIndex);
+
+        // update cam pos and UI
+        updateSltdUnit();
+    }
+
+
+    private boolean isUnitRedeployingWithinTheSameArea(int rowTarget, int colTarget, IUnit unit){
         int[] unitPos = bim.battlefield.getUnitPos(unit);
-        return (Utils.arrayContains(bim.battlefield.getDeploymentArea(false), rowTargetTile, colTarget)
-                && Utils.arrayContains(bim.battlefield.getDeploymentArea(false), unitPos))
-                ||(Utils.arrayContains(bim.battlefield.getDeploymentArea(true), rowTargetTile, colTarget)
-                && Utils.arrayContains(bim.battlefield.getDeploymentArea(true), unitPos));
-        */
-        return true;
+        int areaTargetIndex = getDeploymentAreaIndex(rowTarget, colTarget);
+        int areaUnitIndex = getDeploymentAreaIndex(unitPos[0], unitPos[1]);
+        return  areaTargetIndex != -1 && areaUnitIndex != -1 && areaTargetIndex == areaUnitIndex;
+    }
+
+    private int getDeploymentAreaIndex(int rowTile, int colTile){
+        for(int i = 0; i < bim.battlefield.getDeploymentAreas().size; i++){
+            if(bim.battlefield.getDeploymentArea(i).contains(rowTile, colTile))
+                return i;
+        }
+        return -1;
+    }
+
+    private boolean isDeployementAreaAvailable(int areaIndex){
+        boolean res = false;
+        if(0 == areaIndex){
+            res = true;
+        }else if(0 < areaIndex && areaIndex < bim.battlefield.getNumberOfDeploymentAreas()){
+            res =  true;
+            Array<int[]> targetArea = bim.battlefield.getDeploymentArea(areaIndex).getTiles();
+            for(int i = 0; i < targetArea.size; i++){
+                if(bim.battlefield.isTileOccupied(targetArea.get(i)[0], targetArea.get(i)[1])){
+                    res = false;
+                    continue;
+                }
+            }
+
+        }
+        return res;
     }
 
     @Override

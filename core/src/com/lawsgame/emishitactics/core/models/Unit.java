@@ -1007,7 +1007,7 @@ public class Unit extends IUnit{
             loop :
             {
                 for (int i = 0; i < army.getAllSquads().size; i++) {
-                    for (int j = 0; j < army.getAllSquads().get(j).size; j++) {
+                    for (int j = 0; j < army.getAllSquads().get(i).size; j++) {
                         if (army.getAllSquads().get(i).get(j) == this) {
                             squadIndex = i;
                             break loop;

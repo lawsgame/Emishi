@@ -197,6 +197,18 @@ public class Battlefield extends Observable {
         return guardians;
     }
 
+    public void addDeploymentTile(int row, int col, int areaIndex, boolean notifyObservers){
+
+        if(isTileReachable(row, col, false) && 0 <= areaIndex){
+
+            // add deployment areas not yet added while the areaIndex is positive and superior than the size of the deployment area array
+            while(areaIndex >= deploymentAreas.size){
+                deploymentAreas.add(new Area(this, Data.AreaType.VANGUARD_DEPLOYMENT_AREA));
+            }
+
+            deploymentAreas.get(areaIndex).addTile(row, col, notifyObservers);
+        }
+    }
 
 
     //-------------- TILE STATE CHECK METHODS HIERARCHY ----------------------
@@ -519,8 +531,6 @@ public class Battlefield extends Observable {
     private static final CheckMoveMap checkmap = new CheckMoveMap();
 
 
-
-
     static class CheckMoveMap{
         int rowOrigin;
         int colOrigin;
@@ -828,34 +838,22 @@ public class Battlefield extends Observable {
         return getNbRows();
     }
 
+    public Array<Area> getDeploymentAreas() {
+        return deploymentAreas;
+    }
+
     public Area getDeploymentArea(int areaIndex) {
         if(0 <= areaIndex && areaIndex < deploymentAreas.size)
             return deploymentAreas.get(areaIndex);
         return null;
     }
 
-    public void addDeploymentTile(int row, int col, int areaIndex, boolean notifyObservers){
-        System.out.println("ADDED => "+row+" "+col);
-
-        if(isTileReachable(row, col, false) && 0 <= areaIndex){
-
-            // add deployment areas not yet added while the areaIndex is positive and superior than the size of the deployment area array
-            while(areaIndex >= deploymentAreas.size){
-                deploymentAreas.add(new Area(this, Data.AreaType.VANGUARD_DEPLOYMENT_AREA));
-            }
-
-            deploymentAreas.get(areaIndex).addTile(row, col, notifyObservers);
-        }
-
-        System.out.println(getDeploymentArea(areaIndex).toString());
+    public HashMap<Allegeance, Array<Area.UnitArea>> getGuardedAreas() {
+        return guardedAreas;
     }
 
     public int getNumberOfDeploymentAreas(){
         return deploymentAreas.size;
-    }
-
-    public HashMap<Allegeance, Array<Area.UnitArea>> getGuardedAreas() {
-        return guardedAreas;
     }
 
 
