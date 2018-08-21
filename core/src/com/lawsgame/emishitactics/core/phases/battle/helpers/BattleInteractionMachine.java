@@ -9,20 +9,19 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.LongTilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.LongUnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.ShortTilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.ShortUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
@@ -69,12 +68,12 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.mainStringBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
 
 
-        this.selectedTile = new SimpleAreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
-        this.touchedTile = new SimpleAreaWidget(battlefield, Data.AreaType.TOUCHED_TILE);
+        this.selectedTile = new AreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
+        this.touchedTile = new AreaWidget(battlefield, Data.AreaType.TOUCHED_TILE);
         this.touchedRelatedTiles = new Array<AreaWidget>();
         AreaWidget areaWidget;
         for(int i = 1; i < Data.MAX_UNITS_UNDER_WARLORD; i++){
-            areaWidget = new SimpleAreaWidget(battlefield, Data.AreaType.SQUAD_MEMBER );
+            areaWidget = new AreaWidget(battlefield, Data.AreaType.SQUAD_MEMBER );
             areaWidget.setVisible(false);
             touchedRelatedTiles.add(areaWidget);
         }
@@ -194,9 +193,10 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
                     if(squad.get(i).isStandardBearer()){
                         touchedRelatedTiles.get(i).setTiles(
                                 Utils.getEreaFromRange(battlefield, squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit)),
-                                type);
+                                type,
+                                true);
                     }else {
-                        touchedRelatedTiles.get(i).setTile(squadMemberPos[0], squadMemberPos[1], type);
+                        touchedRelatedTiles.get(i).setTile(squadMemberPos[0], squadMemberPos[1], type, true);
                     }
                     touchedRelatedTiles.get(i).setVisible(true);
                 }
@@ -204,10 +204,10 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         }
 
         if(selected){
-            selectedTile.setTile(row, col);
+            selectedTile.setTile(row, col, true);
             selectedTile.setVisible(true);
         }else {
-            touchedTile.setTile(row, col);
+            touchedTile.setTile(row, col, true);
             touchedTile.setVisible(true);
         }
 

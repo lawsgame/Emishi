@@ -96,10 +96,10 @@ public class BattlefieldLoader {
                         rgb = Utils.getRGBA(colorKey);
                        if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0 && bf.isTileReachable(rowTile, colTile, false)){
                            // main deployment area
-                            bf.addDeploymentTile(rowTile, colTile, false);
-                       }else if(rgb[0] == 255 && rgb[1] == 255 && rgb[2] == 255 && bf.isTileReachable(rowTile, colTile, false)){
+                            bf.addDeploymentTile(rowTile, colTile, 0, false);
+                       }else if(rgb[0] == 255 && rgb[1] == 255 && bf.isTileReachable(rowTile, colTile, false)){
                            // vanguard deployment area
-                           bf.addDeploymentTile(rowTile, colTile, true);
+                           bf.addDeploymentTile(rowTile, colTile, 256 - rgb[2], false);
                        }
                     }else{
 
@@ -162,7 +162,7 @@ public class BattlefieldLoader {
                                 }
 
                                 //add  to the battlefield
-                                if(!bf.isTileDeploymentTile(rowUnit, colUnit, false) && !bf.isTileDeploymentTile(rowUnit, colUnit, true)) {
+                                if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
                                     bf.deployUnit(rowUnit, colUnit, unit, true);
                                 }
                             }

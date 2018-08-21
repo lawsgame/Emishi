@@ -24,13 +24,11 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.SimpleAreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 
 import java.util.Stack;
@@ -53,7 +51,7 @@ public class TestBIS extends BattleInteractionState {
     public TestBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true);
 
-        areaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
+        areaWidget = new AreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
 
 
         warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 15, Data.WeaponType.AXE, false, false, false, true);

@@ -13,62 +13,71 @@ public  class Area extends Observable {
     private Battlefield battlefield;
     private Data.AreaType type;
 
-    public Area(Battlefield battlefield, Data.AreaType type, int row, int col){
+    public Area(Battlefield battlefield, Data.AreaType type){
         this.battlefield = battlefield;
         this.type = type;
-        set(row, col);
+        this.rowInit = -1;
+        this.colInit = -1;
+        this.checkmap = new boolean[][]{{false}};
+    }
+
+    public Area(Battlefield battlefield, Data.AreaType type, int row, int col){
+        this.battlefield = battlefield;
+        setType(type, false);
+        set(row, col, false);
     }
 
     public Area(Battlefield battlefield, Data.AreaType type, Array<int[]> tiles){
         this.battlefield = battlefield;
-        this.type = type;
-        set(tiles);
+        setType(type, false);
+        set(tiles, false);
     }
 
     public Area(Battlefield battlefield, Data.AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax){
         this(battlefield , type, Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax));
     }
 
-    public void addTile(int row, int col){
+    public void addTile(int row, int col, boolean notifyObservers){
         if(checkIndexes(row, col)) {
             checkmap[row - rowInit][col - colInit] = true;
-            notifyAllObservers(null);
+            if(notifyObservers)
+                notifyAllObservers(null);
+        }else if (battlefield.isTileExisted(row, col)){
+            Array<int[]> tiles = getTiles();
+            tiles.add(new int[]{row, col});
+            set(tiles, notifyObservers);
         }
     }
 
-    public void set( int row, int col){
+
+    public void set( int row, int col, boolean notifyObservers){
         if(battlefield.isTileExisted(row, col)) {
             this.checkmap = new boolean[][]{{true}};
             this.rowInit = row;
             this.colInit = col;
-            notifyAllObservers(null);
+            if(notifyObservers)
+                notifyAllObservers(null);
         }
     }
 
-    public void set(int row, int col, Data.AreaType type){
-        if(battlefield.isTileExisted(row, col)) {
-            this.checkmap = new boolean[][]{{true}};
-            this.rowInit = row;
-            this.colInit = col;
-            this.type = type;
-            notifyAllObservers(null);
-        }
+    public void set(int row, int col, Data.AreaType type, boolean notifyObservers){
+        setType(type, false);
+        set(row, col, notifyObservers);
     }
 
-    public void set(int rCenter, int cCenter, int rangeMin, int rangeMax){
-        Array<int[]> tiles = Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax);
-        set(tiles);
+    public void set(int rCenter, int cCenter, int rangeMin, int rangeMax, boolean notifyObservers){
+        set(Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax), notifyObservers);
     }
 
-    public void set(int rCenter, int cCenter, int rangeMin, int rangeMax, Data.AreaType type){
-        this.type = type;
-        set(rCenter, cCenter, rangeMin, rangeMax);
+    public void set(int rCenter, int cCenter, int rangeMin, int rangeMax, Data.AreaType type, boolean notifyObservers){
+        setType(type, false);
+        set(rCenter, cCenter, rangeMin, rangeMax, notifyObservers);
     }
 
-    public void set(Array<int[]> tiles){
+    public void set(Array<int[]> tiles, boolean notifyObservers){
 
         if(tiles.size > 0) {
-            // addExpGained checkmap size and row & col init
+            // add checkmap size and row & col init
             this.rowInit = battlefield.getNbRows();
             this.colInit = battlefield.getNbColumns();
             int rowEnd = 0;
@@ -95,12 +104,13 @@ public  class Area extends Observable {
             colInit = 0;
             checkmap = new boolean[1][1];
         }
-        notifyAllObservers(null);
+        if(notifyObservers)
+            notifyAllObservers(null);
     }
 
-    public void set(Array<int[]> tiles, Data.AreaType type){
-        this.type = type;
-        set(tiles);
+    public void set(Array<int[]> tiles, Data.AreaType type, boolean notifyObservers){
+        setType(type, false);
+        set(tiles, notifyObservers);
     }
 
     public boolean contains(int row, int col){
@@ -137,6 +147,26 @@ public  class Area extends Observable {
 
     public Data.AreaType getType() {
         return type;
+    }
+
+    public void setType(Data.AreaType type, boolean notifyObservers){
+        this.type = type;
+        if(notifyObservers)
+            notifyAllObservers(null);
+    }
+
+    public Array<int[]> getTiles(){
+        Array<int[]> tiles = new Array<int[]>();
+        if(checkmap != null) {
+            for (int r = checkmap.length - 1; r >= 0; r--) {
+                for (int c = 0; c < checkmap[0].length; c++) {
+                    if (checkmap[r][c]) {
+                        tiles.add(new int[]{r+rowInit, c+colInit});
+                    }
+                }
+            }
+        }
+        return tiles;
     }
 
 

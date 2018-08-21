@@ -2,75 +2,67 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoAreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.AreaWidget;
 
-public class SimpleAreaWidget extends AreaWidget {
+public class AreaWidget {
     public Area model;
     public AreaRenderer renderer;
 
 
-    public SimpleAreaWidget(Battlefield battlefield, Data.AreaType color){
+    public AreaWidget(Battlefield battlefield, Data.AreaType color){
         this(battlefield, color, new Array<int[]>());
     }
 
 
-    public SimpleAreaWidget(Battlefield battlefield, Data.AreaType areaType, Array<int[]> tiles){
+    public AreaWidget(Battlefield battlefield, Data.AreaType areaType, Array<int[]> tiles){
         model = new Area(battlefield, areaType, tiles);
         renderer = new TempoAreaRenderer(model);
     }
 
+    public AreaWidget(Area area){
+        model = area;
+        renderer = new TempoAreaRenderer(area);
+    }
 
-    @Override
+
     public void render(SpriteBatch batch) {
         renderer.render(batch);
     }
 
-    @Override
-    public void addTile(int r, int c) {
-        model.addTile(r , c);
+    public void addTile(int r, int c, boolean notifyObservers) { model.addTile(r , c, notifyObservers); }
+
+    public void setTile(int row, int col, boolean notifyObservers) {
+        model.set(row, col, notifyObservers);
     }
 
-    @Override
-    public void setTile(int row, int col) {
-        model.set(row, col);
+    public void setTile(int row, int col, Data.AreaType type, boolean notifyObservers) {
+        model.set(row, col, type, notifyObservers);
     }
 
-    @Override
-    public void setTile(int row, int col, Data.AreaType type) {
-        model.set(row, col, type);
+    public void setTiles(Array<int[]> area, boolean notifyObservers) {
+        model.set(area, notifyObservers);
     }
 
-    @Override
-    public void setTiles(Array<int[]> area) {
-        model.set(area);
+    public void setTiles(Array<int[]> area, Data.AreaType type, boolean notifyObservers) {
+        model.set(area, type, notifyObservers);
     }
 
-    @Override
-    public void setTiles(Array<int[]> area, Data.AreaType type) {
-        model.set(area, type);
-    }
-
-    @Override
     public boolean contains(int r, int c) {
         return model.contains(r, c);
     }
 
-    @Override
     public void setVisible(boolean visible) {
         renderer.setVisible(visible);
     }
 
-    @Override
     public Area getModel() {
         return model;
     }
 
-    @Override
     public AreaRenderer getRenderer() {
         return renderer;
     }
