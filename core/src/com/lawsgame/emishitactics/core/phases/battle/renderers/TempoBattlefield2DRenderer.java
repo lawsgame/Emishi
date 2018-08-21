@@ -55,9 +55,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         // addExpGained up area renderers
         this.areaRenderers = new Array<AreaRenderer>();
         for(Data.Allegeance a : Data.Allegeance.values()){
-            for (int i = 0; i < getModel().getCoveredAreas().get(a).size; i++) {
-                addaAreaRenderer(getModel().getCoveredAreas().get(a).get(i));
-            }
             for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
                 addaAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
             }

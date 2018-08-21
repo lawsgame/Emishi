@@ -231,7 +231,7 @@ public class AttackCommand extends BattleCommand {
 
     protected void removeOutOfActionUnits(){
         Array<IUnit> OOAUnits = battlefield.getOOAUnits();
-        battlefield.removeOOAUnits();
+        battlefield.removeOOAUnits(false);
         Task removeOOAUnitTask = new Task();
         for(int i = 0; i < OOAUnits.size; i++)
             removeOOAUnitTask.addThread(new AnimationScheduler.ViewThread(battlefieldRenderer, OOAUnits.get(i)));

@@ -52,24 +52,27 @@ public class BattlePhase extends GamePhase {
         this.getGameCM().setCameraBoundaries(battlefield.getWidth(), battlefield.getHeight());
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
-        // set the player army
-        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        // TEST player army
+        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.SWORD, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         Unit soldier1 = new Unit("Taro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         Unit soldier2 = new Unit("Maro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
         soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         soldier2.setStandardBearer(true);
-
+        Unit warchief1 = new Unit("Azamaru", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
         IArmy playerArmy = new Army(Data.Allegeance.ALLY, true);
         playerArmy.setLeadershipConditionEnabled(false);
         playerArmy.add(warlord);
+        playerArmy.add(warchief1);
         playerArmy.add(soldier1);
         playerArmy.add(soldier2);
         playerArmy.appointWarLord(warlord);
+        playerArmy.appointWarChief(warchief1);
         playerArmy.appointSoldier(soldier1, 0);
-        playerArmy.appointSoldier(soldier2, 0);
+        playerArmy.appointSoldier(soldier2, 1);
         player.setArmy(playerArmy);
 
 

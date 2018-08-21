@@ -69,7 +69,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.mainStringBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
 
 
-        this.selectedTile = new SimpleAreaWidget(battlefield, Data.AreaType.SELECTED_TILE);
+        this.selectedTile = new SimpleAreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
         this.touchedTile = new SimpleAreaWidget(battlefield, Data.AreaType.TOUCHED_TILE);
         this.touchedRelatedTiles = new Array<AreaWidget>();
         AreaWidget areaWidget;
@@ -152,23 +152,23 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      *  - highlight relevant tile
      *  - display relevant short panels
      *
-     * @param row
-     * @param col
+     * @param rowTarget
+     * @param colTarget
      * @param moveCamSmoothly
      * @param highlightAllsquad
      * @param displayPanels
      */
-    public void focusOn(int row, int col, boolean moveCamSmoothly, boolean highlightAllsquad, boolean displayPanels, boolean targetIsSelected){
-        if(battlefield.isTileExisted(row, col)) {
-            moveCamera(row, col, moveCamSmoothly);
-            highlight(row, col, highlightAllsquad, targetIsSelected);
+    public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean highlightAllsquad, boolean displayPanels, boolean targetIsSelected){
+        if(battlefield.isTileExisted(rowTarget, colTarget)) {
+            moveCamera(rowTarget, colTarget, moveCamSmoothly);
+            highlight(rowTarget, colTarget, highlightAllsquad, targetIsSelected);
             if(displayPanels) {
                 shortTilePanel.hide();
-                shortTilePanel.set(battlefield.getTile(row, col));
+                shortTilePanel.set(battlefield.getTile(rowTarget, colTarget));
                 shortTilePanel.show();
                 shortUnitPanel.hide();
-                if (battlefield.isTileOccupied(row, col)) {
-                    shortUnitPanel.set(battlefield.getUnit(row, col));
+                if (battlefield.isTileOccupied(rowTarget, colTarget)) {
+                    shortUnitPanel.set(battlefield.getUnit(rowTarget, colTarget));
                     shortUnitPanel.show();
                 }
             }

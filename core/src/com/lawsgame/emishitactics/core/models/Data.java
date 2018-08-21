@@ -79,12 +79,13 @@ public class Data {
 
     public enum AreaType {
         TOUCHED_TILE,
-        SELECTED_TILE,
+        SELECTED_UNIT,
         MOVE_AREA,
         ACTION_AREA,
         GUARD_AREA,
         SQUAD_MEMBER,
         DEPLOYMENT_AREA,
+        VANGUARD_DEPLOYMENT_AREA,
         FOE_ACTION_AREA,
         FOE_SQUAD_MEMBER
     }

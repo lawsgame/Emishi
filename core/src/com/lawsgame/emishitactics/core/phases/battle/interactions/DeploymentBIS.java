@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -25,16 +26,25 @@ public class DeploymentBIS extends BattleInteractionState {
     IUnit sltdUnit;
     AreaWidget moveAreaWidget;
     AreaWidget deploymentAreaWidget;
+    AreaWidget vanguardDeploymentAreaWidget;
     StartButton startButton;
 
     boolean initialized;
 
     public DeploymentBIS(final BattleInteractionMachine bim) {
         super(bim, true, true, true);
-        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA, bim.battlefield.getDeploymentArea());
+        this.deploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA, bim.battlefield.getDeploymentArea(false));
+        this.vanguardDeploymentAreaWidget = new SimpleAreaWidget(bim.battlefield, Data.AreaType.VANGUARD_DEPLOYMENT_AREA, bim.battlefield.getDeploymentArea(true));
         this.initialized = false;
 
-        bim.battlefield.randomlyDeployArmy(bim.player.getArmy());
+
+        for(int i = 0; i < bim.battlefield.getDeploymentArea(true).size; i++){
+            int[] a = bim.battlefield.getDeploymentArea(true).get(i);
+            System.out.println(a[0]+" "+a[1]);
+        }
+
+
+        bim.battlefield.randomlyDeploy(bim.player.getArmy().getMobilizedUnits(true), false);
 
         this.sltdUnit = bim.player.getArmy().getWarlord();
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
@@ -79,18 +89,29 @@ public class DeploymentBIS extends BattleInteractionState {
             }
         }else if(initialized
                 && sltdUnit.getArmy().isPlayerControlled()
-                && deploymentAreaWidget.contains(row, col)
                 && bim.battlefield.isTileAvailable(row, col, sltdUnit.has(Data.Ability.PATHFINDER))){
 
-            // if the selected unit belongs to the player's army and the buildingType at (rowInit, colInit) is available and within the deployment area, then redeploy the unit
-            bim.battlefield.moveUnit(rowUnit, colUnit, row, col);
-            bim.scheduler.addTask(new Task(bim.bfr, new Notification.SetUnit(row, col, sltdUnit)));
-            this.rowUnit = row;
-            this.colUnit = col;
-            updateSltdUnit();
-            return true;
+            if(isUnitRedeployedWithinTheSameArea(row, col, sltdUnit)) {
+                // if the selected unit belongs to the player's army and the buildingType at (rowInit, colInit) is available and within the deployment area, then redeploy the unit
+                bim.battlefield.moveUnit(rowUnit, colUnit, row, col, true);
+                this.rowUnit = row;
+                this.colUnit = col;
+                updateSltdUnit();
+                return true;
+            }
         }
         return false;
+    }
+
+    private boolean isUnitRedeployedWithinTheSameArea(int rowTargetTile, int colTarget, IUnit unit){
+        /*
+        int[] unitPos = bim.battlefield.getUnitPos(unit);
+        return (Utils.arrayContains(bim.battlefield.getDeploymentArea(false), rowTargetTile, colTarget)
+                && Utils.arrayContains(bim.battlefield.getDeploymentArea(false), unitPos))
+                ||(Utils.arrayContains(bim.battlefield.getDeploymentArea(true), rowTargetTile, colTarget)
+                && Utils.arrayContains(bim.battlefield.getDeploymentArea(true), unitPos));
+        */
+        return true;
     }
 
     @Override
@@ -101,6 +122,7 @@ public class DeploymentBIS extends BattleInteractionState {
     @Override
     public void renderBetween(SpriteBatch batch) {
         deploymentAreaWidget.render(batch);
+        vanguardDeploymentAreaWidget.render(batch);
         if(moveAreaWidget != null)
             moveAreaWidget.render(batch);
     }

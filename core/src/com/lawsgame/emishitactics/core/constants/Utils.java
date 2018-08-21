@@ -35,15 +35,15 @@ public class Utils {
     }
 
     public static boolean arrayContains(Array<int[]> intArray, int[] value){
-        boolean tempo;
+        boolean contained;
         if(value != null) {
             for (int i = 0; i < intArray.size; i++) {
                 if (intArray.get(i).length == value.length) {
-                    tempo = true;
+                    contained = true;
                     for (int j = 0; j < value.length; j++) {
-                        tempo = tempo && value[j] == intArray.get(i)[j];
+                        contained = contained && value[j] == intArray.get(i)[j];
                     }
-                    if (tempo) return true;
+                    if (contained) return true;
                 }
             }
         }

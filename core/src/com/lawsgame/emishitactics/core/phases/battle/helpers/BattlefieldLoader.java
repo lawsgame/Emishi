@@ -95,8 +95,12 @@ public class BattlefieldLoader {
                         // whether or not the buildingType is to be added to the deployment buildingType
                         rgb = Utils.getRGBA(colorKey);
                        if(rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0 && bf.isTileReachable(rowTile, colTile, false)){
-                            bf.addDeploymentTile(rowTile, colTile);
-                        }
+                           // main deployment area
+                            bf.addDeploymentTile(rowTile, colTile, false);
+                       }else if(rgb[0] == 255 && rgb[1] == 255 && rgb[2] == 255 && bf.isTileReachable(rowTile, colTile, false)){
+                           // vanguard deployment area
+                           bf.addDeploymentTile(rowTile, colTile, true);
+                       }
                     }else{
 
                         //TODO: available for loot loading (shrine, village, etc...)
@@ -145,7 +149,7 @@ public class BattlefieldLoader {
                                 int rowUnit = unitElt.getInt("row");
                                 int colUnit = unitElt.getInt("col");
 
-                                // addExpGained to the army composition
+                                // add to the army composition
                                 army.add(unit);
                                 if(n == 0){
                                     if(k == 0){
@@ -157,8 +161,8 @@ public class BattlefieldLoader {
                                     army.appointSoldier(unit, k);
                                 }
 
-                                // addExpGained to the battlefield
-                                if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
+                                //add  to the battlefield
+                                if(!bf.isTileDeploymentTile(rowUnit, colUnit, false) && !bf.isTileDeploymentTile(rowUnit, colUnit, true)) {
                                     bf.deployUnit(rowUnit, colUnit, unit, true);
                                 }
                             }

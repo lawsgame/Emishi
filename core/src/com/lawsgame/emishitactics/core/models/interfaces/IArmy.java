@@ -12,6 +12,7 @@ public abstract class IArmy extends Observable{
 
     public abstract IUnit getWarlord();
     public abstract IUnit getWarchief(IUnit unit);
+    public abstract IUnit getWarchief(int squadIndex);
     public abstract Array<IUnit> getWarChiefs();
     public abstract Array<IUnit> getSquad(IUnit unit, boolean stillFighting);
     public abstract Array<Array<IUnit>> getAllSquads();
@@ -24,6 +25,7 @@ public abstract class IArmy extends Observable{
     public abstract boolean isUnitMobilized(IUnit unit);
     public abstract boolean isUnitReserve(IUnit unit);
     public abstract boolean contains(IUnit unit);
+    public abstract boolean isSquadIndexValid(int squadIndex);
 
     public abstract Allegeance getAllegeance();
     public abstract boolean isAlliedWith(Allegeance allegeance);

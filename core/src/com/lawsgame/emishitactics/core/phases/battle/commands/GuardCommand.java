@@ -52,7 +52,7 @@ public class GuardCommand extends StandCommand {
     @Override
     public void undo() {
         if(actor != null){
-            UnitArea area = battlefield.removeGuardedArea(actor);
+            UnitArea area = battlefield.removeGuardedArea(actor, false);
             if(area != null)
                 scheduler.addTask(new Task(battlefieldRenderer, area));
         }

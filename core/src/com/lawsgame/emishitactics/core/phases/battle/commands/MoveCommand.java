@@ -43,7 +43,7 @@ public class MoveCommand extends BattleCommand{
         IUnit walker = battlefield.getUnit(rowActor, colActor);
 
         // update model
-        battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget);
+        battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget, false);
         Data.Orientation or = (validPath.size > 1) ?
                 Utils.getOrientationFromCoords(validPath.get(validPath.size - 2)[0], validPath.get(validPath.size - 2)[1], rowTarget, colTarget) :
                 Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
@@ -92,7 +92,7 @@ public class MoveCommand extends BattleCommand{
         if(battlefield.isTileOccupied(rowTarget, colTarget)){
             IUnit actor = battlefield.getUnit(rowTarget, colTarget);
             if(actor == walkerRenderer.getModel()) {
-                battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor);
+                battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor, false);
                 actor.setMoved(false);
                 scheduler.addTask(new Task(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
             }

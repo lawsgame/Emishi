@@ -67,6 +67,14 @@ public class Army extends IArmy{
     }
 
     @Override
+    public IUnit getWarchief(int squadIndex) {
+        if(isSquadIndexValid(squadIndex)){
+            return mobilizedTroups.get(squadIndex).get(0);
+        }
+        return null;
+    }
+
+    @Override
     public Array<IUnit> getWarChiefs() {
         Array<IUnit> warChiefs = new Array<IUnit>();
         for(int i = 0; i < mobilizedTroups.size; i++){
@@ -202,6 +210,11 @@ public class Army extends IArmy{
     @Override
     public boolean contains(IUnit unit){
         return isUnitReserve(unit)|| isUnitMobilized(unit);
+    }
+
+    @Override
+    public boolean isSquadIndexValid(int squadIndex) {
+        return squadIndex < mobilizedTroups.size && 0 <= squadIndex && mobilizedTroups.get(squadIndex).size > 0;
     }
 
 

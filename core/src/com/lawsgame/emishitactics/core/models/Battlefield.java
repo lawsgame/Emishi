@@ -30,9 +30,9 @@ public class Battlefield extends Observable {
     private TileType[][] tiles;
     private IUnit[][] units;
     private boolean[][] looted;
-    private Array<int[]> deploymentArea;
+    private Array<int[]> mainDeploymentArea;
+    private Array<int[]> vanguardDeploymentArea;
     private HashMap<Allegeance, Array<UnitArea>> guardedAreas;
-    private HashMap<Allegeance, Array<UnitArea>> coveredAreas;
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
 
@@ -43,13 +43,12 @@ public class Battlefield extends Observable {
             this.looted = new boolean[nbRows][nbCols];
             this.units = new IUnit[nbRows][nbCols];
         }
-        this.deploymentArea = new Array<int[]>();
+        this.mainDeploymentArea = new Array<int[]>();
+        this.vanguardDeploymentArea = new Array<int[]>();
 
         this.guardedAreas = new HashMap<Allegeance, Array<UnitArea>>();
-        this.coveredAreas = new HashMap<Allegeance, Array<UnitArea>>();
         for(Allegeance a: Allegeance.values()){
             this.guardedAreas.put(a, new Array<UnitArea>());
-            this.coveredAreas.put(a, new Array<UnitArea>());
         }
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
@@ -159,53 +158,6 @@ public class Battlefield extends Observable {
         return c + getNbColumns() * r;
     }
 
-    public UnitArea addCoveredArea(int rowActor, int colActor){
-        UnitArea area = null;
-        if(isTileOccupied(rowActor, colActor)) {
-            IUnit actor = getUnit(rowActor, colActor);
-            if(actor.isMobilized()) {
-                int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, this);
-                int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, this);
-                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, rangeMin, rangeMax);
-                area = new Area.UnitArea(this, Data.AreaType.DEPLOYMENT_AREA, tiles, actor);
-                this.coveredAreas.get(actor.getAllegeance()).add(area);
-            }
-        }
-        return area;
-    }
-
-    public UnitArea removeCoveredArea(IUnit actor){
-        UnitArea area= null;
-        if(actor != null && actor.isMobilized()){
-            Array<Area.UnitArea> areas = this.coveredAreas.get(actor.getAllegeance());
-            for (int i = 0; i < areas.size; i++) {
-                if (areas.get(i).getActor() == actor) {
-                    area = areas.removeIndex(i);
-                    continue;
-                }
-            }
-        }
-        return area;
-    }
-
-    public Array<IUnit> getUnitsCoveringTile(int row, int col, Allegeance alleageance){
-        Array<IUnit> coverers =  new Array<IUnit>();
-        Array<Area.UnitArea> foeCoveredArea;
-        Allegeance a;
-        for(int i = 0; i < Allegeance.values().length; i++) {
-            a = Allegeance.values()[i];
-            if(a != alleageance) {
-                foeCoveredArea = coveredAreas.get(a);
-                for (int k = 0; k < foeCoveredArea.size; k++) {
-                    if (foeCoveredArea.get(k).contains(row, col)) {
-                        coverers.add(foeCoveredArea.get(k).getActor());
-                    }
-                }
-            }
-        }
-        return coverers;
-    }
-
     public UnitArea addGuardedArea(int rowActor, int colActor){
         Area.UnitArea area = null;
         if(isTileOccupied(rowActor, colActor)) {
@@ -220,13 +172,15 @@ public class Battlefield extends Observable {
         return area;
     }
 
-    public UnitArea removeGuardedArea(IUnit actor){
+    public UnitArea removeGuardedArea(IUnit actor, boolean notifyObservers){
         UnitArea area = null;
         if(actor != null && actor.isMobilized()){
             Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getAllegeance());
             for (int i = 0; i < areas.size; i++) {
                 if (areas.get(i).getActor() == actor) {
                     area = areas.removeIndex(i);
+                    if(notifyObservers)
+                        notifyAllObservers(area);
                     continue;
                 }
             }
@@ -263,7 +217,8 @@ public class Battlefield extends Observable {
 
      */
 
-    public boolean isTileDeploymentTile(int row, int col) {
+    public boolean isTileDeploymentTile(int row, int col, boolean vanguard) {
+        Array<int[]> deploymentArea = (!vanguard) ? mainDeploymentArea : vanguardDeploymentArea;
         for(int i = 0; i < deploymentArea.size; i++){
             if(deploymentArea.get(i).length >= 2 && deploymentArea.get(i)[0] == row && deploymentArea.get(i)[1] == col){
                 return true;
@@ -326,21 +281,6 @@ public class Battlefield extends Observable {
         return isTileOccupied(row, col) && getUnit(row, col).getArmy() != null && getUnit(row, col).getArmy().isPlayerControlled();
     }
 
-    public boolean isTileCovered(int row, int col, Allegeance alliedAllegeance){
-        Array<Area.UnitArea> foeCoveredArea;
-        for(Allegeance a : Allegeance.values()) {
-            if(a != alliedAllegeance) {
-                foeCoveredArea = coveredAreas.get(a);
-                for (int i = 0; i < foeCoveredArea.size; i++) {
-                    if (foeCoveredArea.get(i).contains(row, col)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     public boolean isTileGuarded(int row, int col, Allegeance alliedAllegeance){
         boolean res = false;
         Array<Area.UnitArea> allyGuardedArea = guardedAreas.get(alliedAllegeance);
@@ -360,34 +300,28 @@ public class Battlefield extends Observable {
 
 
 
-    public void randomlyDeployArmy(IArmy army){
-        if(army != null) {
+    public void randomlyDeploy(Array<IUnit> mobilizedTroops, boolean vanguard){
+        Array<int[]> deploymentsTile = getDeploymentArea(vanguard);
+        IUnit unit;
+        int[] coords;
+        Array<int[]> remainingAvailableTiles = new Array<int[]>();
+        Array<IUnit> remainingUnits = new Array<IUnit>();
 
-            Array<IUnit> mobilizedTroops = army.getMobilizedUnits(true);
-            Array<int[]> deploymentsTile = getDeploymentArea();
-            IUnit unit;
-            int[] coords;
-            Array<int[]> remainingAvailableTiles = new Array<int[]>();
-            Array<IUnit> remainingUnits = new Array<IUnit>();
-
-
-            for (int i = 0; i < deploymentsTile.size; i++) {
-                coords = deploymentsTile.get(i);
-                if (coords.length >= 2 && isTileAvailable(coords[0], coords[1], false)) {
-                    remainingAvailableTiles.add(coords);
-                }
+        for (int i = 0; i < deploymentsTile.size; i++) {
+            coords = deploymentsTile.get(i);
+            if (coords.length >= 2 && isTileAvailable(coords[0], coords[1], false)) {
+                remainingAvailableTiles.add(coords);
             }
-            for (int i = 0; i < mobilizedTroops.size; i++) {
-                remainingUnits.add(mobilizedTroops.get(i));
+        }
+        for (int i = 0; i < mobilizedTroops.size; i++) {
+            remainingUnits.add(mobilizedTroops.get(i));
 
-            }
+        }
 
-            while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
-                coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
-                unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
-                deployUnit(coords[0], coords[1], unit, true);
-            }
-
+        while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
+            coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
+            unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
+            deployUnit(coords[0], coords[1], unit, true);
         }
     }
 
@@ -412,15 +346,49 @@ public class Battlefield extends Observable {
         return false;
     }
 
+    public void redeploySquad(IArmy army, boolean vanguard, int squadIndex){
+        if(army != null && army.isSquadIndexValid(squadIndex)){
+            IUnit warchief = army.getWarchief(squadIndex);
+            Array<IUnit> squad = new Array<IUnit>();
+
+            //fetch all squad members which are to be found in the previous deployment area
+            Array<int[]> deploymentArea = (!vanguard) ? vanguardDeploymentArea : mainDeploymentArea;
+            int r;
+            int c;
+            for(int i = 0; i < deploymentArea.size; i++){
+                r = deploymentArea.get(i)[0];
+                c = deploymentArea.get(i)[1];
+                if(isTileOccupiedBySameSquad(r,c, warchief)){
+                    squad.add(removeUnit(r,c, true));
+                }
+            }
+
+            //redeploy in the new area
+            randomlyDeploy(squad, vanguard);
+
+        }
+    }
+
+    public boolean isVanguardDeploymentAreaAvailable(){
+        int r;
+        int c;
+        for(int i = 0; i < vanguardDeploymentArea.size; i++){
+            r = vanguardDeploymentArea.get(i)[0];
+            c = vanguardDeploymentArea.get(i)[1];
+            if(isTileOccupied(r,c)){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean switchUnitPositions(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
         if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2)){
             IUnit unit1 = getUnit(rowUnit1, colUnit1);
             IUnit unit2 = getUnit(rowUnit2, colUnit2);
             if(isTileReachable(rowUnit1, colUnit1, unit2.has(Data.Ability.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(Data.Ability.PATHFINDER)))){
-                removeCoveredArea(unit1);
-                removeCoveredArea(unit2);
-                removeGuardedArea(unit1);
-                removeGuardedArea(unit2);
+                removeGuardedArea(unit1, false);
+                removeGuardedArea(unit2, false);
                 this.units[rowUnit2][colUnit2] = unit1;
                 this.units[rowUnit1][colUnit1] = unit2;
                 return true;
@@ -429,14 +397,15 @@ public class Battlefield extends Observable {
         return false;
     }
 
-    public boolean moveUnit(int rowI, int colI, int rowf, int colf){
+    public boolean moveUnit(int rowI, int colI, int rowf, int colf, boolean notifyObservers){
         if(isTileOccupied(rowI, colI)) {
             IUnit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(Data.Ability.PATHFINDER))){
-                removeCoveredArea(unit);
-                removeGuardedArea(unit);
+                removeGuardedArea(unit, notifyObservers);
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
+                if(notifyObservers)
+                    notifyAllObservers(new Notification.SetUnit(rowf, colf, unit));
                 return true;
             }
         }
@@ -448,21 +417,6 @@ public class Battlefield extends Observable {
             IUnit unit = getUnit(rowUnit, colUnit);
             if(unit.isMobilized()) {
                 Array<UnitArea> areas = getGuardedAreas().get(unit.getArmy().getAllegeance());
-                for(int i = 0; i < areas.size; i++){
-                    if(areas.get(i).getActor() == unit){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean isUnitCovering(int rowUnit, int colUnit){
-        if(isTileOccupied(rowUnit, colUnit)){
-            IUnit unit = getUnit(rowUnit, colUnit);
-            if(unit.isMobilized()) {
-                Array<UnitArea> areas = getCoveredAreas().get(unit.getArmy().getAllegeance());
                 for(int i = 0; i < areas.size; i++){
                     if(areas.get(i).getActor() == unit){
                         return true;
@@ -501,19 +455,21 @@ public class Battlefield extends Observable {
         return activeUnits.random();
     }
 
-    public IUnit removeUnit(int row, int col){
+
+    public IUnit removeUnit(int row, int col, boolean notifyObservers){
         IUnit unit = this.units[row][col];
         this.units[row][col] = null;
-        removeCoveredArea(unit);
-        removeGuardedArea(unit);
+        removeGuardedArea(unit, notifyObservers);
+        if(notifyObservers)
+            notifyAllObservers(getUnit(row, col));
         return unit;
     }
 
-    public void removeOOAUnits() {
+    public void removeOOAUnits(boolean notifyObservers) {
         for(int r= 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileOccupied(r, c) && getUnit(r, c).isOutOfAction()){
-                    removeUnit(r, c);
+                    removeUnit(r, c, notifyObservers);
                 }
             }
         }
@@ -824,32 +780,28 @@ public class Battlefield extends Observable {
                 PathNode node;
                 neighbours = new Array<PathNode>();
                 if (isTileReachable(current.row + 1, current.col, pathfinder)
-                        && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)
-                        && (!avoidCoveredArea || !isTileCovered(current.row + 1, current.col, allegeance))) {
+                        && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)) {
                     node = new PathNode(current.row + 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row, current.col + 1, pathfinder)
-                        && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)
-                        && (!avoidCoveredArea || !isTileCovered(current.row, current.col + 1, allegeance))) {
+                        && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)) {
                     node = new PathNode(current.row, current.col + 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row - 1, current.col, pathfinder)
-                        && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)
-                        && (!avoidCoveredArea || !isTileCovered(current.row - 1, current.col, allegeance))) {
+                        && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)) {
                     node = new PathNode(current.row - 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row, current.col - 1, pathfinder)
-                        && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)
-                        && (!avoidCoveredArea || !isTileCovered(current.row, current.col - 1, allegeance))) {
+                        && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)) {
                     node = new PathNode(current.row, current.col - 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
@@ -906,22 +858,27 @@ public class Battlefield extends Observable {
         return getNbRows();
     }
 
-    public Array<int[]> getDeploymentArea() {
-        return deploymentArea;
+    public Array<int[]> getDeploymentArea(boolean vanguard) {
+        return (vanguard) ? vanguardDeploymentArea : mainDeploymentArea;
     }
 
-    public void addDeploymentTile(int row, int col){
+    public void addDeploymentTile(int row, int col, boolean vanguard){
         if(isTileReachable(row, col, false)){
-            this.deploymentArea.add(new int[]{row, col});
+            if(vanguard){
+                this.vanguardDeploymentArea.add(new int[]{row, col});
+            }else {
+                this.mainDeploymentArea.add(new int[]{row, col});
+            }
         }
     }
 
-    public HashMap<Allegeance, Array<Area.UnitArea>> getGuardedAreas() {
-        return guardedAreas;
+    public boolean isVanguardDeploymentAvailable(){
+        return vanguardDeploymentArea.size > 0;
     }
 
-    public HashMap<Allegeance, Array<Area.UnitArea>> getCoveredAreas() {
-        return coveredAreas;
+
+    public HashMap<Allegeance, Array<Area.UnitArea>> getGuardedAreas() {
+        return guardedAreas;
     }
 
 

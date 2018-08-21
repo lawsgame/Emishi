@@ -26,10 +26,10 @@ public class PushCommand extends BattleCommand{
         Data.Orientation pushOr = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         pushed.setOrientation(pushOr);
         switch(pushOr){
-            case WEST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1); break;
-            case NORTH: battlefield.moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget);
-            case SOUTH: battlefield.moveUnit(rowTarget, colTarget, rowTarget - 1, colTarget); break;
-            case EAST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1); break;
+            case WEST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1, false); break;
+            case NORTH: battlefield.moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget, false);
+            case SOUTH: battlefield.moveUnit(rowTarget, colTarget, rowTarget - 1, colTarget, false); break;
+            case EAST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1, false); break;
         }
 
         // push render task

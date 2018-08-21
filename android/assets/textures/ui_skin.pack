@@ -45,7 +45,7 @@ move_area
   orig: 64, 64
   offset: 0, 0
   index: -1
-selected_tile
+selected_unit
   rotate: false
   xy: 384, 0
   size: 64, 64
@@ -66,23 +66,30 @@ touched_tile
   orig: 64, 64
   offset: 0, 0
   index: -1
+vanguard_deployment_area
+  rotate: false
+  xy: 576, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 button_down
   rotate: false
-  xy: 576, 40
+  xy: 640, 40
   size: 60, 24
   orig: 60, 24
   offset: 0, 0
   index: -1
 button_up
   rotate: false
-  xy: 576, 16
+  xy: 640, 16
   size: 60, 24
   orig: 60, 24
   offset: 0, 0
   index: -1
 black_background
   rotate: false
-  xy: 636, 32
+  xy: 700, 32
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
