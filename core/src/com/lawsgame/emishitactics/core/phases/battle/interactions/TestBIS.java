@@ -3,12 +3,9 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -24,12 +21,12 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
 
@@ -37,9 +34,8 @@ public class TestBIS extends BattleInteractionState {
     Unit warlord;
     Unit warchief;
     Unit soldier;
-    ActionPanel panel;
+    //ActionPanel panel;
     AreaWidget areaWidget;
-    TempoChoicePanel choicePanel;
 
     IUnit sltdUnit;
     int index;
@@ -61,6 +57,7 @@ public class TestBIS extends BattleInteractionState {
         warlord.setLeadership(15);
         warchief.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warchief.setLeadership(10);
+        warchief.applyDamage(1, false);
         soldier.addWeapon(new Weapon(Data.WeaponTemplate.CLUB));
 
         IArmy army = new Army(Data.Allegeance.ALLY, true);
@@ -78,23 +75,25 @@ public class TestBIS extends BattleInteractionState {
         Area.UnitArea area = bim.battlefield.addGuardedArea(4, 8);
         bim.bfr.getNotification(area);
 
-
-        // SCHEDULER TEST
-        Array<int[]> validPath = bim.battlefield.getShortestPath(6, 7, 8, 9, warlord.has(Data.Ability.PATHFINDER), warlord.getAllegeance(), false);
-
-        bim.shortTilePanel.set(Data.TileType.PLAIN);
-        bim.shortUnitPanel.set(warlord);
-        bim.scheduler.addTask(new Task(bim.showSTP, 0f));
-        bim.scheduler.addTask(new Task(bim.battlefield, bim.bfr.getUnitRenderer(warlord), new Notification.Walk(warlord, validPath)));
-        bim.scheduler.addTask(new Task(bim.showSUP, 0f));
-        System.out.println(bim.scheduler);
-
-
-        // CHOICE TEST
         sltdUnit = warlord;
         index = 1;
         switchmode = false;
 
+
+        // SCHEDULER TEST
+        /*
+        Array<int[]> validPath = bim.battlefield.getShortestPath(6, 7, 8, 9, warlord.has(Data.Ability.PATHFINDER), warlord.getAllegeance(), false);
+
+        bim.shortTilePanel.set(Data.TileType.PLAIN);
+        bim.shortUnitPanel.set(warlord);
+        bim.scheduler.addTask(new StandardTask(bim.showSTP, 0f));
+        bim.scheduler.addTask(new StandardTask(bim.battlefield, bim.bfr.getUnitRenderer(warlord), new Notification.Walk(warlord, validPath)));
+        bim.scheduler.addTask(new StandardTask(bim.showSUP, 0f));
+        System.out.println(bim.scheduler);
+        */
+
+        // CHOICE TEST
+        /*
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setMoved(true);
         Array<BattleCommand> historic = new Array<BattleCommand>();
@@ -105,7 +104,7 @@ public class TestBIS extends BattleInteractionState {
         }
 
         System.out.println(bim.bcm.toString(warlord, new Array<BattleCommand>(), true));
-
+        */
 
         //choicePanel = new TempoChoicePanel(bim.asm);
         //bim.uiStage.addActor(choicePanel);
@@ -155,9 +154,6 @@ public class TestBIS extends BattleInteractionState {
 
         // TEST FINAL
 
-        if(panel != null) {
-            panel.remove();
-        }
 
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Allegeance.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
@@ -199,14 +195,48 @@ public class TestBIS extends BattleInteractionState {
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
                     command.init();
-                    command.apply();
-                    historic.push(command);
+                    command.highlightTarget(true);
+
                     if(bim.app.isPanelAvailable(command)){
-                        panel = bim.app.getPanel(command);
-                        bim.uiStage.addActor(panel);
-                        panel.hide();
-                        panel.show();
+
+
+                        final ActionPanel panel = bim.app.getPanel(command);
+
+                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                bim.uiStage.addActor(panel);
+                                panel.hide();
+                                panel.show();
+                            }
+                        }, 0f));
+                        bim.scheduler.wait(3.5f);
+                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                panel.hide();
+                            }
+                        }, 0f));
+                        bim.scheduler.wait(0.2f);
+                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                panel.remove();
+                            }
+                        }, 0f));
+
                     }
+
+
+
+                    bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                        @Override
+                        public void apply() {
+                            command.apply();
+                        }
+                    }, 0f));
+
+                    historic.push(command);
                 }
             }
         }

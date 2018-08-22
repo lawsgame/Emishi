@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.StandCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -42,7 +43,7 @@ public class ChooseOrientationCommand extends StandCommand {
         actor.setOrientation(newOrientation);
 
         // push render state
-        scheduler.addTask(new Task(battlefieldRenderer.getUnitRenderer(actor), newOrientation));
+        scheduler.addTask(new StandardTask(battlefieldRenderer.getUnitRenderer(actor), newOrientation));
 
     }
 
@@ -54,7 +55,7 @@ public class ChooseOrientationCommand extends StandCommand {
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer.getModel() == actor) {
                 actor.setOrientation(oldOrientation);
-                scheduler.addTask(new Task(battlefieldRenderer.getUnitRenderer(actor), oldOrientation));
+                scheduler.addTask(new StandardTask(battlefieldRenderer.getUnitRenderer(actor), oldOrientation));
             }
         }
     }

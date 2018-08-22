@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class BuildCommand extends BattleCommand {
@@ -31,7 +32,7 @@ public class BuildCommand extends BattleCommand {
         battlefield.setTile(rowTarget, colTarget, buildingType, false);
 
         // push render task
-        scheduler.addTask(new Task(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, actor)));
+        scheduler.addTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, actor)));
 
         // set outcome
         outcome.receivers.add(actor);

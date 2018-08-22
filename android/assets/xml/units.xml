@@ -19,7 +19,7 @@
                 </Unit>
             </Squad>
             <Squad>
-                <Unit row = "14" col = "7" name = "noname" job="SOLAR_KNIGHT" level="3" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "9" col = "7" name = "noname" job="SOLAR_KNIGHT" level="3" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id = "weapon" value="SHORTSWORD" stealable="true"/>
                     <Attribute id = "right handed" value="true"/>
                     <Attribute id = "orientation" value="SOUTH"/>

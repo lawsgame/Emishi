@@ -310,6 +310,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayTreated(int healedHP) {
+
         unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(Data.AnimationId.TREATED, getModel().getArmy().getAllegeance()));
         showNumbers = true;
         numbersToShow = "+"+healedHP;

@@ -101,7 +101,9 @@ public abstract class TempoActionPanel extends ActionPanel{
 
         @Override
         public void set(BattleCommand command) {
+
             if(command != null && command instanceof AttackCommand && command.isTargetValid()) {
+
                 AttackCommand currentCommand = (AttackCommand)command;
                 builder = new StringBuilder();
                 builder.append(command.getActor().getName()+" => "+currentCommand.getTargetDefender().getName());

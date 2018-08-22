@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.StandCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -36,7 +37,7 @@ public class SwitchWeaponCommand extends StandCommand{
         actor.switchWeapon(weaponIndex);
 
         // push render task
-        scheduler.addTask(new AnimationScheduler.Task(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
+        scheduler.addTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
     }
 
     @Override
@@ -45,7 +46,7 @@ public class SwitchWeaponCommand extends StandCommand{
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer != null && actorRenderer.getModel() == actor) {
                 actor.switchWeapon(weaponIndex);
-                scheduler.addTask(new AnimationScheduler.Task(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
+                scheduler.addTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
             }
         }
     }

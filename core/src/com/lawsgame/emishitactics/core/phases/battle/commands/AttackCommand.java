@@ -2,9 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.ViewThread;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -13,6 +10,10 @@ import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -72,16 +73,16 @@ public class AttackCommand extends BattleCommand {
         IUnit attacker = battlefield.getUnit(rowAttacker, colAttacker);
         IUnit defender = battlefield.getUnit(rowTarget, colTarget);
 
-        Task task = new Task();
-        ViewThread attackerViewThread = new ViewThread(battlefieldRenderer.getUnitRenderer(attacker));
-        ViewThread targetViewThread = new ViewThread(battlefieldRenderer.getUnitRenderer(defender));
-        Array<ViewThread> defendersThreads = new Array<AnimationScheduler.ViewThread>();
+        StandardTask task = new StandardTask();
+        RendererThread attackerRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(attacker));
+        RendererThread targetRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(defender));
+        Array<RendererThread> defendersThreads = new Array<RendererThread>();
 
         Data.Orientation attackerReorientation = Utils.getOrientationFromCoords(rowAttacker, colAttacker, rowTarget, colTarget);
         if(!retaliate) attacker.setOrientation(attackerReorientation);
 
-        attackerViewThread.addQuery(attackerReorientation);
-        attackerViewThread.addQuery(Data.AnimationId.ATTACK);
+        attackerRendererThread.addQuery(attackerReorientation);
+        attackerRendererThread.addQuery(Data.AnimationId.ATTACK);
 
 
 
@@ -96,7 +97,7 @@ public class AttackCommand extends BattleCommand {
 
             // view-wise scheduling
             if(!backstabbed){
-                targetViewThread.addQuery(attacker.getOrientation().getOpposite());
+                targetRendererThread.addQuery(attacker.getOrientation().getOpposite());
             }
             for(int i = 0; i < notifs.size; i++){
                 notifs.get(i).critical = false;
@@ -105,25 +106,25 @@ public class AttackCommand extends BattleCommand {
                 if(i != 0){
                     bur = battlefieldRenderer.getUnitRenderer(notifs.get(i).wounded);
 
-                    defendersThreads.add(new ViewThread(bur, notifs.get(i)));
+                    defendersThreads.add(new RendererThread(bur, notifs.get(i)));
                 }
             }
-            targetViewThread.addQuery(notifs.get(0));
+            targetRendererThread.addQuery(notifs.get(0));
             if(!backstabbed && !defender.isOutOfAction()){
-                targetViewThread.addQuery(defender.getOrientation());
+                targetRendererThread.addQuery(defender.getOrientation());
             }
 
         }else{
             // view-wise scheduling
-            targetViewThread.addQuery(attacker.getOrientation().getOpposite());
-            targetViewThread.addQuery(Data.AnimationId.DODGE);
-            targetViewThread.addQuery(defender.getOrientation());
+            targetRendererThread.addQuery(attacker.getOrientation().getOpposite());
+            targetRendererThread.addQuery(Data.AnimationId.DODGE);
+            targetRendererThread.addQuery(defender.getOrientation());
         }
 
-        if(retaliate) attackerViewThread.addQuery(attacker.getOrientation());
+        if(retaliate) attackerRendererThread.addQuery(attacker.getOrientation());
 
-        task.addThread(attackerViewThread);
-        task.addThread(targetViewThread);
+        task.addThread(attackerRendererThread);
+        task.addThread(targetRendererThread);
         task.addllThreads(defendersThreads);
         scheduler.addTask(task);
 
@@ -142,16 +143,16 @@ public class AttackCommand extends BattleCommand {
                 removeOutOfActionUnits();
                 moveCommand.apply(targetPos[0], targetPos[1], rowTarget0, colTarget0);
 
-                scheduler.addTask(new Task(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
+                scheduler.addTask(new StandardTask(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
             } else {
 
                 switchPositionCommand.apply(targetPos[0], targetPos[1], rowTarget0, colTarget0);
                 Area.UnitArea area = battlefield.addGuardedArea(targetPos[0], targetPos[1]);
 
-                Task task = new Task();
-                task.addThread(new ViewThread(battlefieldRenderer, area));
-                task.addThread(new ViewThread(battlefieldRenderer.getUnitRenderer(defender), defender.getOrientation()));
-                task.addThread(new ViewThread(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
+                StandardTask task = new StandardTask();
+                task.addThread(new RendererThread(battlefieldRenderer, area));
+                task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(defender), defender.getOrientation()));
+                task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
                 scheduler.addTask(task);
             }
         }
@@ -232,9 +233,9 @@ public class AttackCommand extends BattleCommand {
     protected void removeOutOfActionUnits(){
         Array<IUnit> OOAUnits = battlefield.getOOAUnits();
         battlefield.removeOOAUnits(false);
-        Task removeOOAUnitTask = new Task();
+        StandardTask removeOOAUnitTask = new StandardTask();
         for(int i = 0; i < OOAUnits.size; i++)
-            removeOOAUnitTask.addThread(new AnimationScheduler.ViewThread(battlefieldRenderer, OOAUnits.get(i)));
+            removeOOAUnitTask.addThread(new RendererThread(battlefieldRenderer, OOAUnits.get(i)));
         scheduler.addTask(removeOOAUnitTask);
     }
 

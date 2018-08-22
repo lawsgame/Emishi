@@ -3,14 +3,15 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -50,7 +51,7 @@ public class MoveCommand extends BattleCommand{
         walker.setOrientation(or);
 
         // push render task
-        scheduler.addTask(new Task(battlefield, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, validPath)));
+        scheduler.addTask(new StandardTask(battlefield, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, validPath)));
 
     }
 
@@ -94,7 +95,7 @@ public class MoveCommand extends BattleCommand{
             if(actor == walkerRenderer.getModel()) {
                 battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor, false);
                 actor.setMoved(false);
-                scheduler.addTask(new Task(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
+                scheduler.addTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
             }
         }
     }

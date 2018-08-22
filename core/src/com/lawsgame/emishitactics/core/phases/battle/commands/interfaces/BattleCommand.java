@@ -10,8 +10,11 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 /**
  *
@@ -100,6 +103,10 @@ public abstract class BattleCommand implements Command{
                     getActor().setMoved( true);
                 }
             }
+
+            // remove blinking and other highlighting target affect
+            highlightTarget(false);
+
             execute();
 
             // remove already OoA units
@@ -138,6 +145,19 @@ public abstract class BattleCommand implements Command{
      */
     public boolean isTargetValid() {
         return isTargetValid(rowActor, colActor, rowTarget, colTarget);
+    }
+
+    public void highlightTarget(final boolean enable){
+        if(battlefield.isTileOccupied(rowTarget, colTarget)){
+            final BattleUnitRenderer targetRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
+            scheduler.addTask(new StandardTask(targetRenderer, new SimpleCommand() {
+                @Override
+                public void apply() {
+                    targetRenderer.setTargeted(enable);
+                }
+
+            }));
+        }
     }
 
     /*

@@ -2,7 +2,8 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.ViewThread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
@@ -34,7 +35,7 @@ public class SwitchPositionCommand extends BattleCommand {
         battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
         // push render task
-        scheduler.addTask(new Task(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.WALK, battlefield)));
+        scheduler.addTask(new StandardTask(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.WALK, battlefield)));
     }
 
     @Override
@@ -47,11 +48,11 @@ public class SwitchPositionCommand extends BattleCommand {
             IUnit target = battlefield.getUnit(rowTarget, colTarget);
             battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
-            Task task = new Task();
-            ViewThread actorViewThread = new ViewThread(battlefieldRenderer, new Notification.SetUnit(rowActor, colActor, actor));
-            ViewThread targetViewThread = new AnimationScheduler.ViewThread(battlefieldRenderer, new Notification.SetUnit(rowTarget, colTarget, target));
-            task.addThread(actorViewThread);
-            task.addThread(targetViewThread);
+            StandardTask task = new StandardTask();
+            RendererThread actorRendererThread = new RendererThread(battlefieldRenderer, new Notification.SetUnit(rowActor, colActor, actor));
+            RendererThread targetRendererThread = new RendererThread(battlefieldRenderer, new Notification.SetUnit(rowTarget, colTarget, target));
+            task.addThread(actorRendererThread);
+            task.addThread(targetRendererThread);
             scheduler.addTask(task);
         }
     }

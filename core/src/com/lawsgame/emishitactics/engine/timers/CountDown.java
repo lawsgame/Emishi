@@ -63,4 +63,8 @@ public class CountDown implements GameUpdatableEntity {
     public float getValue() {
         return time;
     }
+
+    public float getDelay(){
+		return delay;
+	}
 }

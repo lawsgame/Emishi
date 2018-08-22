@@ -3,7 +3,8 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.ViewThread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
@@ -33,14 +34,14 @@ public class StealCommand extends BattleCommand{
         stealer.setActed(true);
 
         // push render taks
-        Task task = new Task();
-        ViewThread stealerViewThread = new ViewThread(battlefieldRenderer.getUnitRenderer(stealer), stealer.getOrientation());
-        stealerViewThread.addQuery(stealer, Data.AnimationId.STEAL);
-        ViewThread stolenViewThread = new ViewThread(battlefieldRenderer.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
-        stolenViewThread.addQuery(stolen, (stealSuccessful) ? Data.AnimationId.TAKE_HIT : Data.AnimationId.DODGE);
-        stolenViewThread.addQuery(stolen, stolen.getOrientation());
-        task.addThread(stolenViewThread);
-        task.addThread(stealerViewThread);
+        StandardTask task = new StandardTask();
+        RendererThread stealerRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(stealer), stealer.getOrientation());
+        stealerRendererThread.addQuery(stealer, Data.AnimationId.STEAL);
+        RendererThread stolenRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
+        stolenRendererThread.addQuery(stolen, (stealSuccessful) ? Data.AnimationId.TAKE_HIT : Data.AnimationId.DODGE);
+        stolenRendererThread.addQuery(stolen, stolen.getOrientation());
+        task.addThread(stolenRendererThread);
+        task.addThread(stealerRendererThread);
         scheduler.addTask(task);
 
         // set outoome
