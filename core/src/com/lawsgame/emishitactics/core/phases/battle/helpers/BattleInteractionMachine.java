@@ -83,7 +83,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.uiStage = stageUI;
         this.shortTilePanel = new ShortTilePanel(stageUI.getViewport());
         this.shortUnitPanel = new ShortUnitPanel(stageUI.getViewport());
-        this.longUnitPanel = new LongUnitPanel(stageUI.getViewport());
+        this.longUnitPanel = new LongUnitPanel(stageUI.getViewport(), mainStringBundle);
         this.longTilePanel = new LongTilePanel(stageUI.getViewport());
 
         stageUI.addActor(shortTilePanel);
@@ -185,7 +185,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
             IUnit sltdUnit = battlefield.getUnit(row, col);
             Array<IUnit> squad = sltdUnit.getSquad(true);
-            Data.AreaType type = (sltdUnit.isAllyWith(Data.Allegeance.ALLY)) ? Data.AreaType.SQUAD_MEMBER : Data.AreaType.FOE_SQUAD_MEMBER;
+            Data.AreaType type = Data.AreaType.SQUAD_MEMBER ;
             int[] squadMemberPos;
             for (int i = 0; i < squad.size; i++) {
                 if(squad.get(i) != sltdUnit){

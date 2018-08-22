@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.models.BannerSign;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
@@ -196,7 +197,6 @@ public class BattlefieldLoader {
         WeaponType weaponType = WeaponType.FIST;
         boolean horseman = unitElt.getBoolean("horseman");
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
-        boolean standardbearer = unitElt.getBoolean("standardBearer");
         boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
         if(name.equals("noname")){
             name = NAME_DICTIONARY.get(Data.rand(NAME_DICTIONARY.size));
@@ -214,7 +214,7 @@ public class BattlefieldLoader {
             }
         }
 
-        unit = new Unit(name, job ,level, weaponType, horseman, horsemanUponPromotion, standardbearer, homogeneousLevels);
+        unit = new Unit(name, job ,level, weaponType, horseman, horsemanUponPromotion, homogeneousLevels);
 
 
         XmlReader.Element attributeElt;
@@ -246,9 +246,9 @@ public class BattlefieldLoader {
             }
 
             if(attributeElt.get("id").equals("banner sign")) {
-                for (BannerSign value : BannerSign.values()) {
+                for (BannerSignTemplate value : BannerSignTemplate.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
-                        unit.getBanner().addSign(value);
+                        unit.getBanner().addSign(new BannerSign(value, true, attributeElt.getBoolean("stealable")), false);
                         continue;
                     }
                 }

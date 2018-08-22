@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
@@ -27,8 +28,9 @@ public class LongUnitPanel extends UnitPanel {
     private String equipDescription;
     private String statDescription;
     private StringBuilder builder;
+    private I18NBundle bundle;
 
-    public LongUnitPanel(Viewport stageViewport) {
+    public LongUnitPanel(Viewport stageViewport, I18NBundle bundle) {
         super(stageViewport);
         setWidth(PANEL_WIDTH);
         setHeight(PANEL_HEIGHT);
@@ -38,6 +40,7 @@ public class LongUnitPanel extends UnitPanel {
         this.mainDescription = "";
         this.statDescription = "";
         this.equipDescription = "";
+        this.bundle = bundle;
     }
 
     @Override
@@ -67,9 +70,9 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\nWar chief : " + army.getWarchief(unit).getName());
             Banner banner = army.getSquadBanner(unit, false);
             builder.append("\nBanner");
-            builder.append("\n  sign :"+((banner != null && banner.getSign1() != Data.BannerSign.NONE) ? banner.getSign1().name(): ""));
-            builder.append("\n  sign :"+((banner != null && banner.getSign2() != Data.BannerSign.NONE) ? banner.getSign2().name(): ""));
-            builder.append("\n  sign :"+((banner != null && banner.getSign3() != Data.BannerSign.NONE) ? banner.getSign3().name(): ""));
+            for(int i = 0; i < banner.getBannerSigns().size; i++){
+                builder.append("\n  sign :"+banner.getBannerSigns().get(i).getName(bundle));
+            }
 
         }
         mainDescription = builder.toString();

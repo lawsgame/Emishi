@@ -7,20 +7,21 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Weapon extends Observable implements Item{
 
-    public static final Weapon FIST = new Weapon(WeaponTemplate.FIST, false);
+    public static final Weapon FIST = new Weapon(WeaponTemplate.FIST, false, false);
 
     protected int durability;
     protected boolean stealable;
+    protected boolean droppable;
     protected Data.WeaponTemplate template;
 
-    public Weapon (Data.WeaponTemplate template, boolean stealable){
+    public Weapon (Data.WeaponTemplate template, boolean stealable, boolean droppable){
         this.template = template;
         this.durability = template.getDurabilityMax();
         this.stealable = stealable;
     }
 
     public Weapon(Data.WeaponTemplate template){
-        this(template, true);
+        this(template, true, true);
     }
 
     public int getDurability() {
@@ -45,8 +46,17 @@ public class Weapon extends Observable implements Item{
     }
 
     @Override
+    public boolean isDroppable() {
+        return droppable;
+    }
+
+    @Override
     public int getDropRate() {
         return template.getDropRate();
+    }
+
+    public void setDroppable(boolean droppable) {
+        this.droppable = droppable;
     }
 
     @Override

@@ -1,13 +1,13 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Job;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
+import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -20,7 +20,6 @@ public class Unit extends IUnit{
     protected WeaponType weaponType;
     protected boolean horseman;
     protected boolean horsemanUponPromotion;
-    protected boolean standardBearer;
 
     protected Array<Weapon> weapons;
     protected int experience = 0;
@@ -45,7 +44,7 @@ public class Unit extends IUnit{
     protected int currentHitPoints;
 
     protected Array<Equipment> equipments;
-    protected final Banner banner = new Banner();
+    protected Banner banner;
 
     /**
      * battlefield execution related attributes
@@ -75,7 +74,6 @@ public class Unit extends IUnit{
      * @param weaponType
      * @param horseman
      * @param horsemanUponPromotion
-     * @param standardBearer
      * @param homogeneousLevelsup
      */
     public Unit(
@@ -85,7 +83,6 @@ public class Unit extends IUnit{
             WeaponType weaponType,
             boolean horseman,
             boolean horsemanUponPromotion,
-            boolean standardBearer,
             boolean homogeneousLevelsup){
 
         this.name = name;
@@ -94,7 +91,6 @@ public class Unit extends IUnit{
         this.weaponType = weaponType;
         this.horseman = horseman;
         this.horsemanUponPromotion = horsemanUponPromotion;
-        this.standardBearer = standardBearer;
 
         this.mobility = (horseman) ? job.getHorsemanMob() : job.getFootmanMob();
         this.charisma = job.getBaseCha();
@@ -112,6 +108,7 @@ public class Unit extends IUnit{
         this.weapons = new Array<Weapon>();
         this.weapons.add(Weapon.FIST);
         this.equipments = new Array<Equipment>();
+        this.banner = new Banner();
 
         if(homogeneousLevelsup) {
             growup(level);
@@ -126,7 +123,7 @@ public class Unit extends IUnit{
     }
 
     public Unit(String name){
-        this(name, Job.getStandard(), 10, WeaponType.SWORD, false, false, false, true);
+        this(name, Job.getStandard(), 10, WeaponType.SWORD, false, false, true);
     }
 
 
@@ -332,12 +329,7 @@ public class Unit extends IUnit{
 
     @Override
     public boolean isStandardBearer() {
-        return standardBearer;
-    }
-
-    @Override
-    public void setStandardBearer(boolean standardBearer) {
-        this.standardBearer = standardBearer;
+        return isWarChief();
     }
 
     @Override
@@ -724,18 +716,10 @@ public class Unit extends IUnit{
         return olditem;
     }
 
-    @Override
-    public void setItemAsStealable(boolean weapon, int index, boolean stealable) {
-        if(weapon){
-            if(0 <= index && index < weapons.size){
-                weapons.get(index).setStealable(stealable);
-            }
-        }else{
-            if(0 <= index && index < weapons.size){
-                equipments.get(index).setStealable(stealable);
-            }
-        }
-    }
+
+
+
+    // --------------- LOOT & STEAL ----------------------
 
     @Override
     public boolean isStealable() {
@@ -759,30 +743,23 @@ public class Unit extends IUnit{
 
     @Override
     public Item getRandomlyStealableItem() {
-        Item stolenItem = null;
-        int index = Data.rand(equipments.size + weapons.size);
-        if(index >= equipments.size){
-            index -= equipments.size;
-            if(!weapons.contains(Weapon.FIST, true)){
-                stolenItem = removeWeapon(index);
-            }
-        }else{
-            stolenItem = removeEquipment(index);
-        }
-        return stolenItem;
+        return getStealableItems().random();
     }
 
     @Override
     public Item getRandomlyDroppableItem() {
         Item droppedItem = null;
 
-        if(!weapons.contains(Weapon.FIST, true)|| equipments.size > 0) {
+        if(!weapons.contains(Weapon.FIST, true)|| equipments.size > 0 || (isStandardBearer() && banner.isDroppable())) {
             int dropRange = 0;
             for (int i = 0; i < weapons.size; i++) {
                 dropRange += weapons.get(i).getDropRate();
             }
             for (int i = 0; i < equipments.size; i++) {
                 dropRange += equipments.get(i).getDropRate();
+            }
+            for(int i = 0; i < banner.getBannerSigns().size; i++){
+                dropRange += banner.getBannerSigns().get(i).getDropRate();
             }
 
             int pick = 1 + Data.rand(dropRange);
@@ -803,6 +780,15 @@ public class Unit extends IUnit{
                     }
                 }
             }
+            if(droppedItem == null) {
+                for (int i = 0; i < banner.getBannerSigns().size; i++) {
+                    dropRange += banner.getBannerSigns().get(i).getDropRate();
+                    if(pick <= dropRange) {
+                        droppedItem = banner.removeSign(i, false);
+                        continue;
+                    }
+                }
+            }
         }
         return droppedItem;
     }
@@ -818,6 +804,11 @@ public class Unit extends IUnit{
         for(int i =0; i < equipments.size; i++){
             if(equipments.get(i).isStealable()){
                 stealableItems.add(equipments.get(i));
+            }
+        }
+        for(int i =0; i < banner.getBannerSigns().size; i++){
+            if(banner.getBannerSigns().get(i).isStealable()){
+                stealableItems.add(banner.getBannerSigns().get(i));
             }
         }
         return stealableItems;

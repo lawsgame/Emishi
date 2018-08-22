@@ -24,9 +24,4 @@ public class BannerTest {
 
     }
 
-    @Test
-    public void testGetBonusRelativeTo(){
-
-    }
-
 }

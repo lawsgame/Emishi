@@ -53,14 +53,13 @@ public class BattlePhase extends GamePhase {
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
         // TEST player army
-        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.SWORD, false, false, false, false);
+        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.SWORD, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier1 = new Unit("Taro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        Unit soldier1 = new Unit("Taro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier2 = new Unit("Maro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        Unit soldier2 = new Unit("Maro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
         soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        soldier2.setStandardBearer(true);
-        Unit warchief1 = new Unit("Azamaru", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false);
+        Unit warchief1 = new Unit("Azamaru", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
         warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
         IArmy playerArmy = new Army(Data.Allegeance.ALLY, true);

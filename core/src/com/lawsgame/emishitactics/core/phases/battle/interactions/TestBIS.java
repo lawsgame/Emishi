@@ -54,9 +54,9 @@ public class TestBIS extends BattleInteractionState {
         areaWidget = new AreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
 
 
-        warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 15, Data.WeaponType.AXE, false, false, false, true);
-        warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, false, true);
-        soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, false, true);
+        warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 15, Data.WeaponType.AXE, false, false, true);
+        warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, true);
+        soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, true);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setLeadership(15);
         warchief.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));

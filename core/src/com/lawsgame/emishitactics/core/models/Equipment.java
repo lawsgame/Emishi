@@ -6,6 +6,7 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Equipment extends Observable implements Item{
     protected boolean stealable;
+    protected boolean droppable;
     protected Data.EquipmentTemplate template;
 
     public Equipment(Data.EquipmentTemplate template, boolean stealable){
@@ -31,8 +32,15 @@ public class Equipment extends Observable implements Item{
     }
 
     @Override
+    public boolean isDroppable() { return droppable; }
+
+    @Override
     public int getDropRate() {
         return template.getDropRate();
+    }
+
+    public void setDroppable(boolean droppable) {
+        this.droppable = droppable;
     }
 
     @Override

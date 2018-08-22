@@ -1,8 +1,10 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.Random;
+
+import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
 
 public class Data {
 
@@ -28,6 +30,7 @@ public class Data {
     public static final int BASE_DROP_RATE = 5;
     public static final int GUARD_REACTION_RANGE_MIN = 1;
     public static final int GUARD_REACTION_RANGE_MAX = 1;
+    public static final int MAX_BANNER_SIGNS_PER_BANNER = 5;
 
     // RENDER parameters
     public static final float SPEED_WALK = 3f;  //buildingType/s
@@ -42,6 +45,7 @@ public class Data {
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
+
 
     static Random r = new Random();
     public static int rand(int n){
@@ -80,14 +84,14 @@ public class Data {
     public enum AreaType {
         TOUCHED_TILE,
         SELECTED_UNIT,
+        SQUAD_MEMBER,
         MOVE_AREA,
         ACTION_AREA,
         GUARD_AREA,
-        SQUAD_MEMBER,
         DEPLOYMENT_AREA,
         VANGUARD_DEPLOYMENT_AREA,
-        FOE_ACTION_AREA,
-        FOE_SQUAD_MEMBER
+        FOE_ACTION_AREA
+        //FOE_SQUAD_MEMBER
     }
 
     public enum TileType {
@@ -427,23 +431,50 @@ public class Data {
         ENEMY
     }
 
-    public enum BannerSign {
-        NONE(0,3);
+    public enum BonusType{
+        ATTACKACCURACY,
+        ATTACKMIGHT,
+        AVOIDANCE,
+        PIERCINGDEFENSE,
+        BLUNTDEFENSE,
+        EDGEDDEFENSE,
+        CHARGINGOARATE,
+        RANGE
+    }
 
-        private int gain;
+    public enum BannerSignTemplate {
+        WARRIOR(ATTACKMIGHT, 1 ,2, 20);
+
+        private BonusType bonusType;
+        private int amount;
         private int maxSignByBanner;
+        private int dropFactor;
 
-        BannerSign(int gain, int maxSignByBanner){
-            this.gain = gain;
+        BannerSignTemplate(BonusType bonusType, int amount, int maxSignByBanner, int dropFactor) {
+            this.bonusType = bonusType;
+            this.amount = amount;
             this.maxSignByBanner = maxSignByBanner;
+            this.dropFactor = dropFactor;
         }
 
-        public int getGain(){
-            return gain;
+        public BonusType getBonusType() {
+            return bonusType;
         }
 
-        public int getMax() {
+        public int getAmount() {
+            return amount;
+        }
+
+        public int getMaxSignByBanner() {
             return maxSignByBanner;
+        }
+
+        public int getDropFactor() {
+            return dropFactor;
+        }
+
+        public String getName(I18NBundle bundle){
+            return bundle.get(name());
         }
     }
 
