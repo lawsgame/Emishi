@@ -13,19 +13,19 @@ import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 
 public class DeploymentBIS extends BattleInteractionState {
-    int rowUnit;
-    int colUnit;
-    IUnit sltdUnit;
-    AreaWidget moveAreaWidget;
-    Array<AreaWidget> deploymentAreaWidgets;
-    StartButton startButton;
+    private int rowUnit;
+    private int colUnit;
+    private IUnit sltdUnit;
+    private AreaWidget moveAreaWidget;
+    private Array<AreaWidget> deploymentAreaWidgets;
+    private StartButton startButton;
 
-    boolean initialized;
+    private boolean initialized;
 
     public DeploymentBIS(final BattleInteractionMachine bim) {
         super(bim, true, true, true);
@@ -42,7 +42,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
         this.sltdUnit = bim.player.getArmy().getWarlord();
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
-        bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, false);
+        bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, false, false);
 
         startButton = StartButton.create(bim.asm, bim.uiStage.getViewport());
         startButton.addListener(new ChangeListener() {
@@ -64,7 +64,7 @@ public class DeploymentBIS extends BattleInteractionState {
         if(initialized) {
             this.moveAreaWidget = new AreaWidget(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
-            bim.focusOn(rowUnit, colUnit, true, true, true, true);
+            bim.focusOn(rowUnit, colUnit, true, true, true, true, false);
         }
     }
 
@@ -166,7 +166,6 @@ public class DeploymentBIS extends BattleInteractionState {
             for(int i = 0; i < targetArea.size; i++){
                 if(bim.battlefield.isTileOccupied(targetArea.get(i)[0], targetArea.get(i)[1])){
                     res = false;
-                    continue;
                 }
             }
 

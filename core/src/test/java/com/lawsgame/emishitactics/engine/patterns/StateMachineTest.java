@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.engine.patterns;
 
-import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 

@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.helpers;
+package com.lawsgame.emishitactics.core.phases.battle;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -13,6 +13,9 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
@@ -145,42 +148,62 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     // -------------------- SHARED METHOD -----------------------------
 
+    private int rowFocus = -1, colFocus = -1;
+    private IUnit focusUnit = null;
     /**
      * convient method which
-     *  - move the camera at the given position
-     *  - highlight relevant tile
-     *  - display relevant short panels
+     *  - move the camera at the relevant location
+     *  - highlight relevant tiles
+     *  - display relevant short info panels
      *
      * @param rowTarget
      * @param colTarget
-     * @param moveCamSmoothly
-     * @param highlightAllsquad
-     * @param displayPanels
+     * @param moveCamSmoothly :     if true, the camera to the tile location smoothy, else the camera position is updated instantaneously
+     * @param highlightAllsquad :   if true and the tile is occupied by a unit, his whole squad is also highlighted
+     * @param displayPanels :       if true, the short info panels are displayed
+     * @param targetIsSelected :    govern each area type / color is used to highlight the focused tile
+     * @param resetMemory :         the method keep in memory which tile has been focused on the last time it was called to only updated short info panels which require to be updated, if true, this memory is erased.
      */
-    public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean highlightAllsquad, boolean displayPanels, boolean targetIsSelected){
+    public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean highlightAllsquad, boolean displayPanels, boolean targetIsSelected, boolean resetMemory){
+        if(resetMemory){
+            rowFocus = -1;
+            colFocus = -1;
+            focusUnit = null;
+        }
+
         if(battlefield.isTileExisted(rowTarget, colTarget)) {
             moveCamera(rowTarget, colTarget, moveCamSmoothly);
             highlight(rowTarget, colTarget, highlightAllsquad, targetIsSelected);
             if(displayPanels) {
-                shortTilePanel.hide();
-                shortTilePanel.set(battlefield.getTile(rowTarget, colTarget));
-                shortTilePanel.show();
-                shortUnitPanel.hide();
+
+                if(rowTarget != rowFocus || rowTarget != colFocus || shortTilePanel.isHiding()) {
+                    rowFocus = rowTarget;
+                    colFocus = colTarget;
+                    shortTilePanel.hide();
+                    shortTilePanel.set(battlefield.getTile(rowTarget, colTarget));
+                    shortTilePanel.show();
+                }
+
                 if (battlefield.isTileOccupied(rowTarget, colTarget)) {
-                    shortUnitPanel.set(battlefield.getUnit(rowTarget, colTarget));
-                    shortUnitPanel.show();
+                    if (focusUnit == null || focusUnit != battlefield.getUnit(rowTarget, colTarget) || shortUnitPanel.isHiding()) {
+                        focusUnit = battlefield.getUnit(rowTarget, colTarget);
+                        shortUnitPanel.hide();
+                        shortUnitPanel.set(battlefield.getUnit(rowTarget, colTarget));
+                        shortUnitPanel.show();
+                    }
+                } else {
+                    shortUnitPanel.hide();
                 }
             }
         }
-
     }
 
     public void moveCamera(int row, int col, boolean smoothly){
-        gcm.focusOn(col - 0.5f, row - 0.5f, smoothly);
+        gcm.focusOn(col, row , smoothly);
     }
 
     public void highlight(int row, int col, boolean allSquad, boolean selected){
-        hideHighlightedTiles(true);
+        removeTileHighlighting(true);
         if(allSquad && battlefield.isTileOccupied(row, col)) {
 
             IUnit sltdUnit = battlefield.getUnit(row, col);
@@ -213,7 +236,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     }
 
-    public void hideHighlightedTiles(boolean exceptSelectedTile){
+    public void removeTileHighlighting(boolean exceptSelectedTile){
         touchedTile.setVisible(false);
         if(!exceptSelectedTile) selectedTile.setVisible(false);
         for(int i = 0; i < touchedRelatedTiles.size; i++){

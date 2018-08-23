@@ -392,6 +392,14 @@ public abstract class BattleCommand implements Command{
         return battlefield.getUnit(rowActor, colActor);
     }
 
+    public int getRowActor() {
+        return rowActor;
+    }
+
+    public int getColActor() {
+        return colActor;
+    }
+
     public final void setTarget(int rowTarget, int colTarget){
         if(battlefield.isTileExisted(rowTarget, colTarget)){
             this.rowTarget = rowTarget;

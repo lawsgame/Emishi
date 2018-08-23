@@ -3,9 +3,9 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
@@ -53,6 +53,11 @@ public abstract class TempoActionPanel extends ActionPanel{
     @Override
     public void hide() {
         awaitingActions.offer(moveTo( stageViewport.getWorldWidth(),Y_OFFSET, slideDuration));
+    }
+
+    @Override
+    public boolean isHiding(){
+        return getX() == stageViewport.getWorldWidth();
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
 public class SelectActorBIS extends BattleInteractionState {
@@ -34,7 +34,7 @@ public class SelectActorBIS extends BattleInteractionState {
         }
 
         if(activeUnitPos != null){
-            bim.focusOn(activeUnitPos[0], activeUnitPos[1], true, false, false, false);
+            bim.focusOn(activeUnitPos[0], activeUnitPos[1], true, false, false, false, false);
         }else{
             try {
                 throw new BISException("push SelectActorBIS while there no active unit left in the player army");

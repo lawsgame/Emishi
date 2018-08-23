@@ -12,11 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
 public class SelectActionBIS extends BattleInteractionState {
@@ -42,9 +43,9 @@ public class SelectActionBIS extends BattleInteractionState {
 
     @Override
     public void init() {
-        System.out.println("SELECT ACTION");
 
         if(bim.battlefield.isTileOccupied(rowSltdUnit, colSltdUnit)) {
+            System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
             //set choice panel
             choicePanel.clear();
@@ -57,7 +58,7 @@ public class SelectActionBIS extends BattleInteractionState {
             bim.uiStage.addActor(commandPanel);
 
             //focus on the sltd unit
-            bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true);
+            bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, false);
         }
     }
 
@@ -82,7 +83,7 @@ public class SelectActionBIS extends BattleInteractionState {
             if(touchedUnit == selecetedUnit) {
                 choicePanel.setVisible(true);
             }else{
-                if (undoCommands() && !touchedUnit.isDone()) {
+                if (Utils.undoCommands(historic) && !touchedUnit.isDone()) {
                     bim.replace(new SelectActionBIS(bim, row, col));
                     return true;
                 } else {
@@ -93,17 +94,6 @@ public class SelectActionBIS extends BattleInteractionState {
             }
         }
         return false;
-    }
-
-    protected boolean undoCommands(){
-        for(int i = historic.size - 1; i >= 0; i--){
-            if(historic.get(i).isUndoable()){
-                historic.removeIndex(i).undo();
-            }else{
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
@@ -164,9 +154,8 @@ public class SelectActionBIS extends BattleInteractionState {
 
                             if(flavors.size == 1){
 
-                                System.out.println("SELECT TARGET : "+choice.getName(bis.bim.mainStringBundle));
-
-                                //bis.bim.replace(new SelectTargetBIS(bis.bim, bis.rowSltdUnit, bis.colSltdUnit, bis.historic, flavors.get(0)));
+                                flavors.get(0).setActor(bis.rowSltdUnit, bis.colSltdUnit);
+                                bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, flavors.get(0)));
                             }else if(flavors.size > 1){
 
                                 setTouchable(Touchable.disabled);
@@ -207,15 +196,10 @@ public class SelectActionBIS extends BattleInteractionState {
                     final BattleCommand battleCommand = flavors.get(i);
                     battleCommand.setActor(bis.rowSltdUnit, bis.colSltdUnit);
                     TextButton button = new TextButton(battleCommand.getName(bis.bim.mainStringBundle), style);
-
                     button.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
-
-
-                            System.out.println("SELECT TARGET : "+battleCommand.getName(bis.bim.mainStringBundle));
-
-                            //bis.bim.replace(new SelectTargetBIS(bis.bim, bis.rowSltdUnit, bis.colSltdUnit, bis.historic, battleCommand));
+                            bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, battleCommand));
                         }
                     });
                     addButton(button);

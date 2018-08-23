@@ -141,6 +141,10 @@ public class LongUnitPanel extends UnitPanel {
         setVisible(false);
     }
 
+    @Override
+    public boolean isHiding() {
+        return isVisible();
+    }
 
 
     @Override

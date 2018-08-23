@@ -2,8 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.InfoBIS;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
 
@@ -42,7 +41,7 @@ public abstract class BattleInteractionState extends InteractionState {
     public void dispose() { }
 
     public void end(){
-        bim.hideHighlightedTiles(false);
+        bim.removeTileHighlighting(false);
     }
 
     public abstract boolean handleTouchInput(int row, int col);
@@ -62,7 +61,7 @@ public abstract class BattleInteractionState extends InteractionState {
             colTouch = (int)gameX;
             inputNotHandled = !handleTouchInput(rowTouch,colTouch);
             if(inputNotHandled && bim.battlefield.isTileExisted(rowTouch, colTouch)){
-                bim.focusOn(rowTouch, colTouch, true, true, true, false);
+                bim.focusOn(rowTouch, colTouch, true, true, true, false, false);
                 if(bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, Data.Allegeance.ALLY)){
                         //TODO: add or remove selected foe action area to those of its alleageanca alreadt registered
 

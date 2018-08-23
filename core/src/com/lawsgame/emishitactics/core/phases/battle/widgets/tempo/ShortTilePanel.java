@@ -56,6 +56,11 @@ public class ShortTilePanel extends TilePanel {
     }
 
     @Override
+    public boolean isHiding() {
+        return getX() == -getWidth();
+    }
+
+    @Override
     public void act(float delta) {
         super.act(delta);
         if(getX() == stageViewport.getWorldWidth()){

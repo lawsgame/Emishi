@@ -69,6 +69,11 @@ public class ShortUnitPanel extends UnitPanel {
     }
 
     @Override
+    public boolean isHiding() {
+        return getX() == stageViewport.getWorldWidth();
+    }
+
+    @Override
     public void act(float delta) {
         super.act(delta);
         if(getX() == stageViewport.getWorldWidth()){

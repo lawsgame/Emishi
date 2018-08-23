@@ -21,7 +21,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;

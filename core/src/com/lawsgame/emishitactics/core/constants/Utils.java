@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.constants;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 
 public class Utils {
 
@@ -145,5 +146,21 @@ public class Utils {
             result += Data.rand(nbFaces);
         }
         return result /nbOfDices;
+    }
+
+    /**
+     *
+     * @param historic
+     * @return true if all commands has been undone, false otherwise
+     */
+    public static boolean undoCommands(Array<BattleCommand> historic){
+        for(int i = historic.size - 1; i >= 0; i--){
+            if(historic.get(i).isUndoable()){
+                historic.removeIndex(i).undo();
+            }else{
+                return false;
+            }
+        }
+        return true;
     }
 }

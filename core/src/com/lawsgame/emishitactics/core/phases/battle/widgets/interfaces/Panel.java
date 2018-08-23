@@ -34,6 +34,7 @@ public abstract class Panel extends Actor {
 
     public abstract void show();
     public abstract void hide();
+    public abstract boolean isHiding();
 
 
     @Override
