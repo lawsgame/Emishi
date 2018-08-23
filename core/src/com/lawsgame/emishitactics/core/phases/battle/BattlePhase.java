@@ -54,7 +54,9 @@ public class BattlePhase extends GamePhase {
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
         // TEST player army
-        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 7, Data.WeaponType.SWORD, false, false, false);
+        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 18, Data.WeaponType.SWORD, false, false, false);
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         Unit soldier1 = new Unit("Taro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
@@ -78,8 +80,8 @@ public class BattlePhase extends GamePhase {
 
         // set the initial BattleInteractionState
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, player);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
 

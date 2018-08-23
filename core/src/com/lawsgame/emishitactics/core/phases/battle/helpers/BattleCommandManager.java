@@ -52,9 +52,9 @@ public class BattleCommandManager {
         final Array<BattleCommand>  commands = new Array<BattleCommand>();
         for(int i = 1; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
             commands.add(new SwitchWeaponCommand(bfr, scheduler, i));
-            if(commands.get(0) != null)
-                commandPool.put(commands.get(0).getActionChoice(), commands);
         }
+        if(commands.size > 0 && commands.get(0) != null)
+            commandPool.put(commands.get(0).getActionChoice(), commands);
 
     }
 

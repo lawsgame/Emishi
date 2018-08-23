@@ -68,13 +68,14 @@ public class SwitchWeaponCommand extends StandCommand{
 
     @Override
     public String getName(I18NBundle bundle) {
-        String str = null;
+
+        String str = "";
         if(battlefield.isTileOccupied(rowActor, colActor)){
             Weapon weapon = battlefield.getUnit(rowActor, colActor).getWeapon(weaponIndex);
             if(weapon != null){
                 str = weapon.getName(bundle);
             }
         }
-        return (str != null) ? str :super.getName(bundle);
+        return (str != "") ? str :super.getName(bundle);
     }
 }

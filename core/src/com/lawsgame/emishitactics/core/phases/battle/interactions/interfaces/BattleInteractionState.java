@@ -92,19 +92,19 @@ public abstract class BattleInteractionState extends InteractionState {
 
 
 
-    public boolean isBattlefieldDisplayed() {
+    public final boolean isBattlefieldDisplayed() {
         return battlefieldDisplayed;
     }
 
-    public void setBattlefieldDisplayed(boolean battlefieldDisplayed) {
+    public final void setBattlefieldDisplayed(boolean battlefieldDisplayed) {
         this.battlefieldDisplayed = battlefieldDisplayed;
     }
 
-    public void setLongPanelDisplayable(boolean longPanelDisplayable) {
+    public final void setLongPanelDisplayable(boolean longPanelDisplayable) {
         this.longPanelDisplayable = longPanelDisplayable;
     }
 
-    public void setMapSlidable(boolean mapSlidable) {
+    public final void setMapSlidable(boolean mapSlidable) {
         this.mapSlidable = mapSlidable;
     }
 
