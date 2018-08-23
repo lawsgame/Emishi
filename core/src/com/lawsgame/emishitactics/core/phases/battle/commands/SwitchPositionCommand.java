@@ -35,7 +35,7 @@ public class SwitchPositionCommand extends BattleCommand {
         battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
         // push render task
-        scheduler.addTask(new StandardTask(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.WALK, battlefield)));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.WALK, battlefield)));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SwitchPositionCommand extends BattleCommand {
             RendererThread targetRendererThread = new RendererThread(battlefieldRenderer, new Notification.SetUnit(rowTarget, colTarget, target));
             task.addThread(actorRendererThread);
             task.addThread(targetRendererThread);
-            scheduler.addTask(task);
+            scheduleRenderTask(task);
         }
     }
 

@@ -42,7 +42,7 @@ public class StealCommand extends BattleCommand{
         stolenRendererThread.addQuery(stolen, stolen.getOrientation());
         task.addThread(stolenRendererThread);
         task.addThread(stealerRendererThread);
-        scheduler.addTask(task);
+        scheduleRenderTask(task);
 
         // set outoome
         if(stealSuccessful){

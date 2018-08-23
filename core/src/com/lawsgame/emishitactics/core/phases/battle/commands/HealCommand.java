@@ -33,7 +33,7 @@ public class HealCommand extends BattleCommand {
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(patient), patient, healPower));
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(healer), Data.AnimationId.HEAL));
-        scheduler.addTask(task);
+        scheduleRenderTask(task);
 
         // set outcome
         outcome.receivers.add(healer);

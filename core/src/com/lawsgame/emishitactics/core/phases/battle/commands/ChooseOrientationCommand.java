@@ -43,7 +43,7 @@ public class ChooseOrientationCommand extends StandCommand {
         actor.setOrientation(newOrientation);
 
         // push render state
-        scheduler.addTask(new StandardTask(battlefieldRenderer.getUnitRenderer(actor), newOrientation));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(actor), newOrientation));
 
     }
 
@@ -55,13 +55,9 @@ public class ChooseOrientationCommand extends StandCommand {
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer.getModel() == actor) {
                 actor.setOrientation(oldOrientation);
-                scheduler.addTask(new StandardTask(battlefieldRenderer.getUnitRenderer(actor), oldOrientation));
+                scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(actor), oldOrientation));
             }
         }
-    }
-
-    public void setOrientation(Data.Orientation orientation){
-        newOrientation = orientation;
     }
 
     @Override

@@ -120,15 +120,6 @@ public class BattleCommandManager {
     //-------------------------  GETTERS & SETTERS ---------------------------
 
 
-    // optional method
-    public void setBattlefield(BattlefieldRenderer battlefieldRenderer){
-        for(ActionChoice choice : commandPool.keySet()){
-            for(int i = 0; i < commandPool.get(choice).size; i++) {
-                commandPool.get(choice).get(i).setBattlefield(battlefieldRenderer);
-            }
-        }
-    }
-
     public String toString(IUnit actor, Array<BattleCommand> history, boolean checkFlavorPerformable){
         HashMap<ActionChoice, Array<BattleCommand>> allcommands = getAllCommands(actor, history, checkFlavorPerformable);
         String str = "Availables commands : \n";

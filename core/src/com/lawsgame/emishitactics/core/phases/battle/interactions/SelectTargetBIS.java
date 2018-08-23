@@ -18,13 +18,12 @@ public class SelectTargetBIS extends BattleInteractionState {
         super(bim, true, true, true);
         this.historic = historic;
         this.currentCommand = command;
-        if(currentCommand != null){
 
-            Data.AreaType type = (currentCommand.getActionChoice().getRangeType() == ActionChoice.RangedBasedType.MOVE) ?
-                Data.AreaType.MOVE_AREA :
-                Data.AreaType.ACTION_AREA;
-            actionArea = new AreaWidget(bim.battlefield, type, currentCommand.getActionArea());
-        }
+        Data.AreaType type = (currentCommand.getActionChoice().getRangeType() == ActionChoice.RangedBasedType.MOVE) ?
+            Data.AreaType.MOVE_AREA :
+            Data.AreaType.ACTION_AREA;
+        this.actionArea = new AreaWidget(bim.battlefield, type, currentCommand.getActionArea());
+
     }
 
     @Override
@@ -43,7 +42,7 @@ public class SelectTargetBIS extends BattleInteractionState {
     @Override
     public boolean handleTouchInput(int row, int col) {
 
-        if(actionArea != null && actionArea.contains(row, col)){
+        if(actionArea.contains(row, col)){
 
         }
         return false;

@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 import java.util.LinkedList;
 
-public class StandardTask implements Task {
+public class StandardTask extends Task {
 
         protected Array<Thread> parallelThreads;
         protected boolean initiazed = false;

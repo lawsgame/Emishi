@@ -37,7 +37,7 @@ public class PushCommand extends BattleCommand{
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.PUSH));
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(pushed), new Notification.Pushed(pushOr)));
-        scheduler.addTask(task);
+        scheduleRenderTask(task);
 
     }
 

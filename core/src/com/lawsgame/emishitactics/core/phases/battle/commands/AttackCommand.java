@@ -126,7 +126,7 @@ public class AttackCommand extends BattleCommand {
         task.addThread(attackerRendererThread);
         task.addThread(targetRendererThread);
         task.addllThreads(defendersThreads);
-        scheduler.addTask(task);
+        scheduleRenderTask(task);
 
         // guardian
         switchBackTargetGuardianPositions(rowTarget, colTarget, target0);
@@ -143,7 +143,7 @@ public class AttackCommand extends BattleCommand {
                 removeOutOfActionUnits();
                 moveCommand.apply(targetPos[0], targetPos[1], rowTarget0, colTarget0);
 
-                scheduler.addTask(new StandardTask(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
+                scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
             } else {
 
                 switchPositionCommand.apply(targetPos[0], targetPos[1], rowTarget0, colTarget0);
@@ -153,7 +153,7 @@ public class AttackCommand extends BattleCommand {
                 task.addThread(new RendererThread(battlefieldRenderer, area));
                 task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(defender), defender.getOrientation()));
                 task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
-                scheduler.addTask(task);
+                scheduleRenderTask(task);
             }
         }
     }
@@ -236,7 +236,7 @@ public class AttackCommand extends BattleCommand {
         StandardTask removeOOAUnitTask = new StandardTask();
         for(int i = 0; i < OOAUnits.size; i++)
             removeOOAUnitTask.addThread(new RendererThread(battlefieldRenderer, OOAUnits.get(i)));
-        scheduler.addTask(removeOOAUnitTask);
+        scheduleRenderTask(removeOOAUnitTask);
     }
 
     @Override

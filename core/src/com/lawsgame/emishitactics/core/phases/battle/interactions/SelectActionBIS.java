@@ -154,8 +154,9 @@ public class SelectActionBIS extends BattleInteractionState {
 
                             if(flavors.size == 1){
 
-                                flavors.get(0).setActor(bis.rowSltdUnit, bis.colSltdUnit);
-                                bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, flavors.get(0)));
+                                if(flavors.get(0).setActor(bis.rowSltdUnit, bis.colSltdUnit)) {
+                                    bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, flavors.get(0)));
+                                }
                             }else if(flavors.size > 1){
 
                                 setTouchable(Touchable.disabled);
@@ -194,15 +195,16 @@ public class SelectActionBIS extends BattleInteractionState {
                 for (int i = 0; i < flavors.size; i++) {
 
                     final BattleCommand battleCommand = flavors.get(i);
-                    battleCommand.setActor(bis.rowSltdUnit, bis.colSltdUnit);
-                    TextButton button = new TextButton(battleCommand.getName(bis.bim.mainStringBundle), style);
-                    button.addListener(new ChangeListener() {
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor) {
-                            bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, battleCommand));
-                        }
-                    });
-                    addButton(button);
+                    if(battleCommand.setActor(bis.rowSltdUnit, bis.colSltdUnit)) {
+                        TextButton button = new TextButton(battleCommand.getName(bis.bim.mainStringBundle), style);
+                        button.addListener(new ChangeListener() {
+                            @Override
+                            public void changed(ChangeEvent event, Actor actor) {
+                                bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, battleCommand));
+                            }
+                        });
+                        addButton(button);
+                    }
                 }
             }
         }

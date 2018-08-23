@@ -32,7 +32,7 @@ public class BuildCommand extends BattleCommand {
         battlefield.setTile(rowTarget, colTarget, buildingType, false);
 
         // push render task
-        scheduler.addTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, actor)));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, actor)));
 
         // set outcome
         outcome.receivers.add(actor);

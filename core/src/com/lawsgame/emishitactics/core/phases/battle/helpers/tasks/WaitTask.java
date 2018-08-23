@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers.tasks;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
-public class WaitTask implements AnimationScheduler.Task {
+public class WaitTask extends AnimationScheduler.Task {
     protected CountDown countDown;
     protected boolean initiated = false;
 

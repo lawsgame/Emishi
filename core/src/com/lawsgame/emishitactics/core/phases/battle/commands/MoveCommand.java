@@ -51,7 +51,7 @@ public class MoveCommand extends BattleCommand{
         walker.setOrientation(or);
 
         // push render task
-        scheduler.addTask(new StandardTask(battlefield, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, validPath)));
+        scheduleRenderTask(new StandardTask(battlefield, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, validPath)));
 
     }
 
@@ -95,7 +95,7 @@ public class MoveCommand extends BattleCommand{
             if(actor == walkerRenderer.getModel()) {
                 battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor, false);
                 actor.setMoved(false);
-                scheduler.addTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
+                scheduleRenderTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
             }
         }
     }

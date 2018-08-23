@@ -1,7 +1,9 @@
 package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.WaitTask;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.LinkedList;
 
@@ -11,6 +13,7 @@ import java.util.LinkedList;
  * - to synchronize animations triggering
  */
 public class AnimationScheduler implements GameUpdatableEntity{
+
     private LinkedList<Task> tasks;
 
     public AnimationScheduler(){
@@ -30,6 +33,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
 
             // launch the next task
             if(tasks.peek().isCompleted()){
+                tasks.peek().notifyAllObservers(tasks.peek());
                 tasks.pop();
             }
         }
@@ -59,12 +63,12 @@ public class AnimationScheduler implements GameUpdatableEntity{
 
 
 
-    public interface Task extends GameUpdatableEntity{
+    public static abstract class Task extends Observable implements GameUpdatableEntity{
 
-        void init();
-        boolean isInitiazed();
-        boolean isCompleted();
-        boolean isIrrelevant();
+        public abstract void init();
+        public abstract boolean isInitiazed();
+        public abstract boolean isCompleted();
+        public abstract boolean isIrrelevant();
     }
 
 

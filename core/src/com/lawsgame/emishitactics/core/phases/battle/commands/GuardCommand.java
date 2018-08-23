@@ -46,7 +46,7 @@ public class GuardCommand extends StandCommand {
                 }
             }
         }
-        scheduler.addTask(task);
+        scheduleRenderTask(task);
 
     }
 
@@ -55,7 +55,7 @@ public class GuardCommand extends StandCommand {
         if(actor != null){
             UnitArea area = battlefield.removeGuardedArea(actor, false);
             if(area != null)
-                scheduler.addTask(new StandardTask(battlefieldRenderer, area));
+                scheduleRenderTask(new StandardTask(battlefieldRenderer, area));
         }
     }
 }

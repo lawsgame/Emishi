@@ -246,6 +246,9 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void update60(float dt) {
+        if(command!=null){
+            //System.out.println(command.isExecuting()+" => "+command.isCompleted());
+        }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
             BattleCommand command = historic.peek();
@@ -295,6 +298,12 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)){
             System.out.println("action command : build");
             index = 9;
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+            if(command != null){
+                command.setTarget(17,17);
+            }
         }
     }
 

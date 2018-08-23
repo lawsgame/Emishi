@@ -37,7 +37,7 @@ public class SwitchWeaponCommand extends StandCommand{
         actor.switchWeapon(weaponIndex);
 
         // push render task
-        scheduler.addTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
+        scheduleRenderTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
     }
 
     @Override
@@ -46,13 +46,9 @@ public class SwitchWeaponCommand extends StandCommand{
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer != null && actorRenderer.getModel() == actor) {
                 actor.switchWeapon(weaponIndex);
-                scheduler.addTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
+                scheduleRenderTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
             }
         }
-    }
-
-    public void setWeaponIndex(int index){
-        this.weaponIndex = index;
     }
 
     @Override
