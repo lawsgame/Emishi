@@ -256,20 +256,20 @@ public class AttackCommand extends BattleCommand {
 
     public int getHitRate(boolean retaliation){
         int[] defenderPos = (retaliation) ? battlefield.getUnitPos(targetDefender) : battlefield.getUnitPos(initiatorDefender);
-        return (retaliation) ?
+        return (!retaliation) ?
                 Formulas.getHitRate(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield) :
                 Formulas.getHitRate(rowTarget, colTarget, defenderPos[0], defenderPos[1], battlefield);
     }
 
     public int getDealtDamage(boolean retaliation){
         int[] defenderPos = (retaliation) ? battlefield.getUnitPos(targetDefender) : battlefield.getUnitPos(initiatorDefender);
-        return (retaliation) ?
+        return (!retaliation) ?
                 Formulas.getDealtDamage(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield) :
                 Formulas.getDealtDamage(rowTarget, colTarget, defenderPos[0], defenderPos[1], battlefield);
     }
 
     public int getLootRate(boolean retaliation){
-        return (retaliation) ?
+        return (!retaliation) ?
                 Formulas.getLootRate(rowActor, colActor, battlefield) :
                 Formulas.getLootRate(rowTarget, colTarget, battlefield);
     }

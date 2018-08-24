@@ -3,7 +3,7 @@
     <Battle battlefieldId = "0">
         <Army allegeance = "ENEMY">
             <Squad>
-                <Unit row = "13" col = "9" name = "noname" job="SOLAR_KNIGHT" level="6" weaponType="BOW" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "14" col = "5" name = "noname" job="SOLAR_KNIGHT" level="6" weaponType="BOW" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id = "weapon" value="HUNTING_BOW" stealable="true"/>
                     <Attribute id = "right handed" value="true"/>
                     <Attribute id = "equipement" value ="WARRIOR" stealable="false"/>

@@ -35,6 +35,8 @@ public abstract class Panel extends Actor {
     public abstract void show();
     public abstract void hide();
     public abstract boolean isHiding();
+    public abstract float getHidingTime();
+    public abstract float getShowingTime();
 
 
     @Override
@@ -44,6 +46,10 @@ public abstract class Panel extends Actor {
             addAction(awaitingActions.pop());
         }
     }
+
+
+
+    //---------- CONVIENT METHOD -----------------------------
 
     public void setX(float x, boolean fromLeft){
         if(fromLeft){

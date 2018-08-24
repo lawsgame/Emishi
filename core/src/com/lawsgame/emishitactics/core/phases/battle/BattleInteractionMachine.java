@@ -176,7 +176,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
             highlight(rowTarget, colTarget, highlightAllsquad, targetIsSelected);
             if(displayPanels) {
 
-                if(rowTarget != rowFocus || rowTarget != colFocus || shortTilePanel.isHiding()) {
+                if(rowTarget != rowFocus || colTarget != colFocus || shortTilePanel.isHiding()) {
                     rowFocus = rowTarget;
                     colFocus = colTarget;
                     shortTilePanel.hide();

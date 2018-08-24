@@ -74,6 +74,16 @@ public class ShortUnitPanel extends UnitPanel {
     }
 
     @Override
+    public float getHidingTime() {
+        return slideDuration;
+    }
+
+    @Override
+    public float getShowingTime() {
+        return getHidingTime();
+    }
+
+    @Override
     public void act(float delta) {
         super.act(delta);
         if(getX() == stageViewport.getWorldWidth()){

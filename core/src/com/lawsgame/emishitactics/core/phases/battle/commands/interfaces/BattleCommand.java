@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.ActionChoice.RangedBasedType;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
@@ -29,8 +30,8 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
  *      BattleCommand command = bcm.getInstance(...); /OR new XCommand(...);
  *      if(command != null && command.setActor(...)){
  *          command.setTarget(...);
- *          command.init();
  *          if(command.isTargetValid()){
+ *              command.init();
  *              command.apply();
  *          }
  *      }
@@ -59,9 +60,9 @@ public abstract class BattleCommand implements Command, Observer{
     protected final AnimationScheduler scheduler;
     protected final ActionChoice choice;
     protected final boolean undoable;
-    private final boolean acted;                  // if true, command that turn acted to true is executed, moved otherwise.
+    private final boolean acted;                    // if true, command that turn acted to true is executed, moved otherwise.
 
-    private boolean free;                   // command that does not count as the player choice i.e. set acted and moved as true while being applied
+    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied
 
     protected int rowActor;
     protected int colActor;
@@ -69,7 +70,7 @@ public abstract class BattleCommand implements Command, Observer{
     protected int colTarget;
 
     protected EncounterOutcome outcome;
-    private boolean initialize;             // control variable to prevent a battle command to be executed before being initialized and checking if the target choice is valid
+    private boolean initialize;                     // control variable to prevent a battle command to be executed before being initialized and checking if the target choice is valid
 
     private boolean launched;
     private Array<Task> renderTasks;
@@ -125,7 +126,6 @@ public abstract class BattleCommand implements Command, Observer{
     }
 
     public final void apply(int rowActor, int colActor, int rowTarget, int colTarget){
-
         setActor(rowActor, colActor);
         setTarget(rowTarget, colTarget);
         if(isTargetValid()){
@@ -133,6 +133,12 @@ public abstract class BattleCommand implements Command, Observer{
             apply();
         }
     }
+
+    public final void apply(int rowActor, int colActor){
+        apply(rowActor, colActor, rowActor, colActor);
+    }
+
+
 
     public boolean isExecuting(){
         return launched && renderTasks.size > 0;
@@ -421,11 +427,11 @@ public abstract class BattleCommand implements Command, Observer{
         return battlefield.getUnit(rowActor, colActor);
     }
 
-    public int getRowActor() {
+    public final int getRowActor() {
         return rowActor;
     }
 
-    public int getColActor() {
+    public final int getColActor() {
         return colActor;
     }
 
@@ -442,7 +448,11 @@ public abstract class BattleCommand implements Command, Observer{
         return battlefield.getUnit(rowTarget, colTarget);
     }
 
-    public final Data.TileType getTargetTile() {
+    public final int getRowTarget() { return rowTarget; }
+
+    public final int getColTarget() { return colTarget; }
+
+    public final TileType getTargetTile() {
         return battlefield.getTile(rowTarget, colTarget);
     }
 

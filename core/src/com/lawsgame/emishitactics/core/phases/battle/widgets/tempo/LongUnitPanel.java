@@ -146,6 +146,16 @@ public class LongUnitPanel extends UnitPanel {
         return isVisible();
     }
 
+    @Override
+    public float getHidingTime() {
+        return 0;
+    }
+
+    @Override
+    public float getShowingTime() {
+        return 0;
+    }
+
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

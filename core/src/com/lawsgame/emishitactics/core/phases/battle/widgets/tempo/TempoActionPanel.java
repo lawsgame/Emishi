@@ -27,7 +27,7 @@ public abstract class TempoActionPanel extends ActionPanel{
     private static float X_TEXT_OFFSET = 8f;
     private static float Y_TEXT_OFFSET = 8f;
     private static float PANEL_WIDTH = 220;
-    private static float PANEL_HEIGHT = 150;
+    private static float PANEL_HEIGHT = 180;
 
     protected String description;
     protected float slideDuration;
@@ -58,6 +58,16 @@ public abstract class TempoActionPanel extends ActionPanel{
     @Override
     public boolean isHiding(){
         return getX() == stageViewport.getWorldWidth();
+    }
+
+    @Override
+    public float getHidingTime() {
+        return slideDuration;
+    }
+
+    @Override
+    public float getShowingTime() {
+        return getHidingTime();
     }
 
     @Override
@@ -114,10 +124,11 @@ public abstract class TempoActionPanel extends ActionPanel{
                 builder.append(command.getActor().getName()+" => "+currentCommand.getTargetDefender().getName());
                 builder.append("\nDamage : " + currentCommand.getDealtDamage(false));
                 builder.append("\nHit rate : " + currentCommand.getHitRate(false)+"%");
-                System.out.println("\n"+command.getTarget().getName()+" => "+command.getActor().getName()+"\n");
+                builder.append("\nLoot rate : " + currentCommand.getLootRate(false)+"%");
                 builder.append("\n\n"+command.getTarget().getName()+" => "+currentCommand.getInitiatorDefender().getName());
                 builder.append("\nDamage : " + currentCommand.getDealtDamage(true));
                 builder.append("\nHit rate : " + currentCommand.getHitRate(true)+"%");
+                builder.append("\nLoot rate : " + currentCommand.getLootRate(true)+"%");
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.interactions;
+package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

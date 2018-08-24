@@ -20,14 +20,16 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleC
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
+import java.util.Stack;
+
 public class SelectActionBIS extends BattleInteractionState {
     int rowSltdUnit;
     int colSltdUnit;
-    Array<BattleCommand> historic;
+    Stack<BattleCommand> historic;
     ActionChoicePanel choicePanel;
     CommandChoicePanel commandPanel;
 
-    public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit, Array<BattleCommand> historic) {
+    public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit, Stack<BattleCommand> historic) {
         super(bim, true, true, true);
         this.rowSltdUnit = rowSltdUnit;
         this.colSltdUnit = colSltdUnit;
@@ -38,7 +40,7 @@ public class SelectActionBIS extends BattleInteractionState {
     }
 
     public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit) {
-        this(bim, rowSltdUnit, colSltdUnit, new Array<BattleCommand>());
+        this(bim, rowSltdUnit, colSltdUnit, new Stack<BattleCommand>());
     }
 
     @Override
@@ -145,7 +147,6 @@ public class SelectActionBIS extends BattleInteractionState {
                     final ActionChoice choice = choices.get(i);
                     final TextButton button = new TextButton(choice.getName(bis.bim.mainStringBundle), style);
                     final int buttonIndex = i;
-
                     button.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {

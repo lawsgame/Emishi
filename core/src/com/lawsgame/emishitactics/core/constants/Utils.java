@@ -5,6 +5,8 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 
+import java.util.Stack;
+
 public class Utils {
 
     /**
@@ -51,12 +53,15 @@ public class Utils {
         return false;
     }
 
-    public static<T> boolean arrayContainsAtLeastOneElementOf(Array<T> checkedArray, Array<T> initialContainer, boolean identity){
-        boolean contains = false;
+    public static<T> boolean stackContainsAtLeastOneElementOf(Stack<T> checkedStack, Array<T> initialContainer){
         for (int j = 0; j < initialContainer.size; j++) {
-            checkedArray.contains(initialContainer.get(j), identity);
+            for(int i = 0; i < checkedStack.size(); i++){
+                if(checkedStack.get(i) == initialContainer.get(j)){
+                    return true;
+                }
+            }
         }
-        return contains;
+        return false;
     }
 
     public static boolean arrayContains(Array<int[]> intArray, int r, int c){
@@ -153,14 +158,10 @@ public class Utils {
      * @param historic
      * @return true if all commands has been undone, false otherwise
      */
-    public static boolean undoCommands(Array<BattleCommand> historic){
-        for(int i = historic.size - 1; i >= 0; i--){
-            if(historic.get(i).isUndoable()){
-                historic.removeIndex(i).undo();
-            }else{
-                return false;
-            }
+    public static boolean undoCommands(Stack<BattleCommand> historic){
+        while(!historic.isEmpty() && historic.peek().isUndoable()){
+            historic.pop().undo();
         }
-        return true;
+        return historic.isEmpty();
     }
 }

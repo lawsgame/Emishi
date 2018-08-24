@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -20,41 +19,42 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleC
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Stack;
 
 
 /*
  */
 public class BattleCommandManager {
-    private final HashMap<ActionChoice, Array<BattleCommand>> commandPool;
+    private final Array<Array<BattleCommand>> commandPool;
 
     public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler){
-        commandPool = new HashMap<ActionChoice, Array<BattleCommand>>();
+        commandPool = new Array<Array<BattleCommand>>();
 
-        setChoice(new AttackCommand(bfr, scheduler));
-        setChoice(new BattleCommand[]{
-                new BuildCommand(bfr, scheduler, Data.TileType.WATCH_TOWER),
-                new BuildCommand(bfr, scheduler, Data.TileType.BRIDGE)
-        });
-        setChoice(new BattleCommand[]{
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.NORTH),
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.SOUTH),
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.EAST),
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.WEST),
-        });
-        setChoice(new GuardCommand(bfr, scheduler));
-        setChoice(new HealCommand(bfr, scheduler));
         setChoice(new MoveCommand(bfr, scheduler));
-        setChoice(new PushCommand(bfr, scheduler));
-        setChoice(new StealCommand(bfr, scheduler));
-        setChoice(new SwitchPositionCommand(bfr, scheduler));
+        setChoice(new AttackCommand(bfr, scheduler));
 
         final Array<BattleCommand>  commands = new Array<BattleCommand>();
         for(int i = 1; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
             commands.add(new SwitchWeaponCommand(bfr, scheduler, i));
         }
         if(commands.size > 0 && commands.get(0) != null)
-            commandPool.put(commands.get(0).getActionChoice(), commands);
+            commandPool.add(commands);
+
+        setChoice(new PushCommand(bfr, scheduler));
+        setChoice(new SwitchPositionCommand(bfr, scheduler));
+        setChoice(new BattleCommand[]{
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.NORTH),
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.SOUTH),
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.EAST),
+                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.WEST),
+        });
+        setChoice(new BattleCommand[]{
+                new BuildCommand(bfr, scheduler, Data.TileType.WATCH_TOWER),
+                new BuildCommand(bfr, scheduler, Data.TileType.BRIDGE)
+        });
+        setChoice(new GuardCommand(bfr, scheduler));
+        setChoice(new HealCommand(bfr, scheduler));
+        setChoice(new StealCommand(bfr, scheduler));
 
     }
 
@@ -62,13 +62,13 @@ public class BattleCommandManager {
     private void setChoice(BattleCommand command){
         Array<BattleCommand>  commands = new Array<BattleCommand>();
         commands.add(command);
-        commandPool.put(command.getActionChoice(), commands);
+        commandPool.add(commands);
     }
 
     private void setChoice(BattleCommand[] battleCommands){
         Array<BattleCommand>  commands = new Array<BattleCommand>();
         commands.addAll(battleCommands);
-        commandPool.put(battleCommands[0].getActionChoice(), commands);
+        commandPool.add(commands);
     }
 
 
@@ -77,36 +77,39 @@ public class BattleCommandManager {
 
 
 
-    public Array<ActionChoice> getAvailableChoices(IUnit actor, Array<BattleCommand> history){
+    public Array<ActionChoice> getAvailableChoices(IUnit actor, Stack<BattleCommand> history){
         Array<ActionChoice> choices = new Array<ActionChoice>();
-        for (ActionChoice choice : commandPool.keySet()) {
-            if (!choice.isEndTurnActionOnly()
-                    && choice.canbePerformedBy(actor)
-                    && history != null
-                    && !Utils.arrayContainsAtLeastOneElementOf(history, commandPool.get(choice), true)) {
-                choices.add(choice);
+        ActionChoice choice;
+        for (int  i = 0; i < commandPool.size; i++) {
+            if(commandPool.get(i).size > 0) {
+                choice = commandPool.get(i).get(0).getActionChoice();
+                if (!choice.isEndTurnActionOnly()
+                        && choice.canbePerformedBy(actor)
+                        && history != null
+                        && !Utils.stackContainsAtLeastOneElementOf(history, commandPool.get(i))) {
+                    choices.add(choice);
+                }
             }
         }
         return choices;
     }
 
-    public boolean isChoiceDiversified(ActionChoice choice){
-        return commandPool.get(choice) != null && commandPool.get(choice).size > 1;
-    }
-
     public Array<BattleCommand> getAvailableCommands(IUnit actor, ActionChoice choice, boolean checkPerformable){
-        Array<BattleCommand> commands = new Array<BattleCommand>();
-        if(commandPool.get(choice) != null) {
-            for(int i = 0; i < commandPool.get(choice).size; i++){
-                if(!checkPerformable || commandPool.get(choice).get(i).canbePerformedBy(actor)){
-                    commands.add(commandPool.get(choice).get(i));
+        Array<BattleCommand> availableCommands = new Array<BattleCommand>();
+        for(int i = 0; i < commandPool.size ;i++) {
+            if(commandPool.get(i).size > 0 && commandPool.get(i).get(0).getActionChoice() == choice) {
+                Array<BattleCommand> chosenCommands = commandPool.get(i);
+                for (int j = 0; j < chosenCommands.size; j++) {
+                    if (!checkPerformable || chosenCommands.get(j).canbePerformedBy(actor)) {
+                        availableCommands.add(chosenCommands.get(j));
+                    }
                 }
             }
         }
-        return commands;
+        return availableCommands;
     }
 
-    public HashMap<ActionChoice, Array<BattleCommand>> getAllCommands(IUnit actor, Array<BattleCommand> history, boolean checkFlavorPerformable) {
+    public HashMap<ActionChoice, Array<BattleCommand>> getAllCommands(IUnit actor, Stack<BattleCommand> history, boolean checkFlavorPerformable) {
         HashMap<ActionChoice, Array<BattleCommand>> commands = new HashMap<ActionChoice, Array<BattleCommand>>();
         if(actor != null && history != null) {
             Array<ActionChoice> availableChoices = getAvailableChoices(actor, history);
@@ -120,7 +123,7 @@ public class BattleCommandManager {
     //-------------------------  GETTERS & SETTERS ---------------------------
 
 
-    public String toString(IUnit actor, Array<BattleCommand> history, boolean checkFlavorPerformable){
+    public String toString(IUnit actor, Stack<BattleCommand> history, boolean checkFlavorPerformable){
         HashMap<ActionChoice, Array<BattleCommand>> allcommands = getAllCommands(actor, history, checkFlavorPerformable);
         String str = "Availables commands : \n";
         Array<BattleCommand> commands;
@@ -136,8 +139,8 @@ public class BattleCommandManager {
     public String toString(){
         String str = "command pool : \n";
         Array<BattleCommand> commands;
-        for (ActionChoice choice : commandPool.keySet()) {
-            commands = commandPool.get(choice);
+        for (int i = 0; i < commandPool.size; i++) {
+            commands = commandPool.get(i);
             for(BattleCommand bc : commands){
                 str += "\n"+bc.toString();
             }

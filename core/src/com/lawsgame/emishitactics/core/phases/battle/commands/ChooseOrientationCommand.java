@@ -16,10 +16,6 @@ public class ChooseOrientationCommand extends StandCommand {
     protected Data.Orientation newOrientation;
     protected BattleUnitRenderer actorRenderer;
 
-    public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        this(bfr, scheduler, Data.Orientation.NORTH);
-    }
-
     public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.Orientation newOrientation) {
         super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, true, true, true);
         this.newOrientation = newOrientation;

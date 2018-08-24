@@ -216,10 +216,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             batch.draw(orientationTexture, getX() + 0.75f, getY() + 0.75f, 0.25f, 0.25f);
             if (mountedTexture != null) batch.draw(mountedTexture, getX() + 0.75f, getY() + 0f, 0.25f, 0.25f);
             if (offabbTexture != null) batch.draw(offabbTexture, getX(), getY() + 1, 1, 0.25f);
-            if(showNumbers) {
-                //BattlePhase.testFont.getData().setScale(0.07f);
-                //BattlePhase.testFont.draw(batch, numbersToShow, getX(), getY());
-            }
         }
     }
 

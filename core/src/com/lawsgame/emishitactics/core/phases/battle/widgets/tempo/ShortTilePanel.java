@@ -61,6 +61,16 @@ public class ShortTilePanel extends TilePanel {
     }
 
     @Override
+    public float getHidingTime() {
+        return slideDuration;
+    }
+
+    @Override
+    public float getShowingTime() {
+        return getHidingTime();
+    }
+
+    @Override
     public void act(float delta) {
         super.act(delta);
         if(getX() == stageViewport.getWorldWidth()){
