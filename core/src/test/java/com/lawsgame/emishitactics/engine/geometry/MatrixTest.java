@@ -20,7 +20,6 @@ public class MatrixTest {
 
     @BeforeClass
     public static void beforeClass(){
-        System.out.println("\n---+++$$$ Matrix TEST $$$+++--\n");
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
 
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -10,7 +11,7 @@ public abstract class LootPanel extends Panel {
         super(stageViewport);
     }
 
-    public abstract void set(Item item);
-    public abstract void set(Item item, Player player);
+    public abstract void set(Item item, I18NBundle bundle);
+    public abstract void set(Item item, I18NBundle bundle, Player player);
 }
 

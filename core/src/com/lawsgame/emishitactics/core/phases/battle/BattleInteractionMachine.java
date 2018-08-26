@@ -19,6 +19,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManage
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.LongTilePanel;
@@ -40,7 +41,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public ActionPanelPool app;
     public InputMultiplexer multiplexer;
     public AnimationScheduler scheduler;
-    public I18NBundle mainStringBundle;
+    public I18NBundle mainI18nBundle;
 
     public AreaWidget selectedTile;
     public AreaWidget touchedTile;
@@ -68,7 +69,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bcm = new BattleCommandManager(bfr, scheduler);
         this.player = player;
         this.multiplexer = new InputMultiplexer();
-        this.mainStringBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
+        this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
 
 
         this.selectedTile = new AreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
@@ -86,7 +87,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.uiStage = stageUI;
         this.shortTilePanel = new ShortTilePanel(stageUI.getViewport());
         this.shortUnitPanel = new ShortUnitPanel(stageUI.getViewport());
-        this.longUnitPanel = new LongUnitPanel(stageUI.getViewport(), mainStringBundle);
+        this.longUnitPanel = new LongUnitPanel(stageUI.getViewport(), mainI18nBundle);
         this.longTilePanel = new LongTilePanel(stageUI.getViewport());
 
         stageUI.addActor(shortTilePanel);
@@ -118,6 +119,11 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
                 shortUnitPanel.hide();
             }
         };
+
+        showSTP = new ShowPanel(shortTilePanel);
+        showSUP = new ShowPanel(shortUnitPanel);
+        hideSTP = new HidePanel(shortTilePanel);
+        hideSUP = new HidePanel(shortUnitPanel);
 
     }
 
@@ -248,12 +254,58 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     // --------------------- GETTES & SETTERS ----------------------------
 
+
     public String toString(){
         String str = "";
         for(int i=0; i < states.size(); i++){
             str += "\n"+states.get(i).toString();
         }
         return str;
+    }
+
+    public static class FocusOn extends SimpleCommand{
+        private BattleInteractionMachine bim;
+        private int rowFocus;
+        private int colFocus;
+
+
+        public FocusOn (BattleInteractionMachine bim, int rowFocus, int colFocus) {
+            this.bim = bim;
+            this.rowFocus = rowFocus;
+            this.colFocus = colFocus;
+        }
+
+        @Override
+        public void apply() {
+            bim.focusOn(rowFocus, colFocus, true, false, false, true, false);
+
+        }
+    }
+
+    public static class ShowPanel extends SimpleCommand{
+        private Panel panel;
+
+        public ShowPanel(Panel panel) {
+            this.panel = panel;
+        }
+
+        @Override
+        public void apply() {
+            panel.show();
+        }
+    }
+
+    public static class HidePanel extends SimpleCommand{
+        private Panel panel;
+
+        public HidePanel(Panel panel) {
+            this.panel = panel;
+        }
+
+        @Override
+        public void apply() {
+            panel.hide();
+        }
     }
 
 }

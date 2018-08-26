@@ -42,6 +42,7 @@ public class Unit extends IUnit{
 
     protected int currentMoral;
     protected int currentHitPoints;
+    protected int actionPoints = 0;
 
     protected Array<Equipment> equipments;
     protected Banner banner;
@@ -51,7 +52,6 @@ public class Unit extends IUnit{
      */
     protected Orientation orientation = Orientation.SOUTH;
     protected Behaviour behaviour = Behaviour.PASSIVE;
-    protected int OAChargingBar = 0;
     protected boolean moved = false;
     protected boolean acted = false;
 
@@ -416,10 +416,12 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void switchWeapon(int index) {
+    public boolean switchWeapon(int index) {
         if (0 < index && index < weapons.size) {
             weapons.swap(0, index);
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -487,13 +489,19 @@ public class Unit extends IUnit{
 
     @Override
     public int[] addExpPoints(int exp) {
-        int[] gainLvl = new int[0];
-        if(level < Data.MAX_LEVEL) {
-            if (this.experience + exp < Data.EXP_REQUIRED_LEVEL_UP) {
-                this.experience += exp;
+        int[] gainLvl = new int[12];
+        int tempoExp = exp;
+        int[] tempoGainLvl;
+        while(level < Data.MAX_LEVEL && tempoExp > 0) {
+            if (this.experience + tempoExp < Data.EXP_REQUIRED_LEVEL_UP) {
+                this.experience += tempoExp;
+                tempoExp = 0;
             } else {
-                this.experience = (level + 1 == Data.MAX_LEVEL) ? 0 : this.experience + exp - Data.EXP_REQUIRED_LEVEL_UP;
-                gainLvl = levelup();
+                tempoExp -= Data.EXP_REQUIRED_LD_LEVEL_UP - this.experience;
+                this.experience = 0;
+                tempoGainLvl = levelup();
+                for(int i = 0; i < gainLvl.length; i++)
+                    gainLvl[i] += tempoGainLvl[i];
             }
         }
         return gainLvl;
@@ -862,20 +870,20 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setOAChargingBarPoints(int barProgression) {
-        this.OAChargingBar = barProgression % Data.OA_CHARGING_BAR_MAX_VALUE;
+    public void setActionPoints(int barProgression) {
+        this.actionPoints = barProgression % Data.MAX_ACTION_POINTS;
     }
 
     @Override
-    public void addOAChargingBarPoints(int points) {
-        this.OAChargingBar += points;
-        if(OAChargingBar > Data.OA_CHARGING_BAR_MAX_VALUE) OAChargingBar = Data.OA_CHARGING_BAR_MAX_VALUE;
-        if(OAChargingBar < 0 ) OAChargingBar = 0;
+    public void addActionPoints(int points) {
+        this.actionPoints += points;
+        if(actionPoints > Data.MAX_ACTION_POINTS) actionPoints = Data.MAX_ACTION_POINTS;
+        if(actionPoints < 0 ) actionPoints = 0;
     }
 
     @Override
-    public int getOAChargingBarPoints() {
-        return this.OAChargingBar;
+    public int getActionPoints() {
+        return this.actionPoints;
     }
 
     @Override
@@ -1150,4 +1158,8 @@ public class Unit extends IUnit{
         return notifications;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

@@ -145,7 +145,7 @@ public class SelectActionBIS extends BattleInteractionState {
                 for (int i = 0; i < choices.size; i++) {
 
                     final ActionChoice choice = choices.get(i);
-                    final TextButton button = new TextButton(choice.getName(bis.bim.mainStringBundle), style);
+                    final TextButton button = new TextButton(choice.getName(bis.bim.mainI18nBundle), style);
                     final int buttonIndex = i;
                     button.addListener(new ChangeListener() {
                         @Override
@@ -169,7 +169,7 @@ public class SelectActionBIS extends BattleInteractionState {
                             }else{
 
                                 try {
-                                    throw new BISException("Battle command manager found no command available for the following available action choice : "+choice.getName(bis.bim.mainStringBundle));
+                                    throw new BISException("Battle command manager found no command available for the following available action choice : "+choice.getName(bis.bim.mainI18nBundle));
                                 } catch (BISException e) {
                                     e.printStackTrace();
                                 }
@@ -197,7 +197,7 @@ public class SelectActionBIS extends BattleInteractionState {
 
                     final BattleCommand battleCommand = flavors.get(i);
                     if(battleCommand.setActor(bis.rowSltdUnit, bis.colSltdUnit)) {
-                        TextButton button = new TextButton(battleCommand.getName(bis.bim.mainStringBundle), style);
+                        TextButton button = new TextButton(battleCommand.getName(bis.bim.mainI18nBundle), style);
                         button.addListener(new ChangeListener() {
                             @Override
                             public void changed(ChangeEvent event, Actor actor) {

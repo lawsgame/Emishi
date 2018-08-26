@@ -52,7 +52,8 @@ public class AnimationScheduler implements GameUpdatableEntity{
     public String toString(){
         String str = "\nScheduler\n";
         for(int i = 0; i < tasks.size(); i++){
-            str += "\n"+i+" = "+tasks.get(i).toString();
+            str += "\n"+i+" = ";
+            str += tasks.get(i).toString();
         }
         return str+"\n";
     }
@@ -69,11 +70,8 @@ public class AnimationScheduler implements GameUpdatableEntity{
         public abstract boolean isInitiazed();
         public abstract boolean isCompleted();
         public abstract boolean isIrrelevant();
+
+
     }
-
-
-
-
-
 
 }

@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -19,8 +20,8 @@ import java.util.Stack;
 public class ValidateTargetBIS extends BattleInteractionState {
     private Stack<BattleCommand> historic;
     private BattleCommand currentCommand;
-
     private AreaWidget impactArea;
+
     private ChooseOrientationCommand orientationCommand;
     private SimpleCommand hideActionPanelCommand;
     private SimpleCommand removeActionPanelCommand;
@@ -35,25 +36,29 @@ public class ValidateTargetBIS extends BattleInteractionState {
                 Data.AreaType.MOVE_AREA :
                 Data.AreaType.ACTION_AREA;
         this.impactArea = new AreaWidget(bim.battlefield, type, currentCommand.getImpactArea());
-
-
     }
 
     @Override
     public void init() {
-        System.out.println("VALIDATE TARGET : "+currentCommand.getActor().getName()+" => "+currentCommand.getTarget().getName()+" : "+currentCommand.getName(bim.mainStringBundle));
+        System.out.println("VALIDATE TARGET : "
+                +currentCommand.getActor().getName()+" => "
+                +((currentCommand.getTarget() != null) ? currentCommand.getTarget().getName() : "("+currentCommand.getRowTarget()+", "+currentCommand.getColTarget()+")")+" : "
+                +currentCommand.getName(bim.mainI18nBundle));
 
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, true, false);
-        currentCommand.highlightTarget(true);
+        currentCommand.blink(true);
 
         //set the new orientation
-        Data.Orientation actorOrientation = Utils.getOrientationFromCoords(
-                currentCommand.getRowActor(),
-                currentCommand.getColActor(),
-                currentCommand.getRowTarget(),
-                currentCommand.getColTarget());
-        orientationCommand = new ChooseOrientationCommand(bim.bfr, bim.scheduler, actorOrientation);
-        orientationCommand.apply(currentCommand.getRowActor(), currentCommand.getColActor());
+        if(!currentCommand.getActionChoice().isActorIsTarget()) {
+            Data.Orientation actorOrientation = Utils.getOrientationFromCoords(
+                    currentCommand.getRowActor(),
+                    currentCommand.getColActor(),
+                    currentCommand.getRowTarget(),
+                    currentCommand.getColTarget());
+            orientationCommand = new ChooseOrientationCommand(bim.bfr, bim.scheduler, actorOrientation);
+            orientationCommand.setFree(true);
+            orientationCommand.apply(currentCommand.getRowActor(), currentCommand.getColActor());
+        }
 
         //schedule the panels dance
         StandardTask hideShortPanelTask = new StandardTask();
@@ -63,26 +68,10 @@ public class ValidateTargetBIS extends BattleInteractionState {
         if(bim.app.isPanelAvailable(currentCommand)) {
 
             final ActionPanel actionPanel = bim.app.getPanel(currentCommand);
-            bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
-                @Override
-                public void apply() {
-                    bim.uiStage.addActor(actionPanel);
-                    actionPanel.hide();
-                    actionPanel.show();
-                }
-            }, 0));
-            this.hideActionPanelCommand = new SimpleCommand() {
-                @Override
-                public void apply() {
-                    actionPanel.hide();
-                }
-            };
-            removeActionPanelCommand = new SimpleCommand() {
-                @Override
-                public void apply() {
-                    actionPanel.remove();
-                }
-            };
+            bim.scheduler.addTask(new StandardTask(new ManageActionPanel(bim.uiStage, actionPanel, ManageActionPanel.Request.SHOW), 0));
+            this.hideActionPanelCommand = new ManageActionPanel(bim.uiStage, actionPanel, ManageActionPanel.Request.HIDE);
+            removeActionPanelCommand = new ManageActionPanel(bim.uiStage, actionPanel, ManageActionPanel.Request.REMOVE);
+            hidingTime = actionPanel.getHidingTime();
         }
     }
 
@@ -99,9 +88,11 @@ public class ValidateTargetBIS extends BattleInteractionState {
                 //ACTION VALIDATE
 
                 // clear the HUD before hand
-                bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
+                if(bim.app.isPanelAvailable(currentCommand))
+                    bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
                 impactArea.setVisible(false);
                 bim.removeTileHighlighting(false);
+                currentCommand.blink(false);
 
                 currentCommand.apply();
 
@@ -115,19 +106,16 @@ public class ValidateTargetBIS extends BattleInteractionState {
                 orientationCommand.undo();
 
                 // remove blinking effect of the target
-                currentCommand.highlightTarget(false);
+                currentCommand.blink(false);
 
                 // hide action panel before removing it
-                bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, hidingTime));
-                bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
+                if(bim.app.isPanelAvailable(currentCommand)) {
+                    bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, hidingTime));
+                    bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
+                }
 
                 // launch the action selection interaction state
-                bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
-                    @Override
-                    public void apply() {
-                        bim.replace(new SelectActionBIS(bim, currentCommand.getRowActor(), currentCommand.getColActor(), historic));
-                    }
-                }, 0));
+                bim.scheduler.addTask(new StandardTask(new GetBackToSelectAction(currentCommand, bim, historic), 0));
 
             }
         }
@@ -136,7 +124,10 @@ public class ValidateTargetBIS extends BattleInteractionState {
 
     @Override
     public void update60(float dt) {
+        //System.out.println(currentCommand.isExecuting()+" et "+currentCommand.isCompleted());
+
         if(currentCommand.isCompleted()){
+            System.out.println("***START***");
             bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
             bim.replace(new HandleOutcomeBIS(bim, historic));
         }
@@ -158,5 +149,59 @@ public class ValidateTargetBIS extends BattleInteractionState {
 
     }
 
+    static class GetBackToSelectAction extends SimpleCommand{
+        private BattleCommand currentCommand;
+        private BattleInteractionMachine bim;
+        private Stack<BattleCommand> historic;
+
+        public GetBackToSelectAction(BattleCommand currentCommand, BattleInteractionMachine bim, Stack<BattleCommand> historic) {
+            this.currentCommand = currentCommand;
+            this.bim = bim;
+            this.historic = historic;
+        }
+
+        @Override
+        public void apply() {
+            bim.replace(new SelectActionBIS(bim, currentCommand.getRowActor(), currentCommand.getColActor(), historic));
+        }
+    }
+
+    static class ManageActionPanel extends SimpleCommand{
+        private Stage uiStage;
+        private ActionPanel actionPanel;
+        private Request request;
+
+        public ManageActionPanel(Stage uiStage, ActionPanel actionPanel, Request request) {
+            this.uiStage = uiStage;
+            this.actionPanel = actionPanel;
+            this.request = request;
+        }
+
+        enum Request{
+            SHOW,
+            HIDE,
+            REMOVE
+        }
+
+        @Override
+        public void apply() {
+            switch (request){
+
+                case SHOW:
+                    uiStage.addActor(actionPanel);
+                    actionPanel.hide();
+                    actionPanel.show();
+                    break;
+                case HIDE:
+                    actionPanel.hide();
+                    break;
+                case REMOVE:
+                    actionPanel.remove();
+                    break;
+            }
+
+        }
+
+    }
 
 }

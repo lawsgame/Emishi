@@ -65,8 +65,8 @@ public class Formulas {
 
     public static int getGainedExperience(int levelActor, int levelTarget, boolean stillFigthing) {
         double expGained = 50 + (100 / Math.PI) * Math.atan((levelTarget - levelActor - Data.EXP_LVL_GAP_FACTOR) * Data.EXP_ALPHA) - levelActor;
-        if(expGained < 0) expGained = 0;
         if(stillFigthing) expGained *= Data.EXP_WOUNDED_ONLY_FACTOR;
+        if(expGained < 1) expGained = 1;
         return (int)expGained;
     }
 

@@ -61,7 +61,7 @@ public class LongUnitPanel extends UnitPanel {
         }
         builder.append("\nHit points: " + unit.getCurrentHP() + "/"+unit.getAppHitpoints());
         builder.append("\nMoral: " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-        builder.append("\nAO trigger rate : " + unit.getAppOATriggerRate());
+        builder.append("\nAction Points Recovery : " + unit.getAppOATriggerRate());
 
         if (unit.isMobilized()) {
             IArmy army = unit.getArmy();
@@ -97,7 +97,7 @@ public class LongUnitPanel extends UnitPanel {
         builder.append("\nWeapon type : "+ unit.getCurrentWeapon().getTemplate().getWeaponType().name().toLowerCase());
         builder.append("\nDamage type : "+unit.getCurrentWeapon().getTemplate().getDamageType().name().toLowerCase());
         builder.append("\n\n    ABILITIES\n");
-        builder.append("\nAbilities : \n");
+        builder.append("\nAbilities : ");
         Array<Data.Ability> activeAbilities = unit.getAbilities();
         for(int i = 0; i < activeAbilities.size ; i++) {
             builder.append("\n  " + unit.getAbilities().get(i).name().toLowerCase());

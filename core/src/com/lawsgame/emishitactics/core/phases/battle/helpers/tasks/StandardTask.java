@@ -11,115 +11,105 @@ import com.lawsgame.emishitactics.engine.timers.CountDown;
 import java.util.LinkedList;
 
 public class StandardTask extends Task {
+    protected String tag = "";
+    protected Array<Thread> parallelThreads;
+    protected boolean initiazed = false;
 
-        protected Array<Thread> parallelThreads;
-        protected boolean initiazed = false;
+    public StandardTask(Renderer renderer, Object dataBundle){
+        this();
+        RendererThread rendererThread = new RendererThread(renderer);
+        rendererThread.addQuery(dataBundle);
+        parallelThreads.add(rendererThread);
+    }
 
-        public StandardTask(Renderer renderer, Object dataBundle){
-            this();
-            RendererThread rendererThread = new RendererThread(renderer);
-            rendererThread.addQuery(dataBundle);
-            parallelThreads.add(rendererThread);
+    public StandardTask(Observable sender, Renderer executer, Object dataBundle){
+        this();
+        RendererThread rendererThread = new RendererThread(executer);
+        rendererThread.addQuery(sender, dataBundle);
+        parallelThreads.add(rendererThread);
+    }
+
+    public StandardTask(){
+        parallelThreads = new Array<Thread>();
+    }
+
+    public StandardTask(SimpleCommand command, float delay){
+        this();
+        addThread(new  CommandThread(command, delay));
+    }
+
+    public void update(float dt){
+        for(int i = 0; i < parallelThreads.size; i++){
+            parallelThreads.get(i).update(dt);
         }
+    }
 
-        public StandardTask(Observable sender, Renderer executer, Object dataBundle){
-            this();
-            RendererThread rendererThread = new RendererThread(executer);
-            rendererThread.addQuery(sender, dataBundle);
-            parallelThreads.add(rendererThread);
-        }
-
-        public StandardTask(){
-            parallelThreads = new Array<Thread>();
-        }
-
-        public StandardTask(SimpleCommand command, float delay){
-            this();
-            addThread(new  CommandThread(command, delay));
-        }
-
-        public void update(float dt){
-            for(int i = 0; i < parallelThreads.size; i++){
-                parallelThreads.get(i).update(dt);
+    public boolean isCompleted() {
+        for(int i = 0; i < parallelThreads.size; i++){
+            if(parallelThreads.get(i).isCompleted()){
+                return true;
             }
         }
+        return false;
+    }
 
-        public boolean isCompleted() {
-            for(int i = 0; i < parallelThreads.size; i++){
-                if(parallelThreads.get(i).isCompleted()){
-                    return true;
-                }
+    public void init() {
+        initiazed = true;
+        for(int i = 0; i < parallelThreads.size; i++){
+            parallelThreads.get(i).init();
+        }
+    }
+
+    public void addThread(Thread thread){
+        parallelThreads.add(thread);
+    }
+
+    public <T extends Thread> void addllThreads(Array<T> threads){
+        parallelThreads.addAll(threads);
+    }
+
+
+    public boolean isInitiazed() {
+        return initiazed;
+    }
+
+    public String toString(){
+        String str = "STANDARD TASK ";
+        if(!getTag().equals("")) str += "["+getTag()+"] ";
+        str += ": ";
+        for(int i = 0; i < parallelThreads.size; i++) {
+            str +="\n   "+parallelThreads.get(i).toString();
+        }
+        return str;
+    }
+
+    /**
+     * convient method
+     * usefull to check if adding that task to the queue is relevant.
+     * @return
+     */
+    @Override
+    public boolean isIrrelevant() {
+        for(int i = 0; i < parallelThreads.size; i++){
+            if(!parallelThreads.get(i).isEmpty()){
+                return false;
             }
-            return false;
         }
-
-        public void init() {
-            initiazed = true;
-            for(int i = 0; i < parallelThreads.size; i++){
-                parallelThreads.get(i).init();
-            }
-        }
-
-        public void addThread(Thread thread){
-            parallelThreads.add(thread);
-        }
-
-        public <T extends Thread> void addllThreads(Array<T> threads){
-            parallelThreads.addAll(threads);
-        }
+        return true;
+    }
 
 
-        public boolean isInitiazed() {
-            return initiazed;
-        }
+    public void tag(String tag){
+        this.tag = tag;
+    }
 
-        public String toString(){
-            String str = "STANDARD TASK : ";
-            RendererThread rendererThread;
-            CommandThread commandThread;
-            for(int i = 0; i < parallelThreads.size; i++) {
-
-                if(parallelThreads.get(i) instanceof RendererThread) {
-
-                    rendererThread = (RendererThread)parallelThreads.get(i);
-                    if (rendererThread.executer != null)
-                        str += "\n    RendererThread : executer = " + rendererThread.executer.toString();
-                    else
-                        str += "\n    RendererThread : executer = null";
-
-
-                    for (int j = 0; j < rendererThread.bundles.size(); j++) {
-                        if (rendererThread.tag.equals(""))
-                            str += " : " + rendererThread.bundles.get(j) + " => " + rendererThread.senders.get(j);
-                        else
-                            str += " : " + rendererThread.tag;
-                    }
-                } else if(parallelThreads.get(i) instanceof CommandThread){
-                    commandThread = (CommandThread)parallelThreads.get(i);
-                    str +="\n   Command thread : "+commandThread.tag;
-                }
-            }
-            return str;
-        }
-
-        /**
-         * convient method
-         * usefull to check if adding that task to the queue is relevant.
-         * @return
-         */
-        @Override
-        public boolean isIrrelevant() {
-            for(int i = 0; i < parallelThreads.size; i++){
-                if(!parallelThreads.get(i).isEmpty()){
-                    return false;
-                }
-            }
-            return true;
-        }
+    public String getTag() {
+        return tag;
+    }
 
 
     public static abstract class Thread {
-        protected String tag = "";
+        private String tag = "";
 
         abstract void init();
         abstract boolean isCompleted();
@@ -130,6 +120,7 @@ public class StandardTask extends Task {
         public void setTag(String tag){
             this.tag = tag;
         }
+        public String getTag(){ return this.tag; }
     }
 
 
@@ -150,6 +141,9 @@ public class StandardTask extends Task {
         }
 
         public void addQuery(SimpleCommand command, float delay){
+            if(command == null){
+                System.out.println("COMMAND NULL");
+            }
             commands.offer(command);
             delays.offer(delay);
         }
@@ -160,6 +154,14 @@ public class StandardTask extends Task {
         }
 
         private void launch(){
+            /*
+            System.out.println("DIAGNOSIS ");
+            System.out.println("commands size: "+commands.size());
+            System.out.println("commands top element: "+commands.peek());
+            SimpleCommand command = commands.peek();
+            System.out.println("simple command peek :"+command);
+            */
+
             if(!isEmpty()) {
                 commands.peek().apply();
                 countDown.reset(delays.peek());
@@ -185,6 +187,11 @@ public class StandardTask extends Task {
                 delays.pop();
                 launch();
             }
+        }
+
+        @Override
+        public String toString(){
+            return "Command thread ["+getTag()+"]";
         }
     }
 
@@ -246,6 +253,15 @@ public class StandardTask extends Task {
             if(countDown.isFinished() && !isEmpty() && !executer.isExecuting()){
                 senders.pop().notifyAllObservers(bundles.pop());
             }
+        }
+
+        @Override
+        public String toString() {
+            String str = "RendererThread : executer = "+((executer != null) ? executer.toString(): "null");
+            for (int j = 0; j < bundles.size(); j++) {
+                str += " : " + bundles.get(j) + " => " + senders.get(j);
+            }
+            return str;
         }
     }
 }

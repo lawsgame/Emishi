@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
@@ -18,7 +17,7 @@ public class ShortUnitPanel extends UnitPanel {
     private static float X_TEXT_OFFSET = 8f;
     private static float Y_TEXT_OFFSET = 8f;
     private static float PANEL_WIDTH = 220;
-    private static float PANEL_HEIGHT = 130f;
+    private static float PANEL_HEIGHT = 140f;
 
     private String description;
     private float slideDuration;
@@ -52,8 +51,9 @@ public class ShortUnitPanel extends UnitPanel {
             }
         }
 
-        builder.append("\nHP  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
+        builder.append("\nHit points  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
         builder.append("\nMoral  : " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
+        builder.append("\nAction Points  : " + unit.getActionPoints() + "/" + Data.MAX_ACTION_POINTS);
         builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().toString() + " ");
 
     }

@@ -27,7 +27,6 @@ public class StateMachineTest {
         bim.push(bis1);
         bim.replace(bis3);
         bim.rollback();
-        System.out.println("CALLED");
 
     }
 

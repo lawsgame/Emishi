@@ -26,7 +26,7 @@ public abstract class TempoActionPanel extends ActionPanel{
     private static float Y_OFFSET = 15f;
     private static float X_TEXT_OFFSET = 8f;
     private static float Y_TEXT_OFFSET = 8f;
-    private static float PANEL_WIDTH = 220;
+    private static float PANEL_WIDTH = 270;
     private static float PANEL_HEIGHT = 180;
 
     protected String description;
@@ -122,10 +122,12 @@ public abstract class TempoActionPanel extends ActionPanel{
                 AttackCommand currentCommand = (AttackCommand)command;
                 builder = new StringBuilder();
                 builder.append(command.getActor().getName()+" => "+currentCommand.getTargetDefender().getName());
+                builder.append("\nMoral / HP : " + currentCommand.getTargetDefender().getCurrentMoral()+" / "+currentCommand.getTargetDefender().getCurrentHP());
                 builder.append("\nDamage : " + currentCommand.getDealtDamage(false));
                 builder.append("\nHit rate : " + currentCommand.getHitRate(false)+"%");
                 builder.append("\nLoot rate : " + currentCommand.getLootRate(false)+"%");
                 builder.append("\n\n"+command.getTarget().getName()+" => "+currentCommand.getInitiatorDefender().getName());
+                builder.append("\nMoral / HP : " + currentCommand.getInitiatorDefender().getCurrentMoral()+" / "+currentCommand.getInitiatorDefender().getCurrentHP());
                 builder.append("\nDamage : " + currentCommand.getDealtDamage(true));
                 builder.append("\nHit rate : " + currentCommand.getHitRate(true)+"%");
                 builder.append("\nLoot rate : " + currentCommand.getLootRate(true)+"%");
@@ -207,6 +209,19 @@ public abstract class TempoActionPanel extends ActionPanel{
                 builder.append(command.getActor().getName());
                 builder.append(bc.getTargetTile()+" => "+bc.getBuildingType());
             }
+        }
+    }
+
+    public static class EndTurnPanel extends TempoActionPanel {
+
+        public EndTurnPanel(Viewport stageViewport) {
+            super(stageViewport, ActionChoice.END_TURN);
+        }
+
+        @Override
+        public void set(BattleCommand command) {
+            setWidth(0);
+            setHeight(0);
         }
     }
 }

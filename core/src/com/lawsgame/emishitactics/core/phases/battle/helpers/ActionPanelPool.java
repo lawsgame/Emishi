@@ -19,6 +19,7 @@ public class ActionPanelPool {
         panels.put(ActionChoice.STEAL, new TempoActionPanel.StealPanel(UIport));
         panels.put(ActionChoice.BUILD, new TempoActionPanel.BuildPanel(UIport));
         panels.put(ActionChoice.NONE, new TempoActionPanel.InvisiblePanel(UIport));
+        panels.put(ActionChoice.END_TURN, new TempoActionPanel.EndTurnPanel(UIport));
     }
 
     public boolean isPanelAvailable(BattleCommand command){

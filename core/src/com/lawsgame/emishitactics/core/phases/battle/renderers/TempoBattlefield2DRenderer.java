@@ -317,11 +317,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public boolean isVisible() {
-        return false;
-    }
-
-    @Override
     public void setVisible(boolean visible) {
 
     }

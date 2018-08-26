@@ -45,7 +45,7 @@ public abstract class IUnit extends Observable {
     public abstract Array<Weapon> removeAllWeapons();
     public abstract Array<Weapon> getWeapons();
     public abstract Weapon getCurrentWeapon();
-    public abstract void switchWeapon(int index);
+    public abstract boolean switchWeapon(int index);
     public abstract Weapon getWeapon(int index);
 
 
@@ -111,9 +111,9 @@ public abstract class IUnit extends Observable {
     public abstract int getAppAvoidance();
     public abstract int getAppOATriggerRate();
     public abstract int getCurrentOATriggerRate(int rowUnit, int colUnit, Battlefield battlefield);
-    public abstract void setOAChargingBarPoints(int barProgression);
-    public abstract void addOAChargingBarPoints(int points);
-    public abstract int getOAChargingBarPoints();
+    public abstract void setActionPoints(int barProgression);
+    public abstract void addActionPoints(int points);
+    public abstract int getActionPoints();
 
 
     //ARMY

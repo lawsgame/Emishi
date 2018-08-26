@@ -38,12 +38,6 @@ public class TempoAreaRenderer extends AreaRenderer {
     public boolean isExecuting() {
         return false;
     }
-
-    @Override
-    public boolean isVisible() {
-        return visible;
-    }
-
     @Override
     public void update(float dt) {
 

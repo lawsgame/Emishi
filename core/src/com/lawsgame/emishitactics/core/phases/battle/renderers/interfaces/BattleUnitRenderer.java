@@ -16,6 +16,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     public abstract void setY(float y);
     public abstract float getX();
     public abstract float getY();
+    public abstract void setDone(boolean done);
     public abstract void setTargeted(boolean targeted);
 
     public abstract void displayWalk(Array<int[]> path);

@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.ActionChoice.RangedBasedType;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -16,7 +17,6 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
 /**
@@ -57,23 +57,25 @@ public abstract class BattleCommand implements Command, Observer{
 
     protected final Battlefield battlefield;
     protected final BattlefieldRenderer battlefieldRenderer;
-    protected final AnimationScheduler scheduler;
+    private final AnimationScheduler scheduler;
     protected final ActionChoice choice;
     protected final boolean undoable;
     private final boolean acted;                    // if true, command that turn acted to true is executed, moved otherwise.
 
-    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied
+    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied nor it costs any OA point
 
+    protected IUnit actor;
+    protected IUnit target;
     protected int rowActor;
     protected int colActor;
     protected int rowTarget;
     protected int colTarget;
 
     protected EncounterOutcome outcome;
-    private boolean initialize;                     // control variable to prevent a battle command to be executed before being initialized and checking if the target choice is valid
+    private boolean initialized;                     // control variable to prevent a battle command to be executed before being initialized and checking if the target choice is valid
 
     private boolean launched;
-    private Array<Task> renderTasks;
+    private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed
 
 
     public BattleCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean acted, boolean free){
@@ -86,17 +88,17 @@ public abstract class BattleCommand implements Command, Observer{
         this.rowTarget = -1;
         this.colTarget = -1;
         this.undoable = undoable;
-        this.outcome = new EncounterOutcome();
-        this.initialize = false;
+        this.initialized = false;
         this.acted = acted;
         this.free = free;
         this.launched = false;
+        this.outcome = new EncounterOutcome();
         this.renderTasks = new Array<Task>();
     }
 
     public void init(){
         if(isTargetValid()) {
-            this.initialize = true;
+            this.initialized = true;
             this.outcome.reset();
             this.renderTasks.clear();
         }
@@ -104,7 +106,9 @@ public abstract class BattleCommand implements Command, Observer{
 
     @Override
     public final void apply() {
-        if(initialize) {
+        if(initialized) {
+            initialized = false;
+
             // set as moved or acted if required
             if(!free){
                 if(acted) {
@@ -113,9 +117,6 @@ public abstract class BattleCommand implements Command, Observer{
                     getActor().setMoved( true);
                 }
             }
-
-            // remove blinking and other highlighting target affect
-            highlightTarget(false);
 
             this.launched = true;
             execute();
@@ -149,9 +150,13 @@ public abstract class BattleCommand implements Command, Observer{
     }
 
     public void scheduleRenderTask(Task task){
-        task.attach(this);
-        renderTasks.add(task);
-        scheduler.addTask(task);
+        if(!task.isIrrelevant()) {
+            task.attach(this);
+            renderTasks.add(task);
+            scheduler.addTask(task);
+            System.out.println("\nClient "+this.toString());
+            System.out.println("nb "+renderTasks.size+" ADD "+task);
+        }
     }
 
     @Override
@@ -160,6 +165,7 @@ public abstract class BattleCommand implements Command, Observer{
             Task completedTask = (Task)data;
             completedTask.detach(this);
             renderTasks.removeValue(completedTask, true);
+            System.out.println("\nClient "+this.toString()+"\nnb "+renderTasks.size+" REMOVE ");
         }
     }
 
@@ -186,16 +192,14 @@ public abstract class BattleCommand implements Command, Observer{
         return isTargetValid(rowActor, colActor, rowTarget, colTarget);
     }
 
-    public void highlightTarget(final boolean enable){
+    public void blink(final boolean enable){
         if(battlefield.isTileOccupied(rowTarget, colTarget)){
-            final BattleUnitRenderer targetRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
-            scheduleRenderTask(new StandardTask(targetRenderer, new SimpleCommand() {
-                @Override
-                public void apply() {
-                    targetRenderer.setTargeted(enable);
-                }
 
-            }));
+            final BattleUnitRenderer targetRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
+            StandardTask blinkTask = new StandardTask(targetRenderer, new Notification.Blink(enable));
+            blinkTask.tag("blink ("+enable+")");
+            scheduleRenderTask(blinkTask);
+
         }
     }
 
@@ -293,6 +297,7 @@ public abstract class BattleCommand implements Command, Observer{
             if (rangeMin <= dist && dist <= rangeMax) {
                 if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getAllegeance())
                         && (!woundedRequired || battlefield.getUnit(rowTarget0, colTarget0).isWounded())) {
+
                     valid = true;
                 }
             }
@@ -414,9 +419,9 @@ public abstract class BattleCommand implements Command, Observer{
             launched = false;
             this.rowActor = rowActor;
             this.colActor = colActor;
+            this.actor = battlefield.getUnit(rowActor, colActor);
             if(choice.isActorIsTarget()){
-                this.rowTarget = rowActor;
-                this.colTarget = colActor;
+                setTarget(rowActor, colActor);
             }
             return true;
         }
@@ -424,8 +429,9 @@ public abstract class BattleCommand implements Command, Observer{
     }
 
     public final IUnit getActor(){
-        return battlefield.getUnit(rowActor, colActor);
+        return actor;
     }
+
 
     public final int getRowActor() {
         return rowActor;
@@ -435,22 +441,25 @@ public abstract class BattleCommand implements Command, Observer{
         return colActor;
     }
 
+
     public final void setTarget(int rowTarget, int colTarget){
         if(battlefield.isTileExisted(rowTarget, colTarget)){
             launched = false;
             this.rowTarget = rowTarget;
             this.colTarget = colTarget;
-
+            this.target = battlefield.getUnit(rowTarget, colTarget);
         }
     }
 
     public final IUnit getTarget(){
-        return battlefield.getUnit(rowTarget, colTarget);
+        return target;
     }
+
 
     public final int getRowTarget() { return rowTarget; }
 
     public final int getColTarget() { return colTarget; }
+
 
     public final TileType getTargetTile() {
         return battlefield.getTile(rowTarget, colTarget);
@@ -460,15 +469,15 @@ public abstract class BattleCommand implements Command, Observer{
         return outcome;
     }
 
-    public Battlefield getBattlefield() {
+    public final Battlefield getBattlefield() {
         return battlefield;
     }
 
-    public boolean isFree() {
+    public final boolean isFree() {
         return free;
     }
 
-    public void setFree(boolean free) {
+    public final void setFree(boolean free) {
         this.free = free;
     }
 
@@ -476,7 +485,7 @@ public abstract class BattleCommand implements Command, Observer{
 
 
 
-    public static class EncounterOutcome {
+public static class EncounterOutcome {
         public Array<IUnit> receivers;
         public Array<Integer> experienceGained;
         public Array<Item> droppedItems;
@@ -492,9 +501,11 @@ public abstract class BattleCommand implements Command, Observer{
 
         }
 
-        public boolean isExperienceGainedHandled(){
+        public boolean isExperienceDistributed(){
             return receivers.size == 0;
         }
+
+        public boolean isLootedItemsReclaimed(){ return droppedItems.size == 0; }
 
         public boolean isHandled(){
             return receivers.size == 0 && droppedItems.size == 0;
@@ -507,7 +518,7 @@ public abstract class BattleCommand implements Command, Observer{
                 try{
                     throw new BattleOutcomeException("senders' and experience' arrays size don't match");
                 }catch(Exception e){
-                    System.out.println(e.getStackTrace());
+                    e.getStackTrace();
                 }
             }
             for(int i = 0; i < receivers.size; i++){
@@ -537,5 +548,11 @@ public abstract class BattleCommand implements Command, Observer{
             super(s);
         }
     }
+
+    @Override
+    public String toString() {
+        return getActionChoice().getKey();
+    }
+
 
 }

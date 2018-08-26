@@ -6,12 +6,12 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.StandCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class SwitchWeaponCommand extends StandCommand{
+public class SwitchWeaponCommand extends SelfInflitedCommand {
     private int weaponIndex;
     private BattleUnitRenderer actorRenderer;
 
@@ -45,8 +45,9 @@ public class SwitchWeaponCommand extends StandCommand{
         if(battlefield.isTileOccupied(rowActor, colActor)){
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer != null && actorRenderer.getModel() == actor) {
-                actor.switchWeapon(weaponIndex);
-                scheduleRenderTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
+                if(actor.switchWeapon(weaponIndex)) {
+                    scheduleRenderTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
+                }
             }
         }
     }

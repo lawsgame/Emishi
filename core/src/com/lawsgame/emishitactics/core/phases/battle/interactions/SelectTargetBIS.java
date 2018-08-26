@@ -1,11 +1,9 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -32,10 +30,13 @@ public class SelectTargetBIS extends BattleInteractionState {
 
     @Override
     public void init() {
-        System.out.println("SELECT TARGET : "+currentCommand.getActor().getName()+" "+currentCommand.getActionChoice().getName(bim.mainStringBundle));
+        System.out.println("SELECT TARGET : "+currentCommand.getActor().getName()+" "+currentCommand.getActionChoice().getName(bim.mainI18nBundle));
 
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, true, true, false);
 
+        if(currentCommand.getActionChoice().isActorIsTarget()){
+            triggerCurrentCommand();
+        }
     }
 
     @Override
@@ -47,35 +48,45 @@ public class SelectTargetBIS extends BattleInteractionState {
     public boolean handleTouchInput(int row, int col) {
         if(!currentCommand.isExecuting()) {
             currentCommand.setTarget(row, col);
-            if(currentCommand.isTargetValid()){
-                currentCommand.init();
-                if(currentCommand.isUndoable()){
-
-                    currentCommand.apply();
-                    historic.push(currentCommand);
-                    actionArea.setVisible(false);
-                    bim.removeTileHighlighting(false);
-                }else{
-
-                    bim.replace(new ValidateTargetBIS(bim, currentCommand, historic));
-                }
-            }else if(Utils.undoCommands(historic)
-                    && bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)
-                    && !bim.battlefield.getUnit(row, col).isDone()){
-
-                bim.replace(new SelectActionBIS(bim, row, col));
-            }else {
-
-                bim.replace(new SelectActionBIS(bim, currentCommand.getRowActor(), currentCommand.getColActor(), historic));
-            }
+            triggerCurrentCommand();
         }
         return true;
     }
 
+    private void triggerCurrentCommand(){
+        int row = currentCommand.getRowTarget();
+        int col = currentCommand.getColTarget();
+        if(currentCommand.isTargetValid()){
+
+            currentCommand.init();
+            if(currentCommand.isUndoable()){
+
+                // remove blinking and other highlighting target affect
+                currentCommand.blink(false);
+                currentCommand.apply();
+                historic.push(currentCommand);
+                actionArea.setVisible(false);
+                bim.removeTileHighlighting(false);
+            }else{
+
+                bim.replace(new ValidateTargetBIS(bim, currentCommand, historic));
+            }
+        }else if(Utils.undoCommands(historic)
+                && bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)
+                && !bim.battlefield.getUnit(row, col).isDone()){
+
+            bim.replace(new SelectActionBIS(bim, row, col));
+        }else {
+
+            bim.replace(new SelectActionBIS(bim, currentCommand.getRowActor(), currentCommand.getColActor(), historic));
+        }
+    }
+
     @Override
     public void update60(float dt) {
+        //System.out.println(currentCommand.isExecuting() +" "+currentCommand.isCompleted());
         if(currentCommand.isCompleted()){
-            System.out.println("GO TO HandleOutcomeBIS");
+            bim.replace(new HandleOutcomeBIS(bim, historic));
         }
     }
 

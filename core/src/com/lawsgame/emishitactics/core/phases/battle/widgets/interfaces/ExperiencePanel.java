@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
 
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public abstract class ExperiencePanel extends Panel{
@@ -10,5 +11,5 @@ public abstract class ExperiencePanel extends Panel{
 
     public abstract boolean isExecuting();
     public abstract void interrupt();
-    public abstract void set(int initialExperience, int experienceGained);
+    public abstract void set(I18NBundle bundle, int initialExperience, int experienceGained);
 }

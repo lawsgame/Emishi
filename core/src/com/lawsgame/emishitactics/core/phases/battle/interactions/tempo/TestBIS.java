@@ -13,6 +13,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
@@ -23,9 +24,16 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponComman
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
@@ -36,6 +44,9 @@ public class TestBIS extends BattleInteractionState {
     Unit soldier;
     //ActionPanel panel;
     AreaWidget areaWidget;
+    ExperiencePanel experiencePanel;
+    LevelUpPanel levelUpPanel;
+    LootPanel lootPanel;
 
     IUnit sltdUnit;
     int index;
@@ -50,11 +61,12 @@ public class TestBIS extends BattleInteractionState {
         areaWidget = new AreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
 
 
-        warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 15, Data.WeaponType.AXE, false, false, true);
+        warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 11, Data.WeaponType.AXE, false, false, true);
         warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, true);
         soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, true);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setLeadership(15);
+        warlord.setExperience(90);
         warchief.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warchief.setLeadership(10);
         warchief.applyDamage(1, false);
@@ -78,6 +90,26 @@ public class TestBIS extends BattleInteractionState {
         sltdUnit = warlord;
         index = 1;
         switchmode = false;
+
+        experiencePanel = new TempoExperiencePanel(bim.uiStage.getViewport());
+        experiencePanel.set(bim.mainI18nBundle, 20, 35);
+        bim.uiStage.addActor(experiencePanel);
+        levelUpPanel = new TempoLevelUpPanel(bim.uiStage.getViewport());
+        levelUpPanel.set(bim.mainI18nBundle, warlord, warlord.levelup());
+        bim.uiStage.addActor(levelUpPanel);
+        lootPanel = new TempoLootPanel(bim.uiStage.getViewport());
+        lootPanel.set(new Weapon(Data.WeaponTemplate.SHORTSWORD), bim.mainI18nBundle);
+        bim.uiStage.addActor(lootPanel);
+
+
+        //EXP TEST
+        /*
+        System.out.println("lvl : "+warlord.getLevel() + " exp : "+warlord.getExperience());
+        int[] gain = warlord.addExpPoints(960);
+        levelUpPanel.set(bim.mainI18nBundle, warlord, gain);
+        levelUpPanel.show();
+        System.out.println("lvl : "+warlord.getLevel() + " exp : "+warlord.getExperience());
+        */
 
 
         // SCHEDULER TEST
@@ -171,6 +203,7 @@ public class TestBIS extends BattleInteractionState {
                     case 6 : command = new StealCommand(bim.bfr, bim.scheduler);break;
                     case 7 : command =  new SwitchWeaponCommand(bim.bfr, bim.scheduler, 1); break;
                     case 8 : command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, Data.Orientation.NORTH);break;
+                    case 9 : command = new EndTurnCommand(bim.bfr, bim.scheduler);break;
                     default: command = new AttackCommand(bim.bfr, bim.scheduler);
                     /*
                     case 1 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.ATTACK, false).get(0);break;
@@ -195,7 +228,7 @@ public class TestBIS extends BattleInteractionState {
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
                     command.init();
-                    command.highlightTarget(true);
+                    command.blink(true);
 
                     if(bim.app.isPanelAvailable(command)){
 
@@ -296,7 +329,7 @@ public class TestBIS extends BattleInteractionState {
             index = 8;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)){
-            System.out.println("action command : build");
+            System.out.println("action command : end turn");
             index = 9;
         }
 
@@ -305,7 +338,39 @@ public class TestBIS extends BattleInteractionState {
                 command.setTarget(17,17);
             }
         }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
+
+            switch (panelIndex%3){
+                case 0:
+                    lootPanel.hide();
+                    experiencePanel.show();
+                    break;
+                case 1:
+                    experiencePanel.hide();
+                    levelUpPanel.show();
+                    break;
+                case 2:
+                    levelUpPanel.hide();
+                    lootPanel.show();
+                    break;
+            }
+            panelIndex++;
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
+            Stack<BattleCommand> historic = new Stack<BattleCommand>();
+            ChooseOrientationCommand command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, Data.Orientation.NORTH);
+            int[] wlPos = bim.battlefield.getUnitPos(warlord);
+            command.setActor(wlPos[0], wlPos[1]);
+            command.getOutcome().receivers.add(warlord);
+            command.getOutcome().experienceGained.add(60);
+            command.getOutcome().droppedItems.add(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
+            historic.add(command);
+            bim.replace(new HandleOutcomeBIS(bim, historic));
+        }
     }
+    int panelIndex = 0;
 
     @Override
     public void prerender(SpriteBatch batch) {

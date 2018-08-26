@@ -5,9 +5,9 @@ import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public abstract class StandCommand extends BattleCommand{
+public abstract class SelfInflitedCommand extends BattleCommand{
 
-    public StandCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean acted, boolean free) {
+    public SelfInflitedCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean acted, boolean free) {
         super(bfr, choice, scheduler, undoable, acted, free);
     }
 

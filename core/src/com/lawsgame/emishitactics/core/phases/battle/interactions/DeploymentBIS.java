@@ -123,11 +123,6 @@ public class DeploymentBIS extends BattleInteractionState {
             }
         }
 
-        //TEST
-        System.out.println("sltd unit : "+sltdUnit.getName());
-        for(IUnit unit : squadmembers)
-            System.out.println("others : "+unit.getName());
-
         // update sltd unit position
         bim.battlefield.moveUnit(rowUnit, colUnit, row, col, true);
         this.rowUnit = row;

@@ -130,4 +130,20 @@ public class Notification {
     }
 
 
+    public static class Blink  {
+        public boolean targeted;
+
+        public Blink(boolean targeted) {
+            this.targeted = targeted;
+        }
+    }
+
+    public static class Done {
+        public boolean done;
+
+        public Done(boolean done) {
+            this.done = done;
+        }
+    }
+
 }

@@ -26,10 +26,6 @@ public abstract class Renderer<M extends Observable> implements Observer, GameUp
 
     public abstract boolean isExecuting();
 
-    public boolean isVisible(){
-        return visible;
-    }
-
     public void setVisible(boolean visible){
         this.visible = visible;
     }
@@ -39,4 +35,8 @@ public abstract class Renderer<M extends Observable> implements Observer, GameUp
         this.model.detach(this);
     }
 
+    @Override
+    public String toString() {
+        return "renderer of "+model.toString();
+    }
 }

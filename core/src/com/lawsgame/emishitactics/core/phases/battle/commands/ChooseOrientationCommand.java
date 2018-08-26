@@ -2,16 +2,15 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.StandCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class ChooseOrientationCommand extends StandCommand {
+public class ChooseOrientationCommand extends SelfInflitedCommand {
     protected Data.Orientation oldOrientation;
     protected Data.Orientation newOrientation;
     protected BattleUnitRenderer actorRenderer;
@@ -47,7 +46,7 @@ public class ChooseOrientationCommand extends StandCommand {
 
     @Override
     public void undo() {
-        if(battlefield.isTileOccupied(rowActor, colActor)) {
+        if(oldOrientation != null && battlefield.isTileOccupied(rowActor, colActor)) {
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer.getModel() == actor) {
                 actor.setOrientation(oldOrientation);

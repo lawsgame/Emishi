@@ -63,7 +63,7 @@ public abstract class Panel extends Actor {
         if(fromDown){
             super.setY(y);
         }else{
-            super.setX(stageViewport.getWorldHeight() - y);
+            super.setY(stageViewport.getWorldHeight() - y);
         }
     }
 

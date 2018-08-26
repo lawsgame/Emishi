@@ -856,8 +856,10 @@ public class Battlefield extends Observable {
         return deploymentAreas.size;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "battlefield";
+    }
 
     //----------------- NODE HELPER CLASSES -------------------
 

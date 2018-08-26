@@ -42,6 +42,12 @@ public abstract class ActionChoice {
             return true;
         }
     };
+    public static ActionChoice END_TURN  =          new ActionChoice("END_TURN",         0, 0, 0, 0, RangedBasedType.SPECIFIC,  false, new int[0][0]) {
+        @Override
+        public boolean canbePerformedBy(IUnit actor) {
+            return true;
+        }
+    };
     public static ActionChoice HEAL =               new AbilityBasedAC("HEAL",          0, 10, 1, 1, new int[0][0], Data.Ability.HEAL);
     public static ActionChoice GUARD =              new AbilityBasedAC("GUARD",         0, 0, 0, 0, new int[0][0], Data.Ability.GUARD);
     public static ActionChoice STEAL =              new AbilityBasedAC("STEAL",         0, 10, 1, 1, new int[0][0], Data.Ability.STEAL);
@@ -65,6 +71,7 @@ public abstract class ActionChoice {
             GUARD,
             STEAL,
             BUILD,
+            END_TURN,
             NONE
     };
 

@@ -55,8 +55,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private boolean updatePoint = false;
     private boolean pushed = false;
     private Array<int[]> remainingPath = new Array<int[]>(); // array of (r, c) <=> (y, x)
-    private boolean showNumbers = false;
-    private String numbersToShow = "";
 
     private LinkedList<Object> notificationQueue;
 
@@ -84,7 +82,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         countDown.update(dt);
         if (countDown.isFinished()) {
             offabbTexture = null;
-            showNumbers = false;
             countDown.reset();
             if(notificationQueue.isEmpty())
                 display(Data.AnimationId.REST);
@@ -100,13 +97,19 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     public void launchNextAnimation(){
-        if(executing == false){
+        if(!executing){
             if(!notificationQueue.isEmpty()) {
                 Object query = notificationQueue.pop();
 
                 if (query instanceof ApplyDamage) {
                     ApplyDamage notification = (ApplyDamage) query;
                     displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
+
+                } else if(query instanceof Done) {
+                    setDone(((Done) query).done);
+
+                } else if(query instanceof Blink) {
+                    setTargeted(((Blink) query).targeted);
 
                 } else if(query instanceof Integer) {
                     displayTreated((Integer)query);
@@ -290,10 +293,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         }else{
             unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(Data.AnimationId.TAKE_HIT, getModel().getArmy().getAllegeance()));
         }
-        showNumbers = true;
-        numbersToShow = ""+damageTaken+" ";
-        numbersToShow += (moralOnly) ? "m" : "";
-        numbersToShow += (critical) ? "c" : "";
         countDown.run();
     }
 
@@ -308,8 +307,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public void displayTreated(int healedHP) {
 
         unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(Data.AnimationId.TREATED, getModel().getArmy().getAllegeance()));
-        showNumbers = true;
-        numbersToShow = "+"+healedHP;
         countDown.run();
     }
 
@@ -372,7 +369,20 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void setTargeted(boolean targeted) {
         this.targeted = targeted;
-        blinkTime = 0;
+        if(!targeted) {
+            unitSprite.setAlpha(1);
+        }else{
+            blinkTime = 0;
+        }
+    }
+
+    @Override
+    public void setDone(boolean done) {
+        if(done){
+            unitSprite.setRegion(TempoSpritePool.getInstance().getDoneUnitSprite());
+        }else {
+            unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(Data.AnimationId.REST, getModel().getArmy().getAllegeance()));
+        }
     }
 
     @Override
@@ -420,5 +430,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public float getY(){
         return unitSprite.getY();
     }
+
+
 
 }

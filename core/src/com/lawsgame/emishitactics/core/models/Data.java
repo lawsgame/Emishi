@@ -18,7 +18,7 @@ public class Data {
     public static final int HEAL_BASE_POWER = 3;
     public static final float MAX_UNITS_UNDER_WARLORD = 6; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 5; // including the war chief himself / herself
-    public static final int OA_CHARGING_BAR_MAX_VALUE = 100;
+    public static final int MAX_ACTION_POINTS = 100;
     public static final int NB_BUILDING_MAX = 2;
     public static final int DEX_FACTOR_ATT_ACC = 3;
     public static final int DEX_FACTOR_AVO = 4;
