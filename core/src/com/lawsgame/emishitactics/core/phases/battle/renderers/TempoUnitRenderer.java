@@ -32,6 +32,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private TextureRegion orientationTexture;
     private TextureRegion offabbTexture = null;
 
+    private boolean done;
     private boolean targeted;
     private float blinkTime = 0;
     private boolean executing;
@@ -66,6 +67,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         unitSprite.setY(row);
         unitSprite.setSize(1, 1);
         this.executing = false;
+        this.done = false;
         this.visible = true;
         this.notificationQueue = new LinkedList<Object>();
         weapontTexture = TempoSpritePool.getInstance().getWeaponSprite(model.getCurrentWeapon().getTemplate().getWeaponType());
@@ -350,7 +352,11 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(id, getModel().getArmy().getAllegeance()));
                 countDown.run();
             case REST:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(id, getModel().getArmy().getAllegeance()));
+                if(done){
+                    unitSprite.setRegion(TempoSpritePool.getInstance().getDoneUnitSprite());
+                }else {
+                    unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(Data.AnimationId.REST, getModel().getArmy().getAllegeance()));
+                }
                 break;
                 default:
         }
@@ -378,11 +384,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void setDone(boolean done) {
-        if(done){
-            unitSprite.setRegion(TempoSpritePool.getInstance().getDoneUnitSprite());
-        }else {
-            unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(Data.AnimationId.REST, getModel().getArmy().getAllegeance()));
-        }
+        this.done = done;
+        display(Data.AnimationId.REST);
     }
 
     @Override

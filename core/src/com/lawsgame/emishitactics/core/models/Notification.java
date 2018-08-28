@@ -54,7 +54,8 @@ public class Notification {
 
         public enum Mode{
             WALK,
-            GUARDIAN
+            GUARDIAN,
+            INSTANT
         }
 
         public int rowUnit1;

@@ -187,7 +187,7 @@ public class Battlefield extends Observable {
         return area;
     }
 
-    public Array<IUnit> getAvailableGuardian(int row, int col, Allegeance alleageance){
+    public Array<IUnit> getAvailableGuardians(int row, int col, Allegeance alleageance){
         Array<IUnit> guardians =  new Array<IUnit>();
         for (int k = 0; k < guardedAreas.get(alleageance).size; k++) {
             if (guardedAreas.get(alleageance).get(k).contains(row, col)) {

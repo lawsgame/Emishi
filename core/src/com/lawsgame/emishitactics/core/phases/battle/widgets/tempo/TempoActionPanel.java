@@ -118,6 +118,7 @@ public abstract class TempoActionPanel extends ActionPanel{
         public void set(BattleCommand command) {
 
             if(command != null && command instanceof AttackCommand && command.isTargetValid()) {
+                setHeight(220);
 
                 AttackCommand currentCommand = (AttackCommand)command;
                 builder = new StringBuilder();

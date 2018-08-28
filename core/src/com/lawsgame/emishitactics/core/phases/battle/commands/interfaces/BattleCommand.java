@@ -64,8 +64,8 @@ public abstract class BattleCommand implements Command, Observer{
 
     private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied nor it costs any OA point
 
-    protected IUnit actor;
-    protected IUnit target;
+    private IUnit actor;
+    private IUnit target;
     protected int rowActor;
     protected int colActor;
     protected int rowTarget;
@@ -101,6 +101,7 @@ public abstract class BattleCommand implements Command, Observer{
             this.initialized = true;
             this.outcome.reset();
             this.renderTasks.clear();
+            initiate();
         }
     }
 
@@ -117,6 +118,9 @@ public abstract class BattleCommand implements Command, Observer{
                     getActor().setMoved( true);
                 }
             }
+
+            //handle the cost
+            getActor().addActionPoints(-choice.getCost());
 
             this.launched = true;
             execute();
@@ -154,8 +158,8 @@ public abstract class BattleCommand implements Command, Observer{
             task.attach(this);
             renderTasks.add(task);
             scheduler.addTask(task);
-            System.out.println("\nClient "+this.toString());
-            System.out.println("nb "+renderTasks.size+" ADD "+task);
+            //System.out.println("\nClient "+this.toString());
+            //System.out.println("nb "+renderTasks.size+" ADD "+task);
         }
     }
 
@@ -165,10 +169,11 @@ public abstract class BattleCommand implements Command, Observer{
             Task completedTask = (Task)data;
             completedTask.detach(this);
             renderTasks.removeValue(completedTask, true);
-            System.out.println("\nClient "+this.toString()+"\nnb "+renderTasks.size+" REMOVE ");
+            //System.out.println("\nClient "+this.toString()+"\nnb "+renderTasks.size+" REMOVE ");
         }
     }
 
+    protected abstract void initiate();
     protected abstract void execute();
 
     // can be deleted afterwards

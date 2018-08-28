@@ -11,7 +11,6 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -21,8 +20,6 @@ public class AttackCommand extends BattleCommand {
     protected boolean retaliationAllowed;
     protected MoveCommand moveCommand;
     protected SwitchPositionCommand switchPositionCommand;
-    protected IUnit target;
-    protected IUnit initiator;
     protected IUnit targetDefender;
     protected IUnit initiatorDefender;
 
@@ -41,10 +38,7 @@ public class AttackCommand extends BattleCommand {
     }
 
     @Override
-    public void init() {
-        super.init();
-        target = battlefield.getUnit(rowTarget, colTarget);
-        initiator = battlefield.getUnit(rowActor, colActor);
+    public void initiate() {
         targetDefender = setDefender(rowTarget, colTarget);
         initiatorDefender = setDefender(rowActor, colActor);
     }
@@ -53,7 +47,7 @@ public class AttackCommand extends BattleCommand {
     protected void execute() {
 
         switchTargetGuardianPosition(rowTarget, colTarget, targetDefender);
-        Array<ApplyDamage> notifBundleActor = performAttack(rowActor, colActor, rowTarget, colTarget, target, false);
+        Array<ApplyDamage> notifBundleActor = performAttack(rowActor, colActor, rowTarget, colTarget, getTarget(), false);
         addOutcomeData(rowActor, colActor, notifBundleActor);
 
         if(retaliationAllowed
@@ -61,7 +55,7 @@ public class AttackCommand extends BattleCommand {
                 && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
 
             switchTargetGuardianPosition(rowActor, colActor, initiatorDefender);
-            Array<ApplyDamage> notifBundleTarget = performAttack(rowTarget, colTarget, rowActor, colActor, initiator, true);
+            Array<ApplyDamage> notifBundleTarget = performAttack(rowTarget, colTarget, rowActor, colActor, getActor(), true);
             addOutcomeData(rowTarget, colTarget, notifBundleTarget);
         }
 
@@ -84,9 +78,7 @@ public class AttackCommand extends BattleCommand {
         attackerRendererThread.addQuery(attackerReorientation);
         attackerRendererThread.addQuery(Data.AnimationId.ATTACK);
 
-
-
-        boolean backstabbed = attacker.getOrientation() == defender.getOrientation();
+        boolean backstabbed = attacker.getOrientation() == defender.getOrientation() && !retaliate;
         int hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowTarget, colTarget, battlefield);
         if(Utils.getMean(2,100) < hitrate){
             BattleUnitRenderer bur;
@@ -168,8 +160,8 @@ public class AttackCommand extends BattleCommand {
 
     protected IUnit setDefender(int rowTarget, int colTarget){
         IUnit defender = battlefield.getUnit(rowTarget, colTarget);
-        if(battlefield.isTileGuarded(rowTarget, colTarget, target.getAllegeance())){
-            defender = battlefield.getAvailableGuardian(rowTarget, colTarget, target.getAllegeance()).random();
+        if(battlefield.isTileGuarded(rowTarget, colTarget, defender.getAllegeance())){
+            defender = battlefield.getAvailableGuardians(rowTarget, colTarget, defender.getAllegeance()).random();
         }
         return defender;
     }

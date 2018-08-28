@@ -60,7 +60,7 @@ public class SelectActionBIS extends BattleInteractionState {
             bim.uiStage.addActor(commandPanel);
 
             //focus on the sltd unit
-            bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, false);
+            bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, true);
         }
     }
 

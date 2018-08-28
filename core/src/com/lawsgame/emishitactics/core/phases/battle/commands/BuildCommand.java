@@ -20,8 +20,8 @@ public class BuildCommand extends BattleCommand {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void initiate() {
+
     }
 
     @Override

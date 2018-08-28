@@ -19,29 +19,31 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class MoveCommand extends BattleCommand{
     protected BattleUnitRenderer walkerRenderer;
     protected Array<int[]> validPath;
+    protected Data.Orientation oldWalkerOrientation;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
         super(bfr, ActionChoice.MOVE, scheduler, true, false, false);
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void initiate() {
 
         // register old state
-        IUnit walker = battlefield.getUnit(rowActor, colActor);
-        walkerRenderer = battlefieldRenderer.getUnitRenderer(walker);
+        walkerRenderer = battlefieldRenderer.getUnitRenderer(getActor());
 
         // set validPath
-        validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, walker.has(Data.Ability.PATHFINDER), walker.getAllegeance(), true);
-        if(validPath.size == 0 || validPath.size > walker.getAppMobility()){
-            validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, walker.has(Data.Ability.PATHFINDER), walker.getAllegeance(), false);
+        validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance(), true);
+        if (validPath.size == 0 || validPath.size > getActor().getAppMobility()) {
+            validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance(), false);
         }
     }
 
     @Override
     protected void execute() {
         IUnit walker = battlefield.getUnit(rowActor, colActor);
+
+        //store old state info
+        oldWalkerOrientation = getActor().getOrientation();
 
         // update model
         battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget, false);
@@ -95,8 +97,11 @@ public class MoveCommand extends BattleCommand{
             if(actor == walkerRenderer.getModel()) {
                 battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor, false);
                 actor.setMoved(false);
+                actor.setOrientation(oldWalkerOrientation);
                 scheduleRenderTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
+                scheduleRenderTask(new StandardTask(walkerRenderer, oldWalkerOrientation));
             }
+
         }
     }
 

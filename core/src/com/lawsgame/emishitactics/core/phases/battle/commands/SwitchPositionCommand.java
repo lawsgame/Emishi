@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -15,14 +16,15 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class SwitchPositionCommand extends BattleCommand {
     private BattleUnitRenderer actorRenderer;
     private BattleUnitRenderer targetRenderer;
+    private Data.Orientation oldTargetOrientation;
+    private Data.Orientation oldActorOrientation;
 
     public SwitchPositionCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
         super(bfr, ActionChoice.SWITCH_POSITION, scheduler, true, false, true);
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void initiate() {
         actorRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowActor, colActor));
         targetRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
     }
@@ -32,6 +34,8 @@ public class SwitchPositionCommand extends BattleCommand {
         //update model
         IUnit actor = battlefield.getUnit(rowActor, colActor);
         IUnit target = battlefield.getUnit(rowTarget, colTarget);
+        oldActorOrientation = actor.getOrientation();
+        oldTargetOrientation = target.getOrientation();
         battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
         // push render task
@@ -40,20 +44,22 @@ public class SwitchPositionCommand extends BattleCommand {
 
     @Override
     public void undo() {
+        System.out.println("undo switch");
         if(battlefield.isTileOccupied(rowActor, colActor)
-                && targetRenderer.getModel() != battlefield.getUnit(rowActor, colActor)
+                && targetRenderer.getModel() == battlefield.getUnit(rowActor, colActor)
                 && battlefield.isTileOccupied(rowTarget, colTarget)
-                && actorRenderer.getModel() != battlefield.getUnit(rowTarget, colTarget)){
+                && actorRenderer.getModel() == battlefield.getUnit(rowTarget, colTarget)
+                && oldTargetOrientation != null
+                && oldActorOrientation != null){
+
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             IUnit target = battlefield.getUnit(rowTarget, colTarget);
+            actor.setOrientation(oldActorOrientation);
+            target.setOrientation(oldTargetOrientation);
             battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
-
-            StandardTask task = new StandardTask();
-            RendererThread actorRendererThread = new RendererThread(battlefieldRenderer, new Notification.SetUnit(rowActor, colActor, actor));
-            RendererThread targetRendererThread = new RendererThread(battlefieldRenderer, new Notification.SetUnit(rowTarget, colTarget, target));
-            task.addThread(actorRendererThread);
-            task.addThread(targetRendererThread);
-            scheduleRenderTask(task);
+            scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.INSTANT, battlefield)));
+            scheduleRenderTask(new StandardTask(targetRenderer, oldTargetOrientation));
+            scheduleRenderTask(new StandardTask(actorRenderer, oldActorOrientation));
         }
     }
 

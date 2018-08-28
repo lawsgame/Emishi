@@ -237,30 +237,54 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             final SwitchPosition notif = (SwitchPosition)data;
             final BattleUnitRenderer bur1 = getUnitRenderer(notif.unit1);
             final BattleUnitRenderer bur2 = getUnitRenderer(notif.unit2);
+            if (bur1 != null && bur2 != null) {
+                switch (notif.mode) {
+                    case GUARDIAN:
+                    case WALK :
 
 
-            if(bur1 != null && bur2 != null) {
+                        bur1.getNotification(new SimpleCommand() {
 
-                bur1.getNotification(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                removeAreaRenderersAssociatedWith(bur1.getModel());
+                                Array<int[]> path = new Array<int[]>();
+                                path.add(new int[]{notif.rowUnit2, notif.colUnit2});
+                                bur1.displayWalk(path);
+                            }
+                        });
+                        bur2.getNotification(new SimpleCommand() {
 
-                    @Override
-                    public void apply() {
-                        removeAreaRenderersAssociatedWith(bur1.getModel());
-                        Array<int[]> path = new Array<int[]>();
-                        path.add(new int[]{notif.rowUnit2, notif.colUnit2});
-                        bur1.displayWalk(path);
-                    }
-                });
-                bur2.getNotification(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                removeAreaRenderersAssociatedWith(bur2.getModel());
+                                Array<int[]> path = new Array<int[]>();
+                                path.add(new int[]{notif.rowUnit1, notif.colUnit1});
+                                bur2.displayWalk(path);
+                            }
+                        });
+                        break;
+                    case INSTANT:
+                        bur1.getNotification(new SimpleCommand() {
 
-                    @Override
-                    public void apply() {
-                        removeAreaRenderersAssociatedWith(bur2.getModel());
-                        Array<int[]> path = new Array<int[]>();
-                        path.add(new int[]{notif.rowUnit1, notif.colUnit1});
-                        bur2.displayWalk(path);
-                    }
-                });
+                            @Override
+                            public void apply() {
+                                bur1.setX(notif.colUnit2);
+                                bur1.setY(notif.rowUnit2);
+                                removeAreaRenderersAssociatedWith(bur1.getModel());
+                            }
+                        });
+                        bur2.getNotification(new SimpleCommand() {
+
+                            @Override
+                            public void apply() {
+                                bur2.setX(notif.colUnit1);
+                                bur2.setY(notif.rowUnit1);
+                                removeAreaRenderersAssociatedWith(bur2.getModel());
+                            }
+                        });
+                        break;
+                }
             }
         }else if(data instanceof Walk){
 

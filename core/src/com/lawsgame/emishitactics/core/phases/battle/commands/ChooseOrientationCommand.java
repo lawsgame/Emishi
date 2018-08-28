@@ -21,8 +21,7 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void initiate() {
         actorRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowActor, colActor));
     }
 

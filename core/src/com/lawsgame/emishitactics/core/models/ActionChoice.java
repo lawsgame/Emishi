@@ -6,52 +6,52 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public abstract class ActionChoice {
 
-    public static ActionChoice ATTACK =             new ActionChoice("ATTACK",          0, 0, RangedBasedType.WEAPON, new int[0][0]) {
+    public static ActionChoice ATTACK =             new ActionChoice("ATTACK",          1, 0, RangedBasedType.WEAPON, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return !actor.hasActed();
+            return cost <= actor.getActionPoints() && !actor.hasActed();
         }
     };
-    public static ActionChoice MOVE =               new ActionChoice("MOVE",            0, 0, RangedBasedType.MOVE, new int[0][0]) {
+    public static ActionChoice MOVE =               new ActionChoice("MOVE",            1, 0, RangedBasedType.MOVE, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return !actor.hasMoved();
+            return cost <= actor.getActionPoints() && !actor.hasMoved();
         }
     };
-    public static ActionChoice SWITCH_WEAPON =      new ActionChoice("SWITCH_WEAPON",   0, 0, 0, 0, new int[0][0]) {
+    public static ActionChoice SWITCH_WEAPON =      new ActionChoice("SWITCH_WEAPON",   1, 0, 0, 0, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return actor.getWeapons().size > 1;
+            return cost <= actor.getActionPoints() && actor.getWeapons().size > 1;
         }
     };
-    public static ActionChoice SWITCH_POSITION =    new ActionChoice("SWITCH_POSITION", 0, 0, 1, 1, new int[0][0]) {
+    public static ActionChoice SWITCH_POSITION =    new ActionChoice("SWITCH_POSITION", 1, 0, 1, 1, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return true;
+            return cost <= actor.getActionPoints();
         }
     };
-    public static ActionChoice PUSH =               new ActionChoice("PUSH",            0, 0, 1, 1, new int[0][0]) {
+    public static ActionChoice PUSH =               new ActionChoice("PUSH",            1, 0, 1, 1, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return !actor.hasActed() && !actor.isHorseman();
+            return cost <= actor.getActionPoints() && !actor.hasActed() && !actor.isHorseman();
         }
     };
     public static ActionChoice CHOOSE_ORIENTATION = new ActionChoice("CHOOSE_ORIENTATION",0, 0, 0, 0, RangedBasedType.SPECIFIC,  true, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return true;
+            return cost <= actor.getActionPoints();
         }
     };
     public static ActionChoice END_TURN  =          new ActionChoice("END_TURN",         0, 0, 0, 0, RangedBasedType.SPECIFIC,  false, new int[0][0]) {
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return true;
+            return cost <= actor.getActionPoints();
         }
     };
-    public static ActionChoice HEAL =               new AbilityBasedAC("HEAL",          0, 10, 1, 1, new int[0][0], Data.Ability.HEAL);
-    public static ActionChoice GUARD =              new AbilityBasedAC("GUARD",         0, 0, 0, 0, new int[0][0], Data.Ability.GUARD);
-    public static ActionChoice STEAL =              new AbilityBasedAC("STEAL",         0, 10, 1, 1, new int[0][0], Data.Ability.STEAL);
-    public static ActionChoice BUILD =              new AbilityBasedAC("BUILD",         0, 10, 1, 1, new int[0][0], Data.Ability.BUILD);
+    public static ActionChoice HEAL =               new AbilityBasedAC("HEAL",          1, 10, 1, 1, new int[0][0], Data.Ability.HEAL);
+    public static ActionChoice GUARD =              new AbilityBasedAC("GUARD",         1, 0, 0, 0, new int[0][0], Data.Ability.GUARD);
+    public static ActionChoice STEAL =              new AbilityBasedAC("STEAL",         1, 10, 1, 1, new int[0][0], Data.Ability.STEAL);
+    public static ActionChoice BUILD =              new AbilityBasedAC("BUILD",         1, 10, 1, 1, new int[0][0], Data.Ability.BUILD);
     public static ActionChoice NONE =               new ActionChoice("NONE",            0, 0, 0, 0, new int[0][0]){
 
         @Override
@@ -239,7 +239,7 @@ public abstract class ActionChoice {
 
         @Override
         public boolean canbePerformedBy(IUnit actor) {
-            return !actor.hasActed() && actor.has(ability);
+            return cost <= actor.getActionPoints() && !actor.hasActed() && actor.has(ability);
         }
     }
 

@@ -19,6 +19,12 @@ public class GuardCommand extends SelfInflitedCommand {
         super(bfr, ActionChoice.GUARD, scheduler, true, true, false);
     }
 
+
+    @Override
+    protected void initiate() {
+
+    }
+
     @Override
     protected void execute() {
 

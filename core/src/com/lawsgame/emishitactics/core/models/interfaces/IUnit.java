@@ -165,4 +165,5 @@ public abstract class IUnit extends Observable {
     public abstract Array<Notification.ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly);
 
 
+
 }

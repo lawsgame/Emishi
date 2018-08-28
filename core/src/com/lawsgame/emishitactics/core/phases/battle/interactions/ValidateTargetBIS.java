@@ -127,8 +127,8 @@ public class ValidateTargetBIS extends BattleInteractionState {
         //System.out.println(currentCommand.isExecuting()+" et "+currentCommand.isCompleted());
 
         if(currentCommand.isCompleted()){
-            System.out.println("***START***");
-            bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
+            if(bim.app.isPanelAvailable(currentCommand))
+                bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
             bim.replace(new HandleOutcomeBIS(bim, historic));
         }
     }

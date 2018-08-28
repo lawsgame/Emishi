@@ -41,7 +41,6 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<BattleCommand> historic) {
         super(bim, true, false, false);
 
-        System.out.println("***END***");
 
         this.historic = historic;
         if(outcome == null) emptyOutcome = new EncounterOutcome();
