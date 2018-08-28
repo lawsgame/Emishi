@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
@@ -18,7 +18,6 @@ public class ActionPanelPool {
         panels.put(ActionChoice.SWITCH_WEAPON, new TempoActionPanel.SwitchWeaponPanel(UIport));
         panels.put(ActionChoice.STEAL, new TempoActionPanel.StealPanel(UIport));
         panels.put(ActionChoice.BUILD, new TempoActionPanel.BuildPanel(UIport));
-        panels.put(ActionChoice.NONE, new TempoActionPanel.InvisiblePanel(UIport));
         panels.put(ActionChoice.END_TURN, new TempoActionPanel.EndTurnPanel(UIport));
     }
 
@@ -28,9 +27,8 @@ public class ActionPanelPool {
 
     public ActionPanel getPanel(BattleCommand command){
         ActionPanel panel = panels.get(command.getActionChoice());
-        if(panel == null)
-            panel = panels.get(ActionChoice.NONE);
-        panel.set(command);
+        if(panel != null)
+            panel.set(command);
         return panel;
     }
 

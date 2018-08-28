@@ -1,11 +1,11 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.I18NBundle;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -16,7 +16,7 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
     protected BattleUnitRenderer actorRenderer;
 
     public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.Orientation newOrientation) {
-        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, true, true, true);
+        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, true);
         this.newOrientation = newOrientation;
     }
 

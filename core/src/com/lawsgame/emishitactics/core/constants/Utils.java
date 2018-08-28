@@ -159,7 +159,7 @@ public class Utils {
      * @return true if all commands has been undone, false otherwise
      */
     public static boolean undoCommands(Stack<BattleCommand> historic){
-        while(!historic.isEmpty() && historic.peek().isUndoable()){
+        while(!historic.isEmpty() && historic.peek().getActionChoice().isUndoable()){
             historic.pop().undo();
         }
         return historic.isEmpty();

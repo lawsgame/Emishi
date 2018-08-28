@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
@@ -83,13 +83,16 @@ public class BattleCommandManager {
         Array<ActionChoice> choices = new Array<ActionChoice>();
         ActionChoice choice;
         for (int  i = 0; i < commandPool.size; i++) {
-            if(commandPool.get(i).size > 0) {
+            if(history != null && commandPool.get(i).size > 0 && !Utils.stackContainsAtLeastOneElementOf(history, commandPool.get(i))) {
+
                 choice = commandPool.get(i).get(0).getActionChoice();
-                if (!choice.isEndTurnActionOnly()
-                        && choice.canbePerformedBy(actor)
-                        && history != null
-                        && !Utils.stackContainsAtLeastOneElementOf(history, commandPool.get(i))) {
-                    choices.add(choice);
+                if(!choice.isEndTurnActionOnly()) {
+                    for (int j = 0; j < commandPool.get(i).size; j++) {
+                        if (commandPool.get(i).get(j).canbePerformedBy(actor)) {
+                            choices.add(choice);
+                            break;
+                        }
+                    }
                 }
             }
         }

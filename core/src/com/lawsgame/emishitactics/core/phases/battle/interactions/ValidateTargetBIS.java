@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
@@ -32,7 +32,7 @@ public class ValidateTargetBIS extends BattleInteractionState {
         this.historic = historic;
         this.currentCommand = currentCommand;
 
-        Data.AreaType type = (currentCommand.getActionChoice().getRangeType() == ActionChoice.RangedBasedType.MOVE) ?
+        Data.AreaType type = (currentCommand.getActionChoice().getRangedType() == Data.RangedBasedType.MOVE) ?
                 Data.AreaType.MOVE_AREA :
                 Data.AreaType.ACTION_AREA;
         this.impactArea = new AreaWidget(bim.battlefield, type, currentCommand.getImpactArea());

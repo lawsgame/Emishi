@@ -285,7 +285,7 @@ public class TestBIS extends BattleInteractionState {
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
             BattleCommand command = historic.peek();
-            if(command.isUndoable()){
+            if(command.getActionChoice().isUndoable()){
                 command.undo();
                 historic.pop();
             }

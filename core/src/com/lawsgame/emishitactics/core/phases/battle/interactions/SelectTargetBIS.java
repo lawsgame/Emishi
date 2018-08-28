@@ -2,10 +2,10 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 
@@ -21,7 +21,7 @@ public class SelectTargetBIS extends BattleInteractionState {
         this.historic = historic;
         this.currentCommand = command;
 
-        Data.AreaType type = (currentCommand.getActionChoice().getRangeType() == ActionChoice.RangedBasedType.MOVE) ?
+        Data.AreaType type = (currentCommand.getActionChoice().getRangedType() == RangedBasedType.MOVE) ?
             Data.AreaType.MOVE_AREA :
             Data.AreaType.ACTION_AREA;
         this.actionArea = new AreaWidget(bim.battlefield, type, currentCommand.getActionArea());
@@ -59,7 +59,7 @@ public class SelectTargetBIS extends BattleInteractionState {
         if(currentCommand.isTargetValid()){
 
             currentCommand.init();
-            if(currentCommand.isUndoable()){
+            if(currentCommand.getActionChoice().isUndoable()){
 
                 // remove blinking and other highlighting target affect
                 currentCommand.blink(false);

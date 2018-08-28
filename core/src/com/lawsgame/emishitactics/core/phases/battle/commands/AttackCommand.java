@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
@@ -24,7 +23,7 @@ public class AttackCommand extends BattleCommand {
     protected IUnit initiatorDefender;
 
     protected AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, boolean retaliationAllowed) {
-        super(bfr, ActionChoice.ATTACK, scheduler, false, true, false);
+        super(bfr, Data.ActionChoice.ATTACK, scheduler, false);
         this.retaliationAllowed = retaliationAllowed;
         this.moveCommand = new MoveCommand(bfr, scheduler);
         this.switchPositionCommand = new SwitchPositionCommand(bfr, scheduler);

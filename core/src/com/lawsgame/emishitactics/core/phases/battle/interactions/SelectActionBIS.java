@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;

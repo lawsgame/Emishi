@@ -3,14 +3,13 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -22,7 +21,7 @@ public class MoveCommand extends BattleCommand{
     protected Data.Orientation oldWalkerOrientation;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.MOVE, scheduler, true, false, false);
+        super(bfr, ActionChoice.MOVE, scheduler, false);
     }
 
     @Override
@@ -32,9 +31,9 @@ public class MoveCommand extends BattleCommand{
         walkerRenderer = battlefieldRenderer.getUnitRenderer(getActor());
 
         // set validPath
-        validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance(), true);
+        validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance());
         if (validPath.size == 0 || validPath.size > getActor().getAppMobility()) {
-            validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance(), false);
+            validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance());
         }
     }
 
@@ -71,15 +70,12 @@ public class MoveCommand extends BattleCommand{
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
+
             IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            Array<int[]> path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance(), true);
+            Array<int[]> path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance());
             if(path.size > 0 && path.size <= actor.getAppMobility()){
+
                 valid = true;
-            }else{
-                path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance(), false);
-                if(path.size > 0 && path.size <= actor.getAppMobility()){
-                    valid = true;
-                }
             }
         }
         return valid;

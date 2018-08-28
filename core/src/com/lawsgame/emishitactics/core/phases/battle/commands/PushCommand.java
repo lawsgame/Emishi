@@ -1,26 +1,30 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
-import com.lawsgame.emishitactics.core.models.ActionChoice;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class PushCommand extends BattleCommand{
 
     public PushCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.PUSH, scheduler, false, true, false);
+        super(bfr, ActionChoice.PUSH, scheduler, false);
     }
 
     @Override
     protected void initiate() {
 
+    }
+
+    @Override
+    public boolean canbePerformedBy(IUnit actor) {
+        return super.canbePerformedBy(actor) && !actor.isHorseman();
     }
 
     @Override

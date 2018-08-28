@@ -1,13 +1,13 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.Ability;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -15,7 +15,7 @@ public class BuildCommand extends BattleCommand {
     protected Data.TileType buildingType;
 
     public BuildCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.TileType buildingType) {
-        super(bfr, ActionChoice.BUILD, scheduler, false, true, false);
+        super(bfr, ActionChoice.BUILD, scheduler, false);
         this.buildingType = buildingType;
     }
 
@@ -38,6 +38,11 @@ public class BuildCommand extends BattleCommand {
         outcome.receivers.add(actor);
         outcome.experienceGained.add(choice.getExperience());
 
+    }
+
+    @Override
+    public boolean canbePerformedBy(IUnit actor) {
+        return actor.has(Ability.BUILD) && super.canbePerformedBy(actor);
     }
 
     @Override

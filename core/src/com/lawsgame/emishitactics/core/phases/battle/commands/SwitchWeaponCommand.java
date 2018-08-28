@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
@@ -16,12 +16,8 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
     private BattleUnitRenderer actorRenderer;
 
     public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, int weaponIndex) {
-        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, true, true, true);
+        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, true);
         this.weaponIndex = weaponIndex;
-    }
-
-    public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        this(bfr, scheduler, -1);
     }
 
     @Override

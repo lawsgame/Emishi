@@ -2,17 +2,17 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
-import com.lawsgame.emishitactics.core.models.ActionChoice.RangedBasedType;
-import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -59,8 +59,6 @@ public abstract class BattleCommand implements Command, Observer{
     protected final BattlefieldRenderer battlefieldRenderer;
     private final AnimationScheduler scheduler;
     protected final ActionChoice choice;
-    protected final boolean undoable;
-    private final boolean acted;                    // if true, command that turn acted to true is executed, moved otherwise.
 
     private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied nor it costs any OA point
 
@@ -78,7 +76,7 @@ public abstract class BattleCommand implements Command, Observer{
     private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed
 
 
-    public BattleCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean undoable, boolean acted, boolean free){
+    public BattleCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean free){
         this.battlefieldRenderer = bfr;
         this.battlefield = bfr.getModel();
         this.scheduler = scheduler;
@@ -87,9 +85,7 @@ public abstract class BattleCommand implements Command, Observer{
         this.colActor = -1;
         this.rowTarget = -1;
         this.colTarget = -1;
-        this.undoable = undoable;
         this.initialized = false;
-        this.acted = acted;
         this.free = free;
         this.launched = false;
         this.outcome = new EncounterOutcome();
@@ -112,7 +108,7 @@ public abstract class BattleCommand implements Command, Observer{
 
             // set as moved or acted if required
             if(!free){
-                if(acted) {
+                if(choice.isActedBased()) {
                     getActor().setActed(true);
                 }else {
                     getActor().setMoved( true);
@@ -176,14 +172,11 @@ public abstract class BattleCommand implements Command, Observer{
     protected abstract void initiate();
     protected abstract void execute();
 
-    // can be deleted afterwards
-    public final boolean isUndoable(){
-        return undoable;
-    }
 
     // called to checked actor requirements
     public boolean canbePerformedBy(IUnit actor){
-        return choice.canbePerformedBy(actor);
+        return choice.getCost() <= actor.getActionPoints()
+                && (choice.isActedBased() ? !actor.hasActed() : !actor.hasMoved() || free);
     }
 
     /**
@@ -242,7 +235,7 @@ public abstract class BattleCommand implements Command, Observer{
     public Array<int[]> getActionArea() {
         Array<int[]> actionArea = new Array<int[]>();
         if(battlefield.isTileOccupied(rowActor, colActor)) {
-            switch (choice.getRangeType()) {
+            switch (choice.getRangedType()) {
                 case MOVE:
                     actionArea = battlefield.getMoveArea(rowActor, colActor);
                     break;
@@ -294,10 +287,10 @@ public abstract class BattleCommand implements Command, Observer{
     protected final boolean isTargetAllyValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired){
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)
-                && (choice.getRangeType() ==  RangedBasedType.WEAPON || choice.getRangeType() == RangedBasedType.SPECIFIC)){
+                && (choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC)){
             IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            int rangeMin = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
                 if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getAllegeance())
@@ -313,10 +306,10 @@ public abstract class BattleCommand implements Command, Observer{
     protected final boolean isEnemyTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)
-                && (choice.getRangeType() ==  RangedBasedType.WEAPON || choice.getRangeType() == RangedBasedType.SPECIFIC)){
+                && (choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC)){
             IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            int rangeMin = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
                 if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getAllegeance())
@@ -330,10 +323,10 @@ public abstract class BattleCommand implements Command, Observer{
 
     protected final boolean isAllyAtActionRange(int row, int col, IUnit actor, boolean woundedRequired){
         boolean targetAtRange = false;
-        if(choice.getRangeType() ==  RangedBasedType.WEAPON || choice.getRangeType() == RangedBasedType.SPECIFIC) {
+        if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
             int[] unitPos = battlefield.getUnitPos(actor);
-            int rangeMin = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
             int dist;
             loop:
             {
@@ -356,10 +349,10 @@ public abstract class BattleCommand implements Command, Observer{
 
     protected final boolean isEnemyAtActionRange(int row, int col, IUnit actor, boolean stealableRequired){
         boolean targetAtRange = false;
-        if(choice.getRangeType() ==  RangedBasedType.WEAPON || choice.getRangeType() == RangedBasedType.SPECIFIC) {
+        if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
             int[] unitPos = battlefield.getUnitPos(actor);
-            int rangeMin = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangeType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
             int dist;
             loop:
             {
@@ -411,7 +404,7 @@ public abstract class BattleCommand implements Command, Observer{
 
 
     public String getName(I18NBundle bundle){
-        return choice.getName(bundle);
+        return bundle.get(choice.name());
     }
 
     public final ActionChoice getActionChoice() {
@@ -556,7 +549,7 @@ public static class EncounterOutcome {
 
     @Override
     public String toString() {
-        return getActionChoice().getKey();
+        return getActionChoice().name();
     }
 
 

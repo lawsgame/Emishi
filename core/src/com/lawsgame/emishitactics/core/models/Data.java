@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.Random;
@@ -79,6 +80,154 @@ public class Data {
         DIE,
         GUARDED
 
+    }
+
+    public enum RangedBasedType{
+        MOVE,
+        WEAPON,
+        SPECIFIC
+    }
+
+    public enum ActionChoice{
+        MOVE                (1, 0, true, false, RangedBasedType.MOVE, false, new int[0][0]),
+        ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[0][0]),
+        SWITCH_POSITION     (1, 0, true, false, 1, 1, false, new int[0][0]),
+        PUSH                (1, 0, false, true, 1, 1, false, new int[0][0]),
+        SWITCH_WEAPON       (1, 0, false, true, 0, 0, false, new int[0][0]),
+        CHOOSE_ORIENTATION  (0, 0, false, true, 0, 0, true, new int[0][0]),
+        HEAL                (1, 10, false, true, 1, 1, false, new int[0][0]),
+        GUARD               (1, 10, false, true, 0, 0, false, new int[0][0]),
+        STEAL               (1, 10, false, true, 1, 1, false, new int[0][0]),
+        BUILD               (1, 10, false, true, 1, 1, false, new int[0][0]),
+        END_TURN            (0, 0, false, true, 0, 0, false, new int[0][0]);
+
+        private int cost;
+        private int experience;
+        private  boolean undoable;
+        private  boolean actedBased;
+        private int rangeMin;
+        private int rangeMax;                  // if true, command that turn actedBased to true is executed, moved otherwise.
+        private RangedBasedType rangedBasedType;
+        private boolean endTurnActionOnly;
+        /**
+         * AreaWidget of impact :
+         * ( 0, 0) = targeted buildingType
+         * ( 1, 0) = in front of targeted buildingType
+         * ( 0, 1) = right of targeted buildingType
+         * ( 0,-1) = left of targeted buildingType
+         * (-1, 0) = in the back of targeted buildingType
+         */
+        protected Array<int[]> impactArea;
+
+        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, int rangeMin, int rangeMax, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea) {
+            this.cost = cost;
+            this.experience = experience;
+            this.rangeMin = rangeMin;
+            this.rangeMax = rangeMax;
+            this.undoable = undoable;
+            this.actedBased = actedBased;
+            this.rangedBasedType = rangedBasedType;
+            this.endTurnActionOnly = endTurnActionOnly;
+            this.impactArea = new Array<int[]>();
+            this.impactArea.addAll(impactArea);
+        }
+
+        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, int rangeMin, int rangeMax, boolean endTurnActionOnly, int[][] impactArea){
+            this(cost, experience, undoable, actedBased, rangeMin, rangeMax, RangedBasedType.SPECIFIC, endTurnActionOnly, impactArea);
+        }
+
+        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea){
+            this(cost, experience, undoable, actedBased, -1, -1, rangedBasedType, endTurnActionOnly, impactArea);
+        }
+
+        public int getCost() {
+            return cost;
+        }
+
+        public int getExperience() {
+            return experience;
+        }
+
+        public boolean isUndoable() {
+            return undoable;
+        }
+
+        public boolean isActedBased() {
+            return actedBased;
+        }
+
+        public int getRangeMin() {
+            return rangeMin;
+        }
+
+        public int getRangeMax() {
+            return rangeMax;
+        }
+
+        public RangedBasedType getRangedType() {
+            return rangedBasedType;
+        }
+
+        public boolean isEndTurnActionOnly() {
+            return endTurnActionOnly;
+        }
+
+        public boolean isActorIsTarget(){
+            return rangeMin == 0 && rangeMax == 0;
+        }
+
+        public Array<int[]> getOrientedImpactArea(Data.Orientation orientation) {
+            Array<int[]> orientedArea = new Array<int[]>();
+            switch (orientation){
+                case WEST:
+                    for(int i = 0; i < impactArea.size; i++){
+                        orientedArea.add(new int[]{impactArea.get(i)[1], -impactArea.get(i)[0]});
+                    }
+                    break;
+                case NORTH:
+                    for(int i = 0; i < impactArea.size; i++) {
+                        orientedArea.addAll(new int[]{impactArea.get(i)[0], impactArea.get(i)[1]});
+                    }
+                    break;
+                case SOUTH:
+                    for(int i = 0; i < impactArea.size; i++){
+                        orientedArea.add(new int[]{-impactArea.get(i)[0], -impactArea.get(i)[1]});
+                    }
+                    break;
+                case EAST:
+                    for(int i = 0; i < impactArea.size; i++){
+                        orientedArea.add(new int[]{-impactArea.get(i)[1], impactArea.get(i)[0]});
+                    }
+                    break;
+            }
+
+
+            return orientedArea;
+        }
+
+        public Array<int[]> getOrientedImpactArea(Data.Orientation orientation, int rowActor, int colActor, Battlefield battlefield) {
+            Array<int[]> orientedArea = getOrientedImpactArea(orientation);
+            int r;
+            int c;
+            for(int i = 0; i < orientedArea.size; i++){
+                r = orientedArea.get(i)[0] + rowActor;
+                c  = orientedArea.get(i)[0] + colActor;
+                if(battlefield.isTileExisted(r, c)){
+                    orientedArea.get(i)[0] = r;
+                    orientedArea.get(i)[1] = c;
+                }
+            }
+            return orientedArea;
+        }
+
+
+        public int getImpactAreaSize(){
+            return impactArea.size + 1;
+        }
+
+        public String getName(I18NBundle mainI18nBundle) {
+            return mainI18nBundle.get(name());
+        }
     }
 
     public enum AreaType {

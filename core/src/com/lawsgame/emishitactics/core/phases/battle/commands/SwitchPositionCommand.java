@@ -1,15 +1,12 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
-import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -20,7 +17,7 @@ public class SwitchPositionCommand extends BattleCommand {
     private Data.Orientation oldActorOrientation;
 
     public SwitchPositionCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, true, false, true);
+        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, true);
     }
 
     @Override

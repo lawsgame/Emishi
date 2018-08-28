@@ -1,25 +1,29 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
-
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class HealCommand extends BattleCommand {
 
     public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.HEAL, scheduler, false, true, false);
+        super(bfr, ActionChoice.HEAL, scheduler, false);
     }
 
 
     @Override
     protected void initiate() {
 
+    }
+
+    @Override
+    public boolean canbePerformedBy(IUnit actor) {
+        return super.canbePerformedBy(actor) && actor.has(Data.Ability.HEAL);
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -90,21 +90,6 @@ public abstract class TempoActionPanel extends ActionPanel{
 
     public StringBuilder getBuilder() {
         return builder;
-    }
-
-
-
-    public static class InvisiblePanel extends TempoActionPanel{
-
-        public InvisiblePanel(Viewport stageViewport) {
-            super(stageViewport, ActionChoice.NONE);
-            setVisible(false);
-        }
-
-        @Override
-        public void set(BattleCommand command) {
-
-        }
     }
 
     public static class AttackPanel extends TempoActionPanel{

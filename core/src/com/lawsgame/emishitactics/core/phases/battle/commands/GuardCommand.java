@@ -1,14 +1,14 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
-import com.lawsgame.emishitactics.core.models.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class GuardCommand extends SelfInflitedCommand {
@@ -16,13 +16,18 @@ public class GuardCommand extends SelfInflitedCommand {
     protected IUnit actor;
 
     public GuardCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.GUARD, scheduler, true, true, false);
+        super(bfr, ActionChoice.GUARD, scheduler, false);
     }
 
 
     @Override
     protected void initiate() {
 
+    }
+
+    @Override
+    public boolean canbePerformedBy(IUnit actor) {
+        return super.canbePerformedBy(actor) && actor.has(Data.Ability.GUARD);
     }
 
     @Override

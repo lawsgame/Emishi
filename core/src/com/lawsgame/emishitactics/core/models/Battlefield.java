@@ -728,7 +728,7 @@ public class Battlefield extends Observable {
      *
      * @return an array like that {[row, col]} representing the shortest validPath from one buildingType to another
      */
-    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance, boolean avoidCoveredArea){
+    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance){
         Array<int[]> res = new Array<int[]>();
 
         if(isTileAvailable(rowf, colf, pathfinder) && allegeance != null) {
