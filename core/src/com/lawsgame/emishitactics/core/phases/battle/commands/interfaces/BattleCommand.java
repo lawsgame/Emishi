@@ -70,9 +70,10 @@ public abstract class BattleCommand implements Command, Observer{
     protected int colTarget;
 
     protected EncounterOutcome outcome;
-    private boolean initialized;                     // control variable to prevent a battle command to be executed before being initialized and checking if the target choice is valid
 
     private boolean launched;
+    private boolean initialized;
+
     private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed
 
 
@@ -85,26 +86,22 @@ public abstract class BattleCommand implements Command, Observer{
         this.colActor = -1;
         this.rowTarget = -1;
         this.colTarget = -1;
-        this.initialized = false;
         this.free = free;
-        this.launched = false;
         this.outcome = new EncounterOutcome();
         this.renderTasks = new Array<Task>();
+
+        this.launched = false;
     }
 
-    public void init(){
-        if(isTargetValid()) {
-            this.initialized = true;
-            this.outcome.reset();
-            this.renderTasks.clear();
-            initiate();
-        }
-    }
 
     @Override
     public final void apply() {
-        if(initialized) {
-            initialized = false;
+        if(isTargetValid()) {
+            this.launched = true;
+
+            // Outcome and animation scheduler cleared.
+            this.outcome.reset();
+            this.renderTasks.clear();
 
             // set as moved or acted if required
             if(!free){
@@ -118,7 +115,6 @@ public abstract class BattleCommand implements Command, Observer{
             //handle the cost
             getActor().addActionPoints(-choice.getCost());
 
-            this.launched = true;
             execute();
 
             // remove already OoA units
@@ -130,7 +126,6 @@ public abstract class BattleCommand implements Command, Observer{
         setActor(rowActor, colActor);
         setTarget(rowTarget, colTarget);
         if(isTargetValid()){
-            init();
             apply();
         }
     }
@@ -154,8 +149,6 @@ public abstract class BattleCommand implements Command, Observer{
             task.attach(this);
             renderTasks.add(task);
             scheduler.addTask(task);
-            //System.out.println("\nClient "+this.toString());
-            //System.out.println("nb "+renderTasks.size+" ADD "+task);
         }
     }
 
@@ -165,11 +158,9 @@ public abstract class BattleCommand implements Command, Observer{
             Task completedTask = (Task)data;
             completedTask.detach(this);
             renderTasks.removeValue(completedTask, true);
-            //System.out.println("\nClient "+this.toString()+"\nnb "+renderTasks.size+" REMOVE ");
         }
     }
 
-    protected abstract void initiate();
     protected abstract void execute();
 
 
@@ -187,8 +178,31 @@ public abstract class BattleCommand implements Command, Observer{
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public boolean isTargetValid() {
-        return isTargetValid(rowActor, colActor, rowTarget, colTarget);
+        boolean valid = false;
+        if(isTargetValid(rowActor, colActor, rowTarget, colTarget)){
+            valid = true;
+            if(!initialized)
+                init();
+        }else{
+            initialized = false;
+        }
+        return valid;
     }
+
+    /**
+     * especially required to set attributes values required for instanciating the associated ActionPanel
+     */
+    protected void init(){
+        initialized = true;
+    }
+
+
+        /*
+    required for testing retaliation availability for the attacked target without copy and paste the code of the
+    BattleCommand.isTargetValid() method.
+     */
+    public abstract boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0);
+
 
     public void blink(final boolean enable){
         if(battlefield.isTileOccupied(rowTarget, colTarget)){
@@ -201,11 +215,6 @@ public abstract class BattleCommand implements Command, Observer{
         }
     }
 
-    /*
-    required for testing retaliation availability for the attacked target without copy and paste the code of the
-    BattleCommand.isTargetValid() method.
-     */
-    public abstract boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0);
 
 
 
@@ -414,7 +423,8 @@ public abstract class BattleCommand implements Command, Observer{
 
     public final boolean setActor(int rowActor, int colActor) {
         if(battlefield.isTileOccupied(rowActor, colActor)) {
-            launched = false;
+            this.launched = false;
+            this.initialized = false;
             this.rowActor = rowActor;
             this.colActor = colActor;
             this.actor = battlefield.getUnit(rowActor, colActor);
@@ -430,7 +440,6 @@ public abstract class BattleCommand implements Command, Observer{
         return actor;
     }
 
-
     public final int getRowActor() {
         return rowActor;
     }
@@ -442,7 +451,8 @@ public abstract class BattleCommand implements Command, Observer{
 
     public final void setTarget(int rowTarget, int colTarget){
         if(battlefield.isTileExisted(rowTarget, colTarget)){
-            launched = false;
+            this.launched = false;
+            this.initialized = false;
             this.rowTarget = rowTarget;
             this.colTarget = colTarget;
             this.target = battlefield.getUnit(rowTarget, colTarget);
@@ -453,11 +463,9 @@ public abstract class BattleCommand implements Command, Observer{
         return target;
     }
 
-
     public final int getRowTarget() { return rowTarget; }
 
     public final int getColTarget() { return colTarget; }
-
 
     public final TileType getTargetTile() {
         return battlefield.getTile(rowTarget, colTarget);

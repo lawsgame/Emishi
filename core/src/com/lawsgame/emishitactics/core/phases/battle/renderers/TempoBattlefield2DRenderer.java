@@ -185,6 +185,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
+    public int setRowFromTouch(float gameX, float gameY) {
+        return (int)gameY;
+    }
+
+    @Override
+    public int setColFromTouch(float gameX, float gameY) {
+        return (int)gameX;
+    }
+
+    @Override
     public boolean isExecuting() {
         if(countDown.isRunning())
             return true;

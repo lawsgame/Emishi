@@ -24,11 +24,6 @@ public class StealCommand extends BattleCommand{
     }
 
     @Override
-    protected void initiate() {
-
-    }
-
-    @Override
     protected void execute() {
 
         // update model

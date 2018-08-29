@@ -18,11 +18,6 @@ public class PushCommand extends BattleCommand{
     }
 
     @Override
-    protected void initiate() {
-
-    }
-
-    @Override
     public boolean canbePerformedBy(IUnit actor) {
         return super.canbePerformedBy(actor) && !actor.isHorseman();
     }

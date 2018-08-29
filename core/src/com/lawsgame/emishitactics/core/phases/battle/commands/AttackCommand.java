@@ -37,7 +37,8 @@ public class AttackCommand extends BattleCommand {
     }
 
     @Override
-    public void initiate() {
+    protected void init(){
+        super.init();
         targetDefender = setDefender(rowTarget, colTarget);
         initiatorDefender = setDefender(rowActor, colActor);
     }

@@ -57,8 +57,8 @@ public abstract class BattleInteractionState extends InteractionState {
     @Override
     public void onTouch(float gameX, float gameY) {
         if(!bim.gcm.isCameraMoving()){
-            rowTouch = (int)gameY;
-            colTouch = (int)gameX;
+            rowTouch = bim.bfr.setRowFromTouch(gameX, gameY);
+            colTouch =  bim.bfr.setColFromTouch(gameX, gameY);
             inputNotHandled = !handleTouchInput(rowTouch,colTouch);
             if(inputNotHandled && bim.battlefield.isTileExisted(rowTouch, colTouch)){
                 bim.focusOn(rowTouch, colTouch, true, true, true, false, false);

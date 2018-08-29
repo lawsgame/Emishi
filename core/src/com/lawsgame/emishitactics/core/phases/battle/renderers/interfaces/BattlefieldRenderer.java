@@ -17,5 +17,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
 
 
-
+    public abstract int setRowFromTouch(float gameX, float gameY);
+    public abstract int setColFromTouch(float gameX, float gameY);
 }

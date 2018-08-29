@@ -58,7 +58,6 @@ public class SelectTargetBIS extends BattleInteractionState {
         int col = currentCommand.getColTarget();
         if(currentCommand.isTargetValid()){
 
-            currentCommand.init();
             if(currentCommand.getActionChoice().isUndoable()){
 
                 // remove blinking and other highlighting target affect

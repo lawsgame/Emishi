@@ -20,22 +20,16 @@ public class BuildCommand extends BattleCommand {
     }
 
     @Override
-    public void initiate() {
-
-    }
-
-    @Override
     protected void execute() {
-        IUnit actor = battlefield.getUnit(rowActor, colActor);
 
         // update model
         battlefield.setTile(rowTarget, colTarget, buildingType, false);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, actor)));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, getActor())));
 
         // set outcome
-        outcome.receivers.add(actor);
+        outcome.receivers.add(getActor());
         outcome.experienceGained.add(choice.getExperience());
 
     }

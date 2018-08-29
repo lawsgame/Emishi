@@ -21,22 +21,19 @@ public class SwitchPositionCommand extends BattleCommand {
     }
 
     @Override
-    public void initiate() {
-        actorRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowActor, colActor));
-        targetRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
-    }
-
-    @Override
     protected void execute() {
+
+        // store old state
+        actorRenderer = battlefieldRenderer.getUnitRenderer(getActor());
+        targetRenderer = battlefieldRenderer.getUnitRenderer(getTarget());
+        oldActorOrientation = getActor().getOrientation();
+        oldTargetOrientation = getTarget().getOrientation();
+
         //update model
-        IUnit actor = battlefield.getUnit(rowActor, colActor);
-        IUnit target = battlefield.getUnit(rowTarget, colTarget);
-        oldActorOrientation = actor.getOrientation();
-        oldTargetOrientation = target.getOrientation();
         battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.WALK, battlefield)));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(getActor(), getTarget(), SwitchPosition.Mode.WALK, battlefield)));
     }
 
     @Override

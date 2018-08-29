@@ -10,6 +10,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
@@ -22,8 +23,8 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.EndTurnBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
@@ -34,6 +35,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPane
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoRoseWidget;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
@@ -47,6 +49,7 @@ public class TestBIS extends BattleInteractionState {
     ExperiencePanel experiencePanel;
     LevelUpPanel levelUpPanel;
     LootPanel lootPanel;
+    EndTurnBIS.WindRoseWidget windRoseWidget;
 
     IUnit sltdUnit;
     int index;
@@ -101,6 +104,11 @@ public class TestBIS extends BattleInteractionState {
         lootPanel.set(new Weapon(Data.WeaponTemplate.SHORTSWORD), bim.mainI18nBundle);
         bim.uiStage.addActor(lootPanel);
 
+        int windRoseRowTarget = 6;
+        int windRoseColTarget = 7;
+        windRoseWidget = new TempoRoseWidget(bim.gcm.getPort(), bim.uiStage, bim.asm);
+        windRoseWidget.setListeners(bim, windRoseRowTarget, windRoseColTarget);
+        bim.uiStage.addActor(windRoseWidget);
 
         //EXP TEST
         /*
@@ -225,11 +233,11 @@ public class TestBIS extends BattleInteractionState {
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
             if (command.setActor(unitPos[0], unitPos[1])) {
+
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
-                    command.init();
-                    command.blink(true);
 
+                    command.blink(true);
                     if(bim.app.isPanelAvailable(command)){
 
 

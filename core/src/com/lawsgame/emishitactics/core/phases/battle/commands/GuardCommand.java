@@ -21,11 +21,6 @@ public class GuardCommand extends SelfInflitedCommand {
 
 
     @Override
-    protected void initiate() {
-
-    }
-
-    @Override
     public boolean canbePerformedBy(IUnit actor) {
         return super.canbePerformedBy(actor) && actor.has(Data.Ability.GUARD);
     }

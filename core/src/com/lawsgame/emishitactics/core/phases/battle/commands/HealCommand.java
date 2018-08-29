@@ -15,12 +15,6 @@ public class HealCommand extends BattleCommand {
         super(bfr, ActionChoice.HEAL, scheduler, false);
     }
 
-
-    @Override
-    protected void initiate() {
-
-    }
-
     @Override
     public boolean canbePerformedBy(IUnit actor) {
         return super.canbePerformedBy(actor) && actor.has(Data.Ability.HEAL);
@@ -29,23 +23,18 @@ public class HealCommand extends BattleCommand {
     @Override
     protected void execute() {
 
-
-
-        IUnit healer = battlefield.getUnit(rowActor, colActor);
-        IUnit patient = battlefield.getUnit(rowTarget, colTarget);
-
         // update model
         int healPower = getHealPower(rowActor, colActor, rowTarget, colTarget);
-        patient.treated(healPower);
+        getActor().treated(healPower);
 
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(patient), patient, healPower));
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(healer), Data.AnimationId.HEAL));
+        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getTarget()), getTarget(), healPower));
+        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimationId.HEAL));
         scheduleRenderTask(task);
 
         // set outcome
-        outcome.receivers.add(healer);
+        outcome.receivers.add(getActor());
         outcome.experienceGained.add(choice.getExperience());
 
 

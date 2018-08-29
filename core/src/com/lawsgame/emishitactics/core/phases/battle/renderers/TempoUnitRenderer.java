@@ -351,6 +351,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             case COVER:
                 unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(id, getModel().getArmy().getAllegeance()));
                 countDown.run();
+                break;
             case REST:
                 if(done){
                     unitSprite.setRegion(TempoSpritePool.getInstance().getDoneUnitSprite());

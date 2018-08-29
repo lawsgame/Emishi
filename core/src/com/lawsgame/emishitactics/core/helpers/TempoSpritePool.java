@@ -94,7 +94,6 @@ public class TempoSpritePool {
                 region = atlas.findRegion(Assets.REGION_UNIT_SPRITES);
                 TextureRegion[][] unitRegions = region.split(32,32);
                 TextureRegion[][] iconRegions = region.split(8,8);
-                TextureRegion[][] offabbRegions = region.split(32,8);
 
                 unitSprites.put(Data.AnimationId.ATTACK, unitRegions[3][0]);
                 unitSprites.put(Data.AnimationId.PUSH, unitRegions[4][0]);

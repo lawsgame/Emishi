@@ -220,7 +220,7 @@ public class SelectActionBIS extends BattleInteractionState {
                 Skin skin = new Skin(uiAtlas);
 
                 //set button style
-                this.style = new TextButton.TextButtonStyle();
+                style = new TextButton.TextButtonStyle();
                 style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
                 style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);
                 style.font = BattlePhase.testFont;

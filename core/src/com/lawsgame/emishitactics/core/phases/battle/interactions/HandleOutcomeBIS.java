@@ -31,7 +31,6 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
     private static EncounterOutcome emptyOutcome;
 
-    private EndTurnCommand endTurnCommand;
     private ExperiencePanel experiencePanel;
     private LevelUpPanel levelUpPanel;
     private LootPanel lootPanel;
@@ -41,13 +40,9 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<BattleCommand> historic) {
         super(bim, true, false, false);
 
-
         this.historic = historic;
         if(outcome == null) emptyOutcome = new EncounterOutcome();
         this.outcome = (historic.size() > 0) ? historic.peek().getOutcome() : emptyOutcome;
-
-        this.endTurnCommand = new EndTurnCommand(bim.bfr, bim.scheduler);
-        this.endTurnCommand.setFree(true);
         this.experiencePanel = new TempoExperiencePanel(bim.uiStage.getViewport());
         this.levelUpPanel = new TempoLevelUpPanel(bim.uiStage.getViewport());
         this.lootPanel = new TempoLootPanel(bim.uiStage.getViewport());
@@ -128,10 +123,10 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                     if (!historic.peek().getActor().isDone()) {
                         bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));
                     } else {
-                        endTurnCommand.apply(actorPos[0], actorPos[1]);
-                        bim.replace(new SelectActorBIS(bim));
+                        bim.replace(new EndTurnBIS(bim, actorPos[0], actorPos[1]));
                     }
                 }else{
+
                     throw new BISException("historic top command has no actor set up");
                 }
             }else{

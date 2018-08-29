@@ -25,10 +25,10 @@ public class Assets {
 
     // atlases
 
-    public static String ATLAS_UNITS = "textures/unit_sprites.pack";
-    public static String ATLAS_UI = "textures/ui_skin.pack";
-    public static String ATLAS_MAPS = "textures/maps.pack";
-    public static String ATLAS_TILES = "textures/tiles.pack";
+    public static final String ATLAS_UNITS = "textures/unit_sprites.pack";
+    public static final String ATLAS_UI = "textures/ui_skin.pack";
+    public static final String ATLAS_MAPS = "textures/maps.pack";
+    public static final String ATLAS_TILES = "textures/tiles.pack";
 
     // regions
 
@@ -43,9 +43,10 @@ public class Assets {
     public static String getTileHighlighted(Data.AreaType id){
         return id.name().toLowerCase();
     }
-    public static String UI_BLACK_BACKGROUND = "black_background";
-    public static String UI_BUTTON_UP = "button_up";
-    public static String UI_BUTTON_DOWN = "button_down";
+    public static final String UI_BLACK_BACKGROUND = "black_background";
+    public static final String UI_BUTTON_UP = "button_up";
+    public static final String UI_BUTTON_DOWN = "button_down";
+    public static final String UI_ARROW = "arrow";
 
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";

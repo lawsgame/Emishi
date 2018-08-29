@@ -25,23 +25,10 @@ public class MoveCommand extends BattleCommand{
     }
 
     @Override
-    public void initiate() {
-
-        // register old state
-        walkerRenderer = battlefieldRenderer.getUnitRenderer(getActor());
-
-        // set validPath
-        validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance());
-        if (validPath.size == 0 || validPath.size > getActor().getAppMobility()) {
-            validPath = battlefield.getShortestPath(rowActor, colActor, rowTarget, colTarget, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance());
-        }
-    }
-
-    @Override
     protected void execute() {
-        IUnit walker = battlefield.getUnit(rowActor, colActor);
 
         //store old state info
+        walkerRenderer = battlefieldRenderer.getUnitRenderer(getActor());
         oldWalkerOrientation = getActor().getOrientation();
 
         // update model
@@ -49,10 +36,10 @@ public class MoveCommand extends BattleCommand{
         Data.Orientation or = (validPath.size > 1) ?
                 Utils.getOrientationFromCoords(validPath.get(validPath.size - 2)[0], validPath.get(validPath.size - 2)[1], rowTarget, colTarget) :
                 Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
-        walker.setOrientation(or);
+        getActor().setOrientation(or);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefield, battlefieldRenderer.getUnitRenderer(walker), new Walk(walker, validPath)));
+        scheduleRenderTask(new StandardTask(battlefield, battlefieldRenderer.getUnitRenderer(getActor()), new Walk(getActor(), validPath)));
 
     }
 
@@ -71,9 +58,8 @@ public class MoveCommand extends BattleCommand{
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
 
-            IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            Array<int[]> path = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, actor.has(Data.Ability.PATHFINDER), actor.getAllegeance());
-            if(path.size > 0 && path.size <= actor.getAppMobility()){
+            this.validPath = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance());
+            if(validPath.size > 0 && validPath.size <= getActor().getAppMobility()){
 
                 valid = true;
             }

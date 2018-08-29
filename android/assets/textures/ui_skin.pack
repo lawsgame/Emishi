@@ -3,23 +3,30 @@ ui_skin.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-action_area
+arrow
   rotate: false
   xy: 0, 0
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+action_area
+  rotate: false
+  xy: 128, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 deployment_area
   rotate: false
-  xy: 64, 0
+  xy: 128, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 foe_action_area
   rotate: false
-  xy: 128, 0
+  xy: 192, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -33,63 +40,63 @@ foe_squad_member
   index: -1
 guard_area
   rotate: false
-  xy: 256, 0
+  xy: 256, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 move_area
   rotate: false
-  xy: 320, 0
+  xy: 256, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 selected_unit
   rotate: false
-  xy: 384, 0
+  xy: 320, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 squad_member
   rotate: false
-  xy: 448, 0
+  xy: 320, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 touched_tile
   rotate: false
-  xy: 512, 0
+  xy: 384, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 vanguard_deployment_area
   rotate: false
-  xy: 576, 0
+  xy: 384, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 button_down
   rotate: false
-  xy: 640, 40
+  xy: 448, 104
   size: 60, 24
   orig: 60, 24
   offset: 0, 0
   index: -1
 button_up
   rotate: false
-  xy: 640, 16
+  xy: 448, 80
   size: 60, 24
   orig: 60, 24
   offset: 0, 0
   index: -1
 black_background
   rotate: false
-  xy: 700, 32
+  xy: 448, 48
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

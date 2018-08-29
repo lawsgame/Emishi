@@ -24,11 +24,6 @@ public class EndTurnCommand extends SelfInflitedCommand {
     }
 
     @Override
-    protected void initiate() {
-
-    }
-
-    @Override
     protected void execute() {
 
         getActor().setMoved(true);
