@@ -1,7 +1,10 @@
 package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -63,13 +66,58 @@ public class IsoBattlefieldRenderer extends BattlefieldRenderer {
     }
 
     @Override
+    protected void addTileRenderer(int row, int col, Data.TileType type) {
+
+    }
+
+    @Override
+    protected void addUnitRenderer(int row, int col, IUnit model) {
+
+    }
+
+    @Override
+    protected void addaAreaRenderer(Area area) {
+
+    }
+
+    @Override
+    protected boolean isUnitRendererCreated(IUnit model) {
+        return false;
+    }
+
+    @Override
+    protected boolean removeUnitRenderer(IUnit model) {
+        return false;
+    }
+
+    @Override
+    protected void removeAreaRenderersAssociatedWith(IUnit model) {
+
+    }
+
+    @Override
+    protected void removeAreaRenderer(Area model) {
+
+    }
+
+    @Override
+    protected boolean isCurrentTaskCompleted() {
+        return false;
+    }
+
+    @Override
+    protected void setBuildTask(Notification.Build build) {
+
+    }
+
+    @Override
     public boolean isExecuting() {
         return false;
     }
 
     @Override
     public void update(float dt) {
-
+        super.update(dt);
     }
 
     @Override

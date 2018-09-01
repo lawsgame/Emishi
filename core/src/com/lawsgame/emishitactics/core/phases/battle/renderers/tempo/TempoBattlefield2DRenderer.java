@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.Notification.SetTile;
 import com.lawsgame.emishitactics.core.models.Notification.SetUnit;
@@ -27,17 +28,15 @@ import java.util.LinkedList;
  */
 
 public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
-    protected Array<BattleUnitRenderer> unitRenderers;
-    protected Array<AreaRenderer> areaRenderers;
+
     protected TextureRegion[][] tileRenderers;
     protected TempoSpritePool sprite2DPool;
 
     protected CountDown countDown = new CountDown(2f);
-    private LinkedList<SimpleCommand> notificationQueue = new LinkedList<SimpleCommand>();
 
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
-        this.unitRenderers = new Array<BattleUnitRenderer>();
+
         this.sprite2DPool = TempoSpritePool.getInstance();
         this.sprite2DPool.set(asm);
 
@@ -53,7 +52,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
 
         // addExpGained up area renderers
-        this.areaRenderers = new Array<AreaRenderer>();
         for(Data.Allegeance a : Data.Allegeance.values()){
             for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
                 addaAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
@@ -91,19 +89,39 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
+        super.update(dt);
         countDown.update(dt);
-        if(!countDown.isRunning() && !notificationQueue.isEmpty()){
-            if(countDown.isFinished())
-                countDown.reset();
-            notificationQueue.pop().apply();
-        }
-
-        for(int i = 0; i < unitRenderers.size; i++) {
-            unitRenderers.get(i).update(dt);
+        if(countDown.isFinished()) {
+            countDown.reset();
         }
     }
 
-    private void addTileRenderer(int r, int c, Data.TileType tileType){
+    @Override
+    public boolean isCurrentTaskCompleted(){
+        return !countDown.isRunning();
+    }
+
+    @Override
+    protected void setBuildTask(final Build notif) {
+        offerTask(new SimpleCommand() {
+            @Override
+            public void apply() {
+                countDown.run();
+                TextureRegion tr = TempoSpritePool.getInstance().getBuildInConstructionSprite(notif.tileType);
+                if(tr != null)
+                    tileRenderers [notif.row][notif.col] = tr;
+                getUnitRenderer(notif.builder).getNotification(Data.AnimationId.BUILD);
+            }
+        });
+        offerTask(new SimpleCommand() {
+            @Override
+            public void apply() {
+                addTileRenderer(notif.row, notif.col, notif.tileType);
+            }
+        });
+    }
+
+    protected void addTileRenderer(int r, int c, Data.TileType tileType){
         try{
             if (getModel().isTileExisted(r, c)) {
                 TextureRegion tileTR = sprite2DPool.getTileSprite(tileType);
@@ -153,7 +171,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     }
 
-    private boolean removeUnitRenderer(IUnit unit) {
+    protected boolean removeUnitRenderer(IUnit unit) {
         if(unit != null) {
             for(int i = 0; i< unitRenderers.size; i++){
                 if(unitRenderers.get(i).getModel() == unit){
@@ -211,142 +229,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         super.dispose();
         for(int i =0; i < unitRenderers.size; i++){
             unitRenderers.get(i).dispose();
-        }
-    }
-
-    /**
-     *
-     *
-     * @param data
-     */
-    @Override
-    public void getNotification(Object data) {
-        if (data instanceof IUnit) {
-
-            // remove the sent unit
-            removeUnitRenderer((IUnit) data);
-        }  else if(data instanceof SetUnit){
-
-            final SetUnit notif = (SetUnit)data;
-            if (isUnitRendererCreated(notif.unitModel)) {
-                final BattleUnitRenderer bur = getUnitRenderer(notif.unitModel);
-                bur.getNotification(new SimpleCommand() {
-
-                    @Override
-                    public void apply() {
-                        bur.setX(notif.col);
-                        bur.setY(notif.row);
-                        removeAreaRenderersAssociatedWith(bur.getModel());
-                    }
-                });
-            }else{
-                addUnitRenderer(notif.row, notif.col, notif.unitModel);
-            }
-        } else if (data instanceof SwitchPosition) {
-
-            final SwitchPosition notif = (SwitchPosition)data;
-            final BattleUnitRenderer bur1 = getUnitRenderer(notif.unit1);
-            final BattleUnitRenderer bur2 = getUnitRenderer(notif.unit2);
-            if (bur1 != null && bur2 != null) {
-                switch (notif.mode) {
-                    case GUARDIAN:
-                    case WALK :
-
-
-                        bur1.getNotification(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                removeAreaRenderersAssociatedWith(bur1.getModel());
-                                Array<int[]> path = new Array<int[]>();
-                                path.add(new int[]{notif.rowUnit2, notif.colUnit2});
-                                bur1.displayWalk(path);
-                            }
-                        });
-                        bur2.getNotification(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                removeAreaRenderersAssociatedWith(bur2.getModel());
-                                Array<int[]> path = new Array<int[]>();
-                                path.add(new int[]{notif.rowUnit1, notif.colUnit1});
-                                bur2.displayWalk(path);
-                            }
-                        });
-                        break;
-                    case INSTANT:
-                        bur1.getNotification(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                bur1.setX(notif.colUnit2);
-                                bur1.setY(notif.rowUnit2);
-                                removeAreaRenderersAssociatedWith(bur1.getModel());
-                            }
-                        });
-                        bur2.getNotification(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                bur2.setX(notif.colUnit1);
-                                bur2.setY(notif.rowUnit1);
-                                removeAreaRenderersAssociatedWith(bur2.getModel());
-                            }
-                        });
-                        break;
-                }
-            }
-        }else if(data instanceof Walk){
-
-            final Walk notif = (Walk)data;
-            final BattleUnitRenderer bur = getUnitRenderer(notif.unit);
-            bur.getNotification(new SimpleCommand() {
-                @Override
-                public void apply() {
-                    bur.displayWalk(notif.path);
-                    removeAreaRenderersAssociatedWith(bur.getModel());
-                }
-            });
-        }else if(data instanceof SetTile){
-
-            if(data instanceof Build){
-
-                final Build notif= (Build)data;
-                notificationQueue.offer(new SimpleCommand() {
-                    @Override
-                    public void apply() {
-                        countDown.run();
-                        TextureRegion tr = TempoSpritePool.getInstance().getBuildInConstructionSprite(notif.tileType);
-                        if(tr != null)
-                            tileRenderers [notif.row][notif.col] = tr;
-                        getUnitRenderer(notif.builder).getNotification(Data.AnimationId.BUILD);
-                    }
-                });
-                notificationQueue.offer(new SimpleCommand() {
-                    @Override
-                    public void apply() {
-                        addTileRenderer(notif.row, notif.col, notif.tileType);
-                    }
-                });
-            }else {
-
-                SetTile notif = (SetTile)data;
-                addTileRenderer(notif.row, notif.col, notif.tileType);
-            }
-        }else if(data instanceof Area){
-
-            Area area = (Area)data;
-            boolean areaRemoved = false;
-            for(int i = 0; i < areaRenderers.size; i++){
-                if(area == areaRenderers.get(i).getModel()){
-                    removeAreaRenderer(area);
-                    areaRemoved = true;
-                    continue;
-                }
-            }
-            if(!areaRemoved){
-                addaAreaRenderer(area);
-            }
         }
     }
 

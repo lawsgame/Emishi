@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.*;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -57,7 +58,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     private boolean pushed = false;
     private Array<int[]> remainingPath = new Array<int[]>(); // array of (r, c) <=> (y, x)
 
-    private LinkedList<Object> notificationQueue;
+
 
 
     public TempoUnitRenderer(int row, int col, IUnit model) {
@@ -69,7 +70,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         this.executing = false;
         this.done = false;
         this.visible = true;
-        this.notificationQueue = new LinkedList<Object>();
         weapontTexture = TempoSpritePool.getInstance().getWeaponSprite(model.getCurrentWeapon().getTemplate().getWeaponType());
         orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(model.getOrientation());
         display(Data.AnimationId.REST);
@@ -85,7 +85,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         if (countDown.isFinished()) {
             offabbTexture = null;
             countDown.reset();
-            if(notificationQueue.isEmpty())
+            if(!isExecuting())
                 display(Data.AnimationId.REST);
 
         }
@@ -94,75 +94,10 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
         handleWalkAnimation(dt);
 
-        // shall be called last to directly launched the next animation if executing = false
-        launchNextAnimation();
+        super.update(dt);
     }
 
-    public void launchNextAnimation(){
-        if(!executing){
-            if(!notificationQueue.isEmpty()) {
-                Object query = notificationQueue.pop();
 
-                if (query instanceof ApplyDamage) {
-                    ApplyDamage notification = (ApplyDamage) query;
-                    displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
-
-                } else if(query instanceof Done) {
-                    setDone(((Done) query).done);
-
-                } else if(query instanceof Blink) {
-                    setTargeted(((Blink) query).targeted);
-
-                } else if(query instanceof Integer) {
-                    displayTreated((Integer)query);
-
-                } else if (query instanceof int[]) {
-                    int[] array = (int[]) query;
-                    if (array.length == 10) {
-                        int[] gainLvl = (int[]) query;
-                        displayLevelup(gainLvl);
-                    }
-
-                } else if (query instanceof Data.AnimationId) {
-                    display((Data.AnimationId) query);
-
-                } else if (query instanceof Pushed) {
-                    Pushed notif = (Pushed)query;
-                    displayPushed(notif.orientation);
-
-                } else if (query instanceof Fled) {
-                    Fled notif = (Fled)query;
-                    displayFlee(notif.orientation);
-
-                }else if (query instanceof Data.Orientation) {
-                    orientationTexture = TempoSpritePool.getInstance().getOrientationSprite((Data.Orientation)query);
-
-                } else if (query instanceof Command) {
-                    Command customQuery = (Command) query;
-                    customQuery.apply();
-
-                } else if (query instanceof Array) {
-                    if (((Array) query).size > 0 && ((Array) query).get(0) instanceof int[]) {
-                        Array<int[]> path = (Array<int[]>) query;
-                        displayWalk(path);
-                    }
-
-                } else if(query instanceof Data.WeaponType){
-                    weapontTexture = TempoSpritePool.getInstance().getWeaponSprite((Data.WeaponType)query);
-
-                } else if (query instanceof HorsemanUpdate){
-                    if (((HorsemanUpdate)query).horseman){
-                        mountedTexture = TempoSpritePool.getInstance().getMountedSprite();
-                    }else{
-                        mountedTexture = null;
-                    }
-                } else {
-                    launchNextAnimation();
-                }
-
-            }
-        }
-    }
 
     private void handleWalkAnimation(float dt){
         // handle walk animation
@@ -363,15 +298,31 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         }
     }
 
+    @Override
+    public void setOrientation(Data.Orientation or) {
+        orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(or);
+    }
+
+    @Override
+    public void setWeaponType(Data.WeaponType type) {
+        weapontTexture = TempoSpritePool.getInstance().getWeaponSprite(type);
+    }
+
+    @Override
+    public void setHorman(boolean horseman) {
+        if (horseman){
+            mountedTexture = TempoSpritePool.getInstance().getMountedSprite();
+        }else{
+            mountedTexture = null;
+        }
+    }
+
 
     // ---------------- OTHERS METHODS ---------------------------------------------------
 
 
 
-    @Override
-    public boolean isExecuting() {
-        return executing || notificationQueue.size() > 0;
-    }
+
 
     @Override
     public void setTargeted(boolean targeted) {
@@ -381,6 +332,11 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         }else{
             blinkTime = 0;
         }
+    }
+
+    @Override
+    public boolean isAnimationRolling() {
+        return executing;
     }
 
     @Override
@@ -395,27 +351,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
 
-    /**
-     * treat the input data and push animationQueries in the animaition Queue, ready to be rendered
-     * @param data
-     */
-    @Override
-    public void getNotification(final Object data){
-        notificationQueue.offer(data);
-        if(data instanceof ApplyDamage){
-            ApplyDamage notif = (ApplyDamage)data;
-            if(notif.state == ApplyDamage.State.DIED) notificationQueue.offer(Data.AnimationId.DIE);
-            if(notif.state == ApplyDamage.State.FLED) notificationQueue.offer(Fled.get(notif.fleeingOrientation));
-            if(notif.state != ApplyDamage.State.WOUNDED){
-                notificationQueue.offer(new SimpleCommand() {
-                    @Override
-                    public void apply() {
-                        setVisible(false);
-                    }
-                });
-            }
-        }
-    }
+
 
     @Override
     public void setX(float x) {
