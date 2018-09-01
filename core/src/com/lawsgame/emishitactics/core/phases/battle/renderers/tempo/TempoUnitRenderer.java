@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.renderers;
+package com.lawsgame.emishitactics.core.phases.battle.renderers.tempo;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -405,7 +405,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         if(data instanceof ApplyDamage){
             ApplyDamage notif = (ApplyDamage)data;
             if(notif.state == ApplyDamage.State.DIED) notificationQueue.offer(Data.AnimationId.DIE);
-            if(notif.state == ApplyDamage.State.FLED) notificationQueue.offer(new Fled(notif.fleeingOrientation));
+            if(notif.state == ApplyDamage.State.FLED) notificationQueue.offer(Fled.get(notif.fleeingOrientation));
             if(notif.state != ApplyDamage.State.WOUNDED){
                 notificationQueue.offer(new SimpleCommand() {
                     @Override

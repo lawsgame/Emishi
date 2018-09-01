@@ -1,42 +1,23 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
-public class InfoBIS extends BattleInteractionState{
-    int row;
-    int col;
+public class BattleOverBIS extends BattleInteractionState {
 
-    public InfoBIS(BattleInteractionMachine bim, int row, int col) {
+    public BattleOverBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false);
-        this.row = row;
-        this.col = col;
     }
 
     @Override
     public void init() {
-        bim.shortUnitPanel.hide();
-        bim.shortTilePanel.hide();
-        if(bim.battlefield.isTileOccupied(row, col)) {
-            bim.longUnitPanel.set(bim.battlefield.getUnit(row, col));
-            bim.longUnitPanel.show();
-        }else{
-            bim.longTilePanel.set(bim.battlefield.getTile(row, col));
-            bim.longTilePanel.show();
-        }
-    }
-
-    @Override
-    public void end() {
-        super.end();
-        bim.longTilePanel.hide();
-        bim.longUnitPanel.hide();
+        System.out.println("BATTLE OVER!");
     }
 
     @Override
     public boolean handleTouchInput(int row, int col) {
-        bim.rollback();
         return true;
     }
 
@@ -57,6 +38,8 @@ public class InfoBIS extends BattleInteractionState{
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-
+        batch.draw(TempoSpritePool.getInstance().getBlackBGSprite(), 0, 0, bim.gcm.getPortWidth(), bim.gcm.getPortHeight());
     }
+
+
 }

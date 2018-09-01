@@ -30,7 +30,7 @@ public class EndTurnCommand extends SelfInflitedCommand {
         getActor().setActed(true);
 
         final BattleUnitRenderer actorRenderer = battlefieldRenderer.getUnitRenderer(getActor());
-        StandardTask doneTask = new StandardTask(actorRenderer, new Notification.Done(true));
+        StandardTask doneTask = new StandardTask(actorRenderer, Notification.Done.get(true));
         this.scheduleRenderTask(doneTask);
 
     }

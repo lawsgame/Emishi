@@ -16,7 +16,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestBIS;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.TempoBattlefield2DRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.tempo.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
@@ -64,7 +64,7 @@ public class BattlePhase extends GamePhase {
         Unit warchief1 = new Unit("Azamaru", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
         warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
-        IArmy playerArmy = new Army(Data.Allegeance.ALLY, true);
+        IArmy playerArmy = Army.getPlayerArmy();
         playerArmy.setLeadershipConditionEnabled(false);
         playerArmy.add(warlord);
         playerArmy.add(warchief1);
@@ -74,7 +74,6 @@ public class BattlePhase extends GamePhase {
         playerArmy.appointWarChief(warchief1);
         playerArmy.appointSoldier(soldier1, 0);
         playerArmy.appointSoldier(soldier2, 1);
-        player.setArmy(playerArmy);
 
 
         // set the initial BattleInteractionState

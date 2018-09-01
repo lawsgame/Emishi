@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Banner;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -61,7 +60,8 @@ public class LongUnitPanel extends UnitPanel {
         }
         builder.append("\nHit points: " + unit.getCurrentHP() + "/"+unit.getAppHitpoints());
         builder.append("\nMoral: " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-        builder.append("\nAction Points Recovery : " + unit.getAppOATriggerRate());
+        builder.append("\nAction Points : " + unit.getActionPoints()+" (+"+unit.getAppAPRecoveryRate()+" /turn)");
+        builder.append("\nExperience : "+unit.getExperience());
 
         if (unit.isMobilized()) {
             IArmy army = unit.getArmy();

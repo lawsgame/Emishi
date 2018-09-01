@@ -137,7 +137,8 @@ public class BattlefieldLoader {
                                 allegeance = a;
                             }
                         }
-                        army = new Army(allegeance, false);
+                        army = new Army(allegeance);
+                        bf.addArmyId(army.getId());
 
                         // IF: an amry with the relevant battlefield ID
 
@@ -164,7 +165,7 @@ public class BattlefieldLoader {
 
                                 //add  to the battlefield
                                 if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
-                                    bf.deployUnit(rowUnit, colUnit, unit, true);
+                                    bf.deploy(rowUnit, colUnit, unit, true);
                                 }
                             }
                         }
@@ -204,13 +205,13 @@ public class BattlefieldLoader {
         for(Job j: Job.values()){
             if(j.name().equals(unitElt.get("job"))){
                 job = j;
-                continue;
+                break;
             }
         }
         for(WeaponType wt: WeaponType.values()){
             if(wt.name().equals(unitElt.get("weaponType"))){
                 weaponType = wt;
-                continue;
+                break;
             }
         }
 
@@ -227,7 +228,7 @@ public class BattlefieldLoader {
                         weapon = new Weapon(value);
                         weapon.setStealable(attributeElt.getBoolean("stealable"));
                         unit.addWeapon(weapon);
-                        continue;
+                        break;
                     }
                 }
             }
@@ -240,7 +241,7 @@ public class BattlefieldLoader {
                     if (value.name().equals(attributeElt.get("value"))) {
                         equipement = new Equipment(value, attributeElt.getBoolean("stealable"));
                         unit.addEquipment(equipement);
-                        continue;
+                        break;
                     }
                 }
             }
@@ -249,7 +250,7 @@ public class BattlefieldLoader {
                 for (BannerSignTemplate value : BannerSignTemplate.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
                         unit.getBanner().addSign(new BannerSign(value, true, attributeElt.getBoolean("stealable")), false);
-                        continue;
+                        break;
                     }
                 }
             }
@@ -258,7 +259,7 @@ public class BattlefieldLoader {
                 for (Orientation value : Orientation.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
                         unit.setOrientation(value);
-                        continue;
+                        break;
                     }
                 }
             }
@@ -267,7 +268,7 @@ public class BattlefieldLoader {
                 for (Behaviour value : Behaviour.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
                         unit.setBehaviour(value);
-                        continue;
+                        break;
                     }
                 }
             }

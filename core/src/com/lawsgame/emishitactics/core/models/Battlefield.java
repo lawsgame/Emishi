@@ -11,6 +11,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 
 /*
@@ -34,7 +35,7 @@ public class Battlefield extends Observable {
     private HashMap<Allegeance, Array<UnitArea>> guardedAreas;
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
-
+    private LinkedList<Integer> armyIdsTurnOrderQueue;
 
     public Battlefield (int nbRows, int nbCols){
         if(nbRows > 0 && nbCols > 0) {
@@ -51,6 +52,7 @@ public class Battlefield extends Observable {
         }
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
+        this.armyIdsTurnOrderQueue = new LinkedList<Integer>();
     }
 
     public int getNbRows() {
@@ -64,6 +66,68 @@ public class Battlefield extends Observable {
             return getTiles()[0].length;
         }
         return 0;
+    }
+
+    public void addArmyId(int armyId){
+
+        //check if the army if already deployed
+        boolean armyAlreadyAdded = false;
+        for(int i = 0; i < armyIdsTurnOrderQueue.size(); i++){
+            if(armyIdsTurnOrderQueue.get(i) == armyId) {
+                armyAlreadyAdded = true;
+                break;
+            }
+        }
+
+        if(!armyAlreadyAdded) {
+            armyIdsTurnOrderQueue.offer(armyId);
+        }
+    }
+
+    public boolean isBattleOver(){
+        Array<Allegeance> allegeances = new Array<Allegeance>();
+        for (int r = 0; r < getNbRows(); r++) {
+            for (int c = 0; c < getNbColumns(); c++) {
+                if (isTileOccupied(r, c)) {
+                    IUnit unit = getUnit(r, c);
+                    if (unit.isMobilized()
+                            && !unit.isOutOfAction()
+                            && !allegeances.contains(unit.getArmy().getAllegeance(), true)) {
+                        allegeances.add(unit.getArmy().getAllegeance());
+                    }
+                }
+            }
+        }
+        return allegeances.size < 2;
+    }
+
+    public IArmy getNextArmy(){
+        IArmy army = null;
+        int currentId;
+        while(army == null && !armyIdsTurnOrderQueue.isEmpty()) {
+            currentId = armyIdsTurnOrderQueue.peek();
+            loop :
+            {
+                for (int r = 0; r < getNbRows(); r++) {
+                    for (int c = 0; c < getNbColumns(); c++) {
+                        if (isTileOccupied(r, c)) {
+                            IUnit unit = getUnit(r, c);
+                            if (unit.isMobilized() && unit.getArmy().getId() == currentId
+                                    && !unit.isOutOfAction()) {
+                                army = unit.getArmy();
+                                break loop;
+                            }
+                        }
+                    }
+                }
+            }
+            if(army == null){
+                armyIdsTurnOrderQueue.pop();
+            }else{
+                armyIdsTurnOrderQueue.offer(armyIdsTurnOrderQueue.pop());
+            }
+        }
+        return army;
     }
 
 
@@ -164,7 +228,7 @@ public class Battlefield extends Observable {
             if(actor.isMobilized()) {
                 Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX);
                 area = new Area.UnitArea(this, Data.AreaType.GUARD_AREA, tiles, actor);
-                this.guardedAreas.get(actor.getAllegeance()).add(area);
+                this.guardedAreas.get(actor.getArmy().getAllegeance()).add(area);
 
             }
         }
@@ -174,7 +238,7 @@ public class Battlefield extends Observable {
     public UnitArea removeGuardedArea(IUnit actor, boolean notifyObservers){
         UnitArea area = null;
         if(actor != null && actor.isMobilized()){
-            Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getAllegeance());
+            Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getArmy().getAllegeance());
             for (int i = 0; i < areas.size; i++) {
                 if (areas.get(i).getActor() == actor) {
                     area = areas.removeIndex(i);
@@ -300,7 +364,7 @@ public class Battlefield extends Observable {
         for(int i = 0; i < allyGuardedArea.size; i++){
             if(allyGuardedArea.get(i).contains(row, col)){
                 res = true;
-                continue;
+                break;
             }
         }
         return res;
@@ -311,29 +375,46 @@ public class Battlefield extends Observable {
     //----------------- UNIT MANAGEMENT ----------------------
 
 
-
-
-    public void deployUnit(int row, int col, IUnit unit, boolean notifyObservers){
+    /**
+     * deploy mobilized units
+     *
+     * @param row
+     * @param col
+     * @param unit
+     * @param notifyObservers
+     */
+    public void deploy(int row, int col, IUnit unit, boolean notifyObservers){
         if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER))
                 && !isUnitAlreadydeployed(unit)
-                && unit.getArmy() != null){
+                && unit.isMobilized()){
+
             this.units[row][col] = unit;
+            addArmyId(unit.getArmy().getId());
             if(notifyObservers)
                 notifyAllObservers(new  Notification.SetUnit(row, col, unit));
         }
     }
 
     public void randomlyDeploy(IArmy army){
-        randomlyDeploy(army.getMobilizedUnits(true), 0);
+        if(army != null) {
+            randomlyDeploy(army.getMobilizedUnits(true), 0);
+            addArmyId(army.getId());
+        }
     }
 
+    /**
+     * deploy a group of units on the available tiles of the given deployment area
+     *
+     * @param mobilizedTroops
+     * @param areaIndex
+     */
     public void randomlyDeploy(Array<IUnit> mobilizedTroops, int areaIndex){
+
         Array<int[]> deploymentsTile = getDeploymentArea(areaIndex).getTiles();
-        IUnit unit;
+
         int[] coords;
         Array<int[]> remainingAvailableTiles = new Array<int[]>();
         Array<IUnit> remainingUnits = new Array<IUnit>();
-
         for (int i = 0; i < deploymentsTile.size; i++) {
             coords = deploymentsTile.get(i);
             if (coords.length >= 2 && isTileAvailable(coords[0], coords[1], false)) {
@@ -345,10 +426,11 @@ public class Battlefield extends Observable {
 
         }
 
+        IUnit unit;
         while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
             coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
             unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
-            deployUnit(coords[0], coords[1], unit, true);
+            deploy(coords[0], coords[1], unit, true);
         }
     }
 
@@ -380,6 +462,7 @@ public class Battlefield extends Observable {
     }
 
     public boolean moveUnit(int rowI, int colI, int rowf, int colf, boolean notifyObservers){
+
         if(isTileOccupied(rowI, colI)) {
             IUnit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(Data.Ability.PATHFINDER))){
@@ -557,12 +640,13 @@ public class Battlefield extends Observable {
         }
 
         private void set( Battlefield bf, int rowActor, int colActor, boolean moveAreaOnly){
-            if(bf.isTileOccupied(rowActor, colActor)) {
+            if(bf.isTileOccupied(rowActor, colActor) && bf.getUnit(rowActor, colActor).isMobilized()) {
+
                 // getInstance actor relevant pieces of information
                 IUnit actor = bf.getUnit(rowActor, colActor);
                 this.pathfinder = actor.has(Data.Ability.PATHFINDER);
                 this.moveRange = actor.hasMoved() ? 0 : actor.getAppMobility();
-                this.allegeance = actor.getAllegeance();
+                this.allegeance = actor.getArmy().getAllegeance();
                 this.battlefield = bf;
 
                 // addExpGained the check map dimensions and origin point
@@ -625,7 +709,7 @@ public class Battlefield extends Observable {
 
         }
 
-        private void updateTilesMRP(int row, int col, int remainingMovePoints, Data.Orientation from) {
+        private void updateTilesMRP(int row, int col, int remainingMovePoints, Data.Orientation comefrom) {
             if(remainingMovePoints > checkTiles[row][col]) {
                 if (remainingMovePoints == 1) {
                     if (battlefield.isTileAvailable(rowOrigin + row, colOrigin + col, pathfinder)) {
@@ -634,13 +718,13 @@ public class Battlefield extends Observable {
                 } else if (remainingMovePoints > 1) {
                     if(battlefield.isTileReachable(rowOrigin+row, colOrigin+col, pathfinder) && !battlefield.isTileOccupiedByFoe(rowOrigin+row, colOrigin+col, allegeance)){
                         checkTiles[row][col] = remainingMovePoints;
-                        if(from != Data.Orientation.NORTH && checkIndexes(row + 1, col))
+                        if(comefrom != Data.Orientation.NORTH && checkIndexes(row + 1, col))
                             updateTilesMRP(row + 1, col, remainingMovePoints - 1  , Data.Orientation.SOUTH);
-                        if(from != Data.Orientation.SOUTH && checkIndexes(row - 1, colRelActor))
+                        if(comefrom != Data.Orientation.SOUTH && checkIndexes(row - 1, colRelActor))
                             updateTilesMRP(row - 1, col, remainingMovePoints - 1 , Data.Orientation.NORTH);
-                        if(from != Data.Orientation.EAST && checkIndexes(row, col + 1))
+                        if(comefrom != Data.Orientation.EAST && checkIndexes(row, col + 1))
                             updateTilesMRP(row , col + 1, remainingMovePoints - 1 , Data.Orientation.WEST);
-                        if(from != Data.Orientation.WEST && checkIndexes(row , col - 1))
+                        if(comefrom != Data.Orientation.WEST && checkIndexes(row , col - 1))
                             updateTilesMRP(row , col - 1, remainingMovePoints - 1 , Data.Orientation.EAST);
                     }
                 }
@@ -854,6 +938,10 @@ public class Battlefield extends Observable {
 
     public int getNumberOfDeploymentAreas(){
         return deploymentAreas.size;
+    }
+
+    public LinkedList<Integer> getArmyIdsTurnOrderQueue() {
+        return armyIdsTurnOrderQueue;
     }
 
     @Override

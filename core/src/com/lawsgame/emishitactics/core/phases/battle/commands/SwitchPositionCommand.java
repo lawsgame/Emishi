@@ -37,8 +37,7 @@ public class SwitchPositionCommand extends BattleCommand {
     }
 
     @Override
-    public void undo() {
-        System.out.println("undo switch");
+    public void unexecute() {
         if(battlefield.isTileOccupied(rowActor, colActor)
                 && targetRenderer.getModel() == battlefield.getUnit(rowActor, colActor)
                 && battlefield.isTileOccupied(rowTarget, colTarget)

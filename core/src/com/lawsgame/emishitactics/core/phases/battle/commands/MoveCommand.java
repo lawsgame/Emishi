@@ -58,7 +58,7 @@ public class MoveCommand extends BattleCommand{
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
 
-            this.validPath = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getActor().has(Data.Ability.PATHFINDER), getActor().getAllegeance());
+            this.validPath = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getActor().has(Data.Ability.PATHFINDER), getActor().getArmy().getAllegeance());
             if(validPath.size > 0 && validPath.size <= getActor().getAppMobility()){
 
                 valid = true;
@@ -73,12 +73,11 @@ public class MoveCommand extends BattleCommand{
     }
 
     @Override
-    public void undo() {
+    public void unexecute() {
         if(battlefield.isTileOccupied(rowTarget, colTarget)){
             IUnit actor = battlefield.getUnit(rowTarget, colTarget);
             if(actor == walkerRenderer.getModel()) {
                 battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor, false);
-                actor.setMoved(false);
                 actor.setOrientation(oldWalkerOrientation);
                 scheduleRenderTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
                 scheduleRenderTask(new StandardTask(walkerRenderer, oldWalkerOrientation));

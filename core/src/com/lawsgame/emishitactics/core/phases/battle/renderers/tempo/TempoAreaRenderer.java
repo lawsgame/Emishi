@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.renderers;
+package com.lawsgame.emishitactics.core.phases.battle.renderers.tempo;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

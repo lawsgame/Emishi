@@ -1,8 +1,8 @@
 package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data.Allegeance;
 import com.lawsgame.emishitactics.core.models.Banner;
+import com.lawsgame.emishitactics.core.models.Data.Allegeance;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public abstract class IArmy extends Observable{
@@ -38,6 +38,9 @@ public abstract class IArmy extends Observable{
     public abstract boolean isThereStillbuildingResources();
     public abstract void decrementBuildingResources();
     public abstract void resetBuildingResources();
+    public abstract boolean isArmyStillFighting();
+    public abstract void setDone(boolean done, boolean notifyObserves);
+    public abstract boolean isDone();
 
     public abstract boolean add(IUnit unit);
     public abstract void remove(IUnit unit);
@@ -52,5 +55,6 @@ public abstract class IArmy extends Observable{
     public abstract void checkComposition();
     public abstract void setLeadershipConditionEnabled(boolean enabled);
 
-
+    public abstract void replenishMoral();
+    public abstract void updateActionPoints();
 }

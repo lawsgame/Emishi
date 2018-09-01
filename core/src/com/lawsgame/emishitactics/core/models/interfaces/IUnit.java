@@ -52,6 +52,7 @@ public abstract class IUnit extends Observable {
     // STAT related
     public abstract int getBaseHitpoints();
     public abstract int getAppHitpoints();
+    public abstract float getAppGrHitpoints();
     public abstract int getCurrentHP();
     public abstract void setCurrentHitPoints(int hitPoints);
     public abstract void resetCurrentMoral();
@@ -67,20 +68,27 @@ public abstract class IUnit extends Observable {
 
     public abstract int getBaseCharisma();
     public abstract int getAppCharisma();
+    public abstract float getAppGrCharisma();
     public abstract int getBaseLeadership();
     public abstract int getAppLeadership();
     public abstract int getBaseStrength();
     public abstract int getAppStrength();
+    public abstract float getAppGrStrength();
     public abstract int getBaseArmor(DamageType damageType);
     public abstract int getAppArmor(DamageType damageType);
+    public abstract float getAppGrArmor(DamageType damageType);
     public abstract int getBaseAgility();
     public abstract int getAppAgility();
+    public abstract float getAppGrAgility();
     public abstract int getBaseDexterity();
     public abstract int getAppDexterity();
+    public abstract float getAppGrDexterity();
     public abstract int getBaseSkill();
     public abstract int getAppSkill();
+    public abstract float getAppGrSkill();
     public abstract int getBaseBravery();
     public abstract int getAppBravery();
+    public abstract float getAppGrBravery();
     public abstract int getBaseMobility();
     public abstract int getAppMobility();
 
@@ -109,8 +117,8 @@ public abstract class IUnit extends Observable {
     public abstract int getAppAttackMight();
     public abstract int getAppDefense(DamageType damageType);
     public abstract int getAppAvoidance();
-    public abstract int getAppOATriggerRate();
-    public abstract int getCurrentOATriggerRate(int rowUnit, int colUnit, Battlefield battlefield);
+    public abstract int getAppAPRecoveryRate();
+    public abstract int getCurrentAPRecoveryRate(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract void setActionPoints(int barProgression);
     public abstract void addActionPoints(int points);
     public abstract int getActionPoints();
@@ -120,7 +128,6 @@ public abstract class IUnit extends Observable {
     public abstract boolean isMobilized();
     public abstract boolean isWarChief();
     public abstract boolean isWarlord();
-    public abstract Allegeance getAllegeance();
     public abstract int getMaxSoldiersAs(boolean warlord);
     public abstract int getMaxWarChiefs();
 

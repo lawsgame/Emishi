@@ -36,7 +36,7 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public void undo() {
+    public void unexecute() {
         if(oldOrientation != null && battlefield.isTileOccupied(rowActor, colActor)) {
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer.getModel() == actor) {

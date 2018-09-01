@@ -7,7 +7,6 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine.FocusOn;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand.EncounterOutcome;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
@@ -119,12 +118,24 @@ public class HandleOutcomeBIS extends BattleInteractionState{
             if(!historic.isEmpty()) {
                 if(historic.peek().getActor() != null) {
 
-                    int[] actorPos = bim.battlefield.getUnitPos(historic.peek().getActor());
-                    if (!historic.peek().getActor().isDone()) {
-                        bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));
-                    } else {
-                        bim.replace(new EndTurnBIS(bim, actorPos[0], actorPos[1]));
+                    if(bim.battlefield.isBattleOver()) {
+
+                        // if the battle is over
+                        bim.replace(new BattleOverBIS(bim));
+                    }else{
+
+                        int[] actorPos = bim.battlefield.getUnitPos(historic.peek().getActor());
+                        if (historic.peek().getActor().isDone()) {
+
+                            // if the unit is done
+                            bim.replace(new EndTurnBIS(bim, actorPos[0], actorPos[1]));
+                        } else {
+
+                            // the unit is not yet done
+                            bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));
+                        }
                     }
+
                 }else{
 
                     throw new BISException("historic top command has no actor set up");

@@ -1,6 +1,8 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.lawsgame.emishitactics.core.models.Area;
+import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -9,15 +11,18 @@ public class SelectActorBIS extends BattleInteractionState {
     int rowInit;
     int colInit;
 
-    public SelectActorBIS(BattleInteractionMachine bim, int rowInit, int colInit) {
+    public SelectActorBIS(BattleInteractionMachine bim, int rowInit, int colInit, boolean newPlayerTurn) {
         super(bim, true, true, true);
         this.rowInit = rowInit;
         this.colInit = colInit;
+        if(newPlayerTurn){
+            bim.begin(Army.getPlayerArmy());
+        }
 
     }
 
-    public SelectActorBIS(BattleInteractionMachine bim){
-        this(bim, -1, -1);
+    public SelectActorBIS(BattleInteractionMachine bim, boolean newArmyTurn){
+        this(bim, -1, -1, newArmyTurn);
     }
 
     @Override
@@ -30,7 +35,7 @@ public class SelectActorBIS extends BattleInteractionState {
             activeUnitPos[0] = rowInit;
             activeUnitPos[1] = colInit;
         }else{
-            activeUnitPos = bim.battlefield.getRandomlyStillActiveUnitsCoords(bim.player.getArmy().getId());
+            activeUnitPos = bim.battlefield.getRandomlyStillActiveUnitsCoords(Army.getPlayerArmy().getId());
         }
 
         if(activeUnitPos != null){

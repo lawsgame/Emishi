@@ -61,6 +61,7 @@ public abstract class BattleCommand implements Command, Observer{
     protected final ActionChoice choice;
 
     private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied nor it costs any OA point
+    private boolean decoupled;
 
     private IUnit actor;
     private IUnit target;
@@ -74,7 +75,8 @@ public abstract class BattleCommand implements Command, Observer{
     private boolean launched;
     private boolean initialized;
 
-    private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed
+    private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed AND usefull for decoupling view and model updates
+    private boolean tasksScheduled;
 
 
     public BattleCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean free){
@@ -86,11 +88,15 @@ public abstract class BattleCommand implements Command, Observer{
         this.colActor = -1;
         this.rowTarget = -1;
         this.colTarget = -1;
-        this.free = free;
         this.outcome = new EncounterOutcome();
         this.renderTasks = new Array<Task>();
 
         this.launched = false;
+        this.initialized = false;
+        this.tasksScheduled = false;
+
+        this.free = free;
+        this.decoupled = false;
     }
 
 
@@ -98,22 +104,25 @@ public abstract class BattleCommand implements Command, Observer{
     public final void apply() {
         if(isTargetValid()) {
             this.launched = true;
+            this.tasksScheduled = false;
 
             // Outcome and animation scheduler cleared.
             this.outcome.reset();
             this.renderTasks.clear();
 
-            // set as moved or acted if required
             if(!free){
+
+                // set as moved or acted if required
                 if(choice.isActedBased()) {
                     getActor().setActed(true);
                 }else {
                     getActor().setMoved( true);
                 }
+
+                //handle the cost
+                getActor().addActionPoints(-choice.getCost());
             }
 
-            //handle the cost
-            getActor().addActionPoints(-choice.getCost());
 
             execute();
 
@@ -134,6 +143,20 @@ public abstract class BattleCommand implements Command, Observer{
         apply(rowActor, colActor, rowActor, colActor);
     }
 
+    @Override
+    public final void undo(){
+        if(!free){
+
+            if (choice.isActedBased())
+                getActor().setActed(false);
+            else
+                getActor().setMoved( false);
+
+            getActor().addActionPoints(choice.getCost());
+        }
+        unexecute();
+    }
+
 
 
     public boolean isExecuting(){
@@ -144,11 +167,24 @@ public abstract class BattleCommand implements Command, Observer{
         return launched && renderTasks.size == 0;
     }
 
-    public void scheduleRenderTask(Task task){
+    protected void scheduleRenderTask(Task task){
         if(!task.isIrrelevant()) {
-            task.attach(this);
             renderTasks.add(task);
-            scheduler.addTask(task);
+            if(!decoupled) {
+                this.tasksScheduled = true;
+                task.attach(this);
+                scheduler.addTask(task);
+            }
+        }
+    }
+
+    public final void pushRenderTasks(){
+        if(decoupled && !tasksScheduled) {
+            this.tasksScheduled = true;
+            for (int i = 0; i < renderTasks.size; i++) {
+                renderTasks.get(i).attach(this);
+                scheduler.addTask(renderTasks.get(i));
+            }
         }
     }
 
@@ -162,6 +198,10 @@ public abstract class BattleCommand implements Command, Observer{
     }
 
     protected abstract void execute();
+
+    protected void unexecute(){
+
+    }
 
 
     // called to checked actor requirements
@@ -208,7 +248,7 @@ public abstract class BattleCommand implements Command, Observer{
         if(battlefield.isTileOccupied(rowTarget, colTarget)){
 
             final BattleUnitRenderer targetRenderer = battlefieldRenderer.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
-            StandardTask blinkTask = new StandardTask(targetRenderer, new Notification.Blink(enable));
+            StandardTask blinkTask = new StandardTask(targetRenderer, Notification.Blink.get(enable));
             blinkTask.tag("blink ("+enable+")");
             scheduleRenderTask(blinkTask);
 
@@ -284,9 +324,6 @@ public abstract class BattleCommand implements Command, Observer{
 
 
     @Override
-    public void undo() { }
-
-    @Override
     public void redo() { }
 
 
@@ -302,7 +339,7 @@ public abstract class BattleCommand implements Command, Observer{
             int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getAllegeance())
+                if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getArmy().getAllegeance())
                         && (!woundedRequired || battlefield.getUnit(rowTarget0, colTarget0).isWounded())) {
 
                     valid = true;
@@ -321,7 +358,7 @@ public abstract class BattleCommand implements Command, Observer{
             int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getAllegeance())
+                if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getArmy().getAllegeance())
                         && (!stealableRequired || battlefield.getUnit(rowTarget0, colTarget0).isStealable())) {
                     valid = true;
                 }
@@ -343,7 +380,7 @@ public abstract class BattleCommand implements Command, Observer{
                     for (int c = col - rangeMin; c <= col + rangeMax; c++) {
                         dist = Utils.dist(row, col, r, c);
                         if (rangeMin <= dist && dist <= rangeMax
-                                && battlefield.isTileOccupiedByAlly(r, c, actor.getAllegeance())
+                                && battlefield.isTileOccupiedByAlly(r, c, actor.getArmy().getAllegeance())
                                 && (!woundedRequired || battlefield.getUnit(r, c).isWounded())) {
                             targetAtRange = true;
                             break loop;
@@ -370,7 +407,7 @@ public abstract class BattleCommand implements Command, Observer{
                         dist = Utils.dist(row, col, r, c);
                         if (rangeMin <= dist
                                 && dist <= rangeMax
-                                && battlefield.isTileOccupiedByFoe(r, c, actor.getAllegeance())
+                                && battlefield.isTileOccupiedByFoe(r, c, actor.getArmy().getAllegeance())
                                 && (!stealableRequired || battlefield.getUnit(r, c).isStealable())) {
                             targetAtRange = true;
                             break loop;
@@ -485,6 +522,14 @@ public abstract class BattleCommand implements Command, Observer{
 
     public final void setFree(boolean free) {
         this.free = free;
+    }
+
+    public boolean isDecoupled() {
+        return decoupled;
+    }
+
+    public void setDecoupled(boolean decoupled) {
+        this.decoupled = decoupled;
     }
 
     // ----------------- Encounter outcome CLASS -----------------

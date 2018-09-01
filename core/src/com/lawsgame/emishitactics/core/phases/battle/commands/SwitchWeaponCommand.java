@@ -13,7 +13,6 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class SwitchWeaponCommand extends SelfInflitedCommand {
     private final int weaponIndex;
-    private BattleUnitRenderer actorRenderer;
 
     public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, int weaponIndex) {
         super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, true);
@@ -30,15 +29,12 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public void undo() {
-        if(battlefield.isTileOccupied(rowActor, colActor)){
-            IUnit actor = battlefield.getUnit(rowActor, colActor);
-            if(actorRenderer != null && actorRenderer.getModel() == actor) {
-                if(actor.switchWeapon(weaponIndex)) {
-                    scheduleRenderTask(new StandardTask(actorRenderer, Data.AnimationId.SWITCH_WEAPON));
-                }
-            }
+    public void unexecute() {
+        if(getActor().switchWeapon(weaponIndex)) {
+            scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimationId.SWITCH_WEAPON));
         }
+
+
     }
 
     @Override

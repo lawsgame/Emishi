@@ -40,7 +40,7 @@ public class PushCommand extends BattleCommand{
         // push render task
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.PUSH));
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(pushed), new Notification.Pushed(pushOr)));
+        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(pushed), Notification.Pushed.get(pushOr)));
         scheduleRenderTask(task);
 
     }
@@ -51,7 +51,7 @@ public class PushCommand extends BattleCommand{
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
 
             IUnit pusher = battlefield.getUnit(rowActor0, colActor0);
-            if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getAllegeance()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
+            if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getArmy().getAllegeance()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
 
                 IUnit pushed = battlefield.getUnit(rowTarget0, colTarget0);
                 if(rowActor0 < rowTarget0 && battlefield.isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
@@ -70,20 +70,22 @@ public class PushCommand extends BattleCommand{
     @Override
     public boolean atActionRange(int row, int col, IUnit actor) {
         boolean targetAtRange = false;
-        if(battlefield.isTileOccupiedByAlly(row + 1, col, actor.getAllegeance())
-                && battlefield.isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER))){
-            targetAtRange = true;
-        }else{
-            if(battlefield.isTileOccupiedByAlly(row - 1, col, actor.getAllegeance())
-                    && battlefield.isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))){
+        if(actor.isMobilized()) {
+            if (battlefield.isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAllegeance())
+                    && battlefield.isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER))) {
                 targetAtRange = true;
-            }else{
-                if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getAllegeance())
-                        && battlefield.isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))){
+            } else {
+                if (battlefield.isTileOccupiedByAlly(row - 1, col, actor.getArmy().getAllegeance())
+                        && battlefield.isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))) {
                     targetAtRange = true;
-                }else if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getAllegeance())
-                        && battlefield.isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))){
-                    targetAtRange = true;
+                } else {
+                    if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getArmy().getAllegeance())
+                            && battlefield.isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))) {
+                        targetAtRange = true;
+                    } else if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getArmy().getAllegeance())
+                            && battlefield.isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))) {
+                        targetAtRange = true;
+                    }
                 }
             }
         }

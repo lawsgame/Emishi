@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -70,14 +71,36 @@ public class SelectTargetBIS extends BattleInteractionState {
 
                 bim.replace(new ValidateTargetBIS(bim, currentCommand, historic));
             }
-        }else if(Utils.undoCommands(historic)
-                && bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)
-                && !bim.battlefield.getUnit(row, col).isDone()){
+        }else{
 
-            bim.replace(new SelectActionBIS(bim, row, col));
-        }else {
+            /*
+             * this paragraph is required to initialize the SelectActorBIS below, triggerd if the player if:
+             * - touch a none valid target tile
+             * - the historic is fully clearable
+             * - yet, the target tile is not occupied by the active player unit
+             * , and those, before clearing the historic obviously
+             * which explains why it is done here.
+             */
+            int rowInit;
+            int colInit;
+            if(!historic.isEmpty()){
+                rowInit = historic.get(0).getRowActor();
+                colInit = historic.get(0).getColActor();
+            }else{
+                rowInit = currentCommand.getRowActor();
+                colInit = currentCommand.getColActor();
+            }
 
-            bim.replace(new SelectActionBIS(bim, currentCommand.getRowActor(), currentCommand.getColActor(), historic));
+            if (Utils.undoCommands(historic)){
+                if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col) && !bim.battlefield.getUnit(row, col).isDone()) {
+                    bim.replace(new SelectActionBIS(bim, row, col));
+                }else{
+                    bim.replace(new SelectActorBIS(bim, rowInit, colInit, false));
+                }
+            } else {
+
+                bim.replace(new SelectActionBIS(bim, historic.peek().getRowActor(), historic.peek().getColActor(), historic));
+            }
         }
     }
 

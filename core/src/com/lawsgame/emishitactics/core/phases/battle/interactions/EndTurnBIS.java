@@ -1,18 +1,23 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoRoseWidget;
+import com.lawsgame.emishitactics.engine.GameRenderableEntity;
+
+import java.util.HashMap;
 
 public class EndTurnBIS extends BattleInteractionState {
     private int colSltdUnit;
@@ -20,27 +25,45 @@ public class EndTurnBIS extends BattleInteractionState {
     private WindRoseWidget windRoseWidget;
 
     public EndTurnBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit) {
-        super(bim, true, false, false);
+        super(bim, true, false, true);
         this.rowSltdUnit = rowSltdUnit;
         this.colSltdUnit = colSltdUnit;
-        this.windRoseWidget = new TempoRoseWidget(bim.gcm.getPort(), bim.uiStage, bim.asm);
+        this.windRoseWidget = new WindRoseWidget(bim.asm);
     }
 
     @Override
     public void init() {
-        bim.uiStage.addActor(windRoseWidget);
-        bim.focusOn(rowSltdUnit, colSltdUnit, true, false, false,true, false);
-    }
+        System.out.println("END TURN : "+rowSltdUnit+" "+colSltdUnit+" => "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
-    @Override
-    public void end() {
-        super.end();
-        windRoseWidget.remove();
+        windRoseWidget.setLocation(rowSltdUnit, colSltdUnit);
+        bim.focusOn(rowSltdUnit, colSltdUnit, true, false, false,true, false);
     }
 
     @Override
     public boolean handleTouchInput(int row, int col) {
         return true;
+    }
+
+    @Override
+    public boolean handleRawTouchInput(float x, float y) {
+        boolean handled = windRoseWidget.handleTouch(x, y, rowSltdUnit, colSltdUnit, bim);
+        if(handled){
+
+            if(bim.battlefield.isTileOccupied(rowSltdUnit, colSltdUnit) && bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).isMobilized()){
+
+                IUnit sltdUnit =  bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
+                IArmy currentArmy = sltdUnit.getArmy();
+                if(currentArmy.isDone()){
+                    bim.end(currentArmy);
+                    bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Notification.Done.get(false)));
+                    bim.replace(new AiBIS(bim));
+                }else{
+
+                    bim.replace(new SelectActorBIS(bim, rowSltdUnit, colSltdUnit, false));
+                }
+            }
+        }
+        return handled;
     }
 
     @Override
@@ -60,23 +83,62 @@ public class EndTurnBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-
+        windRoseWidget.render(batch);
     }
 
-    public static abstract class WindRoseWidget extends Group {
-        protected Array<OrientationArrowWidget> arrows;
+    public static class WindRoseWidget implements GameRenderableEntity {
+        protected HashMap<Data.Orientation, OrientationArrowWidget> arrows;
 
-        public WindRoseWidget(){
-            arrows = new Array<OrientationArrowWidget>();
+        public WindRoseWidget(AssetManager asm){
+            arrows = new HashMap<Data.Orientation, OrientationArrowWidget>();
+            arrows.put(Data.Orientation.NORTH, new OrientationArrowWidget(asm, Data.Orientation.NORTH));
+            arrows.put(Data.Orientation.EAST, new OrientationArrowWidget(asm, Data.Orientation.EAST));
+            arrows.put(Data.Orientation.WEST, new OrientationArrowWidget(asm, Data.Orientation.WEST));
+            arrows.put(Data.Orientation.SOUTH, new OrientationArrowWidget(asm, Data.Orientation.SOUTH));
+
         }
 
-        public void setListeners(BattleInteractionMachine bim, final int rowActor, final int colActor){
-            for(int i = 0; i < arrows.size; i++){
-                arrows.get(i).setListener(bim, rowActor, colActor);
+        public boolean handleTouch(float gameX, float gameY, int rowActor, int colActor, final BattleInteractionMachine bim){
+            boolean handled = false;
+            int rowTouch = bim.bfr.getRowFromGameCoords(gameX, gameY);
+            int colTouch = bim.bfr.getColFromGameCoords(gameX, gameY);
+
+            if(rowTouch  == rowActor){
+                if(colTouch  == colActor + 1){
+                    arrows.get(Data.Orientation.EAST).handleTouch(rowActor, colActor, bim);
+                    handled = true;
+                }else if(colTouch == colActor - 1){
+                    arrows.get(Data.Orientation.WEST).handleTouch(rowActor, colActor, bim);
+                    handled = true;
+                }
+            }else if(colTouch == colActor){
+                if(rowTouch  == rowActor + 1){
+                    arrows.get(Data.Orientation.NORTH).handleTouch(rowActor, colActor, bim);
+                    handled = true;
+                }else if(rowTouch == rowActor - 1){
+                    arrows.get(Data.Orientation.SOUTH).handleTouch(rowActor, colActor, bim);
+                    handled = true;
+                }
             }
+            return handled;
+
         }
 
-        public abstract void setLocation(int row, int  col);
+        public void setLocation(int row, int  col){
+            arrows.get(Data.Orientation.NORTH).arrowSprite.setPosition(col, row +1);
+            arrows.get(Data.Orientation.EAST).arrowSprite.setPosition(col+1, row);
+            arrows.get(Data.Orientation.WEST).arrowSprite.setPosition(col-1, row);
+            arrows.get(Data.Orientation.SOUTH).arrowSprite.setPosition( col, row -1);
+        }
+
+        @Override
+        public void render(SpriteBatch batch) {
+            arrows.get(Data.Orientation.NORTH).render(batch);
+            arrows.get(Data.Orientation.EAST).render(batch);
+            arrows.get(Data.Orientation.WEST).render(batch);
+            arrows.get(Data.Orientation.SOUTH).render(batch);
+
+        }
     }
 
 
@@ -84,27 +146,37 @@ public class EndTurnBIS extends BattleInteractionState {
     /**
      * arrow of the wind rose compass
      */
-    public static class OrientationArrowWidget extends ImageButton {
-        Data.Orientation orientation;
+    public static class OrientationArrowWidget implements GameRenderableEntity{
+        protected Data.Orientation orientation;
+        protected Sprite arrowSprite;
 
-        public OrientationArrowWidget(ImageButtonStyle style, Data.Orientation or) {
-            super(style);
+        public OrientationArrowWidget(AssetManager asm, Data.Orientation or) {
             this.orientation = or;
+            TextureAtlas atlas = asm.get(Assets.ATLAS_UI);
+            arrowSprite = new Sprite(atlas.findRegion(Assets.UI_ARROW));
+            arrowSprite.setSize(1, 1);
+            arrowSprite.setPosition(0, 0);
+            arrowSprite.setOriginCenter();
+
+            switch (or){
+                case WEST: arrowSprite.rotate(180); break;
+                case NORTH: arrowSprite.rotate(90); break;
+                case SOUTH: arrowSprite.rotate(270); break;
+            }
+
         }
 
-        private void setListener(final BattleInteractionMachine bim, final int rowActor, final int colActor){
-            addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    BattleCommand command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, orientation);
-                    command.apply(rowActor, colActor);
-                    command = new EndTurnCommand(bim.bfr, bim.scheduler);
-                    command.apply(rowActor, colActor);
-                    bim.replace(new SelectActorBIS(bim, rowActor, colActor));
+        private void handleTouch(int rowActor, int colActor, final BattleInteractionMachine bim){
+            BattleCommand command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, orientation);
+            command.apply(rowActor, colActor);
+            command = new EndTurnCommand(bim.bfr, bim.scheduler);
+            command.apply(rowActor, colActor);
+            //bim.replace(new SelectActorBIS(bim, rowActor, colActor, false));
+        }
 
-                }
-            });
-
+        @Override
+        public void render(SpriteBatch batch) {
+            arrowSprite.draw(batch);
         }
     }
 }

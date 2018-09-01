@@ -54,18 +54,24 @@ public abstract class BattleInteractionState extends InteractionState {
     public abstract void renderAhead(SpriteBatch batch);
 
 
+    public boolean handleRawTouchInput(float x, float y){
+        return false;
+    }
+
+
     @Override
     public void onTouch(float gameX, float gameY) {
-        if(!bim.gcm.isCameraMoving()){
-            rowTouch = bim.bfr.setRowFromTouch(gameX, gameY);
-            colTouch =  bim.bfr.setColFromTouch(gameX, gameY);
-            inputNotHandled = !handleTouchInput(rowTouch,colTouch);
-            if(inputNotHandled && bim.battlefield.isTileExisted(rowTouch, colTouch)){
-                bim.focusOn(rowTouch, colTouch, true, true, true, false, false);
-                if(bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, Data.Allegeance.ALLY)){
+        if(!bim.gcm.isCameraMoving()) {
+            if (!handleRawTouchInput(gameX, gameY)) {
+                rowTouch = bim.bfr.getRowFromGameCoords(gameX, gameY);
+                colTouch = bim.bfr.getColFromGameCoords(gameX, gameY);
+                if (!handleTouchInput(rowTouch, colTouch) && bim.battlefield.isTileExisted(rowTouch, colTouch)) {
+                    bim.focusOn(rowTouch, colTouch, true, true, true, false, false);
+                    if (bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, Data.Allegeance.ALLY)) {
                         //TODO: add or remove selected foe action area to those of its alleageanca alreadt registered
 
 
+                    }
 
                 }
             }

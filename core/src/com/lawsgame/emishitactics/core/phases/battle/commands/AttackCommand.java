@@ -160,8 +160,8 @@ public class AttackCommand extends BattleCommand {
 
     protected IUnit setDefender(int rowTarget, int colTarget){
         IUnit defender = battlefield.getUnit(rowTarget, colTarget);
-        if(battlefield.isTileGuarded(rowTarget, colTarget, defender.getAllegeance())){
-            defender = battlefield.getAvailableGuardians(rowTarget, colTarget, defender.getAllegeance()).random();
+        if(battlefield.isTileGuarded(rowTarget, colTarget, defender.getArmy().getAllegeance())){
+            defender = battlefield.getAvailableGuardians(rowTarget, colTarget, defender.getArmy().getAllegeance()).random();
         }
         return defender;
     }
@@ -201,6 +201,7 @@ public class AttackCommand extends BattleCommand {
                 // fetch dropped items
                 for(int i = 0; i < squad.size; i++) {
                     if(squad.get(i).isOutOfAction()) {
+
                         lootRate = Formulas.getLootRate(rowReceiver, colReceiver, battlefield);
                         if (Utils.getMean(1, 100) < lootRate) {
                             droppedItem = squad.get(i).getRandomlyDroppableItem();
@@ -248,22 +249,34 @@ public class AttackCommand extends BattleCommand {
 
     public int getHitRate(boolean retaliation){
         int[] defenderPos = (retaliation) ? battlefield.getUnitPos(targetDefender) : battlefield.getUnitPos(initiatorDefender);
-        return (!retaliation) ?
-                Formulas.getHitRate(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield) :
-                Formulas.getHitRate(rowTarget, colTarget, defenderPos[0], defenderPos[1], battlefield);
+        int hitRate = 0;
+        if(!retaliation){
+            hitRate = Formulas.getHitRate(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield);
+        }else if(retaliation && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
+            hitRate = Formulas.getHitRate(rowTarget, colTarget, defenderPos[0], defenderPos[1], battlefield);
+        }
+        return hitRate;
     }
 
     public int getDealtDamage(boolean retaliation){
         int[] defenderPos = (retaliation) ? battlefield.getUnitPos(targetDefender) : battlefield.getUnitPos(initiatorDefender);
-        return (!retaliation) ?
-                Formulas.getDealtDamage(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield) :
-                Formulas.getDealtDamage(rowTarget, colTarget, defenderPos[0], defenderPos[1], battlefield);
+        int dealtDamage = 0;
+        if(!retaliation){
+            dealtDamage = Formulas.getDealtDamage(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield);
+        }else if(retaliation && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
+            dealtDamage = Formulas.getDealtDamage(rowTarget, colTarget, defenderPos[0], defenderPos[1], battlefield);
+        }
+        return dealtDamage;
     }
 
     public int getLootRate(boolean retaliation){
-        return (!retaliation) ?
-                Formulas.getLootRate(rowActor, colActor, battlefield) :
-                Formulas.getLootRate(rowTarget, colTarget, battlefield);
+        int lootRate = 0;
+        if(!retaliation){
+            lootRate = Formulas.getLootRate(rowActor, colActor, battlefield);
+        }else if(retaliation && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
+            lootRate = Formulas.getLootRate(rowTarget, colTarget, battlefield);
+        }
+        return lootRate;
     }
 
     public IUnit getTargetDefender(){

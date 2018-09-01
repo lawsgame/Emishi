@@ -15,8 +15,12 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract void renderAreas(SpriteBatch batch);
     public abstract void renderUnits(SpriteBatch batch);
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
+    public abstract int getRowFromGameCoords(float gameX, float gameY);
+    public abstract int getColFromGameCoords(float gameX, float gameY);
 
-
-    public abstract int setRowFromTouch(float gameX, float gameY);
-    public abstract int setColFromTouch(float gameX, float gameY);
+    public static class BFRendererException extends Exception{
+        public BFRendererException(String msg){
+            super(msg);
+        }
+    }
 }

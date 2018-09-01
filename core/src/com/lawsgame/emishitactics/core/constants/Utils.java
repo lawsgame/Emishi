@@ -164,4 +164,24 @@ public class Utils {
         }
         return historic.isEmpty();
     }
+
+    public static float getStandardDerivation (float[] array){
+        float expectedValue = getExpectedValue(array);
+        float standardDerivation = 0;
+        float term;
+        for(int i = 0; i < array.length; i++){
+            term = array[i] - expectedValue;
+            standardDerivation += term*term;
+        }
+        standardDerivation = (array.length > 1) ? standardDerivation / (array.length - 1) : 0;
+        return (float)Math.sqrt(standardDerivation);
+    }
+
+    public static float getExpectedValue (float[] array){
+        float expected = 0;
+        for(int i = 0; i < array.length; i++){
+            expected += array[i];
+        }
+        return (array.length > 0) ? expected / array.length : 0;
+    }
 }

@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.constants;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
@@ -15,6 +16,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UtilsTest {
@@ -29,6 +31,7 @@ public class UtilsTest {
 
     @BeforeClass
     public static void testOnfly(){
+
 
     }
 

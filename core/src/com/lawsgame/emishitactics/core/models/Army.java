@@ -17,23 +17,33 @@ public class Army extends IArmy{
      *
      */
 
-    private static int ids = 0;
+    private static int ids = 1;
+    private static Army playerArmy = null;
 
-    private final int id;
-    private final boolean playerControlled;
+    private int id;
+    private boolean playerControlled;
     private final Allegeance allegeance;
     private int buildingResources;
     private Array<Array<IUnit>> mobilizedTroups;
     private Array<IUnit> nonMobTroups;
     private boolean ldCondEnabled;
 
-    public Army(Allegeance allegeance, boolean playerControlled){
+    public Army(Allegeance allegeance){
         this.id = ids++;
         this.allegeance = allegeance;
-        this.playerControlled = playerControlled;
+        this.playerControlled = false;
         this.mobilizedTroups = new Array<Array<IUnit>>();
         this.nonMobTroups = new Array<IUnit>();
         this.ldCondEnabled = false;
+    }
+
+    public static Army getPlayerArmy(){
+        if(playerArmy == null) {
+            playerArmy = new Army(Allegeance.ALLY);
+            playerArmy.playerControlled = true;
+            playerArmy.id = 0;
+        }
+        return playerArmy;
     }
 
     @Override
@@ -277,6 +287,44 @@ public class Army extends IArmy{
         buildingResources = Data.NB_BUILDING_MAX;
     }
 
+    @Override
+    public boolean isArmyStillFighting() {
+        for(int i = 0; i < mobilizedTroups.size; i++){
+            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
+                if(!mobilizedTroups.get(i).get(j).isOutOfAction()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void setDone(boolean done, boolean notifyObservers) {
+        for(int i = 0; i < mobilizedTroups.size; i++){
+            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
+                mobilizedTroups.get(i).get(j).setActed(done);
+                mobilizedTroups.get(i).get(j).setMoved(done);
+                System.out.println(mobilizedTroups.get(i).get(j).getName());
+                if(notifyObservers){
+                    mobilizedTroups.get(i).get(j).notifyAllObservers(Notification.Done.get(done));
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean isDone() {
+        for(int i = 0; i < mobilizedTroups.size; i++){
+            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
+                if(!mobilizedTroups.get(i).get(j).isDone()){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
     @Override
     public boolean hasSquadStandardBearer(int squadId, boolean stillFighting) {
@@ -347,7 +395,7 @@ public class Army extends IArmy{
             nonMobTroups.removeValue(warlord, true);
             mobilizedTroups.add(new Array<IUnit>());
             mobilizedTroups.get(0).add(warlord);
-            updateMobilizedTroopMoral();
+            replenishMoral();
         }
     }
 
@@ -393,7 +441,7 @@ public class Army extends IArmy{
                         newSquad.add(unit);
                         mobilizedTroups.add(newSquad);
                     }
-                    updateMobilizedTroopMoral();
+                    replenishMoral();
                 }
             }
         }
@@ -455,7 +503,7 @@ public class Army extends IArmy{
                         this.mobilizedTroups.get(squadID).add(soldier);
                         nonMobTroups.removeValue(soldier, true);
                     }
-                    updateMobilizedTroopMoral();
+                    replenishMoral();
 
                 }
             }
@@ -494,6 +542,7 @@ public class Army extends IArmy{
     public void setLeadershipConditionEnabled(boolean enabled) {
         this.ldCondEnabled = enabled;
     }
+
 
 
     /**
@@ -562,10 +611,20 @@ public class Army extends IArmy{
         mobilizedTroups.clear();
     }
 
-    private void updateMobilizedTroopMoral(){
+    @Override
+    public void replenishMoral() {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
                 mobilizedTroups.get(i).get(j).resetCurrentMoral();
+            }
+        }
+    }
+
+    @Override
+    public void updateActionPoints() {
+        for(int i = 0; i < mobilizedTroups.size; i++){
+            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
+                mobilizedTroups.get(i).get(j).addActionPoints(mobilizedTroups.get(i).get(j).getAppAPRecoveryRate());
             }
         }
     }

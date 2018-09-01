@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.renderers;
+package com.lawsgame.emishitactics.core.phases.battle.renderers.tempo;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -185,12 +185,12 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public int setRowFromTouch(float gameX, float gameY) {
+    public int getRowFromGameCoords(float gameX, float gameY) {
         return (int)gameY;
     }
 
     @Override
-    public int setColFromTouch(float gameX, float gameY) {
+    public int getColFromGameCoords(float gameX, float gameY) {
         return (int)gameX;
     }
 
@@ -356,9 +356,5 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
 
-    public static class BFRendererException extends Exception{
-        public BFRendererException(String msg){
-            super(msg);
-        }
-    }
+
 }

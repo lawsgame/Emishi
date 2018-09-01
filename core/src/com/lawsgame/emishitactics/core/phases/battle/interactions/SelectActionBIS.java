@@ -45,11 +45,16 @@ public class SelectActionBIS extends BattleInteractionState {
 
     @Override
     public void init() {
+        System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
+        setChoicePanel();
+        bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, true);
+
+    }
+
+    private void setChoicePanel(){
         if(bim.battlefield.isTileOccupied(rowSltdUnit, colSltdUnit)) {
-            System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
-            //set choice panel
             choicePanel.clear();
             choicePanel.setTouchable(Touchable.childrenOnly);
             choicePanel.setChoiceButtons(this);
@@ -58,9 +63,6 @@ public class SelectActionBIS extends BattleInteractionState {
             bim.uiStage.addActor(choicePanel);
             commandPanel.setVisible(false);
             bim.uiStage.addActor(commandPanel);
-
-            //focus on the sltd unit
-            bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, true);
         }
     }
 
@@ -78,19 +80,22 @@ public class SelectActionBIS extends BattleInteractionState {
         choicePanel.setVisible(false);
         commandPanel.remove();
 
-        if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col) && bim.battlefield.isTileOccupied(rowSltdUnit, colSltdUnit)){
+        if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)){
 
             IUnit touchedUnit = bim.battlefield.getUnit(row, col);
-            IUnit selecetedUnit = bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
-            if(touchedUnit == selecetedUnit) {
+            IUnit selectedUnit = bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
+            if(touchedUnit == selectedUnit) {
                 choicePanel.setVisible(true);
             }else{
+
                 if (Utils.undoCommands(historic) && !touchedUnit.isDone()) {
                     bim.replace(new SelectActionBIS(bim, row, col));
                     return true;
                 } else {
                     // if not all commands are undoable, all the undoable ones are done, the unit is updated and a new choice panel is provided
-                    init();
+                    bim.focusOn(row, col, true, true, true, false, false);
+                    setChoicePanel();
+                    choicePanel.setVisible(false);
                     return true;
                 }
             }

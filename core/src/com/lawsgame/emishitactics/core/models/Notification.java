@@ -5,6 +5,8 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
 
+
+
     public static class ApplyDamage {
         public Unit wounded;
         public boolean moralOnly;
@@ -34,19 +36,54 @@ public class Notification {
 
 
     public static class Pushed {
-        public Data.Orientation orientation;
+        public final Data.Orientation orientation;
 
-        public Pushed(Data.Orientation orientation) {
+        private static final Pushed NORTH = new Pushed(Data.Orientation.NORTH);
+        private static final Pushed SOUTH = new Pushed(Data.Orientation.SOUTH);
+        private static final Pushed EAST = new Pushed(Data.Orientation.EAST);
+        private static final Pushed WEST = new Pushed(Data.Orientation.WEST);
+
+
+        private Pushed(Data.Orientation orientation) {
             this.orientation = orientation;
+        }
+
+        public static Pushed get(Data.Orientation or){
+            Pushed notif = null;
+            switch(or){
+
+                case WEST: notif = WEST; break;
+                case NORTH: notif = NORTH; break;
+                case SOUTH: notif = SOUTH; break;
+                case EAST: notif = EAST; break;
+            }
+            return notif;
         }
     }
 
 
     public static class Fled {
-        public Data.Orientation orientation;
+        public final Data.Orientation orientation;
 
-        public Fled(Data.Orientation orientation) {
+        private static final Fled NORTH = new Fled(Data.Orientation.NORTH);
+        private static final Fled SOUTH = new Fled(Data.Orientation.SOUTH);
+        private static final Fled EAST = new Fled(Data.Orientation.EAST);
+        private static final Fled WEST = new Fled(Data.Orientation.WEST);
+
+        private Fled(Data.Orientation orientation) {
             this.orientation = orientation;
+        }
+
+        public static Fled get(Data.Orientation or){
+            Fled notif = null;
+            switch(or){
+
+                case WEST: notif = WEST; break;
+                case NORTH: notif = NORTH; break;
+                case SOUTH: notif = SOUTH; break;
+                case EAST: notif = EAST; break;
+            }
+            return notif;
         }
     }
 
@@ -125,26 +162,51 @@ public class Notification {
     public static class HorsemanUpdate{
         public boolean horseman;
 
-        public HorsemanUpdate(boolean horseman) {
+        private static final HorsemanUpdate FALSE = new HorsemanUpdate(false);
+        private static final HorsemanUpdate TRUE = new HorsemanUpdate(true);
+
+        private HorsemanUpdate(boolean horseman) {
             this.horseman = horseman;
+        }
+
+        public static HorsemanUpdate get(boolean horsman){
+            return (horsman) ? TRUE : FALSE;
         }
     }
 
 
     public static class Blink  {
-        public boolean targeted;
+        public final boolean targeted;
 
-        public Blink(boolean targeted) {
+        private static final Blink FALSE = new Blink(false);
+        private static final Blink TRUE = new Blink(true);
+
+        private Blink(boolean targeted) {
             this.targeted = targeted;
+        }
+
+        public static Blink get(boolean targeted){
+            return (targeted) ? TRUE : FALSE;
         }
     }
 
     public static class Done {
-        public boolean done;
+        public final boolean done;
 
-        public Done(boolean done) {
+        private static final Done FALSE = new Done(false);
+        private static final Done TRUE = new Done(true);
+
+        private Done(boolean done) {
             this.done = done;
         }
+
+        public static Done get(boolean done){
+            return (done) ? TRUE : FALSE;
+        }
+
+
     }
+
+
 
 }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
@@ -38,9 +39,9 @@ public class DeploymentBIS extends BattleInteractionState {
             this.deploymentAreaWidgets.add(areaWidget);
         }
 
-        bim.battlefield.randomlyDeploy(bim.player.getArmy());
+        bim.battlefield.randomlyDeploy(Army.getPlayerArmy());
 
-        this.sltdUnit = bim.player.getArmy().getWarlord();
+        this.sltdUnit = Army.getPlayerArmy().getWarlord();
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
         bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, false, false);
 
@@ -48,7 +49,7 @@ public class DeploymentBIS extends BattleInteractionState {
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                bim.replace(new SelectActorBIS(bim, rowUnit, colUnit));
+                bim.replace(new SelectActorBIS(bim, rowUnit, colUnit, true));
             }
         });
 

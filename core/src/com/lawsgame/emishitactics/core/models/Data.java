@@ -534,6 +534,7 @@ public class Data {
     public enum Ability{
         //Passive
         PATHFINDER,
+        UNBREAKABLE,
         SHADOW,
         VIGILANT,
 

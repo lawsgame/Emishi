@@ -45,7 +45,7 @@ public class GuardCommand extends SelfInflitedCommand {
         for(int r = rowActor - rangeMax; r <= rowActor + rangeMax; r++){
             for(int c = colActor - rangeMax; c <= colActor + rangeMax; c++){
                 dist = Utils.dist(rowActor, colActor, r, c);
-                if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, actor.getAllegeance())){
+                if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, actor.getArmy().getAllegeance())){
                     guardedUnit = battlefield.getUnit(r,c);
                     task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(guardedUnit), Data.AnimationId.GUARDED));
                 }
@@ -56,7 +56,7 @@ public class GuardCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public void undo() {
+    public void unexecute() {
         if(actor != null){
             UnitArea area = battlefield.removeGuardedArea(actor, false);
             if(area != null)

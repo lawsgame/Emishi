@@ -35,7 +35,6 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPane
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoRoseWidget;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
@@ -75,7 +74,7 @@ public class TestBIS extends BattleInteractionState {
         warchief.applyDamage(1, false);
         soldier.addWeapon(new Weapon(Data.WeaponTemplate.CLUB));
 
-        IArmy army = new Army(Data.Allegeance.ALLY, true);
+        IArmy army = Army.getPlayerArmy();
         army.add(warlord);
         army.add(warchief);
         army.add(soldier);
@@ -83,9 +82,9 @@ public class TestBIS extends BattleInteractionState {
         army.appointSoldier(soldier, 0);
         army.appointWarChief(warchief);
 
-        bim.battlefield.deployUnit(6,7,warlord, true);
-        bim.battlefield.deployUnit(6,8,warchief, true);
-        bim.battlefield.deployUnit(6,9,soldier, true);
+        bim.battlefield.deploy(6,7,warlord, true);
+        bim.battlefield.deploy(6,8,warchief, true);
+        bim.battlefield.deploy(6,9,soldier, true);
 
         Area.UnitArea area = bim.battlefield.addGuardedArea(4, 8);
         bim.bfr.getNotification(area);
@@ -103,12 +102,6 @@ public class TestBIS extends BattleInteractionState {
         lootPanel = new TempoLootPanel(bim.uiStage.getViewport());
         lootPanel.set(new Weapon(Data.WeaponTemplate.SHORTSWORD), bim.mainI18nBundle);
         bim.uiStage.addActor(lootPanel);
-
-        int windRoseRowTarget = 6;
-        int windRoseColTarget = 7;
-        windRoseWidget = new TempoRoseWidget(bim.gcm.getPort(), bim.uiStage, bim.asm);
-        windRoseWidget.setListeners(bim, windRoseRowTarget, windRoseColTarget);
-        bim.uiStage.addActor(windRoseWidget);
 
         //EXP TEST
         /*
@@ -233,6 +226,7 @@ public class TestBIS extends BattleInteractionState {
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
             if (command.setActor(unitPos[0], unitPos[1])) {
+                command.setDecoupled(true);
 
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
@@ -376,6 +370,12 @@ public class TestBIS extends BattleInteractionState {
             command.getOutcome().droppedItems.add(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
             historic.add(command);
             bim.replace(new HandleOutcomeBIS(bim, historic));
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.T)){
+            if(historic.peek() != null) {
+                historic.peek().pushRenderTasks();
+            }
         }
     }
     int panelIndex = 0;

@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
@@ -42,7 +43,7 @@ public class Unit extends IUnit{
 
     protected int currentMoral;
     protected int currentHitPoints;
-    protected int actionPoints = 5;
+    protected int actionPoints = 0;
 
     protected Array<Equipment> equipments;
     protected Banner banner;
@@ -171,28 +172,30 @@ public class Unit extends IUnit{
 
 
             if (Data.PROMOTION_LEVEL != level) {
-                float GRcha = (isPromoted()) ? job.getProGrowthCha() : job.getGrowthCha();
-                float GRHP = (isPromoted()) ? job.getGetProGrowthHP() : job.getGrowthHP();
-                float GRstr = (isPromoted()) ? job.getProGrowthStr() : job.getGrowthStr();
-                float GRArmorP = (isPromoted()) ? job.getProGrowthPiercingArmor(): job.getGrowthPiercingArmor();
-                float GRArmorB = (isPromoted()) ? job.getProGrowthBluntArmor() : job.getGrowthBluntArmor();
-                float GRArmorE = (isPromoted()) ? job.getProGrowthEdgedArmor() : job.getGrowthEdgegArmor();
-                float GRdex = (isPromoted()) ? job.getProGrowthDex() : job.getGrowthDex();
-                float GRagi = (isPromoted()) ? job.getProGrowthAg() : job.getGrowthAg();
-                float GRski = (isPromoted()) ? job.getProGrowthSk() : job.getGrowthSk();
-                float GRbra = (isPromoted()) ? job.getProGrowthBr() : job.getGrowthBr();
+                float GRcha = getAppGrCharisma();
+                float GRHP = getAppGrHitpoints();
+                float GRstr = getAppGrStrength();
+                float GRArmorP = getAppGrArmor(DamageType.PIERCING);
+                float GRArmorB = getAppGrArmor(DamageType.BLUNT);
+                float GRArmorE = getAppGrArmor(DamageType.EDGED);
+                float GRdex = getAppGrDexterity();
+                float GRagi = getAppGrAgility();
+                float GRski = getAppGrSkill();
+                float GRbra = getAppGrBravery();
 
 
-                cha += (GRcha * 100 > Data.rand(100)) ? 1 : 0;
-                hpt += (GRHP * 100 > Data.rand(100)) ? 1 : 0;
-                str += (GRstr * 100 > Data.rand(100)) ? 1 : 0;
-                armorE += (GRArmorE * 100 > Data.rand(100)) ? 1 : 0;
-                armorB += (GRArmorB * 100 > Data.rand(100)) ? 1 : 0;
-                armorP += (GRArmorP * 100 > Data.rand(100)) ? 1 : 0;
-                dex += (GRdex * 100 > Data.rand(100)) ? 1 : 0;
-                agi += (GRagi * 100 > Data.rand(100)) ? 1 : 0;
-                ski += (GRski * 100 > Data.rand(100)) ? 1 : 0;
-                bra += (GRbra * 100 > Data.rand(100)) ? 1 : 0;
+                ;
+
+                cha += (GRcha  > MathUtils.random()) ? 1 : 0;
+                hpt += (GRHP  > MathUtils.random()) ? 1 : 0;
+                str += (GRstr  > MathUtils.random()) ? 1 : 0;
+                armorE += (GRArmorE  > MathUtils.random()) ? 1 : 0;
+                armorB += (GRArmorB  > MathUtils.random()) ? 1 : 0;
+                armorP += (GRArmorP  > MathUtils.random()) ? 1 : 0;
+                dex += (GRdex  > MathUtils.random()) ? 1 : 0;
+                agi += (GRagi  > MathUtils.random()) ? 1 : 0;
+                ski += (GRski  > MathUtils.random()) ? 1 : 0;
+                bra += (GRbra  > MathUtils.random()) ? 1 : 0;
             }else{
                 mob = promoted();
                 cha = job.getProBoCha();
@@ -234,7 +237,7 @@ public class Unit extends IUnit{
         return mob - this.mobility;
     }
 
-    private void growup(int upto){
+    public void growup(int upto){
         int gainLvl = upto - getLevel();
 
         if(gainLvl > 0){
@@ -444,6 +447,11 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public float getAppGrHitpoints() {
+        return  (isPromoted()) ? job.getGetProGrowthHP() : job.getGrowthHP();
+    }
+
+    @Override
     public int getCurrentHP() {
         return currentHitPoints;
     }
@@ -539,6 +547,11 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public float getAppGrCharisma() {
+        return (isPromoted()) ? job.getProGrowthDex() : job.getGrowthDex();
+    }
+
+    @Override
     public int getBaseLeadership() {
         return leadership;
     }
@@ -559,6 +572,11 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public float getAppGrStrength() {
+        return (isPromoted()) ? job.getProGrowthStr() : job.getGrowthStr();
+    }
+
+    @Override
     public int getBaseArmor(Data.DamageType damageType) {
         int armor = 0;
         switch(damageType){
@@ -575,6 +593,17 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public float getAppGrArmor(DamageType damageType) {
+        float growthrate = 0;
+        switch(damageType){
+            case BLUNT: growthrate = (isPromoted()) ? job.getProGrowthBluntArmor(): job.getGrowthBluntArmor(); break;
+            case EDGED: growthrate = (isPromoted()) ? job.getProGrowthEdgedArmor(): job.getGrowthEdgegArmor();break;
+            case PIERCING: growthrate = (isPromoted()) ? job.getProGrowthPiercingArmor(): job.getGrowthPiercingArmor();break;
+        }
+        return growthrate;
+    }
+
+    @Override
     public int getBaseAgility() {
         return agility;
     }
@@ -582,6 +611,11 @@ public class Unit extends IUnit{
     @Override
     public int getAppAgility() {
         return agility;
+    }
+
+    @Override
+    public float getAppGrAgility() {
+        return (isPromoted()) ? job.getProGrowthAg() : job.getGrowthAg();
     }
 
     @Override
@@ -595,6 +629,11 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public float getAppGrDexterity() {
+        return (isPromoted()) ? job.getProGrowthDex() : job.getGrowthDex();
+    }
+
+    @Override
     public int getBaseSkill() {
         return skill;
     }
@@ -605,6 +644,11 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public float getAppGrSkill() {
+        return (isPromoted()) ? job.getProGrowthSk() : job.getGrowthSk();
+    }
+
+    @Override
     public int getBaseBravery() {
         return bravery;
     }
@@ -612,6 +656,11 @@ public class Unit extends IUnit{
     @Override
     public int getAppBravery() {
         return bravery;
+    }
+
+    @Override
+    public float getAppGrBravery() {
+        return (isPromoted()) ? job.getProGrowthBr() : job.getGrowthBr();
     }
 
     @Override
@@ -732,17 +781,19 @@ public class Unit extends IUnit{
     @Override
     public boolean isStealable() {
         boolean stealable = false;
-        for(int i = 0; i < equipments.size; i++){
-            if(equipments.get(i).isStealable()){
-                stealable = true;
-                continue;
-            }
-        }
-        if(!stealable){
-            for(int i = 0; i < weapons.size; i++){
-                if(weapons.get(i).isStealable()){
+        if(!has(Data.Ability.VIGILANT)) {
+            for (int i = 0; i < equipments.size; i++) {
+                if (equipments.get(i).isStealable()) {
                     stealable = true;
-                    continue;
+                    break;
+                }
+            }
+            if (!stealable) {
+                for (int i = 0; i < weapons.size; i++) {
+                    if (weapons.get(i).isStealable()) {
+                        stealable = true;
+                        break;
+                    }
                 }
             }
         }
@@ -887,12 +938,12 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getAppOATriggerRate() {
+    public int getAppAPRecoveryRate() {
         return getAppSkill();
     }
 
     @Override
-    public int getCurrentOATriggerRate(int rowUnit, int colUnit, Battlefield battlefield) {
+    public int getCurrentAPRecoveryRate(int rowUnit, int colUnit, Battlefield battlefield) {
         return getAppSkill();
     }
 
@@ -909,14 +960,6 @@ public class Unit extends IUnit{
     @Override
     public boolean isWarlord() {
         return isMobilized() && this == army.getWarlord();
-    }
-
-    @Override
-    public Data.Allegeance getAllegeance() {
-        if(isMobilized()){
-            return army.getAllegeance();
-        }
-        return null;
     }
 
     @Override
@@ -1126,19 +1169,30 @@ public class Unit extends IUnit{
 
         if(this.currentMoral > damageTaken){
             // the unit survive
-            this.currentMoral -= damageTaken;
-            if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
-            notification.state = ApplyDamage.State.WOUNDED;
+            if(!has(Data.Ability.UNBREAKABLE)) {
+                notification.state = ApplyDamage.State.WOUNDED;
+                this.currentMoral -= damageTaken;
+            }
+            if(!moralDamageOnly) {
+                notification.state = ApplyDamage.State.WOUNDED;
+                this.currentHitPoints -= damageTaken;
+            }
+
 
         }else{
             // the unit dies or flies
             if(this.currentHitPoints > damageTaken){
-                this.currentMoral = 0;
-                if(!moralDamageOnly) this.currentHitPoints -= damageTaken;
-                notification.state = ApplyDamage.State.FLED;
+                if(!has(Data.Ability.UNBREAKABLE)) {
+                    this.currentMoral = 0;
+                    notification.state = ApplyDamage.State.FLED;
+                }
+                if(!moralDamageOnly)
+                    this.currentHitPoints -= damageTaken;
             }else{
-                this.currentMoral = 0;
-                notification.state = ApplyDamage.State.FLED;
+                if(!has(Data.Ability.UNBREAKABLE)) {
+                    this.currentMoral = 0;
+                    notification.state = ApplyDamage.State.FLED;
+                }
                 if(!moralDamageOnly){
                     this.currentHitPoints = 0;
                     notification.state = ApplyDamage.State.DIED;
@@ -1161,5 +1215,34 @@ public class Unit extends IUnit{
     @Override
     public String toString() {
         return getName();
+    }
+
+    public String statToString(boolean apparent){
+        String str = "\nname : "+getName();
+
+        str +="\nhitpoints  : ";
+        str += (apparent) ? getAppHitpoints() : getBaseHitpoints();
+        str +="\nbravery    : ";
+        str += (apparent) ? getAppBravery() : getBaseBravery();
+        str +="\ncharisma   : ";
+        str += (apparent) ? getAppCharisma() : getBaseCharisma();
+        str +="\ndexterity: : ";
+        str += (apparent) ? getAppDexterity() : getBaseDexterity();
+        str +="\nskill      : ";
+        str += (apparent) ? getAppSkill() : getBaseSkill();
+        str +="\n_________________: ";
+        str += "\nstrength  : ";
+        str += (apparent) ? getAppStrength() : getBaseStrength();
+        str +="\ndefense    ";
+        str +="\n   piercing : ";
+        str += (apparent) ? getAppArmor(DamageType.PIERCING) : getBaseArmor(DamageType.PIERCING);
+        str +="\n   blunt    : ";
+        str += (apparent) ? getAppArmor(DamageType.BLUNT) : getBaseArmor(DamageType.BLUNT);
+        str +="\n   edged : ";
+        str += (apparent) ? getAppArmor(DamageType.EDGED) : getBaseArmor(DamageType.EDGED);
+        str +="\nagility    : ";
+        str += (apparent) ? getAppAgility() : getBaseAgility();
+
+        return str;
     }
 }
