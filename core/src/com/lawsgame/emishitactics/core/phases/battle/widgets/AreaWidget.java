@@ -36,19 +36,11 @@ public class AreaWidget {
     public void addTile(int r, int c, boolean notifyObservers) { model.addTile(r , c, notifyObservers); }
 
     public void setTile(int row, int col, boolean notifyObservers) {
-        model.set(row, col, notifyObservers);
-    }
-
-    public void setTile(int row, int col, Data.AreaType type, boolean notifyObservers) {
-        model.set(row, col, type, notifyObservers);
+        model.setTiles(row, col, notifyObservers);
     }
 
     public void setTiles(Array<int[]> area, boolean notifyObservers) {
-        model.set(area, notifyObservers);
-    }
-
-    public void setTiles(Array<int[]> area, Data.AreaType type, boolean notifyObservers) {
-        model.set(area, type, notifyObservers);
+        model.setTiles(area, notifyObservers);
     }
 
     public boolean contains(int r, int c) {

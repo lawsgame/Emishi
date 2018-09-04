@@ -33,6 +33,7 @@ public abstract class IUnit extends Observable {
     public abstract boolean setRightHanded(boolean righthanded);
     public abstract boolean isStandardBearer();
     public abstract boolean isHorseman();
+    public abstract boolean isShielbearer();
     public abstract void setHorseman(boolean horseman);
     public abstract boolean isHorsemanUponPromotion();
     public abstract void setHorsemanUponPromotion(boolean horseman);

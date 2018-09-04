@@ -19,6 +19,7 @@ public class Unit extends IUnit{
     protected int level;
     protected Job job;
     protected WeaponType weaponType;
+    protected boolean shielbearer;
     protected boolean horseman;
     protected boolean horsemanUponPromotion;
 
@@ -82,6 +83,7 @@ public class Unit extends IUnit{
             Job job,
             int level,
             WeaponType weaponType,
+            boolean shielbearer,
             boolean horseman,
             boolean horsemanUponPromotion,
             boolean homogeneousLevelsup){
@@ -97,12 +99,12 @@ public class Unit extends IUnit{
         this.charisma = job.getBaseCha();
         this.leadership = job.getBaseLd();
         this.hitPoints = job.getBaseHP();
-        this.strength = job.getBaseStr();
-        this.piercinfArmor = job.getBasePiercingArmor();
-        this.bluntArmor = job.getBaseBluntArmor();
-        this.edgedArmor = job.getBaseEgdedArmor();
-        this.dexterity = job.getBaseDex();
-        this.agility = job.getBaseAg();
+        this.strength = job.getBaseStr() + ((shielbearer) ?  job.getShieldBearerStrengthBonus(): 0) + ((horseman) ? job.getHorsemanStrengthBonus(): 0);
+        this.piercinfArmor = job.getBasePiercingArmor() + ((shielbearer) ?  job.getShieldBearerArmorPBonus(): 0) + ((horseman) ? job.getHorsemanArmorPBonus(): 0);
+        this.bluntArmor = job.getBaseBluntArmor() + ((shielbearer) ?  job.getShieldBearerArmorBBonus(): 0) + ((horseman) ? job.getHorsemanArmorBBonus(): 0);
+        this.edgedArmor = job.getBaseEgdedArmor() + ((shielbearer) ?  job.getShieldBearerArmorEBonus(): 0) + ((horseman) ? job.getShieldBearerArmorEBonus(): 0);
+        this.dexterity = job.getBaseDex() + ((shielbearer) ?  job.getShieldBearerDexBonus(): 0) + ((horseman) ? job.getHorsemanDexBonus(): 0);
+        this.agility = job.getBaseAg() + ((shielbearer) ?  job.getShieldBearerAgilityBonus(): 0) + ((horseman) ? job.getHorsemanAgilityBonus(): 0);
         this.skill = job.getBaseSk();
         this.bravery = job.getBaseBr();
 
@@ -124,7 +126,7 @@ public class Unit extends IUnit{
     }
 
     public Unit(String name){
-        this(name, Job.getStandard(), 10, WeaponType.SWORD, false, false, true);
+        this(name, Job.getStandard(), 10, WeaponType.SWORD, false, false, false, true);
     }
 
 
@@ -183,9 +185,6 @@ public class Unit extends IUnit{
                 float GRski = getAppGrSkill();
                 float GRbra = getAppGrBravery();
 
-
-                ;
-
                 cha += (GRcha  > MathUtils.random()) ? 1 : 0;
                 hpt += (GRHP  > MathUtils.random()) ? 1 : 0;
                 str += (GRstr  > MathUtils.random()) ? 1 : 0;
@@ -197,22 +196,25 @@ public class Unit extends IUnit{
                 ski += (GRski  > MathUtils.random()) ? 1 : 0;
                 bra += (GRbra  > MathUtils.random()) ? 1 : 0;
             }else{
-                mob = promoted();
+                int[] promoStats = promoted();
+
+                mob = promoStats[0];
                 cha = job.getProBoCha();
                 ld = job.getProBoLd();
                 hpt = job.getProBoHP();
-                str = job.getProBoStr();
-                armorP = job.getProBoPiercingArmor();
-                armorE = job.getProBoEdgedArmor();
-                armorB = job.getProBoBluntArmor();
-                dex = job.getProBoDex();
-                agi = job.getProBoAg();
+                str = job.getProBoStr() + promoStats[1];
+                armorP = job.getProBoPiercingArmor() + promoStats[4];
+                armorE = job.getProBoEdgedArmor() + promoStats[5];
+                armorB = job.getProBoBluntArmor() + promoStats[6];
+                dex = job.getProBoDex() + promoStats[2];
+                agi = job.getProBoAg() + promoStats[3];
                 ski = job.getProBoSk();
                 bra = job.getProBoBr();
             }
 
             this.level++;
 
+            this.mobility += mob;
             this.charisma += cha;
             this.setLeadership(this.leadership + ld);
             this.hitPoints += hpt;
@@ -226,15 +228,22 @@ public class Unit extends IUnit{
             this.bravery += bra;
         }
 
-        int[] gainlvl = new int[]{hpt, mob, cha, ld, str, armorP, armorB, armorE, dex, agi, ski, bra};
-        return gainlvl;
+        return new int[]{hpt, mob, cha, ld, str, armorP, armorB, armorE, dex, agi, ski, bra};
     }
 
-    private int promoted(){
+    private int[] promoted(){
+        int mob = (!horseman && horsemanUponPromotion) ? job.getHorsemanMob() - job.getFootmanMob() : 0;
+        int str = ((!horseman && horsemanUponPromotion) ? job.getHorsemanStrengthBonus(): 0);
+        int dex = ((!horseman && horsemanUponPromotion) ? job.getHorsemanDexBonus(): 0);
+        int agi = ((!horseman && horsemanUponPromotion) ? job.getHorsemanAgilityBonus(): 0);
+        int armorP = ((!horseman && horsemanUponPromotion) ? job.getHorsemanArmorPBonus(): 0);
+        int armorB = ((!horseman && horsemanUponPromotion) ? job.getHorsemanArmorBBonus(): 0);
+        int armorE = ((!horseman && horsemanUponPromotion) ? job.getShieldBearerArmorEBonus(): 0);
+
         this.horseman = horsemanUponPromotion;
-        int mob = (horseman) ? job.getHorsemanMob() : job.getFootmanMob();
         mob += Data.MOBILITY_BONUS_PROMOTED;
-        return mob - this.mobility;
+
+        return new int[]{mob, str, dex, agi, armorP, armorB, armorE};
     }
 
     public void growup(int upto){
@@ -271,18 +280,20 @@ public class Unit extends IUnit{
             }
 
             if(getLevel() < Data.PROMOTION_LEVEL && Data.PROMOTION_LEVEL <= upto){
-                mob += promoted();
-                cha += job.getProBoCha();
-                ld += job.getProBoLd();
-                hpt += job.getProBoHP();
-                str += job.getProBoStr();
-                armorP += job.getProBoPiercingArmor();
-                armorE += job.getProBoEdgedArmor();
-                armorB += job.getProBoBluntArmor();
-                dex += job.getProBoDex();
-                agi += job.getProBoAg();
-                ski += job.getProBoSk();
-                bra += job.getProBoBr();
+                int[] promoStats = promoted();
+
+                mob = promoStats[0];
+                cha = job.getProBoCha();
+                ld = job.getProBoLd();
+                hpt = job.getProBoHP();
+                str = job.getProBoStr() + promoStats[1];
+                armorP = job.getProBoPiercingArmor() + promoStats[4];
+                armorE = job.getProBoEdgedArmor() + promoStats[5];
+                armorB = job.getProBoBluntArmor() + promoStats[6];
+                dex = job.getProBoDex() + promoStats[2];
+                agi = job.getProBoAg() + promoStats[3];
+                ski = job.getProBoSk();
+                bra = job.getProBoBr();
             }
 
             if(gainAfterPromotion > 0){
@@ -341,14 +352,13 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setHorseman(boolean horseman) {
-        this.horseman = horseman;
-    }
+    public boolean isShielbearer() { return shielbearer; }
 
     @Override
-    public boolean isHorsemanUponPromotion() {
-        return horsemanUponPromotion;
-    }
+    public void setHorseman(boolean horseman) { this.horseman = horseman; }
+
+    @Override
+    public boolean isHorsemanUponPromotion() { return horsemanUponPromotion; }
 
     @Override
     public void setHorsemanUponPromotion(boolean horseman) {
@@ -1080,6 +1090,7 @@ public class Unit extends IUnit{
     public Data.Behaviour getBehaviour() {
         return behaviour;
     }
+
 
     @Override
     public boolean hasActed() {

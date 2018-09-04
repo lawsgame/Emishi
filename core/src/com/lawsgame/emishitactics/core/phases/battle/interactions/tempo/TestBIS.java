@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -63,9 +62,9 @@ public class TestBIS extends BattleInteractionState {
         areaWidget = new AreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
 
 
-        warlord = new Unit("Phillipe", Data.Job.SOLAR_KNIGHT, 11, Data.WeaponType.AXE, false, false, true);
-        warchief = new Unit("Oscar", Data.Job.SOLAR_KNIGHT, 6, Data.WeaponType.BOW, false, false, true);
-        soldier = new Unit("Jim", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.MACE, false, false, true);
+        warlord = new Unit("Phillipe", Data.Job.SERGEANT, 11, Data.WeaponType.AXE, false, false, false, true);
+        warchief = new Unit("Oscar", Data.Job.SERGEANT, 6, Data.WeaponType.BOW, false, false, false, true);
+        soldier = new Unit("Jim", Data.Job.SERGEANT, 5, Data.WeaponType.MACE, false, false, false, true);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setLeadership(15);
         warlord.setExperience(90);
@@ -107,7 +106,7 @@ public class TestBIS extends BattleInteractionState {
         /*
         System.out.println("lvl : "+warlord.getLevel() + " exp : "+warlord.getExperience());
         int[] gain = warlord.addExpPoints(960);
-        levelUpPanel.set(bim.mainI18nBundle, warlord, gain);
+        levelUpPanel.setTiles(bim.mainI18nBundle, warlord, gain);
         levelUpPanel.show();
         System.out.println("lvl : "+warlord.getLevel() + " exp : "+warlord.getExperience());
         */
@@ -117,8 +116,8 @@ public class TestBIS extends BattleInteractionState {
         /*
         Array<int[]> validPath = bim.battlefield.getShortestPath(6, 7, 8, 9, warlord.has(Data.Ability.PATHFINDER), warlord.getAllegeance(), false);
 
-        bim.shortTilePanel.set(Data.TileType.PLAIN);
-        bim.shortUnitPanel.set(warlord);
+        bim.shortTilePanel.setTiles(Data.TileType.PLAIN);
+        bim.shortUnitPanel.setTiles(warlord);
         bim.scheduler.addTask(new StandardTask(bim.showSTP, 0f));
         bim.scheduler.addTask(new StandardTask(bim.battlefield, bim.bfr.getUnitRenderer(warlord), new Notification.Walk(warlord, validPath)));
         bim.scheduler.addTask(new StandardTask(bim.showSUP, 0f));
@@ -281,9 +280,6 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void update60(float dt) {
-        if(command!=null){
-            //System.out.println(command.isExecuting()+" => "+command.isCompleted());
-        }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
             BattleCommand command = historic.peek();
@@ -335,11 +331,6 @@ public class TestBIS extends BattleInteractionState {
             index = 9;
         }
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            if(command != null){
-                command.setTarget(17,17);
-            }
-        }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
 
@@ -380,20 +371,13 @@ public class TestBIS extends BattleInteractionState {
     }
     int panelIndex = 0;
 
-    @Override
-    public void prerender(SpriteBatch batch) {
 
-    }
-
+    /*
     @Override
     public void renderBetween(SpriteBatch batch) {
         areaWidget.render(batch);
     }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
-    }
+    */
 
     @Override
     public void init() {

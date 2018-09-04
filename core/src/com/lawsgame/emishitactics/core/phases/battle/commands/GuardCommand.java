@@ -38,6 +38,8 @@ public class GuardCommand extends SelfInflitedCommand {
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer, area));
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.GUARD));
+
+        // animated guarded units as well
         IUnit guardedUnit;
         int dist;
         int rangeMin = Data.GUARD_REACTION_RANGE_MIN;

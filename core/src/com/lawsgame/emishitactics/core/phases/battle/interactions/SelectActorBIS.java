@@ -1,7 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
@@ -50,11 +48,6 @@ public class SelectActorBIS extends BattleInteractionState {
     }
 
     @Override
-    public void end() {
-        super.end();
-    }
-
-    @Override
     public boolean handleTouchInput(int row, int col) {
         if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)){
             IUnit selectedUnit = bim.battlefield.getUnit(row, col);
@@ -64,26 +57,6 @@ public class SelectActorBIS extends BattleInteractionState {
             }
         }
         return false;
-    }
-
-    @Override
-    public void update60(float dt) {
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
     }
 
 

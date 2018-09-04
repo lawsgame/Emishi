@@ -15,7 +15,6 @@ import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestBIS;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.tempo.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
@@ -53,15 +52,15 @@ public class BattlePhase extends GamePhase {
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, asm);
 
         // TEST player army
-        Unit warlord = new Unit("Aterui", Data.Job.SOLAR_KNIGHT, 18, Data.WeaponType.SWORD, false, false, false);
+        Unit warlord = new Unit("Aterui", Data.Job.SERGEANT, 18, Data.WeaponType.SWORD, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier1 = new Unit("Taro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
+        Unit soldier1 = new Unit("Taro", Data.Job.SERGEANT, 5, Data.WeaponType.SWORD, false, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier2 = new Unit("Maro", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
+        Unit soldier2 = new Unit("Maro", Data.Job.SERGEANT, 5, Data.WeaponType.SWORD, false, false, false, false);
         soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit warchief1 = new Unit("Azamaru", Data.Job.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false);
+        Unit warchief1 = new Unit("Azamaru", Data.Job.SERGEANT, 5, Data.WeaponType.SWORD, false, false, false, false);
         warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
         IArmy playerArmy = Army.getPlayerArmy();
@@ -76,7 +75,7 @@ public class BattlePhase extends GamePhase {
         playerArmy.appointSoldier(soldier2, 1);
 
 
-        // set the initial BattleInteractionState
+        // setTiles the initial BattleInteractionState
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, player);
         //BattleInteractionState initBIS = new TestBIS(bim);
         BattleInteractionState initBIS = new SceneBIS(bim);
@@ -118,24 +117,14 @@ public class BattlePhase extends GamePhase {
 
     @Override
     public void preRender(SpriteBatch batch) {
-
+        bim.getCurrentState().prerender(batch);
     }
 
     @Override
     public void renderWorld(SpriteBatch batch) {
         if(bim.getCurrentState().isBattlefieldDisplayed()) {
-            bim.bfr.renderTiles(batch);
-            bim.bfr.renderAreas(batch);
-            
-            bim.getCurrentState().renderBetween(batch);
 
-            if (bim.getCurrentState().isBattlefieldDisplayed()) bim.bfr.renderUnits(batch);
-            for (int i = 0; i < bim.touchedRelatedTiles.size; i++) {
-                bim.touchedRelatedTiles.get(i).render(batch);
-            }
-            bim.touchedTile.render(batch);
-            bim.selectedTile.render(batch);
-
+            bim.bfr.render(batch);
             bim.getCurrentState().renderAhead(batch);
         }
     }

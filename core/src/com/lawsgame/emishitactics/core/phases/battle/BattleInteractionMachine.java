@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Army;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
@@ -21,9 +21,9 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
@@ -48,9 +48,9 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public AnimationScheduler scheduler;
     public I18NBundle mainI18nBundle;
 
-    public AreaWidget selectedTile;
-    public AreaWidget touchedTile;
-    public Array<AreaWidget> touchedRelatedTiles;
+    private Area selectedTile;
+    private Area touchedTile;
+    private Array<Area> touchedRelatedUnitTiles;
 
     public Stage uiStage;
     public final TilePanel shortTilePanel;
@@ -77,14 +77,20 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
 
 
-        this.selectedTile = new AreaWidget(battlefield, Data.AreaType.SELECTED_UNIT);
-        this.touchedTile = new AreaWidget(battlefield, Data.AreaType.TOUCHED_TILE);
-        this.touchedRelatedTiles = new Array<AreaWidget>();
-        AreaWidget areaWidget;
+        this.selectedTile = new Area(battlefield, Data.AreaType.SELECTED_UNIT);
+        this.touchedTile = new Area(battlefield, Data.AreaType.TOUCHED_TILE);
+        this.bfr.addAreaRenderer(selectedTile);
+        this.bfr.addAreaRenderer(touchedTile);
+        this.bfr.getAreaRenderer(touchedTile).setVisible(false);
+        this.bfr.getAreaRenderer(selectedTile).setVisible(false);
+        this.touchedRelatedUnitTiles = new Array<Area>();
+        Area area;
+        AreaRenderer renderer;
         for(int i = 1; i < Data.MAX_UNITS_UNDER_WARLORD; i++){
-            areaWidget = new AreaWidget(battlefield, Data.AreaType.SQUAD_MEMBER );
-            areaWidget.setVisible(false);
-            touchedRelatedTiles.add(areaWidget);
+            area = new Area(battlefield, Data.AreaType.SQUAD_MEMBER );
+            this.touchedRelatedUnitTiles.add(area);
+            this.bfr.addAreaRenderer(area);
+             bfr.getAreaRenderer(area).setVisible(false);
         }
 
 
@@ -106,7 +112,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         hideSUP = new HidePanel(shortUnitPanel);
 
     }
-
 
     @Override
     public void push(BattleInteractionState bis){
@@ -200,33 +205,32 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
                 if(squad.get(i) != sltdUnit){
                     squadMemberPos = battlefield.getUnitPos(squad.get(i));
                     if(squad.get(i).isStandardBearer()){
-                        touchedRelatedTiles.get(i).setTiles(
-                                Utils.getEreaFromRange(battlefield, squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit)),
-                                type,
-                                true);
+                        touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit), true);
                     }else {
-                        touchedRelatedTiles.get(i).setTile(squadMemberPos[0], squadMemberPos[1], type, true);
+                        touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], true);
                     }
-                    touchedRelatedTiles.get(i).setVisible(true);
+                    touchedRelatedUnitTiles.get(i).setType(type, true);
+                    bfr.getAreaRenderer(touchedRelatedUnitTiles.get(i)).setVisible(true);
                 }
             }
         }
 
         if(selected){
-            selectedTile.setTile(row, col, true);
-            selectedTile.setVisible(true);
+            selectedTile.setTiles(row, col, true);
+            bfr.getAreaRenderer(selectedTile).setVisible(true);
         }else {
-            touchedTile.setTile(row, col, true);
-            touchedTile.setVisible(true);
+            touchedTile.setTiles(row, col, true);
+            bfr.getAreaRenderer(touchedTile).setVisible(true);
         }
 
     }
 
     public void removeTileHighlighting(boolean exceptSelectedTile){
-        touchedTile.setVisible(false);
-        if(!exceptSelectedTile) selectedTile.setVisible(false);
-        for(int i = 0; i < touchedRelatedTiles.size; i++){
-            touchedRelatedTiles.get(i).setVisible(false);
+        bfr.getAreaRenderer(touchedTile).setVisible(false);
+        if(!exceptSelectedTile)
+            bfr.getAreaRenderer(selectedTile).setVisible(false);
+        for(int i = 0; i < touchedRelatedUnitTiles.size; i++){
+            bfr.getAreaRenderer(touchedRelatedUnitTiles.get(i)).setVisible(false);
         }
     }
 
@@ -236,7 +240,10 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     }
 
     public void end(IArmy army) {
+        //update model
         army.setDone(false, false);
+
+        //push render tasks
         Array<Array<IUnit>> mobilizedTroops = army.getAllSquads();
         StandardTask resetDoneTask = new StandardTask();
         StandardTask.RendererThread doneThread;

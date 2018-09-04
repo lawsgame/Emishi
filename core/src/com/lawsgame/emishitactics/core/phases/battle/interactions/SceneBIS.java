@@ -11,25 +11,6 @@ public class SceneBIS extends BattleInteractionState {
         super(BISys, true, false, false);
     }
 
-    @Override
-    public void update60(float dt) {
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
-    }
 
     @Override
     public boolean handleTouchInput(int row, int col) {

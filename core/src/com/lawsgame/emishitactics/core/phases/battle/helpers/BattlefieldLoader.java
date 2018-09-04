@@ -196,6 +196,7 @@ public class BattlefieldLoader {
         Weapon weapon;
         Equipment equipement;
         WeaponType weaponType = WeaponType.FIST;
+        boolean shieldbearer = unitElt.getBoolean("shieldbearer");
         boolean horseman = unitElt.getBoolean("horseman");
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
         boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
@@ -215,8 +216,7 @@ public class BattlefieldLoader {
             }
         }
 
-        unit = new Unit(name, job ,level, weaponType, horseman, horsemanUponPromotion, homogeneousLevels);
-
+        unit = new Unit(name, job ,level, weaponType, shieldbearer, horseman, horsemanUponPromotion, homogeneousLevels);
 
         XmlReader.Element attributeElt;
         for(int k = 0; k < unitElt.getChildCount(); k++){

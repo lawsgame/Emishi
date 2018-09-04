@@ -127,18 +127,18 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                         int[] actorPos = bim.battlefield.getUnitPos(historic.peek().getActor());
                         if (historic.peek().getActor().isDone()) {
 
-                            // if the unit is done
+                            // if the unit is visible
                             bim.replace(new EndTurnBIS(bim, actorPos[0], actorPos[1]));
                         } else {
 
-                            // the unit is not yet done
+                            // the unit is not yet visible
                             bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));
                         }
                     }
 
                 }else{
 
-                    throw new BISException("historic top command has no actor set up");
+                    throw new BISException("historic top command has no actor setTiles up");
                 }
             }else{
                 throw new BISException("historic empty");
@@ -156,26 +156,6 @@ public class HandleOutcomeBIS extends BattleInteractionState{
             bim.scheduler.addTask(tasks.pop());
         }
         return true;
-    }
-
-    @Override
-    public void update60(float dt) {
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
     }
 
 

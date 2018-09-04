@@ -1,21 +1,20 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
 import java.util.Stack;
 
-public class SelectTargetBIS extends BattleInteractionState {
-    private final Stack<BattleCommand> historic;
-    private final BattleCommand currentCommand;
-    private AreaWidget actionArea;
+public class SelectTargetBIS extends BattleInteractionState implements Observer {
+    final Stack<BattleCommand> historic;
+    final BattleCommand currentCommand;
+    Area actionArea;
 
     public SelectTargetBIS(BattleInteractionMachine bim, Stack<BattleCommand> historic, BattleCommand command) {
         super(bim, true, true, true);
@@ -25,7 +24,7 @@ public class SelectTargetBIS extends BattleInteractionState {
         Data.AreaType type = (currentCommand.getActionChoice().getRangedType() == RangedBasedType.MOVE) ?
             Data.AreaType.MOVE_AREA :
             Data.AreaType.ACTION_AREA;
-        this.actionArea = new AreaWidget(bim.battlefield, type, currentCommand.getActionArea());
+        this.actionArea = new Area(bim.battlefield, type, currentCommand.getActionArea());
 
     }
 
@@ -33,6 +32,7 @@ public class SelectTargetBIS extends BattleInteractionState {
     public void init() {
         System.out.println("SELECT TARGET : "+currentCommand.getActor().getName()+" "+currentCommand.getActionChoice().getName(bim.mainI18nBundle));
 
+        bim.bfr.addAreaRenderer(actionArea);
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, true, true, false);
 
         if(currentCommand.getActionChoice().isActorIsTarget()){
@@ -43,6 +43,7 @@ public class SelectTargetBIS extends BattleInteractionState {
     @Override
     public void end() {
         super.end();
+        bim.bfr.removeAreaRenderer(actionArea);
     }
 
     @Override
@@ -63,9 +64,10 @@ public class SelectTargetBIS extends BattleInteractionState {
 
                 // remove blinking and other highlighting target affect
                 currentCommand.blink(false);
+                currentCommand.attach(this);
                 currentCommand.apply();
                 historic.push(currentCommand);
-                actionArea.setVisible(false);
+                bim.bfr.getAreaRenderer(actionArea).setVisible(false);
                 bim.removeTileHighlighting(false);
             }else{
 
@@ -79,7 +81,7 @@ public class SelectTargetBIS extends BattleInteractionState {
              * - the historic is fully clearable
              * - yet, the target tile is not occupied by the active player unit
              * , and those, before clearing the historic obviously
-             * which explains why it is done here.
+             * which explains why it is visible here.
              */
             int rowInit;
             int colInit;
@@ -105,28 +107,10 @@ public class SelectTargetBIS extends BattleInteractionState {
     }
 
     @Override
-    public void update60(float dt) {
-        //System.out.println(currentCommand.isExecuting() +" "+currentCommand.isCompleted());
-        if(currentCommand.isCompleted()){
+    public void getNotification(Object data) {
+        System.out.println("COMMAND COMPLETED");
+        if(data instanceof BattleCommand && data == currentCommand){
             bim.replace(new HandleOutcomeBIS(bim, historic));
         }
     }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-        if(actionArea != null)
-            actionArea.render(batch);
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
-    }
-
-
 }

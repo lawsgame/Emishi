@@ -1,9 +1,8 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
@@ -11,16 +10,16 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleC
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
 import java.util.Stack;
 
-public class ValidateTargetBIS extends BattleInteractionState {
+public class ValidateTargetBIS extends BattleInteractionState implements Observer {
     private Stack<BattleCommand> historic;
     private BattleCommand currentCommand;
-    private AreaWidget impactArea;
+    private Area impactArea;
 
     private ChooseOrientationCommand orientationCommand;
     private SimpleCommand hideActionPanelCommand;
@@ -35,7 +34,7 @@ public class ValidateTargetBIS extends BattleInteractionState {
         Data.AreaType type = (currentCommand.getActionChoice().getRangedType() == Data.RangedBasedType.MOVE) ?
                 Data.AreaType.MOVE_AREA :
                 Data.AreaType.ACTION_AREA;
-        this.impactArea = new AreaWidget(bim.battlefield, type, currentCommand.getImpactArea());
+        this.impactArea = new Area(bim.battlefield, type, currentCommand.getImpactArea());
     }
 
     @Override
@@ -45,10 +44,11 @@ public class ValidateTargetBIS extends BattleInteractionState {
                 +((currentCommand.getTarget() != null) ? currentCommand.getTarget().getName() : "("+currentCommand.getRowTarget()+", "+currentCommand.getColTarget()+")")+" : "
                 +currentCommand.getName(bim.mainI18nBundle));
 
+        bim.bfr.addAreaRenderer(impactArea);
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, true, false);
         currentCommand.blink(true);
 
-        //set the new orientation
+        //setTiles the new orientation
         if(!currentCommand.getActionChoice().isActorIsTarget()) {
             Data.Orientation actorOrientation = Utils.getOrientationFromCoords(
                     currentCommand.getRowActor(),
@@ -77,7 +77,9 @@ public class ValidateTargetBIS extends BattleInteractionState {
 
     @Override
     public void end() {
+
         super.end();
+        bim.bfr.removeAreaRenderer(impactArea);
     }
 
     @Override
@@ -90,9 +92,10 @@ public class ValidateTargetBIS extends BattleInteractionState {
                 // clear the HUD before hand
                 if(bim.app.isPanelAvailable(currentCommand))
                     bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
-                impactArea.setVisible(false);
+                bim.bfr.getAreaRenderer(impactArea).setVisible(false);
                 bim.removeTileHighlighting(false);
                 currentCommand.blink(false);
+                currentCommand.attach(this);
 
                 currentCommand.apply();
 
@@ -123,31 +126,16 @@ public class ValidateTargetBIS extends BattleInteractionState {
     }
 
     @Override
-    public void update60(float dt) {
-        //System.out.println(currentCommand.isExecuting()+" et "+currentCommand.isCompleted());
-
-        if(currentCommand.isCompleted()){
+    public void getNotification(Object data) {
+        System.out.println("COMMAND completed");
+        if(data instanceof BattleCommand && data == currentCommand){
+            currentCommand.detach(this);
             if(bim.app.isPanelAvailable(currentCommand))
                 bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
             bim.replace(new HandleOutcomeBIS(bim, historic));
         }
     }
 
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-        if(impactArea != null)
-            impactArea.render(batch);
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
-    }
 
     static class GetBackToSelectAction extends SimpleCommand{
         private BattleCommand currentCommand;

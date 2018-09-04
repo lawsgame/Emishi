@@ -8,20 +8,13 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
-import com.lawsgame.emishitactics.core.models.Notification.SetTile;
-import com.lawsgame.emishitactics.core.models.Notification.SetUnit;
-import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
-import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
-
-import java.util.LinkedList;
 
 /*
  * TODO: clipping
@@ -31,12 +24,14 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     protected TextureRegion[][] tileRenderers;
     protected TempoSpritePool sprite2DPool;
+    protected boolean visible;
 
     protected CountDown countDown = new CountDown(2f);
 
     public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
         super(battlefield);
 
+        this.visible = true;
         this.sprite2DPool = TempoSpritePool.getInstance();
         this.sprite2DPool.set(asm);
 
@@ -51,39 +46,33 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             }
         }
 
-        // addExpGained up area renderers
+        // setTiles up area renderers
         for(Data.Allegeance a : Data.Allegeance.values()){
             for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
-                addaAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
+                addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
             }
+        }
+        for(int i = 0; i < battlefield.getDeploymentAreas().size; i++){
+           addAreaRenderer(battlefield.getDeploymentAreas().get(i));
         }
     }
 
-
     @Override
-    public void renderTiles(SpriteBatch batch) {
-        for (int r = 0; r < getModel().getNbRows(); r++) {
-            for (int c = 0; c < getModel().getNbColumns(); c++) {
-                if (getModel().isTileExisted(r, c)) {
-                    batch.draw(tileRenderers[r][c], c, r, 1, 1);
+    public void render(SpriteBatch batch) {
+        if(visible) {
+            for (int r = 0; r < getModel().getNbRows(); r++) {
+                for (int c = 0; c < getModel().getNbColumns(); c++) {
+                    if (getModel().isTileExisted(r, c)) {
+                        batch.draw(tileRenderers[r][c], c, r, 1, 1);
+                    }
                 }
             }
-        }
-
-
-    }
-
-    @Override
-    public void renderAreas(SpriteBatch batch) {
-        for(int i = 0; i < areaRenderers.size; i++) {
-            areaRenderers.get(i).render(batch);
-        }
-    }
-
-    @Override
-    public void renderUnits(SpriteBatch batch) {
-        for(int i = 0; i < unitRenderers.size; i++){
-            unitRenderers.get(i).render(batch);
+            for (int i = 0; i < areaRenderers.size; i++) {
+                areaRenderers.get(i).render(batch);
+            }
+            for (int i = 0; i < unitRenderers.size; i++) {
+                unitRenderers.get(i).render(batch);
+            }
         }
     }
 
@@ -121,7 +110,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         });
     }
 
-    protected void addTileRenderer(int r, int c, Data.TileType tileType){
+    public void addTileRenderer(int r, int c, Data.TileType tileType){
         try{
             if (getModel().isTileExisted(r, c)) {
                 TextureRegion tileTR = sprite2DPool.getTileSprite(tileType);
@@ -137,7 +126,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
-    public void addaAreaRenderer(Area model){
+    public void addAreaRenderer(Area model){
         areaRenderers.add(new TempoAreaRenderer(model));
     }
 
@@ -146,8 +135,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             if(areaRenderers.get(i).getModel() == model) {
                 model.detach(areaRenderers.get(i));
                 areaRenderers.removeIndex(i);
+                break;
             }
-            continue;
         }
     }
 
@@ -171,17 +160,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     }
 
-    protected boolean removeUnitRenderer(IUnit unit) {
+    public void removeUnitRenderer(IUnit unit) {
         if(unit != null) {
             for(int i = 0; i< unitRenderers.size; i++){
                 if(unitRenderers.get(i).getModel() == unit){
                     unit.detach(unitRenderers.get(i));
                     removeAreaRenderersAssociatedWith(unit);
-                    return unitRenderers.removeValue(unitRenderers.get(i), true);
+                    unitRenderers.removeValue(unitRenderers.get(i), true);
                 }
             }
         }
-        return false;
     }
 
     public boolean isUnitRendererCreated(IUnit unit) {
@@ -193,6 +181,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return false;
     }
 
+
     @Override
     public BattleUnitRenderer getUnitRenderer(IUnit model) {
         for(int i = 0; i < unitRenderers.size; i++){
@@ -203,13 +192,40 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public int getRowFromGameCoords(float gameX, float gameY) {
+    public AreaRenderer getAreaRenderer(Area area) {
+        for(int i = 0; i < areaRenderers.size; i++){
+            if(areaRenderers.get(i).getModel() == area)
+                return areaRenderers.get(i);
+        }
+        return null;
+    }
+
+    @Override
+    public int getRowFrom(float gameX, float gameY) {
         return (int)gameY;
     }
 
     @Override
-    public int getColFromGameCoords(float gameX, float gameY) {
+    public int getColFrom(float gameX, float gameY) {
         return (int)gameX;
+    }
+
+    @Override
+    protected float getXFrom(int row, int col) { return col; }
+
+    @Override
+    protected float getYFrom(int row, int col) { return row; }
+
+    @Override
+    public void displayDeploymentAreas(boolean visible) {
+        Array<Area> deploymentArea = getModel().getDeploymentAreas();
+        for(int i = 0; i< deploymentArea.size; i++){
+            for(int j = 0 ; j < areaRenderers.size; j++){
+                if(deploymentArea.get(i) == areaRenderers.get(j).getModel()){
+                    areaRenderers.get(j).setVisible(visible);
+                }
+            }
+        }
     }
 
     @Override
@@ -225,16 +241,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    @Override
     public void dispose(){
         super.dispose();
         for(int i =0; i < unitRenderers.size; i++){
             unitRenderers.get(i).dispose();
         }
-    }
-
-    @Override
-    public void setVisible(boolean visible) {
-
     }
 
 

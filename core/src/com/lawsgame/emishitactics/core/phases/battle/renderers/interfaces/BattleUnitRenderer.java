@@ -60,9 +60,11 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
                     }
                 } else if(query instanceof Data.WeaponType){
                     setWeaponType((Data.WeaponType)query);
-                } else if (query instanceof Notification.HorsemanUpdate){
-                    setHorman(((Notification.HorsemanUpdate)query).horseman);
-                } else {
+                } else if (query instanceof Notification.Horseman){
+                    setHorman(((Notification.Horseman)query).horseman);
+                } else if (query instanceof Notification.Visible){
+                    setVisible(((Notification.Visible)query).visible);
+                }else {
                     launchNextAnimation();
                 }
 

@@ -2,16 +2,16 @@ package com.lawsgame.emishitactics.core.renderers;
 
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 public class IsoBattlefieldRendererTest {
     private Battlefield battlefield;
-    private IsoBattlefieldRenderer bfr;
+    private IsoBFR bfr;
 
     @Before
     public void before(){
@@ -22,22 +22,29 @@ public class IsoBattlefieldRendererTest {
                 battlefield.getTiles()[r][c] = Data.TileType.PLAIN;
             }
         }
-        bfr = new IsoBattlefieldRenderer(battlefield, 0.5f);
+        this.bfr = new IsoBFR(battlefield);
     }
 
     @Test
     public void getTileCoordsFromGameCoordsTest(){
-        float xCenter = 1f;
-        float yCenter = 1f;
-        // r = 2 & c = 1
+        float xCenter = 1.5f;
+        float yCenter = 0.25f;
 
-        assertTrue(bfr.getRowFromGameCoords(xCenter, yCenter) == 2);
-        assertTrue(bfr.getColFromGameCoords(xCenter, yCenter) == 1);
+        // r = 0 & c = 0
+        assertTrue(bfr.getRowFrom(xCenter, yCenter) == 0);
+        assertTrue(bfr.getColFrom(xCenter, yCenter) == 0);
 
         xCenter = 2.5f;
         yCenter = 0.75f;
+
         // r = 0 & c = 2
-        assertTrue(bfr.getRowFromGameCoords(xCenter, yCenter) == 0);
-        assertTrue(bfr.getColFromGameCoords(xCenter, yCenter) == 2);
+        assertTrue(bfr.getRowFrom(xCenter, yCenter) == 0);
+        assertTrue(bfr.getColFrom(xCenter, yCenter) == 2);
+
+        xCenter = 2.0f;
+        yCenter = 1.0f;
+
+        assertTrue(bfr.getRowFrom(xCenter, yCenter) == 1);
+        assertTrue(bfr.getColFrom(xCenter, yCenter) == 2);
     }
 }

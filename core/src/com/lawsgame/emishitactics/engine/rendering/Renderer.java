@@ -7,11 +7,9 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
 public abstract class Renderer<M extends Observable> implements Observer, GameUpdatableEntity, Disposable{
     private M model;
-    private boolean visible;
 
     public Renderer(M model){
         setModel(model);
-        this.visible = true;
     }
 
     public M getModel(){
@@ -25,10 +23,7 @@ public abstract class Renderer<M extends Observable> implements Observer, GameUp
 
 
     public abstract boolean isExecuting();
-
-    public void setVisible(boolean visible){
-        this.visible = visible;
-    }
+    public abstract void setVisible(boolean visible);
 
     @Override
     public void dispose(){
@@ -39,4 +34,5 @@ public abstract class Renderer<M extends Observable> implements Observer, GameUp
     public String toString() {
         return "renderer of "+model.toString();
     }
+
 }

@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
@@ -38,25 +37,5 @@ public class InfoBIS extends BattleInteractionState{
     public boolean handleTouchInput(int row, int col) {
         bim.rollback();
         return true;
-    }
-
-    @Override
-    public void update60(float dt) {
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
     }
 }

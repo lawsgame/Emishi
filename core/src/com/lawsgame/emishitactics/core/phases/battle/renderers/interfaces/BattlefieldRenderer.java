@@ -1,9 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -28,21 +26,23 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         this.notificationQueue = new LinkedList<SimpleCommand>();
     }
 
-    public abstract void renderTiles(SpriteBatch batch);
-    public abstract void renderAreas(SpriteBatch batch);
-    public abstract void renderUnits(SpriteBatch batch);
+    public abstract void render(SpriteBatch batch);
+
+    public abstract int getRowFrom(float gameX, float gameY);
+    public abstract int getColFrom(float gameX, float gameY);
+    protected abstract float getXFrom(int row, int col);
+    protected abstract float getYFrom(int row, int col);
+    public abstract void displayDeploymentAreas(boolean visible);
+
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
-
-    public abstract int getRowFromGameCoords(float gameX, float gameY);
-    public abstract int getColFromGameCoords(float gameX, float gameY);
-
-    protected abstract void addTileRenderer(int row, int col, Data.TileType type);
-    protected abstract void addUnitRenderer(int row, int col, IUnit model);
-    protected abstract void addaAreaRenderer(Area area);
+    public abstract AreaRenderer getAreaRenderer(Area area);
+    public abstract void addTileRenderer(int row, int col, Data.TileType type);
+    public abstract void addUnitRenderer(int row, int col, IUnit model);
+    public abstract void addAreaRenderer(Area area);
+    public abstract void removeUnitRenderer(IUnit model);
+    public abstract void removeAreaRenderer(Area model);
     protected abstract boolean isUnitRendererCreated(IUnit model);
-    protected abstract boolean removeUnitRenderer(IUnit model);
     protected abstract void removeAreaRenderersAssociatedWith(IUnit model);
-    protected abstract void removeAreaRenderer(Area model);
 
     protected abstract boolean isCurrentTaskCompleted();
     protected abstract void setBuildTask(Notification.Build build);
@@ -60,6 +60,10 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
         for(int i = 0; i < unitRenderers.size; i++) {
             unitRenderers.get(i).update(dt);
+        }
+
+        for(int i = 0; i < areaRenderers.size; i++) {
+            areaRenderers.get(i).update(dt);
         }
     }
 
@@ -176,11 +180,11 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                 if(area == areaRenderers.get(i).getModel()){
                     removeAreaRenderer(area);
                     areaRemoved = true;
-                    continue;
+                    break;
                 }
             }
             if(!areaRemoved){
-                addaAreaRenderer(area);
+                addAreaRenderer(area);
             }
         }
     }

@@ -18,7 +18,7 @@ public class UnitTest {
     public void testJob(){
         Array<Unit> units = new Array<Unit>();
         for(int i = 0; i < 1000; i++){
-            units.add(new Unit(""+i, Data.Job.SOLAR_KNIGHT, 25, Data.WeaponType.SWORD, false, false, false));
+            units.add(new Unit(""+i, Data.Job.SERGEANT, 25, Data.WeaponType.SWORD, false, false, false, false));
         }
 
         Unit unit;
@@ -27,9 +27,6 @@ public class UnitTest {
             unit = units.get(i);
             array[i] = unit.getBaseAgility();
         }
-
-        System.out.println("EV : "+Utils.getExpectedValue(array));
-        System.out.println("SD : "+Utils.getStandardDerivation(array));
     }
 
 }

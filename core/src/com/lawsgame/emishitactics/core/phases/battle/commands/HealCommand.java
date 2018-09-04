@@ -33,7 +33,7 @@ public class HealCommand extends BattleCommand {
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimationId.HEAL));
         scheduleRenderTask(task);
 
-        // set outcome
+        // setTiles outcome
         outcome.receivers.add(getActor());
         outcome.experienceGained.add(choice.getExperience());
 

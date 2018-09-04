@@ -92,7 +92,7 @@ public class SelectActionBIS extends BattleInteractionState {
                     bim.replace(new SelectActionBIS(bim, row, col));
                     return true;
                 } else {
-                    // if not all commands are undoable, all the undoable ones are done, the unit is updated and a new choice panel is provided
+                    // if not all commands are undoable, all the undoable ones are visible, the unit is updated and a new choice panel is provided
                     bim.focusOn(row, col, true, true, true, false, false);
                     setChoicePanel();
                     choicePanel.setVisible(false);
@@ -101,26 +101,6 @@ public class SelectActionBIS extends BattleInteractionState {
             }
         }
         return false;
-    }
-
-    @Override
-    public void update60(float dt) {
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderAhead(SpriteBatch batch) {
-
     }
 
     public static abstract class ChoicePanel extends Table{
@@ -224,7 +204,7 @@ public class SelectActionBIS extends BattleInteractionState {
                 TextureAtlas uiAtlas = asm.get(Assets.ATLAS_UI);
                 Skin skin = new Skin(uiAtlas);
 
-                //set button style
+                //setTiles button style
                 style = new TextButton.TextButtonStyle();
                 style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
                 style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);
@@ -256,7 +236,7 @@ public class SelectActionBIS extends BattleInteractionState {
                 TextureAtlas uiAtlas = asm.get(Assets.ATLAS_UI);
                 Skin skin = new Skin(uiAtlas);
 
-                //set button style
+                //setTiles button style
                 style = new TextButton.TextButtonStyle();
                 style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
                 style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);

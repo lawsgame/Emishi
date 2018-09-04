@@ -21,20 +21,6 @@ public class BattleOverBIS extends BattleInteractionState {
         return true;
     }
 
-    @Override
-    public void update60(float dt) {
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
 
     @Override
     public void renderAhead(SpriteBatch batch) {

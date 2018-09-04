@@ -159,17 +159,17 @@ public class Notification {
     }
 
 
-    public static class HorsemanUpdate{
+    public static class Horseman {
         public boolean horseman;
 
-        private static final HorsemanUpdate FALSE = new HorsemanUpdate(false);
-        private static final HorsemanUpdate TRUE = new HorsemanUpdate(true);
+        private static final Horseman FALSE = new Horseman(false);
+        private static final Horseman TRUE = new Horseman(true);
 
-        private HorsemanUpdate(boolean horseman) {
+        private Horseman(boolean horseman) {
             this.horseman = horseman;
         }
 
-        public static HorsemanUpdate get(boolean horsman){
+        public static Horseman get(boolean horsman){
             return (horsman) ? TRUE : FALSE;
         }
     }
@@ -202,6 +202,23 @@ public class Notification {
 
         public static Done get(boolean done){
             return (done) ? TRUE : FALSE;
+        }
+
+
+    }
+
+    public static class Visible {
+        public final boolean visible;
+
+        private static final Visible FALSE = new Visible(false);
+        private static final Visible TRUE = new Visible(true);
+
+        private Visible(boolean visible) {
+            this.visible = visible;
+        }
+
+        public static Visible get(boolean visible){
+            return (visible) ? TRUE : FALSE;
         }
 
 

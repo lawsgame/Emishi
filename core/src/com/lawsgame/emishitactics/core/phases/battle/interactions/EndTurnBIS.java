@@ -67,21 +67,6 @@ public class EndTurnBIS extends BattleInteractionState {
     }
 
     @Override
-    public void update60(float dt) {
-
-    }
-
-    @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
-
-    @Override
     public void renderAhead(SpriteBatch batch) {
         windRoseWidget.render(batch);
     }
@@ -100,8 +85,8 @@ public class EndTurnBIS extends BattleInteractionState {
 
         public boolean handleTouch(float gameX, float gameY, int rowActor, int colActor, final BattleInteractionMachine bim){
             boolean handled = false;
-            int rowTouch = bim.bfr.getRowFromGameCoords(gameX, gameY);
-            int colTouch = bim.bfr.getColFromGameCoords(gameX, gameY);
+            int rowTouch = bim.bfr.getRowFrom(gameX, gameY);
+            int colTouch = bim.bfr.getColFrom(gameX, gameY);
 
             if(rowTouch  == rowActor){
                 if(colTouch  == colActor + 1){

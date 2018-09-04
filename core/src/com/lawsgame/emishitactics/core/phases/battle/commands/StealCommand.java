@@ -48,7 +48,7 @@ public class StealCommand extends BattleCommand{
         task.addThread(stealerRendererThread);
         scheduleRenderTask(task);
 
-        // set outoome
+        // setTiles outoome
         if(stealSuccessful){
             outcome.receivers.add(stealer);
             outcome.experienceGained.add(choice.getExperience());

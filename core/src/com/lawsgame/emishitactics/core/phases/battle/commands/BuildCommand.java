@@ -28,7 +28,7 @@ public class BuildCommand extends BattleCommand {
         // push render task
         scheduleRenderTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, getActor())));
 
-        // set outcome
+        // setTiles outcome
         outcome.receivers.add(getActor());
         outcome.experienceGained.add(choice.getExperience());
 

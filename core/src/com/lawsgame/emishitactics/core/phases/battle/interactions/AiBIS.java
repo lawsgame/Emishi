@@ -33,11 +33,6 @@ public class AiBIS extends BattleInteractionState {
     }
 
     @Override
-    public void renderBetween(SpriteBatch batch) {
-
-    }
-
-    @Override
     public void renderAhead(SpriteBatch batch) {
 
     }

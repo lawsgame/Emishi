@@ -6,13 +6,13 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
-import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 
 public class TempoAreaRenderer extends AreaRenderer {
 
-    protected Array<float[]> spriteCoords;          // coordinates to where render the used sprites => 4 sprites = 1 buildingType
-    protected Array<Sprite> spriteRefs;             // sprites to render associated with the coordinates above
+    private Array<float[]> spriteCoords;          // coordinates to where render the used sprites => 4 sprites = 1 buildingType
+    private Array<Sprite> spriteRefs;             // sprites to render associated with the coordinates above
 
 
     protected boolean visible = true;
@@ -21,17 +21,12 @@ public class TempoAreaRenderer extends AreaRenderer {
         super(model);
         this.spriteCoords = new Array<float[]>();
         this.spriteRefs = new Array<Sprite>();
-        build();
+        change();
     }
 
     @Override
     public void setVisible(boolean visible) {
         this.visible = visible;
-    }
-
-    @Override
-    public Battlefield getBattlefield() {
-        return getModel().getBattlefield();
     }
 
     @Override
@@ -45,7 +40,11 @@ public class TempoAreaRenderer extends AreaRenderer {
 
     @Override
     public void getNotification(Object data) {
-        build();
+        if(data == null) {
+            change();
+        }else if(data instanceof Notification.Visible){
+            setVisible(((Notification.Visible) data).visible);
+        }
     }
 
     @Override
@@ -59,7 +58,7 @@ public class TempoAreaRenderer extends AreaRenderer {
         }
     }
 
-    public void build(){
+    public void change(){
         spriteRefs.clear();
         spriteCoords.clear();
         if(getModel().getCheckmap() != null){

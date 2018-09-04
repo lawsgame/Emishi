@@ -17,6 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
 /**
@@ -40,7 +41,7 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
  *  II - battle command flow
  *
  *  1 - getInstance the command
- *  2 - set actor and target
+ *  2 - setTiles actor and target
  *  3 - call isTargetValid
  *  4 - execute the command
  *
@@ -51,16 +52,16 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
  *  0 - (optional) register the old model state to perform undo() if required
  *  1 - update the model
  *  2 - push the render task
- *  3 - set the outcome bundle
+ *  3 - setTiles the outcome bundle
  */
-public abstract class BattleCommand implements Command, Observer{
+public abstract class BattleCommand extends Observable implements Command, Observer{
 
     protected final Battlefield battlefield;
     protected final BattlefieldRenderer battlefieldRenderer;
     private final AnimationScheduler scheduler;
     protected final ActionChoice choice;
 
-    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied nor it costs any OA point
+    private boolean free;                           // command that does not count as the player choice i.e. setTiles acted and moved as true while being applied nor it costs any OA point
     private boolean decoupled;
 
     private IUnit actor;
@@ -112,7 +113,7 @@ public abstract class BattleCommand implements Command, Observer{
 
             if(!free){
 
-                // set as moved or acted if required
+                // setTiles as moved or acted if required
                 if(choice.isActedBased()) {
                     getActor().setActed(true);
                 }else {
@@ -163,10 +164,6 @@ public abstract class BattleCommand implements Command, Observer{
         return launched && renderTasks.size > 0;
     }
 
-    public boolean isCompleted(){
-        return launched && renderTasks.size == 0;
-    }
-
     protected void scheduleRenderTask(Task task){
         if(!task.isIrrelevant()) {
             renderTasks.add(task);
@@ -191,17 +188,23 @@ public abstract class BattleCommand implements Command, Observer{
     @Override
     public void getNotification(Object data) {
         if(data instanceof Task){
+
             Task completedTask = (Task)data;
             completedTask.detach(this);
             renderTasks.removeValue(completedTask, true);
+
+            System.out.println("TASK completed : remaining tasks : "+renderTasks.size);
+
+            // notify that the command is done : the model is updated AND the render tasks are completed
+            if(renderTasks.size == 0){
+                notifyAllObservers(this);
+            }
         }
     }
 
     protected abstract void execute();
 
-    protected void unexecute(){
-
-    }
+    protected void unexecute(){ }
 
 
     // called to checked actor requirements
@@ -230,7 +233,7 @@ public abstract class BattleCommand implements Command, Observer{
     }
 
     /**
-     * especially required to set attributes values required for instanciating the associated ActionPanel
+     * especially required to setTiles attributes values required for instanciating the associated ActionPanel
      */
     protected void init(){
         initialized = true;

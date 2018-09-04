@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -22,8 +23,7 @@ public class DeploymentBIS extends BattleInteractionState {
     private int rowUnit;
     private int colUnit;
     private IUnit sltdUnit;
-    private AreaWidget moveAreaWidget;
-    private Array<AreaWidget> deploymentAreaWidgets;
+    private Area moveArea;
     private StartButton startButton;
 
     private boolean initialized;
@@ -31,13 +31,6 @@ public class DeploymentBIS extends BattleInteractionState {
     public DeploymentBIS(final BattleInteractionMachine bim) {
         super(bim, true, true, true);
         this.initialized = false;
-
-        AreaWidget areaWidget;
-        this.deploymentAreaWidgets = new Array<AreaWidget>();
-        for(int j = 0; j < bim.battlefield.getNumberOfDeploymentAreas(); j++) {
-            areaWidget = new AreaWidget(bim.battlefield.getDeploymentArea(j));
-            this.deploymentAreaWidgets.add(areaWidget);
-        }
 
         bim.battlefield.randomlyDeploy(Army.getPlayerArmy());
 
@@ -58,12 +51,17 @@ public class DeploymentBIS extends BattleInteractionState {
     @Override
     public void init() {
         bim.uiStage.addActor(startButton);
+        bim.bfr.displayDeploymentAreas(true);
         updateSltdUnit();
     }
 
     private void updateSltdUnit(){
         if(initialized) {
-            this.moveAreaWidget = new AreaWidget(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
+            //update model area
+            bim.bfr.removeAreaRenderer(moveArea);
+            this.moveArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
+            bim.bfr.addAreaRenderer(moveArea);
+
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
             bim.focusOn(rowUnit, colUnit, true, true, true, true, false);
         }
@@ -175,14 +173,6 @@ public class DeploymentBIS extends BattleInteractionState {
     }
 
     @Override
-    public void renderBetween(SpriteBatch batch) {
-        for(int j = 0; j < bim.battlefield.getNumberOfDeploymentAreas(); j++)
-            deploymentAreaWidgets.get(j).render(batch);
-        if(moveAreaWidget != null)
-            moveAreaWidget.render(batch);
-    }
-
-    @Override
     public void renderAhead(SpriteBatch batch) {
 
     }
@@ -190,6 +180,8 @@ public class DeploymentBIS extends BattleInteractionState {
     @Override
     public void end() {
         super.end();
+        bim.bfr.removeAreaRenderer(moveArea);
+        bim.bfr.displayDeploymentAreas(false);
         bim.shortTilePanel.hide();
         bim.shortUnitPanel.hide();
         startButton.remove();

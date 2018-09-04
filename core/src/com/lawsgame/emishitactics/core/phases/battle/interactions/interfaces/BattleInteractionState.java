@@ -48,10 +48,9 @@ public abstract class BattleInteractionState extends InteractionState {
     public void update1(float dt) {}
     public void update3(float dt) {}
     public void update12(float dt) {}
-    public abstract void update60(float dt);
-    public abstract void prerender(SpriteBatch batch);
-    public abstract void renderBetween(SpriteBatch batch);
-    public abstract void renderAhead(SpriteBatch batch);
+    public void update60(float dt) {}
+    public void prerender(SpriteBatch batch){}
+    public void renderAhead(SpriteBatch batch){}
 
 
     public boolean handleRawTouchInput(float x, float y){
@@ -63,8 +62,8 @@ public abstract class BattleInteractionState extends InteractionState {
     public void onTouch(float gameX, float gameY) {
         if(!bim.gcm.isCameraMoving()) {
             if (!handleRawTouchInput(gameX, gameY)) {
-                rowTouch = bim.bfr.getRowFromGameCoords(gameX, gameY);
-                colTouch = bim.bfr.getColFromGameCoords(gameX, gameY);
+                rowTouch = bim.bfr.getRowFrom(gameX, gameY);
+                colTouch = bim.bfr.getColFrom(gameX, gameY);
                 if (!handleTouchInput(rowTouch, colTouch) && bim.battlefield.isTileExisted(rowTouch, colTouch)) {
                     bim.focusOn(rowTouch, colTouch, true, true, true, false, false);
                     if (bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, Data.Allegeance.ALLY)) {
