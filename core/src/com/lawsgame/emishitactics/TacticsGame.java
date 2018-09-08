@@ -11,10 +11,10 @@ import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.engine.GPM;
 
-public class EmishiTacticsGame extends ApplicationAdapter {
+public class TacticsGame extends ApplicationAdapter {
 	public static final int SCREEN_PIXEL_WIDTH = 960;
 	public static final int SCREEN_PIXEL_HEIGHT = 540;
-	public static final String TITLE = "Emishi Wars";
+	public static final String TITLE = "Lawsgame Tactical Game";
 
 	private Player player;
 	private SpriteBatch batch;
@@ -26,6 +26,7 @@ public class EmishiTacticsGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 0f);
+
 
 		this.batch = new SpriteBatch();
 		this.gpm = new GPM();
@@ -41,6 +42,8 @@ public class EmishiTacticsGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		//Anti aliasing enabled
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		gpm.update(Gdx.graphics.getDeltaTime());
 		gpm.render(batch);

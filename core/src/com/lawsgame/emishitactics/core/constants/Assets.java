@@ -8,12 +8,11 @@ public class Assets {
 
     public static final String STRING_BUNDLE_MAIN = "string/MainBundle";
 
-
-
     //XML
 
     public static final String XML_NAME_DB = "xml/name_db.xml";
     public static final String XML_UNITS_DEPLOYMENT = "xml/units.xml";
+    public static final String XML_BATTLE_PARAMS = "xml/battle_params.xml";
 
 
     //SKIN
@@ -25,20 +24,20 @@ public class Assets {
 
     // atlases
 
-    public static final String ATLAS_UNITS = "textures/unit_sprites.pack";
-    public static final String ATLAS_UI = "textures/ui_skin.pack";
+    public static final String ATLAS_TEMPO_UNITS = "textures/tempo/unit_sprites.pack";
+    public static final String ATLAS_TEMPO_UI = "textures/tempo/ui_skin.pack";
     public static final String ATLAS_MAPS = "textures/maps.pack";
+    public static final String ATLAS_TEMPO_TILES = "textures/tempo/tiles.pack";
     public static final String ATLAS_TILES = "textures/tiles.pack";
+
 
     // regions
 
-    public static final String getRegionMap(int id) {
+    public static String getRegionMap(int id) {
         return "map"+id;
     }
 
-    public static String getRegionTile(Data.TileType tileType) {
-        return tileType.name().toLowerCase();
-    }
+    public static String getRegionTile(Data.TileType tileType) { return tileType.name().toLowerCase(); }
 
     public static String getTileHighlighted(Data.AreaType id){
         return id.name().toLowerCase();
@@ -50,6 +49,8 @@ public class Assets {
 
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
+
+    public static final String REGION_TERRAINS_UNDEFINED = "undefined";
 
 
 

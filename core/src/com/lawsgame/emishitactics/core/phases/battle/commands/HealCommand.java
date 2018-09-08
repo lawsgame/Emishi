@@ -30,7 +30,7 @@ public class HealCommand extends BattleCommand {
         // push render task
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getTarget()), getTarget(), healPower));
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimationId.HEAL));
+        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimId.HEAL));
         scheduleRenderTask(task);
 
         // setTiles outcome

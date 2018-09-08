@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.renderers.tempo;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -13,6 +12,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
@@ -21,19 +21,21 @@ import com.lawsgame.emishitactics.engine.timers.CountDown;
  */
 
 public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
+    private static final float CAM_VELOCITY = 15.0f;
 
+    private Array<BattleUnitRenderer> unitRenderers;
     protected TextureRegion[][] tileRenderers;
     protected TempoSpritePool sprite2DPool;
     protected boolean visible;
 
     protected CountDown countDown = new CountDown(2f);
 
-    public TempoBattlefield2DRenderer(Battlefield battlefield, AssetManager asm) {
+    public TempoBattlefield2DRenderer(Battlefield battlefield, TempoSpritePool spritePool) {
         super(battlefield);
+        this.unitRenderers = new Array<BattleUnitRenderer>();
 
         this.visible = true;
-        this.sprite2DPool = TempoSpritePool.getInstance();
-        this.sprite2DPool.set(asm);
+        this.sprite2DPool = spritePool;
 
         // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
         this.tileRenderers = new TextureRegion[battlefield.getNbRows()][battlefield.getNbColumns()];
@@ -55,6 +57,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         for(int i = 0; i < battlefield.getDeploymentAreas().size; i++){
            addAreaRenderer(battlefield.getDeploymentAreas().get(i));
         }
+    }
+
+    @Override
+    public void prerender() {
+
     }
 
     @Override
@@ -83,6 +90,10 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         if(countDown.isFinished()) {
             countDown.reset();
         }
+
+        for(int i =0; i < unitRenderers.size; i++){
+            unitRenderers.get(i).update(dt);
+        }
     }
 
     @Override
@@ -96,10 +107,10 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             @Override
             public void apply() {
                 countDown.run();
-                TextureRegion tr = TempoSpritePool.getInstance().getBuildInConstructionSprite(notif.tileType);
+                TextureRegion tr = sprite2DPool.getBuildInConstructionSprite(notif.tileType);
                 if(tr != null)
                     tileRenderers [notif.row][notif.col] = tr;
-                getUnitRenderer(notif.builder).getNotification(Data.AnimationId.BUILD);
+                getUnitRenderer(notif.builder).getNotification(Data.AnimId.BUILD);
             }
         });
         offerTask(new SimpleCommand() {
@@ -210,11 +221,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return (int)gameX;
     }
 
-    @Override
-    protected float getXFrom(int row, int col) { return col; }
-
-    @Override
-    protected float getYFrom(int row, int col) { return row; }
 
     @Override
     public void displayDeploymentAreas(boolean visible) {
@@ -226,6 +232,12 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 }
             }
         }
+    }
+
+    @Override
+    public void setGameCamParameters(CameraManager cameraManager) {
+        cameraManager.setCameraBoundaries(getModel().getWidth(), getModel().getHeight());
+        cameraManager.setCameraVelocity(CAM_VELOCITY);
     }
 
     @Override

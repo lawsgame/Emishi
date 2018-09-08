@@ -17,7 +17,6 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 
 public class DeploymentBIS extends BattleInteractionState {
     private int rowUnit;
@@ -168,11 +167,6 @@ public class DeploymentBIS extends BattleInteractionState {
     }
 
     @Override
-    public void prerender(SpriteBatch batch) {
-
-    }
-
-    @Override
     public void renderAhead(SpriteBatch batch) {
 
     }
@@ -206,7 +200,7 @@ public class DeploymentBIS extends BattleInteractionState {
         }
 
         static StartButton create(AssetManager asm, Viewport uiPort){
-            TextureAtlas uiAtlas = asm.get(Assets.ATLAS_UI);
+            TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
             Skin skin = new Skin(uiAtlas);
 
             TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();

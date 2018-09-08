@@ -16,6 +16,8 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.ai.DumbAI;
+import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
@@ -36,17 +38,17 @@ import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> {
-    public Player player;
-    public Battlefield battlefield;
-
-    public BattlefieldRenderer bfr;
-    public BattleCommandManager bcm;
-    public CameraManager gcm;
-    public AssetManager asm;
-    public ActionPanelPool app;
-    public InputMultiplexer multiplexer;
-    public AnimationScheduler scheduler;
-    public I18NBundle mainI18nBundle;
+    public final Player player;
+    public final Battlefield battlefield;
+    public final BattlefieldRenderer bfr;
+    public final BattleCommandManager bcm;
+    public final CameraManager gcm;
+    public final AssetManager asm;
+    public final ActionPanelPool app;
+    public final InputMultiplexer multiplexer;
+    public final AnimationScheduler scheduler;
+    public final I18NBundle mainI18nBundle;
+    public final AI ai;
 
     private Area selectedTile;
     private Area touchedTile;
@@ -75,7 +77,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.player = player;
         this.multiplexer = new InputMultiplexer();
         this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
-
+        this.ai = new DumbAI();
 
         this.selectedTile = new Area(battlefield, Data.AreaType.SELECTED_UNIT);
         this.touchedTile = new Area(battlefield, Data.AreaType.TOUCHED_TILE);

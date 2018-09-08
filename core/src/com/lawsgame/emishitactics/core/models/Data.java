@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 
@@ -10,7 +11,7 @@ import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
 public class Data {
 
 
-    public static final float GAME_PORT_WIDTH = 15f;
+    public static final float GAME_PORT_WIDTH = 12f;
 
     //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;
@@ -31,7 +32,6 @@ public class Data {
     public static final int BASE_DROP_RATE = 5;
     public static final int GUARD_REACTION_RANGE_MIN = 1;
     public static final int GUARD_REACTION_RANGE_MAX = 1;
-    public static final int MAX_BANNER_SIGNS_PER_BANNER = 5;
 
     // RENDER parameters
     public static final float SPEED_WALK = 3f;  //buildingType/s
@@ -53,32 +53,63 @@ public class Data {
         return r.nextInt(n);
     }
 
-    /**
-     * for animation / rendering purposes, use to define:
-     *  - ids of animation sprite sets.
-     *  - ids of animations (optional)
-     */
-    public enum AnimationId {
-        WALK,
-        SWITCH_WEAPON,
-        //SWITCH_POSITION,
+
+    public enum Weather {
+        SUNNY(new Color(195f/255f, 236/255f, 240/255f, 1), new Color(89f/255f, 184/255f, 219/255f, 1));
+
+        private Color lowerColor;
+        private Color upperColor;
+
+        Weather(Color lowerColor, Color upperColor) {
+            this.lowerColor = lowerColor;
+            this.upperColor = upperColor;
+        }
+
+        public Color getLowerColor() {
+            return lowerColor;
+        }
+
+        public Color getUpperColor() {
+            return upperColor;
+        }
+
+        public static Weather getStandard(){
+            return SUNNY;
+        }
+    }
+
+    public enum SpriteSetId{
+        WALK_FLEE_SWITCHPOSITION,
+        LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED,
+        BACKSTABED_PUSHED,
+        REGULAR_ATTACK,
+        SPECIAL_MOVE,
+        BANNER_REST,
+        TAKE_HIT,
+        REST,
+        DODGE,
+        STEAL,
+        BUILD,
+        PUSH,
+        HEAL,
+        DIE
+    }
+
+    public enum AnimId {
         PUSH,
         HEAL,
         STEAL,
         BUILD,
         GUARD,
-        COVER,
-        LEVELUP,
         REST,
         ATTACK,
         DODGE,
-        PUSHED,
-        TREATED,
-        BACKSTABBED,
-        TAKE_HIT,
-        FLEE,
         DIE,
-        GUARDED
+        GUARDED,
+        WOUNDED,
+        LEVELUP,
+        SWITCH_WEAPON,
+        SPECIAL_MOVE
 
     }
 
@@ -240,7 +271,6 @@ public class Data {
         DEPLOYMENT_AREA,
         VANGUARD_DEPLOYMENT_AREA,
         FOE_ACTION_AREA
-        //FOE_SQUAD_MEMBER
     }
 
     public enum TileType {
@@ -574,7 +604,8 @@ public class Data {
 
     public enum Allegeance{
         ALLY,
-        ENEMY
+        ENEMY_0,
+        ENEMY_1
     }
 
     public enum BonusType{

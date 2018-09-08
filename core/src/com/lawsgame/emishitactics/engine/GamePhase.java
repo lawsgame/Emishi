@@ -2,12 +2,11 @@ package com.lawsgame.emishitactics.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
-import com.lawsgame.emishitactics.EmishiTacticsGame;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
 
 
@@ -57,7 +56,7 @@ public abstract class GamePhase implements State, GameElement {
 		this.gpm = gpm;
 		this.asm = asm;
 		this.gameCM = new CameraManager(gameWorldWidth, gameWorldHeight, gamePortWidth);
-		this.uiCM = new CameraManager(EmishiTacticsGame.SCREEN_PIXEL_WIDTH);
+		this.uiCM = new CameraManager(TacticsGame.SCREEN_PIXEL_WIDTH);
 		this.stageUI = new Stage(uiCM.getPort());
 	}
 
@@ -106,13 +105,13 @@ public abstract class GamePhase implements State, GameElement {
 
 	@Override
 	public void render(SpriteBatch batch){
-        /**
+        /*
          * stuff to renderUnderlyingMapPart without the batch instance, typically renderUnderlyingMapPart background color
          */
 		preRender(batch);
 
 
-        /**
+        /*
          * renderUnderlyingMapPart textures and shaders
          */
 		batch.setProjectionMatrix(gameCM.getCamera().combined);
@@ -128,7 +127,7 @@ public abstract class GamePhase implements State, GameElement {
 		batch.end();
 
 
-        /**
+        /*
          * UI rendering
          */
 		stageUI.draw();

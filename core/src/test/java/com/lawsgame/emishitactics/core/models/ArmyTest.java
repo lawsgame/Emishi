@@ -20,7 +20,7 @@ public class ArmyTest {
     @Before
     public void before(){
         army1 = new Army(Data.Allegeance.ALLY);
-        army2 = new Army(Data.Allegeance.ENEMY);
+        army2 = new Army(Data.Allegeance.ENEMY_0);
         phillipe = new Unit("phillipe");
         phillipe.setLeadership(20);
         eric = new Unit("eric");

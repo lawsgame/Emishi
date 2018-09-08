@@ -137,7 +137,7 @@ public class EndTurnBIS extends BattleInteractionState {
 
         public OrientationArrowWidget(AssetManager asm, Data.Orientation or) {
             this.orientation = or;
-            TextureAtlas atlas = asm.get(Assets.ATLAS_UI);
+            TextureAtlas atlas = asm.get(Assets.ATLAS_TEMPO_UI);
             arrowSprite = new Sprite(atlas.findRegion(Assets.UI_ARROW));
             arrowSprite.setSize(1, 1);
             arrowSprite.setPosition(0, 0);

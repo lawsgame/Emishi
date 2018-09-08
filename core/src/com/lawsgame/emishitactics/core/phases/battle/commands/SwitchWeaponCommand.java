@@ -8,7 +8,6 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class SwitchWeaponCommand extends SelfInflitedCommand {
@@ -25,13 +24,13 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
         getActor().switchWeapon(weaponIndex);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimationId.SWITCH_WEAPON));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimId.SWITCH_WEAPON));
     }
 
     @Override
     public void unexecute() {
         if(getActor().switchWeapon(weaponIndex)) {
-            scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimationId.SWITCH_WEAPON));
+            scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimId.SWITCH_WEAPON));
         }
 
 

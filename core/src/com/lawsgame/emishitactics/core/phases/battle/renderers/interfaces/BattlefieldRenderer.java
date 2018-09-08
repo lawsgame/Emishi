@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
@@ -15,24 +16,22 @@ import java.util.LinkedList;
 public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
     private LinkedList<SimpleCommand> notificationQueue;
-    protected Array<BattleUnitRenderer> unitRenderers;
     protected Array<AreaRenderer> areaRenderers;
 
     public BattlefieldRenderer(Battlefield model) {
 
         super(model);
-        this.unitRenderers = new Array<BattleUnitRenderer>();
         this.areaRenderers = new Array<AreaRenderer>();
         this.notificationQueue = new LinkedList<SimpleCommand>();
     }
 
+    public abstract void prerender();
     public abstract void render(SpriteBatch batch);
 
     public abstract int getRowFrom(float gameX, float gameY);
     public abstract int getColFrom(float gameX, float gameY);
-    protected abstract float getXFrom(int row, int col);
-    protected abstract float getYFrom(int row, int col);
     public abstract void displayDeploymentAreas(boolean visible);
+    public abstract void setGameCamParameters(CameraManager cameraManager);
 
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
     public abstract AreaRenderer getAreaRenderer(Area area);
@@ -47,7 +46,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     protected abstract boolean isCurrentTaskCompleted();
     protected abstract void setBuildTask(Notification.Build build);
 
-    public void offerTask(SimpleCommand command){
+    public final void offerTask(SimpleCommand command){
         if(command != null)
             notificationQueue.offer(command);
     }
@@ -56,10 +55,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public void update(float dt) {
         if(!isCurrentTaskCompleted() && ! notificationQueue.isEmpty()){
             notificationQueue.pop().apply();
-        }
-
-        for(int i = 0; i < unitRenderers.size; i++) {
-            unitRenderers.get(i).update(dt);
         }
 
         for(int i = 0; i < areaRenderers.size; i++) {
@@ -74,7 +69,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
      * @param data
      */
     @Override
-    public void getNotification(Object data) {
+    public final void getNotification(Object data) {
         if (data instanceof IUnit) {
 
             // remove the sent unit

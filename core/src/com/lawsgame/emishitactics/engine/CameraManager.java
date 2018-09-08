@@ -7,12 +7,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-import java.lang.annotation.Target;
-
 import static com.lawsgame.emishitactics.engine.GamePhase.getAspRatio;
 
 public class CameraManager extends Observable implements GameUpdatableEntity {
-    private static final float CAM_VELOCITY = 15;
+    private static final float CAM_STD_VELOCITY = 15;
     private static final float CAM_SLOPE_FACTOR = 0.1f; 	// increase it raise the transition period
 
     protected OrthographicCamera camera;     // level camera
@@ -29,6 +27,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
     private  Vector dl;
     private boolean cameraMoving;
     private float intensity;
+    private float cameraVelocity;
 
     public CameraManager(float worldWidth, float worldHeight, float portWidth){
         this.worldHeight = worldHeight;
@@ -50,6 +49,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.dl = new Vector(0,0);
         this.cameraMoving = false;
         this.intensity = 0;
+        this.cameraVelocity = CAM_STD_VELOCITY;
 
     }
 
@@ -98,7 +98,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
             gamma.x = (vTarget.x - vFrom.x);
             gamma.y = (vTarget.y - vFrom.y);
             alpha = CAM_SLOPE_FACTOR*gamma.length();
-            gamma.multiply(CAM_VELOCITY);
+            gamma.multiply(cameraVelocity);
             cameraMoving = true;
             intensity = 0;
         }
@@ -212,6 +212,10 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
     public float getPortWidth(){ return  viewport.getWorldWidth(); }
 
     public float getPortHeight(){ return  viewport.getWorldHeight(); }
+
+    public void setCameraVelocity(float cameraVelocity) {
+        this.cameraVelocity = cameraVelocity;
+    }
 
     public OrthographicCamera getCamera() {
         return camera;

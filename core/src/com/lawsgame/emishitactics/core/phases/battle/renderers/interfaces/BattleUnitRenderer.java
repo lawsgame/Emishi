@@ -34,14 +34,8 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
                     setTargeted(((Notification.Blink) query).targeted);
                 } else if(query instanceof Integer) {
                     displayTreated((Integer)query);
-                } else if (query instanceof int[]) {
-                    int[] array = (int[]) query;
-                    if (array.length == 10) {
-                        int[] gainLvl = (int[]) query;
-                        displayLevelup(gainLvl);
-                    }
-                } else if (query instanceof Data.AnimationId) {
-                    display((Data.AnimationId) query);
+                }  else if (query instanceof Data.AnimId) {
+                    display((Data.AnimId) query);
                 } else if (query instanceof Notification.Pushed) {
                     Notification.Pushed notif = (Notification.Pushed)query;
                     displayPushed(notif.orientation);
@@ -61,7 +55,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
                 } else if(query instanceof Data.WeaponType){
                     setWeaponType((Data.WeaponType)query);
                 } else if (query instanceof Notification.Horseman){
-                    setHorman(((Notification.Horseman)query).horseman);
+                    setHorseman(((Notification.Horseman)query).horseman);
                 } else if (query instanceof Notification.Visible){
                     setVisible(((Notification.Visible)query).visible);
                 }else {
@@ -87,14 +81,13 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
 
     public abstract void displayWalk(Array<int[]> path);
     public abstract void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab);
-    public abstract void displayLevelup(int[] gainlvl);
     public abstract void displayTreated(int healedHP);
     public abstract void displayPushed(Data.Orientation pushedTowards);
     public abstract void displayFlee(Data.Orientation fleeingDirection);
-    public abstract void display(Data.AnimationId id);
+    public abstract void display(Data.AnimId id);
     public abstract void setOrientation(Data.Orientation or);
     public abstract void setWeaponType(Data.WeaponType type);
-    public abstract void setHorman(boolean horseman);
+    public abstract void setHorseman(boolean horseman);
 
 
     @Override
@@ -112,7 +105,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
         notificationQueue.offer(data);
         if(data instanceof Notification.ApplyDamage){
             Notification.ApplyDamage notif = (Notification.ApplyDamage)data;
-            if(notif.state == Notification.ApplyDamage.State.DIED) notificationQueue.offer(Data.AnimationId.DIE);
+            if(notif.state == Notification.ApplyDamage.State.DIED) notificationQueue.offer(Data.AnimId.DIE);
             if(notif.state == Notification.ApplyDamage.State.FLED) notificationQueue.offer(Notification.Fled.get(notif.fleeingOrientation));
             if(notif.state != Notification.ApplyDamage.State.WOUNDED){
                 notificationQueue.offer(new SimpleCommand() {

@@ -37,7 +37,7 @@ public class GuardCommand extends SelfInflitedCommand {
         // push render task
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer, area));
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimationId.GUARD));
+        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimId.GUARD));
 
         // animated guarded units as well
         IUnit guardedUnit;
@@ -49,7 +49,7 @@ public class GuardCommand extends SelfInflitedCommand {
                 dist = Utils.dist(rowActor, colActor, r, c);
                 if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, actor.getArmy().getAllegeance())){
                     guardedUnit = battlefield.getUnit(r,c);
-                    task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(guardedUnit), Data.AnimationId.GUARDED));
+                    task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(guardedUnit), Data.AnimId.GUARDED));
                 }
             }
         }

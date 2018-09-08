@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Battles>
+    <Battle battlefieldId = "0">
+        <Parameter id="weather" value="SUNNY" />
+    </Battle>
+</Battles>

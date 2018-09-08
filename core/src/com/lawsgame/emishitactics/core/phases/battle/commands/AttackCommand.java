@@ -76,7 +76,7 @@ public class AttackCommand extends BattleCommand {
         if(!retaliate) attacker.setOrientation(attackerReorientation);
 
         attackerRendererThread.addQuery(attackerReorientation);
-        attackerRendererThread.addQuery(Data.AnimationId.ATTACK);
+        attackerRendererThread.addQuery(Data.AnimId.ATTACK);
 
         boolean backstabbed = attacker.getOrientation() == defender.getOrientation() && !retaliate;
         int hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowTarget, colTarget, battlefield);
@@ -109,7 +109,7 @@ public class AttackCommand extends BattleCommand {
         }else{
             // view-wise scheduling
             targetRendererThread.addQuery(attacker.getOrientation().getOpposite());
-            targetRendererThread.addQuery(Data.AnimationId.DODGE);
+            targetRendererThread.addQuery(Data.AnimId.DODGE);
             targetRendererThread.addQuery(defender.getOrientation());
         }
 

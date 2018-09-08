@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -201,7 +200,7 @@ public class SelectActionBIS extends BattleInteractionState {
         public TempoActionChoicePanel(AssetManager asm) {
             super();
             if(style == null) {
-                TextureAtlas uiAtlas = asm.get(Assets.ATLAS_UI);
+                TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
                 Skin skin = new Skin(uiAtlas);
 
                 //setTiles button style
@@ -233,7 +232,7 @@ public class SelectActionBIS extends BattleInteractionState {
             super();
             this.buttonIndex = 0;
             if(style == null) {
-                TextureAtlas uiAtlas = asm.get(Assets.ATLAS_UI);
+                TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
                 Skin skin = new Skin(uiAtlas);
 
                 //setTiles button style

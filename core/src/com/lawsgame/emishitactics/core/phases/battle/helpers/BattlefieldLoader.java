@@ -57,7 +57,39 @@ public class BattlefieldLoader {
                 cols++;
             }
         }
-        Battlefield bf = new Battlefield(rows/2,cols/2);
+
+        //FETCH BATTLEFIELD PARAM
+        Weather weather = Data.Weather.getStandard();
+        try {
+            XmlReader.Element battlesElt = reader.parse(Gdx.files.internal(Assets.XML_BATTLE_PARAMS));
+            XmlReader.Element battleElt;
+            XmlReader.Element paramElt;
+            for (int i = 0; i < battlesElt.getChildCount(); i++) {
+                battleElt = battlesElt.getChild(i);
+
+                if (battleElt.getInt("battlefieldId") == bfId) {
+                    for(int k = 0; k < battleElt.getChildCount(); k++) {
+
+                        paramElt = battleElt.getChild(k);
+                        if(paramElt.get("id").equals("waether")){
+                            for(Weather w : Weather.values()){
+                                if(paramElt.get("value").equals(w.name())){
+                                    weather = w;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //CREATE BATTLEFIELD INSTANCE
+
+        Battlefield bf = new Battlefield(rows/2,cols/2, weather);
 
 
         // LOAD TILES
@@ -131,7 +163,7 @@ public class BattlefieldLoader {
                     for (int j = 0; j < battleElt.getChildCount(); j++) {
 
                         armyElt = battleElt.getChild(i);
-                        Data.Allegeance allegeance = Data.Allegeance.ENEMY;
+                        Data.Allegeance allegeance = Data.Allegeance.ENEMY_0;
                         for(Data.Allegeance a: Data.Allegeance.values()){
                             if(a.name().equals(armyElt.get("allegeance"))){
                                 allegeance = a;

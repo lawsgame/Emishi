@@ -3,7 +3,6 @@ package com.lawsgame.emishitactics.core.models;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -34,8 +33,8 @@ public class BattlefieldTest {
     public void testArmyQueue(){
         Army army1 = new Army(Data.Allegeance.ALLY);
         Army army2 = new Army(Data.Allegeance.ALLY);
-        Army army3 = new Army(Data.Allegeance.ENEMY);
-        Army army4 = new Army(Data.Allegeance.ENEMY);
+        Army army3 = new Army(Data.Allegeance.ENEMY_0);
+        Army army4 = new Army(Data.Allegeance.ENEMY_0);
 
         battlefield.randomlyDeploy(army1);
         battlefield.randomlyDeploy(army2);

@@ -49,7 +49,6 @@ public abstract class BattleInteractionState extends InteractionState {
     public void update3(float dt) {}
     public void update12(float dt) {}
     public void update60(float dt) {}
-    public void prerender(SpriteBatch batch){}
     public void renderAhead(SpriteBatch batch){}
 
 

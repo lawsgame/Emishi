@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -80,7 +79,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
                                 // of the unit has leveled up
                                 StandardTask levelUpTask = new StandardTask();
-                                levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(receiver), Data.AnimationId.LEVELUP));
+                                levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(receiver), Data.AnimId.LEVELUP));
                                 levelUpTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
 
                                 if (receiver.getArmy().isPlayerControlled()) {

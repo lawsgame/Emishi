@@ -156,11 +156,11 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("input : "+row+" "+col);
 
         //TEST 0
-        //System.out.println(bim.battlefield.isTileGuarded(rowInit, colInit, Data.Allegeance.ENEMY));
+        //System.out.println(bim.battlefield.isTileGuarded(rowInit, colInit, Data.Allegeance.ENEMY_0));
 
         //TEST 1
         /*
-        Array<IUnit> coverers = bim.battlefield.getUnitsCoveringTile(rowInit, colInit, Data.Allegeance.ENEMY);
+        Array<IUnit> coverers = bim.battlefield.getUnitsCoveringTile(rowInit, colInit, Data.Allegeance.ENEMY_0);
         System.out.println("COVERERS : ");
         for(int i = 0; i <  coverers.size; i++){
             System.out.println(coverers.getInstance(i).getName());
@@ -186,7 +186,7 @@ public class TestBIS extends BattleInteractionState {
 
         // TEST FINAL
 
-
+        /**
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Allegeance.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
 
@@ -205,20 +205,8 @@ public class TestBIS extends BattleInteractionState {
                     case 8 : command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, Data.Orientation.NORTH);break;
                     case 9 : command = new EndTurnCommand(bim.bfr, bim.scheduler);break;
                     default: command = new AttackCommand(bim.bfr, bim.scheduler);
-                    /*
-                    case 1 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.ATTACK, false).get(0);break;
-                    case 2 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.HEAL, false).get(0);break;
-                    case 3 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.PUSH, false).get(0); break;
-                    case 4 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.SWITCH_POSITION, false).get(0);break;
-                    case 5 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.GUARD, false).get(0); break;
-                    case 6 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.STEAL, false).get(0);break;
-                    case 7 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.SWITCH_WEAPON, false).get(0); break;
-                    case 8 : command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.CHOOSE_ORIENTATION, false).get(0);break;
-                    default: command = bim.bcm.getAvailableCommands(sltdUnit, ActionChoice.ATTACK, false).get(0);
-                    */
                 }
             } else {
-                //command = bim.bcm.getAvailableCommands(sltdUnit, (index != 9) ? ActionChoice.MOVE : ActionChoice.BUILD, false).get(0);
                 command = (index != 9) ? new MoveCommand(bim.bfr, bim.scheduler) : new BuildCommand(bim.bfr, bim.scheduler, Data.TileType.BRIDGE);
 
             }
@@ -274,6 +262,7 @@ public class TestBIS extends BattleInteractionState {
                 }
             }
         }
+        */
 
         return true;
     }

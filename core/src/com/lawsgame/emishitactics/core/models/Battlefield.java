@@ -35,9 +35,12 @@ public class Battlefield extends Observable {
     private HashMap<Allegeance, Array<UnitArea>> guardedAreas;
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
+    private Data.Weather weather;
+
     private LinkedList<Integer> armyIdsTurnOrderQueue;
 
-    public Battlefield (int nbRows, int nbCols){
+    public Battlefield (int nbRows, int nbCols, Data.Weather weather){
+        this.weather = weather;
         if(nbRows > 0 && nbCols > 0) {
             this.tiles = new TileType[nbRows][nbCols];
             this.looted = new boolean[nbRows][nbCols];
@@ -53,6 +56,10 @@ public class Battlefield extends Observable {
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
         this.armyIdsTurnOrderQueue = new LinkedList<Integer>();
+    }
+
+    public Battlefield(int nbRows, int nbCols){
+        this(nbRows, nbCols, Data.Weather.getStandard());
     }
 
     public int getNbRows() {
@@ -613,7 +620,6 @@ public class Battlefield extends Observable {
 
     private static final CheckMoveMap checkmap = new CheckMoveMap();
 
-
     static class CheckMoveMap{
         int rowOrigin;
         int colOrigin;
@@ -942,6 +948,10 @@ public class Battlefield extends Observable {
 
     public LinkedList<Integer> getArmyIdsTurnOrderQueue() {
         return armyIdsTurnOrderQueue;
+    }
+
+    public Data.Weather getWeather() {
+        return weather;
     }
 
     @Override

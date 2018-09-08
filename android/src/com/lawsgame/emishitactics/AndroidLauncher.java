@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.lawsgame.emishitactics.EmishiTacticsGame;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override
@@ -14,6 +13,7 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useAccelerometer = false;
 		config.useGyroscope = false;
 		config.useCompass = false;
-		initialize(new EmishiTacticsGame(), config);
+		//config.numSamples = 2;
+		initialize(new TacticsGame(), config);
 	}
 }
