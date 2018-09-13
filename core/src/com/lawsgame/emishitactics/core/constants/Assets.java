@@ -11,7 +11,6 @@ public class Assets {
     //XML
 
     public static final String XML_NAME_DB = "xml/name_db.xml";
-    public static final String XML_UNITS_DEPLOYMENT = "xml/units.xml";
     public static final String XML_BATTLE_PARAMS = "xml/battle_params.xml";
 
 
@@ -26,8 +25,8 @@ public class Assets {
 
     public static final String ATLAS_TEMPO_UNITS = "textures/tempo/unit_sprites.pack";
     public static final String ATLAS_TEMPO_UI = "textures/tempo/ui_skin.pack";
-    public static final String ATLAS_MAPS = "textures/maps.pack";
     public static final String ATLAS_TEMPO_TILES = "textures/tempo/tiles.pack";
+    public static final String ATLAS_MAPS = "textures/maps.pack";
     public static final String ATLAS_TILES = "textures/tiles.pack";
 
 
@@ -36,7 +35,6 @@ public class Assets {
     public static String getRegionMap(int id) {
         return "map"+id;
     }
-
     public static String getRegionTile(Data.TileType tileType) { return tileType.name().toLowerCase(); }
 
     public static String getTileHighlighted(Data.AreaType id){
@@ -46,7 +44,6 @@ public class Assets {
     public static final String UI_BUTTON_UP = "button_up";
     public static final String UI_BUTTON_DOWN = "button_down";
     public static final String UI_ARROW = "arrow";
-
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
 

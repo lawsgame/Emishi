@@ -193,8 +193,6 @@ public abstract class BattleCommand extends Observable implements Command, Obser
             completedTask.detach(this);
             renderTasks.removeValue(completedTask, true);
 
-            System.out.println("TASK completed : remaining tasks : "+renderTasks.size);
-
             // notify that the command is done : the model is updated AND the render tasks are completed
             if(renderTasks.size == 0){
                 notifyAllObservers(this);

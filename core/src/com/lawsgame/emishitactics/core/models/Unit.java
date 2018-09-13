@@ -58,8 +58,9 @@ public class Unit extends IUnit{
     protected boolean acted = false;
 
     /**
+     * GENERIC UNIT constructor
      *
-     * Can be addExpGained as well:
+     * Can be set as well:
      * - weapons
      * - battle and leadership experience
      * - right handed
@@ -128,6 +129,27 @@ public class Unit extends IUnit{
     public Unit(String name){
         this(name, Job.getStandard(), 10, WeaponType.SWORD, false, false, false, true);
     }
+
+    /**
+     * CHARACTER constructor
+     *
+     * @param job
+     * @param level
+     * @param weaponType
+     * @param shielbearer
+     * @param horseman
+     * @param horsemanUponPromotion
+     */
+    public Unit(
+            Job job,
+            int level,
+            WeaponType weaponType,
+            boolean shielbearer,
+            boolean horseman,
+            boolean horsemanUponPromotion){
+        this(job.name(), job, level, weaponType, shielbearer, horseman, horsemanUponPromotion, false);
+    }
+
 
 
     @Override

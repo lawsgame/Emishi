@@ -16,7 +16,6 @@ public class TacticsGame extends ApplicationAdapter {
 	public static final int SCREEN_PIXEL_HEIGHT = 540;
 	public static final String TITLE = "Lawsgame Tactical Game";
 
-	private Player player;
 	private SpriteBatch batch;
 	private GPM gpm;
 
@@ -30,8 +29,7 @@ public class TacticsGame extends ApplicationAdapter {
 
 		this.batch = new SpriteBatch();
 		this.gpm = new GPM();
-		this.player = new Player();
-		this.gpm.push(new BattlePhase(gpm, player, 0));
+		this.gpm.push(new BattlePhase(gpm, Player.create(), 0));
 
 	}
 

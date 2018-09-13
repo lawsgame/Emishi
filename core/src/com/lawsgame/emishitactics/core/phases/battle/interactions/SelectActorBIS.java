@@ -14,7 +14,7 @@ public class SelectActorBIS extends BattleInteractionState {
         this.rowInit = rowInit;
         this.colInit = colInit;
         if(newPlayerTurn){
-            bim.begin(Army.getPlayerArmy());
+            bim.begin(bim.player.getArmy());
         }
 
     }
@@ -33,7 +33,7 @@ public class SelectActorBIS extends BattleInteractionState {
             activeUnitPos[0] = rowInit;
             activeUnitPos[1] = colInit;
         }else{
-            activeUnitPos = bim.battlefield.getRandomlyStillActiveUnitsCoords(Army.getPlayerArmy().getId());
+            activeUnitPos = bim.battlefield.getRandomlyStillActiveUnitsCoords(bim.player.getArmy().getId());
         }
 
         if(activeUnitPos != null){

@@ -236,6 +236,10 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         }
     }
 
+    /**
+     * initiates the given army turn
+     * @param army
+     */
     public void begin(IArmy army) {
         army.replenishMoral();
         army.updateActionPoints();

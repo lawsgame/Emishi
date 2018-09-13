@@ -3,6 +3,8 @@ package com.lawsgame.emishitactics.core.models;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.Allegeance;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.Job;
+import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -40,7 +42,6 @@ public class Battlefield extends Observable {
     private LinkedList<Integer> armyIdsTurnOrderQueue;
 
     public Battlefield (int nbRows, int nbCols, Data.Weather weather){
-        this.weather = weather;
         if(nbRows > 0 && nbCols > 0) {
             this.tiles = new TileType[nbRows][nbCols];
             this.looted = new boolean[nbRows][nbCols];
@@ -56,6 +57,7 @@ public class Battlefield extends Observable {
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
         this.armyIdsTurnOrderQueue = new LinkedList<Integer>();
+        setWeather(weather, true);
     }
 
     public Battlefield(int nbRows, int nbCols){
@@ -75,6 +77,10 @@ public class Battlefield extends Observable {
         return 0;
     }
 
+    /**
+     * only for loaded AI armies which do not use Battlefield.randomlyDeploy()
+     * @param armyId
+     */
     public void addArmyId(int armyId){
 
         //check if the army if already deployed
@@ -950,6 +956,13 @@ public class Battlefield extends Observable {
         return armyIdsTurnOrderQueue;
     }
 
+    public void setWeather(Data.Weather weather, boolean notifyObservers) {
+        this.weather = weather;
+        if(notifyObservers){
+            notifyAllObservers(weather);
+        }
+    }
+
     public Data.Weather getWeather() {
         return weather;
     }
@@ -1042,6 +1055,7 @@ public class Battlefield extends Observable {
 
 
     }
+    
 
 
 }

@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Battles>
-    <Battle battlefieldId = "0">
-        <Parameter id="weather" value="SUNNY" />
+    <Battle battlefieldId = "0" weather="SUNNY">
+        <Army allegeance = "ENEMY1">
+            <Squad>
+                <Unit row = "14" col = "5" name = "noname" job="SOLAR_KNIGHT" level="8" weaponType="BOW" shieldbearer="false" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                    <Attribute id = "weapon" value="HUNTING_BOW" stealable="true"/>
+                    <Attribute id = "right handed" value="true"/>
+                    <Attribute id = "equipement" value ="WARRIOR" stealable="false"/>
+                    <Attribute id = "banner sign" value ="NONE"/>
+                    <Attribute id = "orientation" value="SOUTH"/>
+                    <Attribute id = "behaviour" value="PASSIVE"/>
+                </Unit>
+                <Unit row = "13" col = "8" name = "noname" job="SOLAR_KNIGHT" level="7" weaponType="AXE" shieldbearer="false" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                    <Attribute id = "weapon" value="BROAD_AXE" stealable="true" />
+                    <Attribute id = "right handed" value="true"/>
+                    <Attribute id = "orientation" value="SOUTH"/>
+                    <Attribute id = "behaviour" value="PASSIVE"/>
+                </Unit>
+            </Squad>
+            <Squad>
+                <Unit row = "9" col = "7" name = "noname" job="SOLAR_KNIGHT" level="7" weaponType="SWORD" shieldbearer="false" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                    <Attribute id = "weapon" value="SHORTSWORD" stealable="true"/>
+                    <Attribute id = "right handed" value="true"/>
+                    <Attribute id = "orientation" value="SOUTH"/>
+                    <Attribute id = "behaviour" value="PASSIVE"/>
+                </Unit>
+            </Squad>
+        </Army>
     </Battle>
 </Battles>

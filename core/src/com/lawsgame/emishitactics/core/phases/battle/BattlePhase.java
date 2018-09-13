@@ -33,16 +33,15 @@ public class BattlePhase extends GamePhase {
     private BattleInteractionMachine bim;
 
     public void loadRequiredAssets() {
-        asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
-        asm.load(Assets.ATLAS_TEMPO_TILES, TextureAtlas.class);
-        asm.load(Assets.ATLAS_TILES, TextureAtlas.class);
+        //TEMPO
         asm.load(Assets.ATLAS_TEMPO_UI, TextureAtlas.class);
         asm.load(Assets.ATLAS_TEMPO_UNITS, TextureAtlas.class);
+        asm.load(Assets.ATLAS_TEMPO_TILES, TextureAtlas.class);
+
+        asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
+        asm.load(Assets.ATLAS_TILES, TextureAtlas.class);
         asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class); //, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
-        //asm.load(Assets.SKIN_UI, Skin.class);
         asm.finishLoading();
-
-
 
     }
 
@@ -52,41 +51,18 @@ public class BattlePhase extends GamePhase {
         // load assets
         loadRequiredAssets();
 
-        // load and setup the battlefield and its receiver
+        // load the battlefield
         Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
 
-
+        // set up sprite pool and battlefield renderers
         TempoSpritePool.getInstance().set(asm);
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.getInstance());
         SpritePool spritePool = new SpritePool();
-        spritePool.set(battlefield, asm);
+        spritePool.set(battlefield, player, asm);
         //BattlefieldRenderer battlefieldRenderer = new IsoBFR(battlefield, spritePool);
         battlefieldRenderer.setGameCamParameters(this.getGameCM());
 
-        // TEST player army
-        Unit warlord = new Unit("Aterui", Data.Job.SERGEANT, 18, Data.WeaponType.SWORD, false, false, false, false);
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier1 = new Unit("Taro", Data.Job.SERGEANT, 5, Data.WeaponType.SWORD, false, false, false, false);
-        soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier2 = new Unit("Maro", Data.Job.SERGEANT, 5, Data.WeaponType.SWORD, false, false, false, false);
-        soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit warchief1 = new Unit("Azamaru", Data.Job.SERGEANT, 5, Data.WeaponType.SWORD, false, false, false, false);
-        warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-
-        IArmy playerArmy = Army.getPlayerArmy();
-        playerArmy.setLeadershipConditionEnabled(false);
-        playerArmy.add(warlord);
-        playerArmy.add(warchief1);
-        playerArmy.add(soldier1);
-        playerArmy.add(soldier2);
-        playerArmy.appointWarLord(warlord);
-        playerArmy.appointWarChief(warchief1);
-        playerArmy.appointSoldier(soldier1, 0);
-        playerArmy.appointSoldier(soldier2, 1);
-
-
+        //lauch initial BIS
         this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, player);
         //BattleInteractionState initBIS = new TestBIS(bim);
         BattleInteractionState initBIS = new SceneBIS(bim);

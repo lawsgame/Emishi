@@ -1,25 +1,27 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data.BannerSignTemplate;
+import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Banner extends Observable  {
-    private final Array<BannerSign> bannerSigns;
+    private final Array<Sign> bannerSigns;
 
     public Banner() {
-        this.bannerSigns = new Array<BannerSign>();
+        this.bannerSigns = new Array<Sign>();
     }
 
-    public  void addSign(BannerSign sign, boolean notifyObservers){
+    public  void addSign(Sign sign, boolean notifyObservers){
         if(hasSign(sign.getTemplate()) < sign.getTemplate().getMaxSignByBanner()) {
             if(notifyObservers)
                 notifyAllObservers(null);
         }
     }
 
-    public BannerSign removeSign(int index, boolean notifyObservers){
-        BannerSign sign = null;
+    public Sign removeSign(int index, boolean notifyObservers){
+        Sign sign = null;
         if(0 <= index && index < bannerSigns.size) {
             sign = bannerSigns.removeIndex(index);
             if (notifyObservers)
@@ -45,7 +47,7 @@ public class Banner extends Observable  {
         return numberSigns;
     }
 
-    public Array<BannerSign> getBannerSigns() {
+    public Array<Sign> getBannerSigns() {
         return bannerSigns;
     }
 
@@ -84,6 +86,52 @@ public class Banner extends Observable  {
             }
         }
         return stealable;
+    }
+
+
+
+    public static class Sign implements Item {
+        private Data.BannerSignTemplate template;
+        private boolean droppable;
+        private boolean stealable;
+
+        public Sign(Data.BannerSignTemplate template, boolean droppable, boolean stealable) {
+            this.template = template;
+            this.droppable = droppable;
+            this.stealable = stealable;
+        }
+
+        @Override
+        public String getName(I18NBundle bundle) {
+            return template.getName(bundle);
+        }
+
+        @Override
+        public boolean isStealable() {
+            return stealable;
+        }
+
+        @Override
+        public boolean isDroppable() {
+            return droppable;
+        }
+
+        public void setDroppable(boolean droppable) {
+            this.droppable = droppable;
+        }
+
+        public void setStealable(boolean stealable) {
+            this.stealable = stealable;
+        }
+
+        @Override
+        public int getDropRate() {
+            return template.getDropFactor();
+        }
+
+        public Data.BannerSignTemplate getTemplate() {
+            return template;
+        }
     }
 
 }

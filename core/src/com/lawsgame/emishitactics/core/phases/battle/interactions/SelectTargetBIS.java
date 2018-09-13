@@ -43,6 +43,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     @Override
     public void end() {
         super.end();
+        currentCommand.detach(this);
         bim.bfr.removeAreaRenderer(actionArea);
     }
 
@@ -60,6 +61,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         int col = currentCommand.getColTarget();
         if(currentCommand.isTargetValid()){
 
+
             if(currentCommand.getActionChoice().isUndoable()){
 
                 // remove blinking and other highlighting target affect
@@ -76,7 +78,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         }else{
 
             /*
-             * this paragraph is required to initialize the SelectActorBIS below, triggerd if the player if:
+             * this paragraph is required to initialize the SelectActorBIS below, triggerd if the player :
              * - touch a none valid target tile
              * - the historic is fully clearable
              * - yet, the target tile is not occupied by the active player unit
@@ -93,7 +95,11 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
                 colInit = currentCommand.getColActor();
             }
 
+            System.out.println("TRIGER COMMAND : "+currentCommand.toString());
+            System.out.println("BIS : "+this);
+
             if (Utils.undoCommands(historic)){
+
                 if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col) && !bim.battlefield.getUnit(row, col).isDone()) {
                     bim.replace(new SelectActionBIS(bim, row, col));
                 }else{
@@ -108,7 +114,9 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
     @Override
     public void getNotification(Object data) {
-        System.out.println("COMMAND COMPLETED");
+        System.out.println("DATA COMMAND : "+data);
+        System.out.println("CURRENT COMMAND : "+currentCommand);
+        System.out.println("BIS : "+this);
         if(data instanceof BattleCommand && data == currentCommand){
             bim.replace(new HandleOutcomeBIS(bim, historic));
         }

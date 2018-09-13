@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.models.BannerSign;
+import com.lawsgame.emishitactics.core.models.Banner.Sign;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
@@ -33,7 +33,7 @@ public class BattlefieldLoader {
 
     public static Battlefield load(BattlePhase phase, int bfId){
 
-        // load required files
+        // LOAD TEXTURE MAPPING THE BATTLEFIELD
 
         TextureAtlas layoutAtlas = phase.getAsm().get(Assets.ATLAS_MAPS);
         Texture layoutTexture =  layoutAtlas.findRegion(Assets.getRegionMap(bfId)).getTexture();
@@ -43,7 +43,7 @@ public class BattlefieldLoader {
         Pixmap layoutPixmap = layoutTexture.getTextureData().consumePixmap();
 
 
-        // SET BATTLEFIELD DIMENSION
+        // FIND BATTLEFIELD DIMENSION
 
         int rows = 0;
         int cols = 0;
@@ -58,38 +58,11 @@ public class BattlefieldLoader {
             }
         }
 
-        //FETCH BATTLEFIELD PARAM
-        Weather weather = Data.Weather.getStandard();
-        try {
-            XmlReader.Element battlesElt = reader.parse(Gdx.files.internal(Assets.XML_BATTLE_PARAMS));
-            XmlReader.Element battleElt;
-            XmlReader.Element paramElt;
-            for (int i = 0; i < battlesElt.getChildCount(); i++) {
-                battleElt = battlesElt.getChild(i);
-
-                if (battleElt.getInt("battlefieldId") == bfId) {
-                    for(int k = 0; k < battleElt.getChildCount(); k++) {
-
-                        paramElt = battleElt.getChild(k);
-                        if(paramElt.get("id").equals("waether")){
-                            for(Weather w : Weather.values()){
-                                if(paramElt.get("value").equals(w.name())){
-                                    weather = w;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
         //CREATE BATTLEFIELD INSTANCE
 
-        Battlefield bf = new Battlefield(rows/2,cols/2, weather);
+        Battlefield bf = new Battlefield(rows/2,cols/2);
+
 
 
         // LOAD TILES
@@ -143,81 +116,98 @@ public class BattlefieldLoader {
         }
 
 
-        // DEPLOY UNITS
-
 
         try {
             loadNameDictionary();
 
-            XmlReader.Element battlesElt = reader.parse(Gdx.files.internal(Assets.XML_UNITS_DEPLOYMENT));
-            XmlReader.Element battleElt;
-            XmlReader.Element armyElt;
-            XmlReader.Element squadElt;
-            XmlReader.Element unitElt;
-            IUnit unit;
-            IArmy army;
+            XmlReader.Element battlesElt = reader.parse(Gdx.files.internal(Assets.XML_BATTLE_PARAMS));
+            XmlReader.Element battleElt = null;
             for (int i = 0; i < battlesElt.getChildCount(); i++) {
+                if (battlesElt.getChild(i).getInt("battlefieldId") == bfId) {
+                    battleElt = battlesElt.getChild(i);
+                    break;
+                }
+            }
 
-                battleElt = battlesElt.getChild(i);
-                if (battleElt.getInt("battlefieldId") == bfId) {
-                    for (int j = 0; j < battleElt.getChildCount(); j++) {
+            if(battleElt != null){
 
-                        armyElt = battleElt.getChild(i);
-                        Data.Allegeance allegeance = Data.Allegeance.ENEMY_0;
-                        for(Data.Allegeance a: Data.Allegeance.values()){
-                            if(a.name().equals(armyElt.get("allegeance"))){
-                                allegeance = a;
-                            }
+
+                // PARAMS
+
+                for(Weather weather : Weather.values()){
+                    if(battleElt.get("weather").equals(weather.name())){
+                        bf.setWeather(weather, false);
+                        break;
+                    }
+                }
+
+
+                // DEPLOY ARMIES
+
+                XmlReader.Element armyElt;
+                XmlReader.Element squadElt;
+                XmlReader.Element unitElt;
+                IUnit unit;
+                IArmy army;
+                for (int j = 0; j < battleElt.getChildCount(); j++) {
+
+                    armyElt = battleElt.getChild(j);
+                    Data.Allegeance allegeance = Data.Allegeance.ENEMY_0;
+                    for(Data.Allegeance a: Data.Allegeance.values()){
+                        if(a.name().equals(armyElt.get("allegeance"))){
+                            allegeance = a;
+                            break;
                         }
-                        army = new Army(allegeance);
-                        bf.addArmyId(army.getId());
+                    }
+                    army = new Army(allegeance);
+                    bf.addArmyId(army.getId());
 
-                        // IF: an amry with the relevant battlefield ID
+                    // IF: an amry with the relevant battlefield ID
 
-                        for (int k = 0; k < armyElt.getChildCount(); k++) {
-                            squadElt = armyElt.getChild(k);
+                    for (int k = 0; k < armyElt.getChildCount(); k++) {
+                        squadElt = armyElt.getChild(k);
 
-                            for (int n = 0; n < squadElt.getChildCount(); n++) {
-                                unitElt = squadElt.getChild(n);
-                                unit = instanciateUnit(unitElt);
-                                int rowUnit = unitElt.getInt("row");
-                                int colUnit = unitElt.getInt("col");
+                        for (int n = 0; n < squadElt.getChildCount(); n++) {
+                            unitElt = squadElt.getChild(n);
 
-                                // add to the army composition
-                                army.add(unit);
-                                if(n == 0){
-                                    if(k == 0){
-                                        army.appointWarLord(unit);
-                                    }else{
-                                        army.appointWarChief(unit);
-                                    }
+                            // instanciation unit
+                            unit = instanciateUnit(unitElt);
+
+                            // add to the army composition
+                            army.add(unit);
+                            if(n == 0){
+                                if(k == 0){
+                                    army.appointWarLord(unit);
                                 }else{
-                                    army.appointSoldier(unit, k);
+                                    army.appointWarChief(unit);
                                 }
+                            }else{
+                                army.appointSoldier(unit, k);
+                            }
 
-                                //add  to the battlefield
-                                if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
-                                    bf.deploy(rowUnit, colUnit, unit, true);
-                                }
+                            //add  to the battlefield
+                            int rowUnit = unitElt.getInt("row");
+                            int colUnit = unitElt.getInt("col");
+                            if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
+                                bf.deploy(rowUnit, colUnit, unit, true);
                             }
                         }
                     }
                 }
+
+
             }
 
-            unloadNameDictionary();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        unloadNameDictionary();
         layoutAtlas.dispose();
         layoutPixmap.dispose();
         layoutTexture.dispose();
         return bf;
     }
-
-
-    // ------------- CREATE A UNIT ------------------
 
     public static IUnit instanciateUnit(XmlReader.Element unitElt){
         IUnit unit;
@@ -281,7 +271,7 @@ public class BattlefieldLoader {
             if(attributeElt.get("id").equals("banner sign")) {
                 for (BannerSignTemplate value : BannerSignTemplate.values()) {
                     if (value.name().equals(attributeElt.get("value"))) {
-                        unit.getBanner().addSign(new BannerSign(value, true, attributeElt.getBoolean("stealable")), false);
+                        unit.getBanner().addSign(new Sign(value, true, attributeElt.getBoolean("stealable")), false);
                         break;
                     }
                 }
@@ -334,4 +324,5 @@ public class BattlefieldLoader {
     public static void unloadNameDictionary(){
         NAME_DICTIONARY.clear();
     }
+
 }

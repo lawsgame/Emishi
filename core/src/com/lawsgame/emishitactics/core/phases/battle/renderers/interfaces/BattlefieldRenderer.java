@@ -17,6 +17,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
     private LinkedList<SimpleCommand> notificationQueue;
     protected Array<AreaRenderer> areaRenderers;
+    protected Data.Weather renderedWeather;
 
     public BattlefieldRenderer(Battlefield model) {
 
@@ -72,9 +73,11 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public final void getNotification(Object data) {
         if (data instanceof IUnit) {
 
-            // remove the sent unit
             removeUnitRenderer((IUnit) data);
-        }  else if(data instanceof Notification.SetUnit){
+        } else if(data instanceof Data.Weather){
+
+            this.renderedWeather = (Data.Weather) data;
+        } else if(data instanceof Notification.SetUnit){
 
             final Notification.SetUnit notif = (Notification.SetUnit)data;
             if (isUnitRendererCreated(notif.unitModel)) {

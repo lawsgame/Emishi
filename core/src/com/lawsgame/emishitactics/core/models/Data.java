@@ -656,6 +656,17 @@ public class Data {
     }
 
     public enum Job {
+        SOLAIRE(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
+                3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
+                0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
+                0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
+                0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f),
+        SOLAR_KNIGHT(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
+                3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
+                0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
+                0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
+                0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f);
+        /*
         SERGEANT(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
                 3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
@@ -666,6 +677,7 @@ public class Data {
                 0, 2, 2, 1, 2, 2, 1, 12, 3, 2, 2,
                 0.00f, 0.15f, 0.15f, 0.10f, 0.15f, 0.15f, 0.15f, 0.65f, 0.45f, 0.40f, 0.45f,
                 0.00f, 0.25f, 0.15f, 0.10f, 0.20f, 0.15f, 0.15f, 0.90f, 0.60f, 0.50f, 0.60f);
+                */
 
         private int startingLevel;
         private int footmanMob;
@@ -1018,7 +1030,7 @@ public class Data {
         }
 
         public static Job getStandard(){
-            return SERGEANT;
+            return SOLAR_KNIGHT;
         }
     }
 

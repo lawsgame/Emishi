@@ -10,31 +10,18 @@ import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.EndTurnBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
 
@@ -62,9 +49,9 @@ public class TestBIS extends BattleInteractionState {
         areaWidget = new AreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
 
 
-        warlord = new Unit("Phillipe", Data.Job.SERGEANT, 11, Data.WeaponType.AXE, false, false, false, true);
-        warchief = new Unit("Oscar", Data.Job.SERGEANT, 6, Data.WeaponType.BOW, false, false, false, true);
-        soldier = new Unit("Jim", Data.Job.SERGEANT, 5, Data.WeaponType.MACE, false, false, false, true);
+        warlord = new Unit("Phillipe", Data.Job.SOLAIRE, 11, Data.WeaponType.AXE, false, false, false, true);
+        warchief = new Unit("Oscar", Data.Job.SOLAIRE, 6, Data.WeaponType.BOW, false, false, false, true);
+        soldier = new Unit("Jim", Data.Job.SOLAIRE, 5, Data.WeaponType.MACE, false, false, false, true);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
         warlord.setLeadership(15);
         warlord.setExperience(90);
@@ -73,7 +60,8 @@ public class TestBIS extends BattleInteractionState {
         warchief.applyDamage(1, false);
         soldier.addWeapon(new Weapon(Data.WeaponTemplate.CLUB));
 
-        IArmy army = Army.getPlayerArmy();
+        IArmy army = Army.createPlayerArmyTemplate();
+        army.setLeadershipConditionEnabled(false);
         army.add(warlord);
         army.add(warchief);
         army.add(soldier);

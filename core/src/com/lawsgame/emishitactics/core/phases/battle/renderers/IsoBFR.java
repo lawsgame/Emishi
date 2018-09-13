@@ -40,6 +40,8 @@ public class IsoBFR extends BattlefieldRenderer {
         this.lowerTileSprites = new TextureRegion[battlefield.getNbRows()*battlefield.getNbColumns()];
         this.tileParameters = new float[battlefield.getNbRows()*battlefield.getNbColumns()][2];
         this.unitRenderers = new BattleUnitRenderer[battlefield.getNbRows()*battlefield.getNbColumns()];
+        this.visible = true;
+        this.spritePool = spritePool;
 
         // required for the junit testes
         if(test){
@@ -48,8 +50,7 @@ public class IsoBFR extends BattlefieldRenderer {
         }else{
             this.backkgroundRenderer = new ShapeRenderer();
         }
-        this.visible = true;
-        this.spritePool = spritePool;
+
 
         // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
         for (int r = 0; r < battlefield.getNbRows(); r++) {
@@ -61,7 +62,7 @@ public class IsoBFR extends BattlefieldRenderer {
             }
         }
 
-        // setTiles up area renderers
+        // set up area renderers
         for(Data.Allegeance a : Data.Allegeance.values()){
             for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
                 addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
@@ -70,6 +71,9 @@ public class IsoBFR extends BattlefieldRenderer {
         for(int i = 0; i < battlefield.getDeploymentAreas().size; i++){
             addAreaRenderer(battlefield.getDeploymentAreas().get(i));
         }
+
+        //set weather renderer
+        this.renderedWeather = getModel().getWeather();
     }
 
     @Override
@@ -78,10 +82,10 @@ public class IsoBFR extends BattlefieldRenderer {
         backkgroundRenderer.rect(0,0,
                 TacticsGame.SCREEN_PIXEL_WIDTH,
                 TacticsGame.SCREEN_PIXEL_HEIGHT,
-                getModel().getWeather().getLowerColor(),
-                getModel().getWeather().getLowerColor(),
-                getModel().getWeather().getUpperColor(),
-                getModel().getWeather().getUpperColor());
+                renderedWeather.getLowerColor(),
+                renderedWeather.getLowerColor(),
+                renderedWeather.getUpperColor(),
+                renderedWeather.getUpperColor());
         backkgroundRenderer.end();
     }
 

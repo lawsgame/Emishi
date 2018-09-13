@@ -18,7 +18,6 @@ public class Army extends IArmy{
      */
 
     private static int ids = 1;
-    private static Army playerArmy = null;
 
     private int id;
     private boolean playerControlled;
@@ -37,11 +36,14 @@ public class Army extends IArmy{
         this.ldCondEnabled = false;
     }
 
-    public static Army getPlayerArmy(){
-        if(playerArmy == null) {
-            playerArmy = new Army(Allegeance.ALLY);
-            playerArmy.playerControlled = true;
+    private static boolean firstCall = true;
+    public static Army createPlayerArmyTemplate(){
+        Army playerArmy = new Army(Allegeance.ALLY);
+        playerArmy.playerControlled = true;
+        playerArmy.ldCondEnabled = true;
+        if(firstCall){
             playerArmy.id = 0;
+            firstCall = false;
         }
         return playerArmy;
     }
