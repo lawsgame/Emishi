@@ -58,7 +58,7 @@ public class MoveCommand extends BattleCommand{
         boolean valid = false;
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
 
-            this.validPath = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getActor().has(Data.Ability.PATHFINDER), getActor().getArmy().getAllegeance());
+            this.validPath = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getActor().has(Data.Ability.PATHFINDER), getActor().getArmy().getAffiliation());
             if(validPath.size > 0 && validPath.size <= getActor().getAppMobility()){
 
                 valid = true;

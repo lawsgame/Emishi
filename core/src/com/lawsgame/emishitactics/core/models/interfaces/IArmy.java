@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Banner;
-import com.lawsgame.emishitactics.core.models.Data.Allegeance;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public abstract class IArmy extends Observable{
@@ -27,8 +27,8 @@ public abstract class IArmy extends Observable{
     public abstract boolean contains(IUnit unit);
     public abstract boolean isSquadIndexValid(int squadIndex);
 
-    public abstract Allegeance getAllegeance();
-    public abstract boolean isAlliedWith(Allegeance allegeance);
+    public abstract Data.Affiliation getAffiliation();
+    public abstract boolean isAlliedWith(Data.Affiliation affiliation);
     public abstract boolean isPlayerControlled();
     public abstract boolean hasSquadStandardBearer(int squadId, boolean stillFighting);
     public abstract Banner getSquadBanner(IUnit unit, boolean stillFighting);

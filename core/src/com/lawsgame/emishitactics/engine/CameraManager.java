@@ -71,9 +71,9 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
     public void focusOn(float xTargetTile, float yTargetTile, boolean smoothly) {
         if(xTargetTile != camera.position.x || yTargetTile != camera.position.y){
             if(smoothly){
-                set(xTargetTile + 0.5f, yTargetTile+ 0.5f);
+                moveTo(xTargetTile, yTargetTile);
             }else{
-                setCamPos(xTargetTile  + 0.5f, yTargetTile + 0.5f);
+                setCamPos(xTargetTile  , yTargetTile);
             }
         }
     }
@@ -82,7 +82,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         return cameraMoving;
     }
 
-    private void set(float xTarget, float yTarget){
+    private void moveTo(float xTarget, float yTarget){
         if(!cameraMoving){
 
             //addExpGained xTarget & yTarget, addExpGained change it if too clase to the camera frame borders

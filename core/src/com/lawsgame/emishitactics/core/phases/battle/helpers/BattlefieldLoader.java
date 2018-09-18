@@ -152,14 +152,14 @@ public class BattlefieldLoader {
                 for (int j = 0; j < battleElt.getChildCount(); j++) {
 
                     armyElt = battleElt.getChild(j);
-                    Data.Allegeance allegeance = Data.Allegeance.ENEMY_0;
-                    for(Data.Allegeance a: Data.Allegeance.values()){
-                        if(a.name().equals(armyElt.get("allegeance"))){
-                            allegeance = a;
+                    Affiliation affiliation = Affiliation.ENEMY_0;
+                    for(Affiliation a: Affiliation.values()){
+                        if(a.name().equals(armyElt.get("affiliation"))){
+                            affiliation = a;
                             break;
                         }
                     }
-                    army = new Army(allegeance);
+                    army = new Army(affiliation);
                     bf.addArmyId(army.getId());
 
                     // IF: an amry with the relevant battlefield ID
@@ -209,25 +209,27 @@ public class BattlefieldLoader {
         return bf;
     }
 
-    public static IUnit instanciateUnit(XmlReader.Element unitElt){
+    private static IUnit instanciateUnit(XmlReader.Element unitElt){
         IUnit unit;
 
         String name = unitElt.get("name");
-        Job job = Job.getStandard();
+        String title = unitElt.get("title");
+        UnitTemplate unitTemplate = UnitTemplate.getStandard();
         int level = unitElt.getInt("level");
         Weapon weapon;
         Equipment equipement;
         WeaponType weaponType = WeaponType.FIST;
+        boolean character = !name.equals("noname");
         boolean shieldbearer = unitElt.getBoolean("shieldbearer");
         boolean horseman = unitElt.getBoolean("horseman");
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
         boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
-        if(name.equals("noname")){
+        if(!character){
             name = NAME_DICTIONARY.get(Data.rand(NAME_DICTIONARY.size));
         }
-        for(Job j: Job.values()){
-            if(j.name().equals(unitElt.get("job"))){
-                job = j;
+        for(UnitTemplate j: UnitTemplate.values()){
+            if(j.name().equals(unitElt.get("template"))){
+                unitTemplate = j;
                 break;
             }
         }
@@ -238,7 +240,10 @@ public class BattlefieldLoader {
             }
         }
 
-        unit = new Unit(name, job ,level, weaponType, shieldbearer, horseman, horsemanUponPromotion, homogeneousLevels);
+
+        unit = (character)?
+                Unit.createCharacterUnit(name, title, unitTemplate,level, weaponType, shieldbearer, horseman, horsemanUponPromotion):
+                Unit.createGenericUnit(name, unitTemplate,level, weaponType, shieldbearer, horseman, horsemanUponPromotion, homogeneousLevels);
 
         XmlReader.Element attributeElt;
         for(int k = 0; k < unitElt.getChildCount(); k++){

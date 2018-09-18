@@ -51,7 +51,7 @@ public class PushCommand extends BattleCommand{
         if(battlefield.isTileOccupied(rowActor0, colActor0)){
 
             IUnit pusher = battlefield.getUnit(rowActor0, colActor0);
-            if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getArmy().getAllegeance()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
+            if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getArmy().getAffiliation()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
 
                 IUnit pushed = battlefield.getUnit(rowTarget0, colTarget0);
                 if(rowActor0 < rowTarget0 && battlefield.isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
@@ -71,18 +71,18 @@ public class PushCommand extends BattleCommand{
     public boolean atActionRange(int row, int col, IUnit actor) {
         boolean targetAtRange = false;
         if(actor.isMobilized()) {
-            if (battlefield.isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAllegeance())
+            if (battlefield.isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAffiliation())
                     && battlefield.isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER))) {
                 targetAtRange = true;
             } else {
-                if (battlefield.isTileOccupiedByAlly(row - 1, col, actor.getArmy().getAllegeance())
+                if (battlefield.isTileOccupiedByAlly(row - 1, col, actor.getArmy().getAffiliation())
                         && battlefield.isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))) {
                     targetAtRange = true;
                 } else {
-                    if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getArmy().getAllegeance())
+                    if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getArmy().getAffiliation())
                             && battlefield.isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))) {
                         targetAtRange = true;
-                    } else if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getArmy().getAllegeance())
+                    } else if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getArmy().getAffiliation())
                             && battlefield.isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))) {
                         targetAtRange = true;
                     }

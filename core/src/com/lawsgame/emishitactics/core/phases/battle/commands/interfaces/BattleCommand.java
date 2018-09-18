@@ -340,7 +340,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
             int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getArmy().getAllegeance())
+                if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getArmy().getAffiliation())
                         && (!woundedRequired || battlefield.getUnit(rowTarget0, colTarget0).isWounded())) {
 
                     valid = true;
@@ -359,7 +359,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
             int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getArmy().getAllegeance())
+                if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getArmy().getAffiliation())
                         && (!stealableRequired || battlefield.getUnit(rowTarget0, colTarget0).isStealable())) {
                     valid = true;
                 }
@@ -381,7 +381,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
                     for (int c = col - rangeMin; c <= col + rangeMax; c++) {
                         dist = Utils.dist(row, col, r, c);
                         if (rangeMin <= dist && dist <= rangeMax
-                                && battlefield.isTileOccupiedByAlly(r, c, actor.getArmy().getAllegeance())
+                                && battlefield.isTileOccupiedByAlly(r, c, actor.getArmy().getAffiliation())
                                 && (!woundedRequired || battlefield.getUnit(r, c).isWounded())) {
                             targetAtRange = true;
                             break loop;
@@ -408,7 +408,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
                         dist = Utils.dist(row, col, r, c);
                         if (rangeMin <= dist
                                 && dist <= rangeMax
-                                && battlefield.isTileOccupiedByFoe(r, c, actor.getArmy().getAllegeance())
+                                && battlefield.isTileOccupiedByFoe(r, c, actor.getArmy().getAffiliation())
                                 && (!stealableRequired || battlefield.getUnit(r, c).isStealable())) {
                             targetAtRange = true;
                             break loop;

@@ -28,6 +28,7 @@ public class Assets {
     public static final String ATLAS_TEMPO_TILES = "textures/tempo/tiles.pack";
     public static final String ATLAS_MAPS = "textures/maps.pack";
     public static final String ATLAS_TILES = "textures/tiles.pack";
+    public static final String UNIT_SPRITES_DIR = "textures/units";
 
 
     // regions
@@ -46,6 +47,10 @@ public class Assets {
     public static final String UI_ARROW = "arrow";
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
+    public static final String REGION_UNIT_PROMOTED = "promoted";
+    public static final String REGION_UNIT_RECRUIT = "recruit";
+    public static final String REGION_UNIT_PLAYER_CONTROLLED = "player_controlled";
+    public static final String REGION_UNIT_AI_CONTROLLED = "AI_controlled";
 
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";
 

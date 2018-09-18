@@ -29,8 +29,10 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract void prerender();
     public abstract void render(SpriteBatch batch);
 
-    public abstract int getRowFrom(float gameX, float gameY);
-    public abstract int getColFrom(float gameX, float gameY);
+    public abstract int getRow(float gameX, float gameY);
+    public abstract int getCol(float gameX, float gameY);
+    public abstract float getCenterX(int row, int col);
+    public abstract float getCenterY(int row, int col);
     public abstract void displayDeploymentAreas(boolean visible);
     public abstract void setGameCamParameters(CameraManager cameraManager);
 
@@ -86,8 +88,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
                     @Override
                     public void apply() {
-                        bur.setX(notif.col);
-                        bur.setY(notif.row);
+                        bur.setPos(notif.row, notif.col);
                         removeAreaRenderersAssociatedWith(bur.getModel());
                     }
                 });
@@ -112,7 +113,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                                 removeAreaRenderersAssociatedWith(bur1.getModel());
                                 Array<int[]> path = new Array<int[]>();
                                 path.add(new int[]{notif.rowUnit2, notif.colUnit2});
-                                bur1.displayWalk(path);
+                                bur1.displayWalk(path, true);
                             }
                         });
                         bur2.getNotification(new SimpleCommand() {
@@ -122,7 +123,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                                 removeAreaRenderersAssociatedWith(bur2.getModel());
                                 Array<int[]> path = new Array<int[]>();
                                 path.add(new int[]{notif.rowUnit1, notif.colUnit1});
-                                bur2.displayWalk(path);
+                                bur2.displayWalk(path, true);
                             }
                         });
                         break;
@@ -131,8 +132,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
                             @Override
                             public void apply() {
-                                bur1.setX(notif.colUnit2);
-                                bur1.setY(notif.rowUnit2);
+                                bur1.setPos(notif.rowUnit2, notif.colUnit2);
                                 removeAreaRenderersAssociatedWith(bur1.getModel());
                             }
                         });
@@ -140,8 +140,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
                             @Override
                             public void apply() {
-                                bur2.setX(notif.colUnit1);
-                                bur2.setY(notif.rowUnit1);
+                                bur2.setPos(notif.rowUnit1, notif.colUnit1);
                                 removeAreaRenderersAssociatedWith(bur2.getModel());
                             }
                         });
@@ -155,7 +154,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
             bur.getNotification(new SimpleCommand() {
                 @Override
                 public void apply() {
-                    bur.displayWalk(notif.path);
+                    bur.displayWalk(notif.path, false);
                     removeAreaRenderersAssociatedWith(bur.getModel());
                 }
             });

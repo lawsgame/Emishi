@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -45,6 +46,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final CameraManager gcm;
     public final AssetManager asm;
     public final ActionPanelPool app;
+    public final SpriteProvider spriteProvider;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle mainI18nBundle;
@@ -66,11 +68,12 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public SimpleCommand hideSUP;
 
 
-    public BattleInteractionMachine(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player) {
+    public BattleInteractionMachine(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player, SpriteProvider spriteProvider) {
         this.battlefield = battlefield;
         this.bfr = bfr;
         this.gcm = gcm;
         this.asm = asm;
+        this.spriteProvider = spriteProvider;
         this.app = new ActionPanelPool(stageUI.getViewport());
         this.scheduler = new AnimationScheduler();
         this.bcm = new BattleCommandManager(bfr, scheduler);
@@ -87,7 +90,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bfr.getAreaRenderer(selectedTile).setVisible(false);
         this.touchedRelatedUnitTiles = new Array<Area>();
         Area area;
-        AreaRenderer renderer;
         for(int i = 1; i < Data.MAX_UNITS_UNDER_WARLORD; i++){
             area = new Area(battlefield, Data.AreaType.SQUAD_MEMBER );
             this.touchedRelatedUnitTiles.add(area);
@@ -192,7 +194,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     }
 
     public void moveCamera(int row, int col, boolean smoothly){
-        gcm.focusOn(col, row , smoothly);
+        gcm.focusOn(bfr.getCenterX(row, col), bfr.getCenterY(row, col) , smoothly);
     }
 
     public void highlight(int row, int col, boolean allSquad, boolean selected){

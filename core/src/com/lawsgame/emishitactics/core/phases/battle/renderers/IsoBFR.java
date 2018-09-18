@@ -1,10 +1,12 @@
 package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.TacticsGame;
-import com.lawsgame.emishitactics.core.helpers.SpritePool;
+import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -18,36 +20,40 @@ import com.lawsgame.emishitactics.engine.CameraManager;
 public class IsoBFR extends BattlefieldRenderer {
     public static final float RATIO = 0.5f; // <1 : ratio between the the great and little dialogue
     public static final float SPRITE_STD_SIZE = 1.25f;
-
     private static final float CAM_VELOCITY = 15.0f;
     private static float X_CAM_BOUNDS_OFFSET = 1f;
     private static float Y_CAM_BOUNDS_OFFSET = RATIO;
 
     private boolean visible;
-    private SpritePool spritePool;
-    private TextureRegion[] lowerTileSprites;
-    private float[][] tileParameters; // x, y
-    private BattleUnitRenderer[] unitRenderers;
+    protected SpriteProvider spriteProvider;
+    private Array<Array<Sprite>> lowerTileSprites;
+    private Array<Array<BattleUnitRenderer>> unitRenderers;
+
     private ShapeRenderer backkgroundRenderer;
 
-    public IsoBFR(Battlefield battlefield, SpritePool spritePool){
-        this(battlefield, spritePool,false);
+
+    public IsoBFR(Battlefield battlefield, SpriteProvider spriteProvider){
+        this(battlefield, spriteProvider,false);
     }
 
-
-    public IsoBFR(Battlefield battlefield, SpritePool spritePool, boolean test) {
+    public IsoBFR(Battlefield battlefield, SpriteProvider spriteProvider, boolean test) {
         super(battlefield);
-        this.lowerTileSprites = new TextureRegion[battlefield.getNbRows()*battlefield.getNbColumns()];
-        this.tileParameters = new float[battlefield.getNbRows()*battlefield.getNbColumns()][2];
-        this.unitRenderers = new BattleUnitRenderer[battlefield.getNbRows()*battlefield.getNbColumns()];
+        int depth = 2*(battlefield.getNbRows() + battlefield.getNbColumns()) - 3;
+        this.lowerTileSprites = new Array<Array<Sprite>>();
+        this.unitRenderers = new Array<Array<BattleUnitRenderer>>();
+        for(int i = 0; i < depth; i++) {
+            lowerTileSprites.add(new Array<Sprite>());
+            unitRenderers.add(new Array<BattleUnitRenderer>());
+        }
+
         this.visible = true;
-        this.spritePool = spritePool;
+        this.spriteProvider = spriteProvider;
 
         // required for the junit testes
-        if(test){
-           X_CAM_BOUNDS_OFFSET = 0;
-           Y_CAM_BOUNDS_OFFSET = 0;
-        }else{
+        if (test) {
+            X_CAM_BOUNDS_OFFSET = 0;
+            Y_CAM_BOUNDS_OFFSET = 0;
+        } else {
             this.backkgroundRenderer = new ShapeRenderer();
         }
 
@@ -56,19 +62,19 @@ public class IsoBFR extends BattlefieldRenderer {
         for (int r = 0; r < battlefield.getNbRows(); r++) {
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
                 addTileRenderer(r, c, getModel().getTile(r, c));
-                if(battlefield.isTileOccupied(r, c)) {
+                if (battlefield.isTileOccupied(r, c)) {
                     addUnitRenderer(r, c, getModel().getUnit(r, c));
                 }
             }
         }
 
         // set up area renderers
-        for(Data.Allegeance a : Data.Allegeance.values()){
+        for (Data.Affiliation a : Data.Affiliation.values()) {
             for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
                 addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
             }
         }
-        for(int i = 0; i < battlefield.getDeploymentAreas().size; i++){
+        for (int i = 0; i < battlefield.getDeploymentAreas().size; i++) {
             addAreaRenderer(battlefield.getDeploymentAreas().get(i));
         }
 
@@ -89,89 +95,77 @@ public class IsoBFR extends BattlefieldRenderer {
         backkgroundRenderer.end();
     }
 
+
+
+
     @Override
     public void render(SpriteBatch batch) {
         if(visible) {
-            for(int i = 0; i < lowerTileSprites.length; i++){
-                if(lowerTileSprites != null) {
-                    batch.draw(lowerTileSprites[i], tileParameters[i][0], tileParameters[i][1], SPRITE_STD_SIZE, SPRITE_STD_SIZE);
+            for(int i = lowerTileSprites.size - 1; i >= 0 ; i--){
+                for(int j = 0; j < lowerTileSprites.get(i).size; j++){
+                    lowerTileSprites.get(i).get(j).draw(batch);
                 }
+
+            }
+            for(int i = unitRenderers.size - 1; i >= 0 ; i--){
+                for(int j = 0; j < unitRenderers.get(i).size; j++){
+                    unitRenderers.get(i).get(j).render(batch);
+                }
+
             }
         }
     }
 
     @Override
-    public int getRowFrom(float gameX, float gameY) {
+    public void update(float dt) {
+        super.update(dt);
+        for(int i = 0; i < unitRenderers.size; i++){
+            for(int j = 0; j < unitRenderers.get(i).size; j++){
+                unitRenderers.get(i).get(j).update(dt);
+            }
+        }
+    }
+
+    @Override
+    public int getRow(float gameX, float gameY) {
         float x = gameX - X_CAM_BOUNDS_OFFSET;
         float y = gameY - Y_CAM_BOUNDS_OFFSET;
         return (int)(y/RATIO - x + getModel().getNbRows()/2.0f);
     }
 
     @Override
-    public int getColFrom(float gameX, float gameY) {
+    public int getCol(float gameX, float gameY) {
         float x = gameX - X_CAM_BOUNDS_OFFSET;
         float y = gameY - Y_CAM_BOUNDS_OFFSET;
         return (int) (y/RATIO + x - getModel().getNbColumns()/2.0f);
     }
 
-    public float getCenterXFrom(int row, int col) {
+    @Override
+    public float getCenterX(int row, int col) {
         return (col - row + getModel().getNbRows()) / 2.0f + X_CAM_BOUNDS_OFFSET;
     }
 
-    public float getCenterYFrom(int row, int col) {
+    @Override
+    public float getCenterY(int row, int col) {
         return (col + row + 1) * RATIO / 2.0f + Y_CAM_BOUNDS_OFFSET;
     }
 
     public float getRenderXFrom(int row, int col) {
-        return getCenterXFrom(row, col) - SPRITE_STD_SIZE * 0.5f;
+        return getCenterX(row, col) - SPRITE_STD_SIZE * 0.5f;
     }
 
     public float getRenderYFrom(int row, int col) {
-        return getCenterYFrom(row, col)- RATIO*SPRITE_STD_SIZE * 1.5f;
-    }
-
-    public int getRenderingIndex(int row, int col){
-        int returnedIndex = -1;
-
-        //System.out.print("(R, C) = ("+row+", "+col+") ");
-
-        if(getModel().isTileExisted(row, col)) {
-
-            int currentIndex = -1;
-            int sum = getModel().getNbRows() + getModel().getNbColumns() - 2;
-            while (returnedIndex == -1) {
-                loop :
-                {
-                    for (int r = 0; r < getModel().getNbRows(); r++) {
-                        for (int c = 0; c < getModel().getNbColumns(); c++) {
-                            if (r + c == sum) {
-                                currentIndex++;
-                                if (r == row && c == col) {
-                                    //System.out.println(" => current index : "+currentIndex);
-                                    returnedIndex = currentIndex;
-                                    break loop;
-                                }
-                            }
-                        }
-                    }
-                }
-                sum -- ;
-            }
-        }
-        return returnedIndex;
-
+        return getCenterY(row, col)- RATIO*SPRITE_STD_SIZE * 1.5f;
     }
 
     @Override
     public void addTileRenderer(int row, int col, Data.TileType type) {
-        if(spritePool != null && getModel().checkIndexes(row, col)){
-            int renderIndex = getRenderingIndex(row, col);
-            TextureRegion tileTR = spritePool.tileSprites.get(type);
-            lowerTileSprites[renderIndex] = (tileTR != null) ? tileTR : spritePool.undefinedTileSprite;
-            float xRender = getRenderXFrom(row, col);
-            float yRender = getRenderYFrom(row, col);
-            tileParameters[renderIndex][0] =xRender;
-            tileParameters[renderIndex][1] =yRender;
+        if(spriteProvider != null && getModel().checkIndexes(row, col)){
+            TextureRegion tileTR = spriteProvider.getTileSprite(type);
+            Sprite tileSprite = new Sprite(tileTR);
+            tileSprite.setSize(SPRITE_STD_SIZE, SPRITE_STD_SIZE);
+            tileSprite.setPosition(getRenderXFrom(row, col), getRenderYFrom(row, col));
+            lowerTileSprites.get(2*row + 2*col).add(tileSprite);
         }
     }
 
@@ -191,9 +185,11 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public BattleUnitRenderer getUnitRenderer(IUnit model) {
-        for (int i = 0; i < lowerTileSprites.length; i++) {
-            if(unitRenderers[i] != null && unitRenderers[i].getModel() == model){
-                return unitRenderers[i];
+        for(int i = 0; i < unitRenderers.size; i++){
+            for(int j = 0; j < unitRenderers.get(i).size; j++){
+                if(unitRenderers.get(i).get(j).getModel() == model){
+                    return unitRenderers.get(i).get(j);
+                }
             }
         }
         return null;
@@ -212,7 +208,7 @@ public class IsoBFR extends BattlefieldRenderer {
     @Override
     public void addUnitRenderer(int row, int col, IUnit model) {
         if(!isUnitRendererCreated(model)){
-            unitRenderers[getRenderingIndex(row, col)] = new IsoUnitRenderer(row, col, model, this);
+            unitRenderers.get(2*row + 2*col).add( new IsoUnitRenderer(row, col, model, this) );
         }
     }
 
@@ -225,7 +221,33 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public void removeUnitRenderer(IUnit model) {
+        loop:
+        {
+            for (int i = 0; i < unitRenderers.size; i++) {
+                for (int j = 0; j < unitRenderers.get(i).size; j++) {
+                    if (unitRenderers.get(i).get(j).getModel() == model) {
+                        unitRenderers.get(i).removeIndex(j);
+                        break loop;
+                    }
+                }
+            }
+        }
+    }
 
+    protected void updateBURRenderCall(IsoUnitRenderer unitRenderer){
+        removeUnitRenderer(unitRenderer.getModel());
+        int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        if(getModel().checkIndexes(row, col))
+            unitRenderers.get(2*row + 2*col).add(unitRenderer);
+    }
+
+    protected void updateBURRenderCall(int rowTarget, int colTarget, IsoUnitRenderer unitRenderer){
+        removeUnitRenderer(unitRenderer.getModel());
+        int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        if(getModel().checkIndexes(row, col) && getModel().checkIndexes(rowTarget, colTarget))
+            unitRenderers.get(row + col + rowTarget + colTarget).add(unitRenderer);
     }
 
     @Override
@@ -235,9 +257,11 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     protected boolean isUnitRendererCreated(IUnit model) {
-        for(int i = 0; i < unitRenderers.length; i++){
-            if(unitRenderers[i] != null && unitRenderers[i].getModel() == model){
-                return true;
+        for(int i = 0; i < unitRenderers.size; i++){
+            for(int j = 0; j < unitRenderers.get(i).size; j++){
+                if(unitRenderers.get(i).get(j).getModel() == model){
+                    return true;
+                }
             }
         }
         return false;
@@ -278,16 +302,8 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    public void update(float dt) {
-        super.update(dt);
-    }
-
-    @Override
     public void dispose() {
         super.dispose();
     }
 
-    public SpritePool getSpritePool() {
-        return spritePool;
-    }
 }

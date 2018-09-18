@@ -49,7 +49,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
 
         // setTiles up area renderers
-        for(Data.Allegeance a : Data.Allegeance.values()){
+        for(Data.Affiliation a : Data.Affiliation.values()){
             for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
                 addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
             }
@@ -212,13 +212,23 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public int getRowFrom(float gameX, float gameY) {
+    public int getRow(float gameX, float gameY) {
         return (int)gameY;
     }
 
     @Override
-    public int getColFrom(float gameX, float gameY) {
+    public int getCol(float gameX, float gameY) {
         return (int)gameX;
+    }
+
+    @Override
+    public float getCenterX(int row, int col) {
+        return col + 0.5f;
+    }
+
+    @Override
+    public float getCenterY(int row, int col) {
+        return row + 0.5f;
     }
 
 

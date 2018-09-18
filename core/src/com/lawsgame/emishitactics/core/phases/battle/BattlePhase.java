@@ -5,22 +5,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.helpers.SpritePool;
+import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Weapon;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestBIS;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.tempo.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
 
@@ -53,19 +47,20 @@ public class BattlePhase extends GamePhase {
 
         // load the battlefield
         Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
+        battlefield.randomlyDeploy(player.getArmy());
 
         // set up sprite pool and battlefield renderers
         TempoSpritePool.getInstance().set(asm);
-        BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.getInstance());
-        SpritePool spritePool = new SpritePool();
-        spritePool.set(battlefield, player, asm);
-        //BattlefieldRenderer battlefieldRenderer = new IsoBFR(battlefield, spritePool);
+        //BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.getInstance());
+        SpriteProvider spriteProvider = new SpriteProvider();
+        spriteProvider.set(battlefield, asm);
+        BattlefieldRenderer battlefieldRenderer = new IsoBFR(battlefield, spriteProvider);
         battlefieldRenderer.setGameCamParameters(this.getGameCM());
 
         //lauch initial BIS
-        this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, player);
-        //BattleInteractionState initBIS = new TestBIS(bim);
-        BattleInteractionState initBIS = new SceneBIS(bim);
+        this.bim = new BattleInteractionMachine(battlefield, battlefieldRenderer, gameCM, asm, stageUI, player, spriteProvider);
+        BattleInteractionState initBIS = new TestBIS(bim);
+        //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
 

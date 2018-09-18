@@ -1,9 +1,9 @@
 
-enemy2.png
+AI.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-enemy2
+AI_controlled
   rotate: false
   xy: 0, 0
   size: 512, 512

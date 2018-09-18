@@ -1,10 +1,8 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data.Allegeance;
+import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
-import com.lawsgame.emishitactics.core.models.Data.Job;
-import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -34,7 +32,7 @@ public class Battlefield extends Observable {
     private IUnit[][] units;
     private boolean[][] looted;
     private Array<Area> deploymentAreas;
-    private HashMap<Allegeance, Array<UnitArea>> guardedAreas;
+    private HashMap<Affiliation, Array<UnitArea>> guardedAreas;
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
     private Data.Weather weather;
@@ -50,8 +48,8 @@ public class Battlefield extends Observable {
         this.deploymentAreas = new Array<Area>();
         this.deploymentAreas.add(new Area(this, Data.AreaType.DEPLOYMENT_AREA));
 
-        this.guardedAreas = new HashMap<Allegeance, Array<UnitArea>>();
-        for(Allegeance a: Allegeance.values()){
+        this.guardedAreas = new HashMap<Affiliation, Array<UnitArea>>();
+        for(Data.Affiliation a: Affiliation.values()){
             this.guardedAreas.put(a, new Array<UnitArea>());
         }
         this.recruits = new HashMap<Integer, IUnit>();
@@ -98,15 +96,15 @@ public class Battlefield extends Observable {
     }
 
     public boolean isBattleOver(){
-        Array<Allegeance> allegeances = new Array<Allegeance>();
+        Array<Affiliation> allegeances = new Array<Data.Affiliation>();
         for (int r = 0; r < getNbRows(); r++) {
             for (int c = 0; c < getNbColumns(); c++) {
                 if (isTileOccupied(r, c)) {
                     IUnit unit = getUnit(r, c);
                     if (unit.isMobilized()
                             && !unit.isOutOfAction()
-                            && !allegeances.contains(unit.getArmy().getAllegeance(), true)) {
-                        allegeances.add(unit.getArmy().getAllegeance());
+                            && !allegeances.contains(unit.getArmy().getAffiliation(), true)) {
+                        allegeances.add(unit.getArmy().getAffiliation());
                     }
                 }
             }
@@ -241,7 +239,7 @@ public class Battlefield extends Observable {
             if(actor.isMobilized()) {
                 Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX);
                 area = new Area.UnitArea(this, Data.AreaType.GUARD_AREA, tiles, actor);
-                this.guardedAreas.get(actor.getArmy().getAllegeance()).add(area);
+                this.guardedAreas.get(actor.getArmy().getAffiliation()).add(area);
 
             }
         }
@@ -251,7 +249,7 @@ public class Battlefield extends Observable {
     public UnitArea removeGuardedArea(IUnit actor, boolean notifyObservers){
         UnitArea area = null;
         if(actor != null && actor.isMobilized()){
-            Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getArmy().getAllegeance());
+            Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getArmy().getAffiliation());
             for (int i = 0; i < areas.size; i++) {
                 if (areas.get(i).getActor() == actor) {
                     area = areas.removeIndex(i);
@@ -264,7 +262,7 @@ public class Battlefield extends Observable {
         return area;
     }
 
-    public Array<IUnit> getAvailableGuardians(int row, int col, Allegeance alleageance){
+    public Array<IUnit> getAvailableGuardians(int row, int col, Affiliation alleageance){
         Array<IUnit> guardians =  new Array<IUnit>();
         for (int k = 0; k < guardedAreas.get(alleageance).size; k++) {
             if (guardedAreas.get(alleageance).get(k).contains(row, col)) {
@@ -359,21 +357,21 @@ public class Battlefield extends Observable {
         return isTileOccupied(row, col) && this.units[row][col].sameSquadAs(unit);
     }
 
-    public boolean isTileOccupiedByAlly(int row , int col, Allegeance allegeance){
-        return isTileOccupied(row, col) && getUnit(row, col).isAllyWith(allegeance);
+    public boolean isTileOccupiedByAlly(int row , int col, Affiliation affiliation){
+        return isTileOccupied(row, col) && getUnit(row, col).isAllyWith(affiliation);
     }
 
-    public boolean isTileOccupiedByFoe(int row , int col, Allegeance allegeance){
-        return isTileOccupied(row, col) && !getUnit(row, col).isAllyWith(allegeance);
+    public boolean isTileOccupiedByFoe(int row , int col, Data.Affiliation affiliation){
+        return isTileOccupied(row, col) && !getUnit(row, col).isAllyWith(affiliation);
     }
 
     public boolean isTileOccupiedByPlayerControlledUnit(int row, int col) {
         return isTileOccupied(row, col) && getUnit(row, col).getArmy() != null && getUnit(row, col).getArmy().isPlayerControlled();
     }
 
-    public boolean isTileGuarded(int row, int col, Allegeance alliedAllegeance){
+    public boolean isTileGuarded(int row, int col, Affiliation alliedAffiliation){
         boolean res = false;
-        Array<Area.UnitArea> allyGuardedArea = guardedAreas.get(alliedAllegeance);
+        Array<Area.UnitArea> allyGuardedArea = guardedAreas.get(alliedAffiliation);
         for(int i = 0; i < allyGuardedArea.size; i++){
             if(allyGuardedArea.get(i).contains(row, col)){
                 res = true;
@@ -494,7 +492,7 @@ public class Battlefield extends Observable {
         if(isTileOccupied(rowUnit, colUnit)){
             IUnit unit = getUnit(rowUnit, colUnit);
             if(unit.isMobilized()) {
-                Array<UnitArea> areas = getGuardedAreas().get(unit.getArmy().getAllegeance());
+                Array<UnitArea> areas = getGuardedAreas().get(unit.getArmy().getAffiliation());
                 for(int i = 0; i < areas.size; i++){
                     if(areas.get(i).getActor() == unit){
                         return true;
@@ -636,7 +634,7 @@ public class Battlefield extends Observable {
         int[][] checkTiles;
         int moveRange;
         boolean pathfinder;
-        Allegeance allegeance;
+        Data.Affiliation affiliation;
 
         CheckMoveMap(){ }
 
@@ -658,7 +656,7 @@ public class Battlefield extends Observable {
                 IUnit actor = bf.getUnit(rowActor, colActor);
                 this.pathfinder = actor.has(Data.Ability.PATHFINDER);
                 this.moveRange = actor.hasMoved() ? 0 : actor.getAppMobility();
-                this.allegeance = actor.getArmy().getAllegeance();
+                this.affiliation = actor.getArmy().getAffiliation();
                 this.battlefield = bf;
 
                 // addExpGained the check map dimensions and origin point
@@ -728,7 +726,7 @@ public class Battlefield extends Observable {
                         checkTiles[row][col] = remainingMovePoints;
                     }
                 } else if (remainingMovePoints > 1) {
-                    if(battlefield.isTileReachable(rowOrigin+row, colOrigin+col, pathfinder) && !battlefield.isTileOccupiedByFoe(rowOrigin+row, colOrigin+col, allegeance)){
+                    if(battlefield.isTileReachable(rowOrigin+row, colOrigin+col, pathfinder) && !battlefield.isTileOccupiedByFoe(rowOrigin+row, colOrigin+col, affiliation)){
                         checkTiles[row][col] = remainingMovePoints;
                         if(comefrom != Data.Orientation.NORTH && checkIndexes(row + 1, col))
                             updateTilesMRP(row + 1, col, remainingMovePoints - 1  , Data.Orientation.SOUTH);
@@ -824,10 +822,10 @@ public class Battlefield extends Observable {
      *
      * @return an array like that {[row, col]} representing the shortest validPath from one buildingType to another
      */
-    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Allegeance allegeance){
+    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Affiliation affiliation){
         Array<int[]> res = new Array<int[]>();
 
-        if(isTileAvailable(rowf, colf, pathfinder) && allegeance != null) {
+        if(isTileAvailable(rowf, colf, pathfinder) && affiliation != null) {
 
             Array<PathNode> path = new Array<PathNode>();
             Array<PathNode> opened = new Array<PathNode>();
@@ -856,28 +854,28 @@ public class Battlefield extends Observable {
                 PathNode node;
                 neighbours = new Array<PathNode>();
                 if (isTileReachable(current.row + 1, current.col, pathfinder)
-                        && !isTileOccupiedByFoe(current.row + 1, current.col, allegeance)) {
+                        && !isTileOccupiedByFoe(current.row + 1, current.col, affiliation)) {
                     node = new PathNode(current.row + 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row, current.col + 1, pathfinder)
-                        && !isTileOccupiedByFoe(current.row, current.col + 1, allegeance)) {
+                        && !isTileOccupiedByFoe(current.row, current.col + 1, affiliation)) {
                     node = new PathNode(current.row, current.col + 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row - 1, current.col, pathfinder)
-                        && !isTileOccupiedByFoe(current.row - 1, current.col, allegeance)) {
+                        && !isTileOccupiedByFoe(current.row - 1, current.col, affiliation)) {
                     node = new PathNode(current.row - 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row, current.col - 1, pathfinder)
-                        && !isTileOccupiedByFoe(current.row, current.col - 1, allegeance)) {
+                        && !isTileOccupiedByFoe(current.row, current.col - 1, affiliation)) {
                     node = new PathNode(current.row, current.col - 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
@@ -944,7 +942,7 @@ public class Battlefield extends Observable {
         return null;
     }
 
-    public HashMap<Allegeance, Array<Area.UnitArea>> getGuardedAreas() {
+    public HashMap<Affiliation, Array<Area.UnitArea>> getGuardedAreas() {
         return guardedAreas;
     }
 

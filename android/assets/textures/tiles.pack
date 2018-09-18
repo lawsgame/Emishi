@@ -5,21 +5,21 @@ filter: Nearest,Nearest
 repeat: none
 dirt
   rotate: false
-  xy: 0, 258
+  xy: 0, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 plain
   rotate: false
-  xy: 0, 129
+  xy: 128, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 undefined
   rotate: false
-  xy: 0, 0
+  xy: 256, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0

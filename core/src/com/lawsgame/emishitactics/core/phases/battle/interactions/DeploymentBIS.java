@@ -31,8 +31,6 @@ public class DeploymentBIS extends BattleInteractionState {
         super(bim, true, true, true);
         this.initialized = false;
 
-        bim.battlefield.randomlyDeploy(bim.player.getArmy());
-
         this.sltdUnit = bim.player.getArmy().getWarlord();
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
         bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, false, false);

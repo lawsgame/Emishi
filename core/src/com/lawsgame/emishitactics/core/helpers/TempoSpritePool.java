@@ -230,9 +230,9 @@ public class TempoSpritePool {
         return shieldSprite;
     }
 
-    public TextureRegion getUnitSprite(Data.SpriteSetId id, Data.Allegeance allegeance){
+    public TextureRegion getUnitSprite(Data.SpriteSetId id, Data.Affiliation affiliation){
         TextureRegion res;
-        if(allegeance == Data.Allegeance.ALLY){
+        if(affiliation == Data.Affiliation.ALLY){
             res = unitSprites.get(id);
         }else{
             res = foeSprites.get(id);

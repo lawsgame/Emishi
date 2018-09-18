@@ -1,9 +1,9 @@
 
-ally.png
+PC.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-ally
+player_controlled
   rotate: false
   xy: 0, 0
   size: 512, 512

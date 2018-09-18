@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data.Allegeance;
+import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
@@ -21,15 +21,15 @@ public class Army extends IArmy{
 
     private int id;
     private boolean playerControlled;
-    private final Allegeance allegeance;
+    private final Data.Affiliation affiliation;
     private int buildingResources;
     private Array<Array<IUnit>> mobilizedTroups;
     private Array<IUnit> nonMobTroups;
     private boolean ldCondEnabled;
 
-    public Army(Allegeance allegeance){
+    public Army(Affiliation affiliation){
         this.id = ids++;
-        this.allegeance = allegeance;
+        this.affiliation = affiliation;
         this.playerControlled = false;
         this.mobilizedTroups = new Array<Array<IUnit>>();
         this.nonMobTroups = new Array<IUnit>();
@@ -38,7 +38,7 @@ public class Army extends IArmy{
 
     private static boolean firstCall = true;
     public static Army createPlayerArmyTemplate(){
-        Army playerArmy = new Army(Allegeance.ALLY);
+        Army playerArmy = new Army(Affiliation.ALLY);
         playerArmy.playerControlled = true;
         playerArmy.ldCondEnabled = true;
         if(firstCall){
@@ -231,13 +231,13 @@ public class Army extends IArmy{
 
 
     @Override
-    public Allegeance getAllegeance() {
-        return allegeance;
+    public Affiliation getAffiliation() {
+        return affiliation;
     }
 
     @Override
-    public boolean isAlliedWith(Allegeance allegeance) {
-        return this.allegeance == allegeance;
+    public boolean isAlliedWith(Affiliation affiliation) {
+        return this.affiliation == affiliation;
     }
 
     @Override

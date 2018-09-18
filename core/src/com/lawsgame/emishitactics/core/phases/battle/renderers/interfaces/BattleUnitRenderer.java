@@ -21,78 +21,78 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     }
 
     protected void launchNextAnimation(){
-        if(!isAnimationRolling()){
+        if(isResting()){
             if(!notificationQueue.isEmpty()) {
                 Object query = notificationQueue.pop();
 
-                if (query instanceof Notification.ApplyDamage) {
-                    Notification.ApplyDamage notification = (Notification.ApplyDamage) query;
-                    displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
-                } else if(query instanceof Notification.Done) {
-                    setDone(((Notification.Done) query).done);
-                } else if(query instanceof Notification.Blink) {
-                    setTargeted(((Notification.Blink) query).targeted);
-                } else if(query instanceof Integer) {
-                    displayTreated((Integer)query);
-                }  else if (query instanceof Data.AnimId) {
-                    display((Data.AnimId) query);
-                } else if (query instanceof Notification.Pushed) {
-                    Notification.Pushed notif = (Notification.Pushed)query;
-                    displayPushed(notif.orientation);
-                } else if (query instanceof Notification.Fled) {
-                    Notification.Fled notif = (Notification.Fled)query;
-                    displayFlee(notif.orientation);
-                }else if (query instanceof Data.Orientation) {
-                    setOrientation((Data.Orientation)query);
-                } else if (query instanceof Command) {
-                    Command customQuery = (Command) query;
-                    customQuery.apply();
-                } else if (query instanceof Array) {
-                    if (((Array) query).size > 0 && ((Array) query).get(0) instanceof int[]) {
-                        Array<int[]> path = (Array<int[]>) query;
-                        displayWalk(path);
+                if(query != null) {
+                    if (query instanceof Notification.ApplyDamage) {
+                        Notification.ApplyDamage notification = (Notification.ApplyDamage) query;
+                        displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
+                    } else if (query instanceof Notification.Done) {
+                        setDone(((Notification.Done) query).done);
+                    } else if (query instanceof Notification.Blink) {
+                        setTargeted(((Notification.Blink) query).targeted);
+                    } else if (query instanceof Integer) {
+                        displayTreated((Integer) query);
+                    } else if (query instanceof Data.AnimId) {
+                        display((Data.AnimId) query);
+                    } else if (query instanceof Notification.Pushed) {
+                        Notification.Pushed notif = (Notification.Pushed) query;
+                        displayPushed(notif.orientation);
+                    } else if (query instanceof Notification.Fled) {
+                        Notification.Fled notif = (Notification.Fled) query;
+                        displayFlee(notif.orientation);
+                    } else if (query instanceof Data.Orientation) {
+                        setOrientation((Data.Orientation) query);
+                    } else if (query instanceof Command) {
+                        Command customQuery = (Command) query;
+                        customQuery.apply();
+                    } else if (query instanceof Array) {
+                        if (((Array) query).size > 0 && ((Array) query).get(0) instanceof int[]) {
+                            Array<int[]> path = (Array<int[]>) query;
+                            displayWalk(path, false);
+                        }
+                    } else if (query instanceof Data.WeaponType) {
+                        setWeaponType((Data.WeaponType) query);
+                    } else if (query instanceof Notification.Horseman) {
+                        setHorseman(((Notification.Horseman) query).horseman);
+                    } else if (query instanceof Notification.Visible) {
+                        setVisible(((Notification.Visible) query).visible);
+                    } else {
+                        launchNextAnimation();
                     }
-                } else if(query instanceof Data.WeaponType){
-                    setWeaponType((Data.WeaponType)query);
-                } else if (query instanceof Notification.Horseman){
-                    setHorseman(((Notification.Horseman)query).horseman);
-                } else if (query instanceof Notification.Visible){
-                    setVisible(((Notification.Visible)query).visible);
-                }else {
-                    launchNextAnimation();
                 }
-
             }
         }
     }
 
     @Override
     public boolean isExecuting() {
-        return isAnimationRolling() || notificationQueue.size() > 0;
+        return !isResting() || notificationQueue.size() > 0;
     }
 
-    public abstract void setX(float x);
-    public abstract void setY(float y);
-    public abstract float getX();
-    public abstract float getY();
+    public abstract void setPos(int row, int col);
+    public abstract float getCenterX();
+    public abstract float getCenterY();
     public abstract void setDone(boolean done);
     public abstract void setTargeted(boolean targeted);
-    public abstract boolean isAnimationRolling();
+    public abstract void setOrientation(Data.Orientation or);
+    public abstract void setWeaponType(Data.WeaponType type);
+    public abstract void setHorseman(boolean horseman);
+    public abstract boolean isResting();
 
-    public abstract void displayWalk(Array<int[]> path);
+    public abstract void displayWalk(Array<int[]> path, boolean swithpos);
     public abstract void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab);
     public abstract void displayTreated(int healedHP);
     public abstract void displayPushed(Data.Orientation pushedTowards);
     public abstract void displayFlee(Data.Orientation fleeingDirection);
     public abstract void display(Data.AnimId id);
-    public abstract void setOrientation(Data.Orientation or);
-    public abstract void setWeaponType(Data.WeaponType type);
-    public abstract void setHorseman(boolean horseman);
 
 
     @Override
     public void update(float dt){
-        // shall be called last to directly launched the next animation if isAnimationRolling = false
+        // shall be called last to directly launched the next animation if isResting = false
         launchNextAnimation();
     }
 

@@ -160,8 +160,8 @@ public class AttackCommand extends BattleCommand {
 
     protected IUnit setDefender(int rowTarget, int colTarget){
         IUnit defender = battlefield.getUnit(rowTarget, colTarget);
-        if(battlefield.isTileGuarded(rowTarget, colTarget, defender.getArmy().getAllegeance())){
-            defender = battlefield.getAvailableGuardians(rowTarget, colTarget, defender.getArmy().getAllegeance()).random();
+        if(battlefield.isTileGuarded(rowTarget, colTarget, defender.getArmy().getAffiliation())){
+            defender = battlefield.getAvailableGuardians(rowTarget, colTarget, defender.getArmy().getAffiliation()).random();
         }
         return defender;
     }

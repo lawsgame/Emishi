@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.renderers;
 
-import com.lawsgame.emishitactics.core.helpers.SpritePool;
-import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
+import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
@@ -25,7 +24,7 @@ public class IsoBattlefieldRendererTest {
                 battlefield.getTiles()[r][c] = Data.TileType.PLAIN;
             }
         }
-        bfr0 = new IsoBFR(battlefield, new SpritePool(), true);
+        bfr0 = new IsoBFR(battlefield, new SpriteProvider(), true);
 
     }
 
@@ -35,21 +34,21 @@ public class IsoBattlefieldRendererTest {
         float yCenter = 0.25f;
 
         // r = 0 & c = 0
-        assertTrue(bfr0.getRowFrom(xCenter, yCenter) == 0);
-        assertTrue(bfr0.getColFrom(xCenter, yCenter) == 0);
+        assertTrue(bfr0.getRow(xCenter, yCenter) == 0);
+        assertTrue(bfr0.getCol(xCenter, yCenter) == 0);
 
         xCenter = 2.5f;
         yCenter = 0.75f;
 
         // r = 0 & c = 2
-        assertTrue(bfr0.getRowFrom(xCenter, yCenter) == 0);
-        assertTrue(bfr0.getColFrom(xCenter, yCenter) == 2);
+        assertTrue(bfr0.getRow(xCenter, yCenter) == 0);
+        assertTrue(bfr0.getCol(xCenter, yCenter) == 2);
 
         xCenter = 2.0f;
         yCenter = 1.0f;
 
-        assertTrue(bfr0.getRowFrom(xCenter, yCenter) == 1);
-        assertTrue(bfr0.getColFrom(xCenter, yCenter) == 2);
+        assertTrue(bfr0.getRow(xCenter, yCenter) == 1);
+        assertTrue(bfr0.getCol(xCenter, yCenter) == 2);
     }
 
     @Test
@@ -59,30 +58,22 @@ public class IsoBattlefieldRendererTest {
 
         // r = 0 & c = 0
 
-        assertTrue(bfr0.getCenterXFrom(row, col) == 1.5f);
-        assertTrue(bfr0.getCenterYFrom(row, col) == 0.25f);
+        assertTrue(bfr0.getCenterX(row, col) == 1.5f);
+        assertTrue(bfr0.getCenterY(row, col) == 0.25f);
 
         row = 0;
         col = 2;
 
         // r = 0 & c = 2
-        assertTrue(bfr0.getCenterXFrom(row, col) == 2.5f);
-        assertTrue(bfr0.getCenterYFrom(row, col) == 0.75f);
+        assertTrue(bfr0.getCenterX(row, col) == 2.5f);
+        assertTrue(bfr0.getCenterY(row, col) == 0.75f);
 
         row = 1;
         col = 2;
 
-        assertTrue(bfr0.getCenterXFrom(row, col) == 2.0f);
-        assertTrue(bfr0.getCenterYFrom(row, col) == 1.0f);
+        assertTrue(bfr0.getCenterX(row, col) == 2.0f);
+        assertTrue(bfr0.getCenterY(row, col) == 1.0f);
 
     }
 
-     @Test
-    public void testGetRenderingIndex(){
-        assertTrue(bfr0.getRenderingIndex(2,3) == 0);
-        assertTrue(bfr0.getRenderingIndex(0,0) == 11);
-        assertTrue(bfr0.getRenderingIndex(0,3) == 3);
-        assertTrue(bfr0.getRenderingIndex(1,2) == 4);
-        assertTrue(bfr0.getRenderingIndex(2,1) == 5);
-     }
 }

@@ -17,7 +17,7 @@ public class UnitTest {
     public void testJob(){
         Array<Unit> units = new Array<Unit>();
         for(int i = 0; i < 1000; i++){
-            units.add(new Unit(""+i, Data.Job.SOLAIRE, 25, Data.WeaponType.SWORD, false, false, false, false));
+            units.add(new Unit(""+i, Data.UnitTemplate.SOLAIRE, 25, Data.WeaponType.SWORD, false, false, false, false, false));
         }
 
         Unit unit;

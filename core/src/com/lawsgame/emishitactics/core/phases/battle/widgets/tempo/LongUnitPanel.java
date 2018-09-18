@@ -48,7 +48,7 @@ public class LongUnitPanel extends UnitPanel {
         builder = new StringBuilder("   MAIN\n");
         builder.append("\nName : " + unit.getName());
         builder.append("\nLevel : " + unit.getLevel());
-        builder.append("\nJob : " + unit.getJob().name());
+        builder.append("\nUnitTemplate : " + unit.getTemplate().name());
         if (unit.isWarlord()) {
             builder.append("\nPosition : warlord");
         } else {

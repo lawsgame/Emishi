@@ -31,10 +31,10 @@ public class BattlefieldTest {
 
     @Test
     public void testArmyQueue(){
-        Army army1 = new Army(Data.Allegeance.ALLY);
-        Army army2 = new Army(Data.Allegeance.ALLY);
-        Army army3 = new Army(Data.Allegeance.ENEMY_0);
-        Army army4 = new Army(Data.Allegeance.ENEMY_0);
+        Army army1 = new Army(Data.Affiliation.ALLY);
+        Army army2 = new Army(Data.Affiliation.ALLY);
+        Army army3 = new Army(Data.Affiliation.ENEMY_0);
+        Army army4 = new Army(Data.Affiliation.ENEMY_0);
 
         battlefield.randomlyDeploy(army1);
         battlefield.randomlyDeploy(army2);

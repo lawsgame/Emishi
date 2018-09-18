@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 
@@ -11,7 +12,7 @@ import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
 public class Data {
 
 
-    public static final float GAME_PORT_WIDTH = 12f;
+    public static final float GAME_PORT_WIDTH = 9f;
 
     //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;
@@ -34,8 +35,10 @@ public class Data {
     public static final int GUARD_REACTION_RANGE_MAX = 1;
 
     // RENDER parameters
-    public static final float SPEED_WALK = 3f;  //buildingType/s
-    public static final float SPEED_PUSHED = 8f;
+        public static final float SPEED_TEMPO_WALK = 3f;  //buildingType/s
+        public static final float SPEED_TEMPO_PUSHED = 8f;
+    public static final float ANIMATION_NORMAL_SPEED = 0.55f;
+    public static final float TARGET_BLINK_PERIOD = 1.0f * MathUtils.PI;
 
     // EXP parameter
     public static final double EXP_ALPHA = 0.15;
@@ -84,7 +87,6 @@ public class Data {
         BACKSTABED_PUSHED,
         REGULAR_ATTACK,
         SPECIAL_MOVE,
-        BANNER_REST,
         TAKE_HIT,
         REST,
         DODGE,
@@ -96,21 +98,57 @@ public class Data {
     }
 
     public enum AnimId {
-        PUSH,
-        HEAL,
-        STEAL,
-        BUILD,
-        GUARD,
-        REST,
-        ATTACK,
-        DODGE,
-        DIE,
-        GUARDED,
-        WOUNDED,
-        LEVELUP,
-        SWITCH_WEAPON,
-        SPECIAL_MOVE
+        WALK(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true),
+        TAKE_HIT(   SpriteSetId.HEAL, false, false),
+        TREATED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
+        PUSHED(     SpriteSetId.BACKSTABED_PUSHED, true, false),
+        FLEE(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, false, false, 0.15f),
+        PUSH(       SpriteSetId.PUSH, false, false),
+        HEAL(       SpriteSetId.HEAL, false, false),
+        STEAL(      SpriteSetId.STEAL, false, false),
+        BUILD(      SpriteSetId.BUILD, false, false),
+        GUARD(      SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
+        REST(       SpriteSetId.REST, false, false),
+        ATTACK(     SpriteSetId.REGULAR_ATTACK, false, false),
+        DODGE(      SpriteSetId.DODGE, false, false),
+        DIE(        SpriteSetId.DIE, false, false),
+        GUARDED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
+        WOUNDED(    SpriteSetId.TAKE_HIT, false, false),
+        LEVELUP(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
+        SWITCH_WEAPON(SpriteSetId.WALK_FLEE_SWITCHPOSITION, false, false),
+        SPECIAL_MOVE(SpriteSetId.SPECIAL_MOVE, false, false);
 
+        SpriteSetId id;
+        boolean loop;
+        boolean backnforth;
+        float speed;
+
+        AnimId(SpriteSetId id, boolean loop, boolean backnforth, float speed) {
+            this.id = id;
+            this.loop = loop;
+            this.backnforth = backnforth;
+            this.speed = speed;
+        }
+
+        AnimId(SpriteSetId id, boolean loop, boolean backnforth) {
+            this(id, loop, backnforth, Data.ANIMATION_NORMAL_SPEED);
+        }
+
+        public SpriteSetId getSpriteSetId() {
+            return id;
+        }
+
+        public boolean isLoop() {
+            return loop;
+        }
+
+        public boolean isBacknforth() {
+            return backnforth;
+        }
+
+        public float getSpeed() {
+            return speed;
+        }
     }
 
     public enum RangedBasedType{
@@ -602,7 +640,10 @@ public class Data {
         }
     }
 
-    public enum Allegeance{
+    /**
+     * define which units are foes with one other.
+     */
+    public enum Affiliation {
         ALLY,
         ENEMY_0,
         ENEMY_1
@@ -655,7 +696,7 @@ public class Data {
         }
     }
 
-    public enum Job {
+    public enum UnitTemplate {
         SOLAIRE(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
                 3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
@@ -666,18 +707,7 @@ public class Data {
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
                 0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
                 0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f);
-        /*
-        SERGEANT(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
-                3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
-                0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
-                0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
-                0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f),
-        KNIGHT(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
-                3, 8, 9, 4, 11, 7, 3, 35, 7, 4, 3,
-                0, 2, 2, 1, 2, 2, 1, 12, 3, 2, 2,
-                0.00f, 0.15f, 0.15f, 0.10f, 0.15f, 0.15f, 0.15f, 0.65f, 0.45f, 0.40f, 0.45f,
-                0.00f, 0.25f, 0.15f, 0.10f, 0.20f, 0.15f, 0.15f, 0.90f, 0.60f, 0.50f, 0.60f);
-                */
+
 
         private int startingLevel;
         private int footmanMob;
@@ -734,7 +764,7 @@ public class Data {
         private float proGrowthSk;
         private float proGrowthBr;
 
-        Job(int startingLevel, int footmanMob, int horsemanMob, int[] horsemanBonus, int[] shieldBearerBonus, Ability[] nativeAbilities, int baseLd, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseCha, int baseHP, int baseDex, int baseSk, int baseBr, int proBoLd, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoCha, int proBoHP, int proBoDex, int proBoSk, int proBoBr, float growthLd, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthCha, float growthHP, float growthDex, float growthSk, float growthBr, float proGrowthLd, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthDex, float proGrowthCha, float getProGrowthHP, float proGrowthAg, float proGrowthSk, float proGrowthBr) {
+        UnitTemplate(int startingLevel, int footmanMob, int horsemanMob, int[] horsemanBonus, int[] shieldBearerBonus, Ability[] nativeAbilities, int baseLd, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseCha, int baseHP, int baseDex, int baseSk, int baseBr, int proBoLd, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoCha, int proBoHP, int proBoDex, int proBoSk, int proBoBr, float growthLd, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthCha, float growthHP, float growthDex, float growthSk, float growthBr, float proGrowthLd, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthDex, float proGrowthCha, float getProGrowthHP, float proGrowthAg, float proGrowthSk, float proGrowthBr) {
             this.startingLevel = startingLevel;
             this.footmanMob = footmanMob;
             this.horsemanMob = horsemanMob;
@@ -1029,7 +1059,7 @@ public class Data {
             return proGrowthBr;
         }
 
-        public static Job getStandard(){
+        public static UnitTemplate getStandard(){
             return SOLAR_KNIGHT;
         }
     }

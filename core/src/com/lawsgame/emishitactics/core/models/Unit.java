@@ -2,9 +2,10 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
-import com.lawsgame.emishitactics.core.models.Data.Job;
+import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
@@ -17,8 +18,9 @@ public class Unit extends IUnit{
 
     protected String name;
     protected int level;
-    protected Job job;
+    protected UnitTemplate template;
     protected WeaponType weaponType;
+    protected boolean character;
     protected boolean shielbearer;
     protected boolean horseman;
     protected boolean horsemanUponPromotion;
@@ -72,7 +74,7 @@ public class Unit extends IUnit{
      *
      *
      * @param name
-     * @param job
+     * @param template
      * @param level
      * @param weaponType
      * @param horseman
@@ -81,33 +83,35 @@ public class Unit extends IUnit{
      */
     public Unit(
             String name,
-            Job job,
+            UnitTemplate template,
             int level,
             WeaponType weaponType,
+            boolean character,
             boolean shielbearer,
             boolean horseman,
             boolean horsemanUponPromotion,
             boolean homogeneousLevelsup){
 
         this.name = name;
-        this.job = job;
-        this.level = job.getStartingLevel();
+        this.template = template;
+        this.level = template.getStartingLevel();
+        this.character = character;
         this.weaponType = weaponType;
         this.horseman = horseman;
         this.horsemanUponPromotion = horsemanUponPromotion;
 
-        this.mobility = (horseman) ? job.getHorsemanMob() : job.getFootmanMob();
-        this.charisma = job.getBaseCha();
-        this.leadership = job.getBaseLd();
-        this.hitPoints = job.getBaseHP();
-        this.strength = job.getBaseStr() + ((shielbearer) ?  job.getShieldBearerStrengthBonus(): 0) + ((horseman) ? job.getHorsemanStrengthBonus(): 0);
-        this.piercinfArmor = job.getBasePiercingArmor() + ((shielbearer) ?  job.getShieldBearerArmorPBonus(): 0) + ((horseman) ? job.getHorsemanArmorPBonus(): 0);
-        this.bluntArmor = job.getBaseBluntArmor() + ((shielbearer) ?  job.getShieldBearerArmorBBonus(): 0) + ((horseman) ? job.getHorsemanArmorBBonus(): 0);
-        this.edgedArmor = job.getBaseEgdedArmor() + ((shielbearer) ?  job.getShieldBearerArmorEBonus(): 0) + ((horseman) ? job.getShieldBearerArmorEBonus(): 0);
-        this.dexterity = job.getBaseDex() + ((shielbearer) ?  job.getShieldBearerDexBonus(): 0) + ((horseman) ? job.getHorsemanDexBonus(): 0);
-        this.agility = job.getBaseAg() + ((shielbearer) ?  job.getShieldBearerAgilityBonus(): 0) + ((horseman) ? job.getHorsemanAgilityBonus(): 0);
-        this.skill = job.getBaseSk();
-        this.bravery = job.getBaseBr();
+        this.mobility = (horseman) ? template.getHorsemanMob() : template.getFootmanMob();
+        this.charisma = template.getBaseCha();
+        this.leadership = template.getBaseLd();
+        this.hitPoints = template.getBaseHP();
+        this.strength = template.getBaseStr() + ((shielbearer) ?  template.getShieldBearerStrengthBonus(): 0) + ((horseman) ? template.getHorsemanStrengthBonus(): 0);
+        this.piercinfArmor = template.getBasePiercingArmor() + ((shielbearer) ?  template.getShieldBearerArmorPBonus(): 0) + ((horseman) ? template.getHorsemanArmorPBonus(): 0);
+        this.bluntArmor = template.getBaseBluntArmor() + ((shielbearer) ?  template.getShieldBearerArmorBBonus(): 0) + ((horseman) ? template.getHorsemanArmorBBonus(): 0);
+        this.edgedArmor = template.getBaseEgdedArmor() + ((shielbearer) ?  template.getShieldBearerArmorEBonus(): 0) + ((horseman) ? template.getShieldBearerArmorEBonus(): 0);
+        this.dexterity = template.getBaseDex() + ((shielbearer) ?  template.getShieldBearerDexBonus(): 0) + ((horseman) ? template.getHorsemanDexBonus(): 0);
+        this.agility = template.getBaseAg() + ((shielbearer) ?  template.getShieldBearerAgilityBonus(): 0) + ((horseman) ? template.getHorsemanAgilityBonus(): 0);
+        this.skill = template.getBaseSk();
+        this.bravery = template.getBaseBr();
 
         this.weapons = new Array<Weapon>();
         this.weapons.add(Weapon.FIST);
@@ -117,7 +121,7 @@ public class Unit extends IUnit{
         if(homogeneousLevelsup) {
             growup(level);
         }else{
-            for(int lvl = job.getStartingLevel(); lvl < level; lvl++){
+            for(int lvl = template.getStartingLevel(); lvl < level; lvl++){
                 levelup();
             }
         }
@@ -127,30 +131,37 @@ public class Unit extends IUnit{
     }
 
     public Unit(String name){
-        this(name, Job.getStandard(), 10, WeaponType.SWORD, false, false, false, true);
+        this(name, Data.UnitTemplate.getStandard(), 10, WeaponType.SWORD, false, false, false, false, true);
     }
 
-    /**
-     * CHARACTER constructor
-     *
-     * @param job
-     * @param level
-     * @param weaponType
-     * @param shielbearer
-     * @param horseman
-     * @param horsemanUponPromotion
-     */
-    public Unit(
-            Job job,
+   public static Unit createGenericUnit(
+           String name,
+           UnitTemplate template,
+           int level,
+           WeaponType weaponType,
+           boolean shielbearer,
+           boolean horseman,
+           boolean horsemanUponPromotion,
+           boolean homogeneousLevelsup){
+        return new Unit(name, template, level, weaponType, false, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
+   }
+
+    public static Unit createCharacterUnit(
+            String name,
+            String title,
+            UnitTemplate template,
             int level,
             WeaponType weaponType,
             boolean shielbearer,
             boolean horseman,
             boolean horsemanUponPromotion){
-        this(job.name(), job, level, weaponType, shielbearer, horseman, horsemanUponPromotion, false);
+        return new CharacterUnit(name, title, template, level, weaponType, false, shielbearer, horseman, horsemanUponPromotion, true);
     }
 
-
+    @Override
+    public String getName(I18NBundle bundle) {
+        return bundle.get(name);
+    }
 
     @Override
     public String getName() {
@@ -163,8 +174,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public Data.Job getJob() {
-        return job;
+    public Data.UnitTemplate getTemplate() {
+        return template;
     }
 
     @Override
@@ -195,7 +206,7 @@ public class Unit extends IUnit{
         if(this.level < Data.MAX_LEVEL) {
 
 
-            if (Data.PROMOTION_LEVEL != level) {
+            if (Data.PROMOTION_LEVEL != level ) {
                 float GRcha = getAppGrCharisma();
                 float GRHP = getAppGrHitpoints();
                 float GRstr = getAppGrStrength();
@@ -221,17 +232,17 @@ public class Unit extends IUnit{
                 int[] promoStats = promoted();
 
                 mob = promoStats[0];
-                cha = job.getProBoCha();
-                ld = job.getProBoLd();
-                hpt = job.getProBoHP();
-                str = job.getProBoStr() + promoStats[1];
-                armorP = job.getProBoPiercingArmor() + promoStats[4];
-                armorE = job.getProBoEdgedArmor() + promoStats[5];
-                armorB = job.getProBoBluntArmor() + promoStats[6];
-                dex = job.getProBoDex() + promoStats[2];
-                agi = job.getProBoAg() + promoStats[3];
-                ski = job.getProBoSk();
-                bra = job.getProBoBr();
+                cha = template.getProBoCha();
+                ld = template.getProBoLd();
+                hpt = template.getProBoHP();
+                str = template.getProBoStr() + promoStats[1];
+                armorP = template.getProBoPiercingArmor() + promoStats[4];
+                armorE = template.getProBoEdgedArmor() + promoStats[5];
+                armorB = template.getProBoBluntArmor() + promoStats[6];
+                dex = template.getProBoDex() + promoStats[2];
+                agi = template.getProBoAg() + promoStats[3];
+                ski = template.getProBoSk();
+                bra = template.getProBoBr();
             }
 
             this.level++;
@@ -254,13 +265,13 @@ public class Unit extends IUnit{
     }
 
     private int[] promoted(){
-        int mob = (!horseman && horsemanUponPromotion) ? job.getHorsemanMob() - job.getFootmanMob() : 0;
-        int str = ((!horseman && horsemanUponPromotion) ? job.getHorsemanStrengthBonus(): 0);
-        int dex = ((!horseman && horsemanUponPromotion) ? job.getHorsemanDexBonus(): 0);
-        int agi = ((!horseman && horsemanUponPromotion) ? job.getHorsemanAgilityBonus(): 0);
-        int armorP = ((!horseman && horsemanUponPromotion) ? job.getHorsemanArmorPBonus(): 0);
-        int armorB = ((!horseman && horsemanUponPromotion) ? job.getHorsemanArmorBBonus(): 0);
-        int armorE = ((!horseman && horsemanUponPromotion) ? job.getShieldBearerArmorEBonus(): 0);
+        int mob = (!horseman && horsemanUponPromotion) ? template.getHorsemanMob() - template.getFootmanMob() : 0;
+        int str = ((!horseman && horsemanUponPromotion) ? template.getHorsemanStrengthBonus(): 0);
+        int dex = ((!horseman && horsemanUponPromotion) ? template.getHorsemanDexBonus(): 0);
+        int agi = ((!horseman && horsemanUponPromotion) ? template.getHorsemanAgilityBonus(): 0);
+        int armorP = ((!horseman && horsemanUponPromotion) ? template.getHorsemanArmorPBonus(): 0);
+        int armorB = ((!horseman && horsemanUponPromotion) ? template.getHorsemanArmorBBonus(): 0);
+        int armorE = ((!horseman && horsemanUponPromotion) ? template.getShieldBearerArmorEBonus(): 0);
 
         this.horseman = horsemanUponPromotion;
         mob += Data.MOBILITY_BONUS_PROMOTED;
@@ -289,46 +300,46 @@ public class Unit extends IUnit{
             float bra = 0;
 
             if(gainBeforePromotion > 0){
-                cha += job.getGrowthCha() * gainBeforePromotion;
-                hpt += job.getGrowthHP() * gainBeforePromotion;
-                str += job.getGrowthStr() * gainBeforePromotion;
-                armorE += job.getGrowthEdgegArmor()  * gainBeforePromotion;
-                armorB += job.getGrowthBluntArmor()  * gainBeforePromotion;
-                armorP += job.getGrowthPiercingArmor()  * gainBeforePromotion;
-                dex += job.getGrowthDex()  * gainBeforePromotion;
-                agi += job.getGrowthAg() * gainBeforePromotion;
-                ski += job.getGrowthSk() * gainBeforePromotion;
-                bra += job.getGrowthBr()  * gainBeforePromotion;
+                cha += template.getGrowthCha() * gainBeforePromotion;
+                hpt += template.getGrowthHP() * gainBeforePromotion;
+                str += template.getGrowthStr() * gainBeforePromotion;
+                armorE += template.getGrowthEdgegArmor()  * gainBeforePromotion;
+                armorB += template.getGrowthBluntArmor()  * gainBeforePromotion;
+                armorP += template.getGrowthPiercingArmor()  * gainBeforePromotion;
+                dex += template.getGrowthDex()  * gainBeforePromotion;
+                agi += template.getGrowthAg() * gainBeforePromotion;
+                ski += template.getGrowthSk() * gainBeforePromotion;
+                bra += template.getGrowthBr()  * gainBeforePromotion;
             }
 
             if(getLevel() < Data.PROMOTION_LEVEL && Data.PROMOTION_LEVEL <= upto){
                 int[] promoStats = promoted();
 
                 mob = promoStats[0];
-                cha = job.getProBoCha();
-                ld = job.getProBoLd();
-                hpt = job.getProBoHP();
-                str = job.getProBoStr() + promoStats[1];
-                armorP = job.getProBoPiercingArmor() + promoStats[4];
-                armorE = job.getProBoEdgedArmor() + promoStats[5];
-                armorB = job.getProBoBluntArmor() + promoStats[6];
-                dex = job.getProBoDex() + promoStats[2];
-                agi = job.getProBoAg() + promoStats[3];
-                ski = job.getProBoSk();
-                bra = job.getProBoBr();
+                cha = template.getProBoCha();
+                ld = template.getProBoLd();
+                hpt = template.getProBoHP();
+                str = template.getProBoStr() + promoStats[1];
+                armorP = template.getProBoPiercingArmor() + promoStats[4];
+                armorE = template.getProBoEdgedArmor() + promoStats[5];
+                armorB = template.getProBoBluntArmor() + promoStats[6];
+                dex = template.getProBoDex() + promoStats[2];
+                agi = template.getProBoAg() + promoStats[3];
+                ski = template.getProBoSk();
+                bra = template.getProBoBr();
             }
 
             if(gainAfterPromotion > 0){
-                cha += job.getProGrowthCha()  * gainAfterPromotion;
-                hpt += job.getGetProGrowthHP() * gainAfterPromotion;
-                str += job.getProGrowthStr() * gainAfterPromotion;
-                armorE += job.getProGrowthEdgedArmor()  * gainAfterPromotion;
-                armorB += job.getProGrowthBluntArmor()  * gainAfterPromotion;
-                armorP += job.getProGrowthPiercingArmor()  * gainAfterPromotion;
-                dex += job.getProGrowthDex()  * gainAfterPromotion;
-                agi += job.getProGrowthAg() * gainAfterPromotion;
-                ski += job.getProGrowthSk() * gainAfterPromotion;
-                bra += job.getProGrowthBr()  * gainAfterPromotion;
+                cha += template.getProGrowthCha()  * gainAfterPromotion;
+                hpt += template.getGetProGrowthHP() * gainAfterPromotion;
+                str += template.getProGrowthStr() * gainAfterPromotion;
+                armorE += template.getProGrowthEdgedArmor()  * gainAfterPromotion;
+                armorB += template.getProGrowthBluntArmor()  * gainAfterPromotion;
+                armorP += template.getProGrowthPiercingArmor()  * gainAfterPromotion;
+                dex += template.getProGrowthDex()  * gainAfterPromotion;
+                agi += template.getProGrowthAg() * gainAfterPromotion;
+                ski += template.getProGrowthSk() * gainAfterPromotion;
+                bra += template.getProGrowthBr()  * gainAfterPromotion;
             }
 
             this.level = upto;
@@ -364,6 +375,11 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public boolean isCharacter() {
+        return character;
+    }
+
+    @Override
     public boolean isStandardBearer() {
         return isWarChief();
     }
@@ -391,6 +407,11 @@ public class Unit extends IUnit{
     @Override
     public Banner getBanner() {
         return banner;
+    }
+
+    @Override
+    public String getTitle(I18NBundle bundle) {
+        return template.getName(bundle);
     }
 
     @Override
@@ -480,7 +501,7 @@ public class Unit extends IUnit{
 
     @Override
     public float getAppGrHitpoints() {
-        return  (isPromoted()) ? job.getGetProGrowthHP() : job.getGrowthHP();
+        return  (isPromoted()) ? template.getGetProGrowthHP() : template.getGrowthHP();
     }
 
     @Override
@@ -580,7 +601,7 @@ public class Unit extends IUnit{
 
     @Override
     public float getAppGrCharisma() {
-        return (isPromoted()) ? job.getProGrowthDex() : job.getGrowthDex();
+        return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
     }
 
     @Override
@@ -605,7 +626,7 @@ public class Unit extends IUnit{
 
     @Override
     public float getAppGrStrength() {
-        return (isPromoted()) ? job.getProGrowthStr() : job.getGrowthStr();
+        return (isPromoted()) ? template.getProGrowthStr() : template.getGrowthStr();
     }
 
     @Override
@@ -628,9 +649,9 @@ public class Unit extends IUnit{
     public float getAppGrArmor(DamageType damageType) {
         float growthrate = 0;
         switch(damageType){
-            case BLUNT: growthrate = (isPromoted()) ? job.getProGrowthBluntArmor(): job.getGrowthBluntArmor(); break;
-            case EDGED: growthrate = (isPromoted()) ? job.getProGrowthEdgedArmor(): job.getGrowthEdgegArmor();break;
-            case PIERCING: growthrate = (isPromoted()) ? job.getProGrowthPiercingArmor(): job.getGrowthPiercingArmor();break;
+            case BLUNT: growthrate = (isPromoted()) ? template.getProGrowthBluntArmor(): template.getGrowthBluntArmor(); break;
+            case EDGED: growthrate = (isPromoted()) ? template.getProGrowthEdgedArmor(): template.getGrowthEdgegArmor();break;
+            case PIERCING: growthrate = (isPromoted()) ? template.getProGrowthPiercingArmor(): template.getGrowthPiercingArmor();break;
         }
         return growthrate;
     }
@@ -647,7 +668,7 @@ public class Unit extends IUnit{
 
     @Override
     public float getAppGrAgility() {
-        return (isPromoted()) ? job.getProGrowthAg() : job.getGrowthAg();
+        return (isPromoted()) ? template.getProGrowthAg() : template.getGrowthAg();
     }
 
     @Override
@@ -662,7 +683,7 @@ public class Unit extends IUnit{
 
     @Override
     public float getAppGrDexterity() {
-        return (isPromoted()) ? job.getProGrowthDex() : job.getGrowthDex();
+        return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
     }
 
     @Override
@@ -677,7 +698,7 @@ public class Unit extends IUnit{
 
     @Override
     public float getAppGrSkill() {
-        return (isPromoted()) ? job.getProGrowthSk() : job.getGrowthSk();
+        return (isPromoted()) ? template.getProGrowthSk() : template.getGrowthSk();
     }
 
     @Override
@@ -692,7 +713,7 @@ public class Unit extends IUnit{
 
     @Override
     public float getAppGrBravery() {
-        return (isPromoted()) ? job.getProGrowthBr() : job.getGrowthBr();
+        return (isPromoted()) ? template.getProGrowthBr() : template.getGrowthBr();
     }
 
     @Override
@@ -723,8 +744,8 @@ public class Unit extends IUnit{
             }
         }
         if(!hasAbility){
-            for(int i = 0; i < job.getNativeAbilities().length; i++){
-                if(job.getNativeAbilities()[i] == ability){
+            for(int i = 0; i < template.getNativeAbilities().length; i++){
+                if(template.getNativeAbilities()[i] == ability){
                     hasAbility = true;
                     continue;
                 }
@@ -751,8 +772,8 @@ public class Unit extends IUnit{
                     abilities.add(ability);
             }
         }
-        for(int i = 0; i < job.getNativeAbilities().length; i++){
-            ability = job.getNativeAbilities()[i];
+        for(int i = 0; i < template.getNativeAbilities().length; i++){
+            ability = template.getNativeAbilities()[i];
             if(!abilities.contains(ability, true))
                 abilities.add(ability);
         }
@@ -1026,8 +1047,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public boolean isAllyWith(Data.Allegeance allegeance) {
-        return (army != null) && army.getAllegeance() == allegeance;
+    public boolean isAllyWith(Data.Affiliation affiliation) {
+        return (army != null) && army.getAffiliation() == affiliation;
     }
 
     @Override
@@ -1277,5 +1298,21 @@ public class Unit extends IUnit{
         str += (apparent) ? getAppAgility() : getBaseAgility();
 
         return str;
+    }
+
+
+
+    static class CharacterUnit extends Unit{
+        private String title;
+
+        public CharacterUnit(String name, String title, UnitTemplate template, int level, WeaponType weaponType, boolean character, boolean shielbearer, boolean horseman, boolean horsemanUponPromotion, boolean homogeneousLevelsup) {
+            super(name, template, level, weaponType, character, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
+            this.title = title;
+        }
+
+        @Override
+        public String getTitle(I18NBundle bundle) {
+            return bundle.get(title);
+        }
     }
 }

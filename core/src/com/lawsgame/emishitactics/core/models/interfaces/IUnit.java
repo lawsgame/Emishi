@@ -1,26 +1,27 @@
 package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.Allegeance;
+import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
-import com.lawsgame.emishitactics.core.models.Data.Job;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public abstract class IUnit extends Observable {
 
+    public abstract String getName(I18NBundle bundle);
+
     public abstract String getName();
     public abstract void setName(String name);
-    public abstract Job getJob();
+    public abstract Data.UnitTemplate getTemplate();
     public abstract WeaponType getWeaponType();
     public abstract int getLevel();
 
@@ -31,6 +32,7 @@ public abstract class IUnit extends Observable {
     public abstract boolean isPromoted();
     public abstract boolean isRightHanded();
     public abstract boolean setRightHanded(boolean righthanded);
+    public abstract boolean isCharacter();
     public abstract boolean isStandardBearer();
     public abstract boolean isHorseman();
     public abstract boolean isShielbearer();
@@ -38,6 +40,7 @@ public abstract class IUnit extends Observable {
     public abstract boolean isHorsemanUponPromotion();
     public abstract void setHorsemanUponPromotion(boolean horseman);
     public abstract Banner getBanner();
+    public abstract String getTitle(I18NBundle bundle);
 
     // WEAPON related
     public abstract boolean addWeapon(Weapon weapon);
@@ -140,10 +143,10 @@ public abstract class IUnit extends Observable {
 
     /**
      *
-     * @param allegeance
+     * @param affiliation
      * @return true if ally, false if foe
      */
-    public abstract boolean isAllyWith(Allegeance allegeance);
+    public abstract boolean isAllyWith(Affiliation affiliation);
     public abstract Array<IUnit> getSquad(boolean stillFighting);
     public abstract IArmy getArmy();
     public abstract boolean sameSquadAs(IUnit unit);
