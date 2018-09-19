@@ -51,35 +51,36 @@ public class IsoBFR extends BattlefieldRenderer {
 
         // required for the junit testes
         if (test) {
+
             X_CAM_BOUNDS_OFFSET = 0;
             Y_CAM_BOUNDS_OFFSET = 0;
         } else {
+
             this.backkgroundRenderer = new ShapeRenderer();
-        }
 
-
-        // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
-        for (int r = 0; r < battlefield.getNbRows(); r++) {
-            for (int c = 0; c < battlefield.getNbColumns(); c++) {
-                addTileRenderer(r, c, getModel().getTile(r, c));
-                if (battlefield.isTileOccupied(r, c)) {
-                    addUnitRenderer(r, c, getModel().getUnit(r, c));
+            // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
+            for (int r = 0; r < battlefield.getNbRows(); r++) {
+                for (int c = 0; c < battlefield.getNbColumns(); c++) {
+                    addTileRenderer(r, c, getModel().getTile(r, c));
+                    if (battlefield.isTileOccupied(r, c)) {
+                        addUnitRenderer(r, c, getModel().getUnit(r, c));
+                    }
                 }
             }
-        }
 
-        // set up area renderers
-        for (Data.Affiliation a : Data.Affiliation.values()) {
-            for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
-                addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
+            // set up area renderers
+            for (Data.Affiliation a : Data.Affiliation.values()) {
+                for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
+                    addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
+                }
             }
-        }
-        for (int i = 0; i < battlefield.getDeploymentAreas().size; i++) {
-            addAreaRenderer(battlefield.getDeploymentAreas().get(i));
-        }
+            for (int i = 0; i < battlefield.getDeploymentAreas().size; i++) {
+                addAreaRenderer(battlefield.getDeploymentAreas().get(i));
+            }
 
-        //set weather renderer
-        this.renderedWeather = getModel().getWeather();
+            //set weather renderer
+            this.renderedWeather = getModel().getWeather();
+        }
     }
 
     @Override

@@ -84,8 +84,10 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	}
 	
 	public void stop(){
+	    time = 0;
 		playing = false;
 		finish = false;
+		direction = Direction.FORTH;
 		frameCurrentIndex = 0;
 	}
 	

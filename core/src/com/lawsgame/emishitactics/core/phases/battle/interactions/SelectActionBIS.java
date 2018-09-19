@@ -18,6 +18,8 @@ import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoCommandChoicePanel;
 
 import java.util.Stack;
 
@@ -192,72 +194,6 @@ public class SelectActionBIS extends BattleInteractionState {
                     }
                 }
             }
-        }
-    }
-
-    public static class TempoActionChoicePanel extends ActionChoicePanel{
-
-        public TempoActionChoicePanel(AssetManager asm) {
-            super();
-            if(style == null) {
-                TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
-                Skin skin = new Skin(uiAtlas);
-
-                //setTiles button style
-                style = new TextButton.TextButtonStyle();
-                style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
-                style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);
-                style.font = BattlePhase.testFont;
-            }
-        }
-
-        @Override
-        public void setLayout() {
-            setFillParent(true);
-            align(Align.right | Align.top);
-            padTop(10f);
-            padRight(25f);
-        }
-
-        public void addButton(TextButton button){
-            add(button).width(150f).height(30);
-            row();
-        }
-    }
-
-    public static class TempoCommandChoicePanel extends CommandChoicePanel{
-        protected int buttonIndex;
-
-        public TempoCommandChoicePanel(AssetManager asm) {
-            super();
-            this.buttonIndex = 0;
-            if(style == null) {
-                TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
-                Skin skin = new Skin(uiAtlas);
-
-                //setTiles button style
-                style = new TextButton.TextButtonStyle();
-                style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
-                style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);
-                style.font = BattlePhase.testFont;
-            }
-        }
-
-        public void setButtonIndex(int buttonIndex) {
-            this.buttonIndex = buttonIndex;
-        }
-
-        @Override
-        public void setLayout() {
-            setFillParent(true);
-            align(Align.right | Align.top);
-            padTop(15f + buttonIndex*30f);
-            padRight(15f);
-        }
-
-        public void addButton(TextButton button){
-            add(button).width(150f).height(30);
-            row();
         }
     }
 }

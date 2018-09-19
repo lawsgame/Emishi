@@ -71,6 +71,8 @@ public class EndTurnBIS extends BattleInteractionState {
         windRoseWidget.render(batch);
     }
 
+
+
     public static class WindRoseWidget implements GameRenderableEntity {
         protected HashMap<Data.Orientation, OrientationArrowWidget> arrows;
 

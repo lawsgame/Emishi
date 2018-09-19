@@ -1,9 +1,9 @@
 
-PC.png
+ai.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-player_controlled
+unit_sprite_sheet
   rotate: false
   xy: 0, 0
   size: 512, 512

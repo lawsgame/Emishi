@@ -114,9 +114,6 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
     @Override
     public void getNotification(Object data) {
-        System.out.println("DATA COMMAND : "+data);
-        System.out.println("CURRENT COMMAND : "+currentCommand);
-        System.out.println("BIS : "+this);
         if(data instanceof BattleCommand && data == currentCommand){
             bim.replace(new HandleOutcomeBIS(bim, historic));
         }

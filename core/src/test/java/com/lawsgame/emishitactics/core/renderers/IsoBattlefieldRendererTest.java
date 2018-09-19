@@ -74,6 +74,11 @@ public class IsoBattlefieldRendererTest {
         assertTrue(bfr0.getCenterX(row, col) == 2.0f);
         assertTrue(bfr0.getCenterY(row, col) == 1.0f);
 
+        row = 2;
+        col = 2;
+        assertTrue(bfr0.getRow(bfr0.getCenterX(row, col), bfr0.getCenterY(row, col)) == 2);
+        assertTrue(bfr0.getCol(bfr0.getCenterX(row, col), bfr0.getCenterY(row, col)) == 2);
+
     }
 
 }

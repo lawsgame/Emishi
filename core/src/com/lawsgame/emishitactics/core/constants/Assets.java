@@ -47,10 +47,7 @@ public class Assets {
     public static final String UI_ARROW = "arrow";
 
     public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
-    public static final String REGION_UNIT_PROMOTED = "promoted";
-    public static final String REGION_UNIT_RECRUIT = "recruit";
-    public static final String REGION_UNIT_PLAYER_CONTROLLED = "player_controlled";
-    public static final String REGION_UNIT_AI_CONTROLLED = "AI_controlled";
+    public static final String REGION_UNIT_SPRITE_SHEET = "unit_sprite_sheet";
 
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";
 

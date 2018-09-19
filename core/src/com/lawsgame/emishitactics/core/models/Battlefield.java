@@ -820,7 +820,9 @@ public class Battlefield extends Observable {
      *
      * getInstance the shortest validPath of a target buildingType using the A* algorithm
      *
-     * @return an array like that {[row, col]} representing the shortest validPath from one buildingType to another
+     * @return an {[row, col]} array  representing the shortest validPath from one buildingType to another,
+     * excluding (rowI, colI) and finishing by (rowf, colf). If the path is invalid, the returned array will be empty
+     *
      */
     public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Affiliation affiliation){
         Array<int[]> res = new Array<int[]>();

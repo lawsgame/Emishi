@@ -105,4 +105,6 @@ public class UtilsTest {
         int[] rgbaRes = Utils.getRGBA(Utils.getColor32Bits(r,g,b));
         assertTrue(r == rgbaRes[0] && g == rgbaRes[1] && b == rgbaRes[2]);
     }
+
+
 }

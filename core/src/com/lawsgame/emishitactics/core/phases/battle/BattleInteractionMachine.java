@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
@@ -38,7 +39,7 @@ import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
-public class BattleInteractionMachine extends StateMachine<BattleInteractionState> {
+public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
     public final Player player;
     public final Battlefield battlefield;
     public final BattlefieldRenderer bfr;
@@ -287,6 +288,10 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         return str;
     }
 
+    @Override
+    public void dispose() {
+        spriteProvider.dispose();
+    }
 
 
     public static class FocusOn extends SimpleCommand{

@@ -2,8 +2,13 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -12,8 +17,19 @@ import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.EndTurnBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -25,6 +41,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPane
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.Stack;
@@ -38,7 +55,10 @@ public class TestBIS extends BattleInteractionState {
     EndTurnBIS.WindRoseWidget windRoseWidget;
 
     private Animation animation;
+    private Array<Sprite> sprites;
     private TextureRegion[] spriteSet;
+
+    private Texture madeupTexture = null;
 
     IUnit sltdUnit;
     int index;
@@ -55,8 +75,42 @@ public class TestBIS extends BattleInteractionState {
         index = 1;
         switchmode = false;
 
+        //createTexture();
 
+        //sprites = bim.spriteProvider.genSpriteTree.getSpriteSet(true, false, false,  Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, false, Data.SpriteSetId.WALK_FLEE_SWITCHPOSITION);
+        sprites = bim.spriteProvider.charaSpriteTree.getSpriteSet(false, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, Data.Orientation.SOUTH, true, false, Data.SpriteSetId.PUSH);
+        for(int i = 0; i < sprites.size; i++){
+            sprites.get(i).setSize((sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 2 : 1), 2);
+            sprites.get(i).setPosition(2 + (sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 0 : 0.5f), 2);
+
+        }
+        System.out.println(sprites.size);
+        animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false);
+        animation.play();
     }
+
+    public void createTexture(){
+        Array<Sprite> as = bim.spriteProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, false, Data.SpriteSetId.REST);
+        madeupTexture = as.get(0).getTexture();
+        madeupTexture.getTextureData().prepare();
+        Pixmap pixmap = madeupTexture.getTextureData().consumePixmap();
+        int colorInt;
+        int average;
+        int[] colorArray;
+        for(int r = 0; r < madeupTexture.getHeight(); r++){
+            for(int c = 0; c < madeupTexture.getWidth(); c++){
+                colorInt = pixmap.getPixel(r, c);
+                colorArray = Utils.getRGBA(colorInt);
+                average = (colorArray[0] + colorArray[1] + colorArray[2])/3;
+                colorInt = Utils.getColor32Bits(average, average, average, colorArray[3]);
+                pixmap.drawPixel(r, c, colorInt);
+            }
+        }
+        pixmap.getPixels().rewind();
+        madeupTexture = new Texture(pixmap);
+        pixmap.dispose();
+    }
+
 
     @Override
     public void end() {
@@ -65,7 +119,12 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-
+        /*
+        if(madeupTexture != null)
+            batch.draw(madeupTexture, 0, 0, 19, 19 );
+        if(sprites != null)
+            sprites.get(animation.getCurrentFrame()).draw(batch);
+            */
     }
 
     @Override
@@ -73,12 +132,12 @@ public class TestBIS extends BattleInteractionState {
         // command test
 
         System.out.println("input : "+row+" "+col);
-        bim.moveCamera(row, col, true);
-        bim.bfr.getUnitRenderer(sltdUnit).setPos(row, col);
+        //bim.moveCamera(row, col, true);
+        //bim.bfr.getUnitRenderer(sltdUnit).setPos(row, col);
 
         // TEST FINAL
 
-        /*
+
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Affiliation.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
 
@@ -105,7 +164,7 @@ public class TestBIS extends BattleInteractionState {
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
             if (command.setActor(unitPos[0], unitPos[1])) {
-                command.setDecoupled(true);
+                //command.setDecoupled(true);
 
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
@@ -154,7 +213,7 @@ public class TestBIS extends BattleInteractionState {
                 }
             }
         }
-        */
+
 
         return true;
     }
@@ -210,7 +269,7 @@ public class TestBIS extends BattleInteractionState {
             index = 8;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)){
-            System.out.println("action command : end turn");
+            System.out.println("action command : end turn / build");
             index = 9;
         }
 
@@ -221,15 +280,17 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.R)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.BUILD);
         if(Gdx.input.isKeyJustPressed(Input.Keys.T)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.WALK);
         if(Gdx.input.isKeyJustPressed(Input.Keys.Y)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.DODGE);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.O)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.WEST);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.P)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.NORTH);
+        if(Gdx.input.isKeyJustPressed(Input.Keys.C)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.WEST);
+        if(Gdx.input.isKeyJustPressed(Input.Keys.V)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.NORTH);
+        if(Gdx.input.isKeyJustPressed(Input.Keys.N)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.SOUTH);
+        if(Gdx.input.isKeyJustPressed(Input.Keys.B)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.EAST);
         if(Gdx.input.isKeyJustPressed(Input.Keys.I)) {
             this.targeted = ! targeted;
             bim.bfr.getUnitRenderer(sltdUnit).setTargeted(targeted);
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             this.done = ! done;
-            bim.bfr.getUnitRenderer(sltdUnit).setDone(done);
+            bim.bfr.getUnitRenderer(sltdUnit.getArmy().getAllSquads().get(0).get(0)).setDone(done);
         }
 
     }

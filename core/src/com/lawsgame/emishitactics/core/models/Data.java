@@ -37,8 +37,11 @@ public class Data {
     // RENDER parameters
         public static final float SPEED_TEMPO_WALK = 3f;  //buildingType/s
         public static final float SPEED_TEMPO_PUSHED = 8f;
+    public static final float SPEED_WALK = 0.9f;
+    public static final float SPEED_PUSHED = 1.9f;
     public static final float ANIMATION_NORMAL_SPEED = 0.55f;
     public static final float TARGET_BLINK_PERIOD = 1.0f * MathUtils.PI;
+    public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
 
     // EXP parameter
     public static final double EXP_ALPHA = 0.15;
@@ -99,16 +102,16 @@ public class Data {
 
     public enum AnimId {
         WALK(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true),
-        TAKE_HIT(   SpriteSetId.HEAL, false, false),
+        BACKSTAB(   SpriteSetId.BACKSTABED_PUSHED, false, false),
         TREATED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
-        PUSHED(     SpriteSetId.BACKSTABED_PUSHED, true, false),
+        PUSHED(     SpriteSetId.BACKSTABED_PUSHED, false, false),
         FLEE(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, false, false, 0.15f),
         PUSH(       SpriteSetId.PUSH, false, false),
         HEAL(       SpriteSetId.HEAL, false, false),
         STEAL(      SpriteSetId.STEAL, false, false),
         BUILD(      SpriteSetId.BUILD, false, false),
         GUARD(      SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
-        REST(       SpriteSetId.REST, false, false),
+        REST(       SpriteSetId.REST, true, true),
         ATTACK(     SpriteSetId.REGULAR_ATTACK, false, false),
         DODGE(      SpriteSetId.DODGE, false, false),
         DIE(        SpriteSetId.DIE, false, false),

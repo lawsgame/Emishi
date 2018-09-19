@@ -5,7 +5,11 @@ public class Vector {
 	public float y;
 
 	static Vector vectorUtils = new Vector(0,0);
-	
+
+	public Vector(){
+		this(0, 0);
+	}
+
 	public Vector(float vx, float vy) {
 		super();
 		this.x = vx;
@@ -20,7 +24,7 @@ public class Vector {
 		this(original.x, original.y);
 	}
 	
-	public void normalize(){
+	public Vector normalize(){
 		float xtempo = x;
 		if(!(x == 0 && y == 0)){
 			x = (float) (x/(Math.sqrt(x*x + y*y)));
@@ -29,11 +33,13 @@ public class Vector {
 			y = 0;
 			x = 0;
 		}
+		return this;
 	}
 	
-	public void multiply(float value){
+	public Vector multiply(float value){
 		x *= value;
 		y *= value;
+		return this;
 	}
 
 	public void apply(Matrix m){
@@ -55,7 +61,13 @@ public class Vector {
 		return v.x*vtempo.x + v.y*vtempo.y;
 	}
 
+	public static boolean colinear(Vector v1, Vector v2){
+		return v1.x*v2.y - v2.x*v1.y == 0;
+	}
 
+	public static float vectprod(Vector v1, Vector v2){
+		return v1.x*v2.y - v2.x*v1.y;
+	}
 
 	@Override
 	public boolean equals(Object obj){

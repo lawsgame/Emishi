@@ -137,12 +137,16 @@ public class Utils {
         return 255 + 256*b + 256*256*g + 256*256*256*r;
     }
 
+    public static int getColor32Bits(int r, int g, int b, int a) {
+        return a + 256*b + 256*256*g + 256*256*256*r;
+    }
+
     public static int[] getRGBA(int color32bits){
-        int r = (color32bits)&0xFF;
-        int g = (color32bits>>8)&0xFF;
-        int b = (color32bits>>16)&0xFF;
-        int a = (color32bits>>24)&0xFF;
-        return new int[]{a,b,g,r};
+        int A = (color32bits)&0xFF;
+        int B = (color32bits>>8)&0xFF;
+        int G = (color32bits>>16)&0xFF;
+        int R = (color32bits>>24)&0xFF;
+        return new int[]{R,G,B,A};
     }
 
     public static int getMean(int nbOfDices, int nbFaces){

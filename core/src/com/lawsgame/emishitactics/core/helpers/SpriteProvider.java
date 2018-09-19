@@ -3,11 +3,15 @@ package com.lawsgame.emishitactics.core.helpers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
@@ -20,11 +24,16 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 
 import java.util.HashMap;
 
-public class SpriteProvider {
+public class SpriteProvider implements Disposable{
     private static String EXT_PACK = ".pack";
     private static int PORTRAIT_TEXTURE_SIZE = 128;
 
-    public SpriteProvider(){ }
+
+    private Array<Texture> madeupTextures;
+
+    public SpriteProvider(){
+        this.madeupTextures = new Array<Texture>();
+    }
 
     public TextureRegion undefinedTileSprite = null;
     private HashMap<TileType, TextureRegion> tileSprites = new HashMap<Data.TileType, TextureRegion>();
@@ -72,18 +81,13 @@ public class SpriteProvider {
 
                 // CHECK FILE EXISTENCE
 
-                unitFileHandle = unitsDirHandle.child(filenames.get(i)[0]);
-                unitFileHandle = (filenames.get(i).length == 3) ?
-                    unitFileHandle.child(filenames.get(i)[1]).child(filenames.get(i)[2]+EXT_PACK):
-                    unitFileHandle.child(filenames.get(i)[1]+EXT_PACK);
+                unitFileHandle = unitsDirHandle.child(filenames.get(i)[0]).child(filenames.get(i)[1]).child(filenames.get(i)[2]+EXT_PACK);
 
                 if(unitFileHandle.exists()){
 
                     // LOAD FILE
 
-                    filepath = (filenames.get(i).length == 2) ?
-                            String.format("%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenames.get(i)[0], filenames.get(i)[1], EXT_PACK) :
-                            String.format("%s/%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenames.get(i)[0], filenames.get(i)[1], filenames.get(i)[2], EXT_PACK);
+                    filepath = String.format("%s/%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenames.get(i)[0], filenames.get(i)[1], filenames.get(i)[2], EXT_PACK);
 
                     asm.load(filepath, TextureAtlas.class);
                     asm.finishLoading();
@@ -92,58 +96,79 @@ public class SpriteProvider {
                     // HANDLE FILE CONTENT
 
                     unitAtlas = asm.get(filepath);
-                    if(filenames.get(i).length == 2) {
+                    unitRegion = unitAtlas.findRegion(Assets.REGION_UNIT_SPRITE_SHEET);
+                    if(unitRegion.getRegionWidth() == PORTRAIT_TEXTURE_SIZE &&  unitRegion.getRegionHeight() == PORTRAIT_TEXTURE_SIZE){
 
-                        // if file is the texture of a character
-                        unitRegion = unitAtlas.findRegion(Assets.REGION_UNIT_RECRUIT);
-                        if(unitRegion.getRegionWidth() == PORTRAIT_TEXTURE_SIZE &&  unitRegion.getRegionHeight() == PORTRAIT_TEXTURE_SIZE){
-
-                            portraits.put(filenames.get(i)[0], unitRegion);
-                        }else {
-
-                            weaponTypeNode = charaSpriteTree.initSpriteSheet(false,
+                        portraits.put(filenames.get(i)[0], unitRegion);
+                    }else {
+                        boolean character = filenames.get(i)[2].equals("promoted") || filenames.get(i)[2].equals("recruit");
+                        if(character){
+                            weaponTypeNode = charaSpriteTree.initSpriteSheet(filenames.get(i)[2].equals("promoted") ,
                                     UnitTemplate.valueOf(filenames.get(i)[0].toUpperCase()),
                                     WeaponType.valueOf(filenames.get(i)[1].toUpperCase()));
-                            loadSpriteSet(filenames.get(i)[0], weaponTypeNode, unitRegion);
-                        }
-
-                        unitRegion = unitAtlas.findRegion(Assets.REGION_UNIT_PROMOTED);
-                        if(unitRegion.getRegionWidth() == PORTRAIT_TEXTURE_SIZE &&  unitRegion.getRegionHeight() == PORTRAIT_TEXTURE_SIZE){
-
-                            portraits.put(filenames.get(i)[0], unitRegion);
-                        }else {
-
-                            weaponTypeNode = charaSpriteTree.initSpriteSheet(true,
+                            loadSpriteSet(filenames.get(i)[0], weaponTypeNode, unitRegion, asm);
+                        }else{
+                            boolean shieldbearer = filenames.get(i)[1].contains("S");
+                            boolean horseman = filenames.get(i)[1].contains("H");
+                            weaponTypeNode = genSpriteTree.initSpriteSheet(
+                                    filenames.get(i)[2].equals("pc"),
+                                    shieldbearer,
+                                    horseman,
                                     UnitTemplate.valueOf(filenames.get(i)[0].toUpperCase()),
-                                    WeaponType.valueOf(filenames.get(i)[1].toUpperCase()));
-                            loadSpriteSet(filenames.get(i)[0], weaponTypeNode, unitRegion);
+                                    WeaponType.valueOf(filenames.get(i)[1].toUpperCase().split("_")[0]));
+                            loadSpriteSet(filenames.get(i)[0], weaponTypeNode, unitRegion, asm);
                         }
-                    }else if (filenames.get(i).length == 3){
-
-                        unitRegion = filenames.get(i)[2].equals("PC") ?
-                                unitAtlas.findRegion(Assets.REGION_UNIT_PLAYER_CONTROLLED) :
-                                unitAtlas.findRegion(Assets.REGION_UNIT_AI_CONTROLLED);
-                        boolean shieldbearer = filenames.get(i)[1].contains("S");
-                        boolean horseman = filenames.get(i)[1].contains("H");
-                        weaponTypeNode = genSpriteTree.initSpriteSheet(
-                                filenames.get(i)[2].equals("PC"),
-                                shieldbearer,
-                                horseman,
-                                UnitTemplate.valueOf(filenames.get(i)[0].toUpperCase()),
-                                WeaponType.valueOf(filenames.get(i)[1].toUpperCase().split("_")[0]));
-                        loadSpriteSet(filenames.get(i)[0], weaponTypeNode, unitRegion);
                     }
                 }
             }
         }
     }
 
-    private void loadSpriteSet(String portraitId, WeaponTypeNode node, TextureRegion unitRegion) {
+    private void loadSpriteSet(String portraitId, WeaponTypeNode node, TextureRegion unitRegion, AssetManager asm) {
         TextureRegion[][] spriteSheet16x8 = unitRegion.split(unitRegion.getRegionWidth()/16, unitRegion.getRegionHeight()/8);
         TextureRegion[][] spriteSheet8x8 = unitRegion.split(unitRegion.getRegionWidth()/8, unitRegion.getRegionHeight()/8);
         boolean footman = unitRegion.getRegionHeight() == unitRegion.getRegionWidth();
 
+
+        //DONE SPRITE SETS
+
+        Texture doneTexture = createDoneTexture(unitRegion, asm);
+        TextureRegion unitDoneRegion = new TextureRegion(doneTexture);
+        TextureRegion[][] spriteSheetDone16x8 = unitDoneRegion.split(unitDoneRegion.getRegionWidth() / 16, unitDoneRegion.getRegionHeight() / 8);
+        TextureRegion[][] spriteSheetDone8x8 = unitDoneRegion.split(unitDoneRegion.getRegionWidth() / 8, unitDoneRegion.getRegionHeight() / 8);
+        madeupTextures.add(doneTexture);
+
+        node.populate(true, SpriteSetId.REST, false, true, new TextureRegion[]{
+                spriteSheetDone16x8[0][0],
+                spriteSheetDone16x8[0][1],
+                spriteSheetDone16x8[0][2]
+
+        });
+        node.populate(false, SpriteSetId.REST, false, true, new TextureRegion[]{
+                spriteSheetDone16x8[1][0],
+                spriteSheetDone16x8[1][1],
+                spriteSheetDone16x8[1][2]
+
+        });
+        node.populate(true, SpriteSetId.REST, true, true, new TextureRegion[]{
+                (footman) ? spriteSheetDone8x8[2][0] : spriteSheetDone16x8[2][0],
+                (footman) ? spriteSheetDone8x8[2][1] : spriteSheetDone16x8[2][1],
+                (footman) ? spriteSheetDone8x8[2][2] : spriteSheetDone16x8[2][2]
+        });
+        node.populate(false, SpriteSetId.REST, true, true, new TextureRegion[]{
+                (footman) ? spriteSheetDone8x8[3][0] : spriteSheetDone16x8[3][0],
+                (footman) ? spriteSheetDone8x8[3][1] : spriteSheetDone16x8[3][1],
+                (footman) ? spriteSheetDone8x8[3][2] : spriteSheetDone16x8[3][2]
+        });
+
+
+
+        // PORTRAIT
+
         portraits.put(portraitId, (footman) ?  spriteSheet8x8[7][7]: spriteSheet16x8[7][15]);
+
+
+        // ACTIVE SPRITE SETS
 
         //ROW 0
         node.populate(true, SpriteSetId.REST, false, false, new TextureRegion[]{
@@ -291,6 +316,28 @@ public class SpriteProvider {
 
     }
 
+    private Texture createDoneTexture(TextureRegion unitRegion, AssetManager asm) {
+        final Texture originalTexture = unitRegion.getTexture();
+        originalTexture.getTextureData().prepare();
+        Pixmap pixmap = originalTexture.getTextureData().consumePixmap();
+        int colorInt;
+        int average;
+        int[] colorArray;
+        for(int r = 0; r < pixmap.getHeight(); r++){
+            for(int c = 0; c < pixmap.getWidth(); c++){
+                colorInt = pixmap.getPixel(r, c);
+                colorArray = Utils.getRGBA(colorInt);
+                average = (colorArray[0] + colorArray[1] + colorArray[2])/3;
+                colorInt = Utils.getColor32Bits(average, average, average, colorArray[3]);
+                pixmap.drawPixel(r, c, colorInt);
+            }
+        }
+        pixmap.getPixels().rewind();
+        Texture madeupTexture = new Texture(pixmap);
+        pixmap.dispose();
+        return madeupTexture;
+    }
+
     private Array<String[]> getFileNames(Battlefield battlefield) {
         Array<String[]> filenames = new Array<String[]>();
         String[] filename;
@@ -299,7 +346,7 @@ public class SpriteProvider {
                 if (battlefield.isTileOccupied(r, c)) {
                     IUnit unit = battlefield.getUnit(r, c);
 
-                    filename = (unit.isCharacter()) ? new String[2] : new String[3] ; ;
+                    filename = new String[3];
                     filename[0] = unit.getTemplate().name().toLowerCase();
                     filename[1] = (unit.isCharacter()) ?
                             String.format("%s", unit.getWeaponType().name().toLowerCase()) :
@@ -307,28 +354,50 @@ public class SpriteProvider {
                                     unit.getWeaponType().name().toLowerCase(),
                                     (unit.isHorseman()) ? "H" : "F",
                                     (unit.isShielbearer()) ? "S" : "");
-                    if(!unit.isCharacter()) {
-                        filename[2] = (unit.getArmy().isPlayerControlled()) ? "PC" : "AI";
+
+                    if(!unit.isCharacter()){
+                        filename[2] = (unit.getArmy().isPlayerControlled()) ? "pc" : "ai";
                     }
+
 
                     boolean notRegistered = true;
                     for (int i = 0; i < filenames.size; i++) {
                         if (filename[0].equals(filenames.get(i)[0])
                                 && filename[1].equals(filenames.get(i)[1])
-                                && ((filename.length != 3 || filenames.get(i).length != 3) || filename[2].equals(filenames.get(i)[2]))) {
+                                && (unit.isCharacter() || filename[2].equals(filenames.get(i)[2]))) {
                             notRegistered = false;
                             break;
                         }
                     }
 
-                    if(notRegistered)
-                        filenames.add(filename);
+                    if(notRegistered) {
+                        if(unit.isCharacter()){
+                            filename[2] = "recruit";
+                            filenames.add(filename);
+                            filename = new String[3];
+                            filename[0] = unit.getTemplate().name().toLowerCase();
+                            filename[1] = unit.getWeaponType().name().toLowerCase();
+                            filename[2] = "promoted";
+                            filenames.add(filename);
+                        }else {
+                            filenames.add(filename);
+                        }
+                    }
 
                 }
             }
         }
         return filenames;
     }
+
+    @Override
+    public void dispose() {
+        for(int i = 0; i < madeupTextures.size; i++){
+            madeupTextures.get(i).dispose();
+        }
+    }
+
+
 
 
 
@@ -773,6 +842,7 @@ public class SpriteProvider {
         }
 
         public Array<Sprite> getSpriteSet(boolean promoted, UnitTemplate template, WeaponType type, Orientation or, boolean warchief, boolean done, SpriteSetId id){
+
             Array<Sprite> spriteset;
             TextureRegion[] tra = null;
             for(int i = 0; i < children.size; i++){
