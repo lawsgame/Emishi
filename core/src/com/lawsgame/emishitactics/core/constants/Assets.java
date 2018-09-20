@@ -52,11 +52,12 @@ public class Assets {
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";
 
 
-
-
     //FONT
 
-
+    public static final String FONT_MAIN = "fonts/main_text_font.fnt";
+    public static final String FONT_ITALIC_MAIN = "fonts/italic_main_text_font.fnt";
+    public static final String FONT_GREEN_MAIN = "fonts/green_text_font.fnt";
+    public static final String FONT_UI = "fonts/ui_font.fnt";
 
 
     //SHADERS

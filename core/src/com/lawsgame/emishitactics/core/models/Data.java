@@ -37,9 +37,11 @@ public class Data {
     // RENDER parameters
         public static final float SPEED_TEMPO_WALK = 3f;  //buildingType/s
         public static final float SPEED_TEMPO_PUSHED = 8f;
-    public static final float SPEED_WALK = 0.9f;
+    public static final float SPEED_WALK = 0.8f;
     public static final float SPEED_PUSHED = 1.9f;
     public static final float ANIMATION_NORMAL_SPEED = 0.55f;
+    public static final float ANIMATION_FLEE_SPEED = 0.09f;
+    public static final float ANIMATION_WALK_SPEED = 0.33f;
     public static final float TARGET_BLINK_PERIOD = 1.0f * MathUtils.PI;
     public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
 
@@ -101,17 +103,17 @@ public class Data {
     }
 
     public enum AnimId {
-        WALK(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true),
+        WALK(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_WALK_SPEED, false),
         BACKSTAB(   SpriteSetId.BACKSTABED_PUSHED, false, false),
         TREATED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
         PUSHED(     SpriteSetId.BACKSTABED_PUSHED, false, false),
-        FLEE(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, false, false, 0.15f),
+        FLEE(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_FLEE_SPEED, true),
         PUSH(       SpriteSetId.PUSH, false, false),
         HEAL(       SpriteSetId.HEAL, false, false),
         STEAL(      SpriteSetId.STEAL, false, false),
         BUILD(      SpriteSetId.BUILD, false, false),
         GUARD(      SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
-        REST(       SpriteSetId.REST, true, true),
+        REST(       SpriteSetId.REST, true, true, ANIMATION_NORMAL_SPEED, false),
         ATTACK(     SpriteSetId.REGULAR_ATTACK, false, false),
         DODGE(      SpriteSetId.DODGE, false, false),
         DIE(        SpriteSetId.DIE, false, false),
@@ -125,16 +127,18 @@ public class Data {
         boolean loop;
         boolean backnforth;
         float speed;
+        boolean timeLimited;
 
-        AnimId(SpriteSetId id, boolean loop, boolean backnforth, float speed) {
+        AnimId(SpriteSetId id, boolean loop, boolean backnforth, float speed, boolean timeLimited) {
             this.id = id;
             this.loop = loop;
             this.backnforth = backnforth;
             this.speed = speed;
+            this.timeLimited = timeLimited;
         }
 
         AnimId(SpriteSetId id, boolean loop, boolean backnforth) {
-            this(id, loop, backnforth, Data.ANIMATION_NORMAL_SPEED);
+            this(id, loop, backnforth, Data.ANIMATION_NORMAL_SPEED, true);
         }
 
         public SpriteSetId getSpriteSetId() {
@@ -151,6 +155,10 @@ public class Data {
 
         public float getSpeed() {
             return speed;
+        }
+
+        public boolean isTimeLimited() {
+            return timeLimited;
         }
     }
 

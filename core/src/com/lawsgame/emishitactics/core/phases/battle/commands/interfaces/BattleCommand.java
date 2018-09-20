@@ -32,7 +32,6 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
  *      if(command != null && command.setActor(...)){
  *          command.setTarget(...);
  *          if(command.isTargetValid()){
- *              command.init();
  *              command.apply();
  *          }
  *      }
@@ -133,10 +132,11 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     }
 
     public final void apply(int rowActor, int colActor, int rowTarget, int colTarget){
-        setActor(rowActor, colActor);
-        setTarget(rowTarget, colTarget);
-        if(isTargetValid()){
-            apply();
+        if(setActor(rowActor, colActor)) {
+            setTarget(rowTarget, colTarget);
+            if (isTargetValid()) {
+                apply();
+            }
         }
     }
 
@@ -160,11 +160,11 @@ public abstract class BattleCommand extends Observable implements Command, Obser
 
 
 
-    public boolean isExecuting(){
+    public final boolean isExecuting(){
         return launched && renderTasks.size > 0;
     }
 
-    protected void scheduleRenderTask(Task task){
+    protected final void scheduleRenderTask(Task task){
         if(!task.isIrrelevant()) {
             renderTasks.add(task);
             if(!decoupled) {
@@ -218,7 +218,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
      * @return whether or not THIS SPECIFIC TARGET is at range by the actor performing the given action if one's is standing the buildingType (rowActor, colActor)
      * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public boolean isTargetValid() {
+    public final boolean isTargetValid() {
         boolean valid = false;
         if(isTargetValid(rowActor, colActor, rowTarget, colTarget)){
             valid = true;
@@ -231,7 +231,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     }
 
     /**
-     * especially required to setTiles attributes values required for instanciating the associated ActionPanel
+     * especially required to set attributes values required for instanciating the associated ActionPanel
      */
     protected void init(){
         initialized = true;

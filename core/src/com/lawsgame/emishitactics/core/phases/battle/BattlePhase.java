@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -23,8 +24,7 @@ import com.lawsgame.emishitactics.engine.GamePhase;
 
 public class BattlePhase extends GamePhase {
 
-    public static BitmapFont testFont = new BitmapFont();
-    //private static
+    public static BitmapFont testFont;
 
     private BattleInteractionMachine bim;
 
@@ -34,6 +34,8 @@ public class BattlePhase extends GamePhase {
         asm.load(Assets.ATLAS_TEMPO_UNITS, TextureAtlas.class);
         asm.load(Assets.ATLAS_TEMPO_TILES, TextureAtlas.class);
 
+        asm.load(Assets.FONT_MAIN, BitmapFont.class);
+        asm.load(Assets.FONT_UI, BitmapFont.class);
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
         asm.load(Assets.ATLAS_TILES, TextureAtlas.class);
         asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class); //, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
@@ -41,17 +43,45 @@ public class BattlePhase extends GamePhase {
 
     }
 
+    public void setFontParams(){
+        //TEST
+        testFont = asm.get(Assets.FONT_MAIN);
+
+        float requiredSize = 18f;
+        float scale = 1f;
+        float lineSpacingFactor = 0.95f;
+        float charSpacingFactor = 1.05f;
+        // prevent LIBGDX to replace ghyph to fit the pîxel canvas, leading to a slight misalignment of the rendered glyphs
+        testFont.setUseIntegerPositions(false);
+        // apply linear filtering on the underlying texture to smoothe the glyph on screen
+        testFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        //add character spacing to avoid overlapping causing by the addition of outline of glyph
+        for(int i = 0; i< testFont.getData().glyphs.length; i ++){
+            if(testFont.getData().glyphs[i] != null) {
+                for (int j = 0; j < testFont.getData().glyphs[i].length; j++) {
+                    if (testFont.getData().glyphs[i][j] != null) {
+                        testFont.getData().glyphs[i][j].xadvance *= charSpacingFactor;
+                    }
+                }
+            }
+        }
+        testFont.getData().setLineHeight(testFont.getData().lineHeight * lineSpacingFactor);
+        testFont.getData().setScale(requiredSize/testFont.getData().lineHeight);
+    }
+
+
     public BattlePhase(GPM gsm, Player player, int chapterId ){
         super(gsm, Data.GAME_PORT_WIDTH);
 
         // load assets
         loadRequiredAssets();
+        setFontParams();
 
         // load the battlefield
         Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
         battlefield.randomlyDeploy(player.getArmy());
 
-        // set up sprite pool and battlefield renderers
+        // set up sprite pool and battlefield renderer
         TempoSpritePool.getInstance().set(asm);
         //BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.getInstance());
         SpriteProvider spriteProvider = new SpriteProvider();
@@ -64,6 +94,7 @@ public class BattlePhase extends GamePhase {
         //BattleInteractionState initBIS = new TestBIS(bim);
         BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
+
 
 
     }

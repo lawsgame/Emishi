@@ -34,6 +34,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     protected boolean done;
     protected boolean targeted;
     protected boolean promoted;
+    protected boolean outofaction = false;
 
 
     // RENDER ATTRIBUTES
@@ -93,7 +94,12 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
         if(animationCountDown.isFinished()){
             animationCountDown.reset();
-            this.display(AnimId.REST);
+            if(!outofaction) {
+                this.display(AnimId.REST);
+            }else{
+                this.state = AnimId.REST;
+            }
+
         }
 
     }
@@ -350,8 +356,11 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             this.animation.set(updatedSet.size, animId.getSpeed(), animId.isLoop(), animId.isBacknforth());
             this.animation.stop();
             this.animation.play();
-            if(!animId.isLoop()) {
+            if(state.isTimeLimited()) {
                 animationCountDown.run();
+            }
+            if(state == AnimId.DIE || state == AnimId.FLEE) {
+                outofaction = true;
             }
         }
     }

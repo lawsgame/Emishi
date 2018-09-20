@@ -108,12 +108,21 @@ public class AttackCommand extends BattleCommand {
 
         }else{
             // view-wise scheduling
-            targetRendererThread.addQuery(attacker.getOrientation().getOpposite());
+
+            /*
+             *  No need to do it if retaliation, the initiator who is now the defender is already oriented in the right direction
+             *  Futhermore, the target/attacker orientation model-wise remains as it was before the attack and consequently, can hold any
+             *  value possible and then does permit to set correctly the initiator/defender orientation anyway.
+              */
+            if(!retaliate)
+                targetRendererThread.addQuery(attacker.getOrientation().getOpposite());
             targetRendererThread.addQuery(Data.AnimId.DODGE);
             targetRendererThread.addQuery(defender.getOrientation());
         }
 
-        if(retaliate) attackerRendererThread.addQuery(attacker.getOrientation());
+        // reset the attacker orientation if he is retaliated
+        if(retaliate)
+            attackerRendererThread.addQuery(attacker.getOrientation());
 
         task.addThread(attackerRendererThread);
         task.addThread(targetRendererThread);

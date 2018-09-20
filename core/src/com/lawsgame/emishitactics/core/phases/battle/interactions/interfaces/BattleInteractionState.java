@@ -79,7 +79,7 @@ public abstract class BattleInteractionState extends InteractionState {
     @Override
     public void onLongTouch(float gameX, float gameY) {
         if(longPanelDisplayable && !bim.gcm.isCameraMoving()){
-            bim.push(new InfoBIS(bim, (int)gameY, (int)gameX));
+            bim.push(new InfoBIS(bim, bim.bfr.getRow(gameX, gameY), bim.bfr.getCol(gameX, gameY)));
         }
     }
 

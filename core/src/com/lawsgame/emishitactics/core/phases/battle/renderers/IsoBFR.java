@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -87,8 +88,8 @@ public class IsoBFR extends BattlefieldRenderer {
     public void prerender() {
         backkgroundRenderer.begin(ShapeRenderer.ShapeType.Filled);
         backkgroundRenderer.rect(0,0,
-                TacticsGame.SCREEN_PIXEL_WIDTH,
-                TacticsGame.SCREEN_PIXEL_HEIGHT,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight(),
                 renderedWeather.getLowerColor(),
                 renderedWeather.getLowerColor(),
                 renderedWeather.getUpperColor(),

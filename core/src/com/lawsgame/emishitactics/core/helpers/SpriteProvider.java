@@ -63,6 +63,7 @@ public class SpriteProvider implements Disposable{
                     regionName = Assets.getRegionTile(tileType);
                     region = atlas.findRegion(regionName);
                     if (region != null) {
+                        region.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
                         this.tileSprites.put(tileType, region);
                     }
                 }
@@ -97,6 +98,7 @@ public class SpriteProvider implements Disposable{
 
                     unitAtlas = asm.get(filepath);
                     unitRegion = unitAtlas.findRegion(Assets.REGION_UNIT_SPRITE_SHEET);
+                    //unitRegion.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
                     if(unitRegion.getRegionWidth() == PORTRAIT_TEXTURE_SIZE &&  unitRegion.getRegionHeight() == PORTRAIT_TEXTURE_SIZE){
 
                         portraits.put(filenames.get(i)[0], unitRegion);
