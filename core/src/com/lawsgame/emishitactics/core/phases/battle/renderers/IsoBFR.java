@@ -69,7 +69,7 @@ public class IsoBFR extends BattlefieldRenderer {
                 }
             }
 
-            // set up area renderers
+            // build up area renderers
             for (Data.Affiliation a : Data.Affiliation.values()) {
                 for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
                     addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
@@ -79,7 +79,7 @@ public class IsoBFR extends BattlefieldRenderer {
                 addAreaRenderer(battlefield.getDeploymentAreas().get(i));
             }
 
-            //set weather renderer
+            //build weather renderer
             this.renderedWeather = getModel().getWeather();
         }
     }

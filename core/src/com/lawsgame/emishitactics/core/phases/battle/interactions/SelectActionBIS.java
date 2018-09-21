@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -12,7 +11,8 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoCommandChoicePanel;
 
 import java.util.Stack;
@@ -21,16 +21,16 @@ public class SelectActionBIS extends BattleInteractionState {
     int rowSltdUnit;
     int colSltdUnit;
     Stack<BattleCommand> historic;
-    ActionChoicePanel choicePanel;
-    CommandChoicePanel commandPanel;
+    private ChoicePanel choicePanel;
+    private ChoicePanel commandPanel;
 
     public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit, Stack<BattleCommand> historic) {
         super(bim, true, true, true);
         this.rowSltdUnit = rowSltdUnit;
         this.colSltdUnit = colSltdUnit;
         this.historic = historic;
-        this.choicePanel = new TempoActionChoicePanel(bim.asm);
-        this.commandPanel = new TempoCommandChoicePanel(bim.asm);
+        this.choicePanel = new TempoChoicePanel(bim.asm);
+        this.commandPanel = new TempoCommandChoicePanel(bim.asm, 0);
 
     }
 
@@ -42,23 +42,15 @@ public class SelectActionBIS extends BattleInteractionState {
     public void init() {
         System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
-        setChoicePanel();
+        resetChoicePanel();
         bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, true);
 
     }
 
-    private void setChoicePanel(){
-        if(bim.battlefield.isTileOccupied(rowSltdUnit, colSltdUnit)) {
-
-            choicePanel.clear();
-            choicePanel.setTouchable(Touchable.childrenOnly);
-            choicePanel.setChoiceButtons(this);
-            choicePanel.setVisible(true);
-            choicePanel.setLayout();
-            bim.uiStage.addActor(choicePanel);
-            commandPanel.setVisible(false);
-            bim.uiStage.addActor(commandPanel);
-        }
+    private void resetChoicePanel(){
+        choicePanel.build(new ActionButtonHandler(this));
+        choicePanel.setVisible(true);
+        bim.uiStage.addActor(choicePanel);
     }
 
     @Override
@@ -71,7 +63,6 @@ public class SelectActionBIS extends BattleInteractionState {
 
     @Override
     public boolean handleTouchInput(int row, int col) {
-        choicePanel.setTouchable(Touchable.childrenOnly);
         choicePanel.setVisible(false);
         commandPanel.remove();
 
@@ -89,7 +80,7 @@ public class SelectActionBIS extends BattleInteractionState {
                 } else {
                     // if not all commands are undoable, all the undoable ones are visible, the unit is updated and a new choice panel is provided
                     bim.focusOn(row, col, true, true, true, false, false);
-                    setChoicePanel();
+                    resetChoicePanel();
                     choicePanel.setVisible(false);
                     return true;
                 }
@@ -98,25 +89,16 @@ public class SelectActionBIS extends BattleInteractionState {
         return false;
     }
 
-    public static abstract class ChoicePanel extends Table{
-        protected static TextButton.TextButtonStyle style;
 
+    public static class ActionButtonHandler implements ChoicePanel.ButtonHandler{
+        private SelectActionBIS bis;
 
-        public ChoicePanel(){
-            super();
-            setTouchable(Touchable.childrenOnly);
-
+        public ActionButtonHandler(SelectActionBIS bis){
+            this.bis = bis;
         }
 
-        public abstract void addButton(TextButton button);
-        public abstract void setLayout();
-
-
-    }
-
-    public static abstract class ActionChoicePanel extends ChoicePanel{
-
-        public void setChoiceButtons(final SelectActionBIS bis) {
+        public Array<TextButton> getButtons(TextButton.TextButtonStyle style) {
+            Array<TextButton> buttons = new Array<TextButton>();
 
             if (bis.bim.battlefield.isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
 
@@ -140,12 +122,15 @@ public class SelectActionBIS extends BattleInteractionState {
                                 }
                             }else if(flavors.size > 1){
 
-                                setTouchable(Touchable.disabled);
-                                bis.commandPanel.clear();
-                                bis.commandPanel.setChoiceButtons(bis, choice);
-                                bis.commandPanel.setButtonIndex(buttonIndex);
-                                bis.commandPanel.setLayout();
+                                bis.choicePanel.setTouchable(Touchable.disabled);
+
+                                if(bis.commandPanel != null)
+                                    bis.commandPanel.remove();
+
+                                bis.commandPanel = new TempoCommandChoicePanel(bis.bim.asm, buttonIndex);
+                                bis.commandPanel.build(new CommandChoiceButtonHandler(bis, choice));
                                 bis.commandPanel.setVisible(true);
+                                bis.bim.uiStage.addActor(bis.commandPanel);
                             }else{
 
                                 try {
@@ -157,18 +142,25 @@ public class SelectActionBIS extends BattleInteractionState {
 
                         }
                     });
-                    addButton(button);
+                    buttons.add(button);
                 }
             }
+            return buttons;
         }
     }
 
 
-    public static abstract class CommandChoicePanel extends ChoicePanel{
+    public static class CommandChoiceButtonHandler implements ChoicePanel.ButtonHandler{
+        private SelectActionBIS bis;
+        private ActionChoice actionChoice;
 
-        public abstract void setButtonIndex(int buttonIndex);
+        public CommandChoiceButtonHandler(SelectActionBIS bis, ActionChoice actionChoice) {
+            this.bis = bis;
+            this.actionChoice = actionChoice;
+        }
 
-        public void setChoiceButtons(final SelectActionBIS bis, ActionChoice actionChoice){
+        public Array<TextButton> getButtons(TextButton.TextButtonStyle style){
+            Array<TextButton> buttons = new Array<TextButton>();
             if (bis.bim.battlefield.isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
 
                 IUnit sltdUnit = bis.bim.battlefield.getUnit(bis.rowSltdUnit, bis.colSltdUnit);
@@ -184,10 +176,11 @@ public class SelectActionBIS extends BattleInteractionState {
                                 bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, battleCommand));
                             }
                         });
-                        addButton(button);
+                        buttons.add(button);
                     }
                 }
             }
+            return buttons;
         }
     }
 }

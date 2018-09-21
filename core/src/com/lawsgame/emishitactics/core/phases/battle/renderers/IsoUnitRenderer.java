@@ -342,14 +342,14 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
      */
     private void updateAnimation(AnimId animId){
 
-        // fetch the required sprite set
+        // fetch the required sprite build
        Array<Sprite> updatedSet = (getModel().isCharacter()) ?
                 bfr.spriteProvider.charaSpriteTree.getSpriteSet(promoted, getModel().getTemplate(), weaponType, orientation, getModel().isWarChief(), done && animId == AnimId.REST, animId.getSpriteSetId()) :
                 bfr.spriteProvider.genSpriteTree.getSpriteSet(getModel().getArmy().isPlayerControlled(), shieldbearer, horseman, getModel().getTemplate(), weaponType, orientation, getModel().isWarChief(), done && animId == AnimId.REST , animId.getSpriteSetId()) ;
 
         if(updatedSet != null) {
 
-            // set animation , sprites, ids and rendering coords fitting
+            // build animation , sprites, ids and rendering coords fitting
             this.state = animId;
             this.spriteSet = updatedSet;
             updateSpritePos();

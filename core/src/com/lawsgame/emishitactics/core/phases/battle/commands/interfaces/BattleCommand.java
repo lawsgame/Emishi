@@ -231,7 +231,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     }
 
     /**
-     * especially required to set attributes values required for instanciating the associated ActionPanel
+     * especially required to build attributes values required for instanciating the associated ActionPanel
      */
     protected void init(){
         initialized = true;
@@ -557,7 +557,7 @@ public static class EncounterOutcome {
             return receivers.size == 0;
         }
 
-        public boolean isLootedItemsReclaimed(){ return droppedItems.size == 0; }
+        public boolean isLootedItemsClaimed(){ return droppedItems.size == 0; }
 
         public boolean isHandled(){
             return receivers.size == 0 && droppedItems.size == 0;

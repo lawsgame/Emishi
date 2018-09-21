@@ -55,7 +55,7 @@ public class SpriteProvider implements Disposable{
             String regionName;
             TextureAtlas atlas;
 
-            // set tiles sprite pool
+            // build tiles sprite pool
             if (asm.isLoaded(Assets.ATLAS_TILES)) {
                 atlas = asm.get(Assets.ATLAS_TILES);
                 this.undefinedTileSprite = atlas.findRegion(Assets.REGION_TERRAINS_UNDEFINED);

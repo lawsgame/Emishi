@@ -52,7 +52,6 @@ public class TestBIS extends BattleInteractionState {
     ExperiencePanel experiencePanel;
     LevelUpPanel levelUpPanel;
     LootPanel lootPanel;
-    EndTurnBIS.WindRoseWidget windRoseWidget;
 
     private Animation animation;
     private Array<Sprite> sprites;

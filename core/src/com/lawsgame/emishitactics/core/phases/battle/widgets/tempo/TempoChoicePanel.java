@@ -7,22 +7,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.SelectActionBIS;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
 
-public class TempoActionChoicePanel extends SelectActionBIS.ActionChoicePanel {
+public class TempoChoicePanel extends ChoicePanel {
 
-    public TempoActionChoicePanel(AssetManager asm) {
+    public TempoChoicePanel(AssetManager asm) {
         super();
-        if(style == null) {
-            TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
-            Skin skin = new Skin(uiAtlas);
+        TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
+        Skin skin = new Skin(uiAtlas);
 
-            //setTiles button style
-            style = new TextButton.TextButtonStyle();
-            style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
-            style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);
-            style.font = BattlePhase.testFont;
-        }
+        //setTiles button style
+        style = new TextButton.TextButtonStyle();
+        style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
+        style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);
+        style.font = BattlePhase.testFont;
+
     }
 
     @Override

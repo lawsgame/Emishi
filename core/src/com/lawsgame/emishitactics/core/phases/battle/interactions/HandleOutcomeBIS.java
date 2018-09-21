@@ -39,7 +39,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         super(bim, true, false, false);
 
         this.historic = historic;
-        if(outcome == null) emptyOutcome = new EncounterOutcome();
+        if(emptyOutcome == null) emptyOutcome = new EncounterOutcome();
         this.outcome = (historic.size() > 0) ? historic.peek().getOutcome() : emptyOutcome;
         this.experiencePanel = new TempoExperiencePanel(bim.uiStage.getViewport());
         this.levelUpPanel = new TempoLevelUpPanel(bim.uiStage.getViewport());
@@ -92,7 +92,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
                     }
 
-                }else if(!outcome.isLootedItemsReclaimed()){
+                }else if(!outcome.isLootedItemsClaimed()){
                     final Item droppedItem = outcome.droppedItems.pop();
 
                     tasks.offer(new StandardTask(new DisplayLootPanel(droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f));

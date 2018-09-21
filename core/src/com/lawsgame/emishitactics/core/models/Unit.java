@@ -62,7 +62,7 @@ public class Unit extends IUnit{
     /**
      * GENERIC UNIT constructor
      *
-     * Can be set as well:
+     * Can be build as well:
      * - weapons
      * - battle and leadership experience
      * - right handed

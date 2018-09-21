@@ -649,6 +649,10 @@ public class Data {
             if(this == WEST) opposite = EAST;
             return opposite;
         }
+
+        public String getName(I18NBundle bundle) {
+            return bundle.get(name());
+        }
     }
 
     /**
