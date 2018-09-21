@@ -3,30 +3,30 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionInfoPanel;
 
 import java.util.HashMap;
 
 public class ActionPanelPool {
-    private HashMap<ActionChoice, ActionPanel> panels;
+    private HashMap<ActionChoice, ActionInfoPanel> panels;
 
     public ActionPanelPool(Viewport UIport){
-        panels = new HashMap<ActionChoice, ActionPanel>();
-        panels.put(ActionChoice.ATTACK, new TempoActionPanel.AttackPanel(UIport));
-        panels.put(ActionChoice.HEAL, new TempoActionPanel.HealPanel(UIport));
-        panels.put(ActionChoice.SWITCH_WEAPON, new TempoActionPanel.SwitchWeaponPanel(UIport));
-        panels.put(ActionChoice.STEAL, new TempoActionPanel.StealPanel(UIport));
-        panels.put(ActionChoice.BUILD, new TempoActionPanel.BuildPanel(UIport));
-        panels.put(ActionChoice.END_TURN, new TempoActionPanel.EndTurnPanel(UIport));
+        panels = new HashMap<ActionChoice, ActionInfoPanel>();
+        panels.put(ActionChoice.ATTACK, new TempoActionInfoPanel.AttackInfoPanel(UIport));
+        panels.put(ActionChoice.HEAL, new TempoActionInfoPanel.HealInfoPanel(UIport));
+        panels.put(ActionChoice.SWITCH_WEAPON, new TempoActionInfoPanel.SwitchWeaponInfoPanel(UIport));
+        panels.put(ActionChoice.STEAL, new TempoActionInfoPanel.StealInfoPanel(UIport));
+        panels.put(ActionChoice.BUILD, new TempoActionInfoPanel.BuildInfoPanel(UIport));
+        panels.put(ActionChoice.END_TURN, new TempoActionInfoPanel.EndTurnInfoPanel(UIport));
     }
 
     public boolean isPanelAvailable(BattleCommand command){
         return panels.get(command.getActionChoice()) != null;
     }
 
-    public ActionPanel getPanel(BattleCommand command){
-        ActionPanel panel = panels.get(command.getActionChoice());
+    public ActionInfoPanel getPanel(BattleCommand command){
+        ActionInfoPanel panel = panels.get(command.getActionChoice());
         if(panel != null)
             panel.set(command);
         return panel;

@@ -4,6 +4,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -15,8 +16,8 @@ public class GuardCommand extends SelfInflitedCommand {
 
     protected IUnit actor;
 
-    public GuardCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.GUARD, scheduler, false);
+    public GuardCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, ActionChoice.GUARD, scheduler, playerInventory, false);
     }
 
 
@@ -34,11 +35,11 @@ public class GuardCommand extends SelfInflitedCommand {
         // update model
         UnitArea area = battlefield.addGuardedArea(rowActor, colActor);
 
+
         // push render task
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer, area));
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimId.GUARD));
-
         // animated guarded units as well
         IUnit guardedUnit;
         int dist;
@@ -55,6 +56,9 @@ public class GuardCommand extends SelfInflitedCommand {
         }
         scheduleRenderTask(task);
 
+
+        //outcome
+        outcome.expHolders.add(new ExperiencePointsHolder(getInitiator(), choice.getExperience()));
     }
 
     @Override

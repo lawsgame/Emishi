@@ -39,7 +39,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         super(bim, true, false, false);
 
         this.historic = historic;
-        if(emptyOutcome == null) emptyOutcome = new EncounterOutcome();
+        if(emptyOutcome == null) emptyOutcome = new EncounterOutcome(bim.player.getInventory());
         this.outcome = (historic.size() > 0) ? historic.peek().getOutcome() : emptyOutcome;
         this.experiencePanel = new TempoExperiencePanel(bim.uiStage.getViewport());
         this.levelUpPanel = new TempoLevelUpPanel(bim.uiStage.getViewport());
@@ -55,47 +55,39 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
     @Override
     public void init() {
-        System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getActor().getName()+"\n" +outcome.toString());
+        System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName()+"\n" +outcome.toString());
 
         if(outcome.isHandled()){
             if(tasks.isEmpty()) {
-                moveForward();
+                proceed();
             }
         }else {
-
             while (!outcome.isHandled()) {
 
-                if(!outcome.isExperienceDistributed()){
-                    final IUnit receiver = outcome.receivers.pop();
-                    final int experience = outcome.experienceGained.pop();
+                if(!outcome.isExperienceShown()){
 
-                    if(!receiver.isOutOfAction()) {
-                        final int[] receiverPos = bim.battlefield.getUnitPos(receiver);
-                        tasks.offer(new StandardTask(new DisplayExperiencePanel(receiver, bim, experiencePanel, levelUpPanel, lootPanel, experience), 0f));
+                    BattleCommand.ExperiencePointsHolder holder = outcome.expHolders.pop();
+                    int[] receiverPos = bim.battlefield.getUnitPos(holder.receiver);
 
-                        final int[] statGain = receiver.addExpPoints(experience);
-                        for (int i = 0; i < statGain.length; i++) {
-                            if (statGain[i] > 0) {
+                    StandardTask experienceTask = new StandardTask();
+                    experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
+                    experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, holder.experience), 0f));
+                    tasks.add(experienceTask);
 
-                                // of the unit has leveled up
-                                StandardTask levelUpTask = new StandardTask();
-                                levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(receiver), Data.AnimId.LEVELUP));
-                                levelUpTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
-
-                                if (receiver.getArmy().isPlayerControlled()) {
-                                    levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(receiver, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel, statGain), 0f));
-                                }
-                                tasks.add(levelUpTask);
-                                break;
-                            }
+                    if(holder.isReceiverLevelup()){
+                        // of the unit has leveled up
+                        StandardTask levelUpTask = new StandardTask();
+                        levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
+                        if (holder.receiver.isMobilized() || holder.receiver.getArmy().isPlayerControlled()) {
+                            levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(holder.receiver, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel, holder.getStatGained()), 0f));
                         }
-
+                        tasks.add(levelUpTask);
                     }
-
                 }else if(!outcome.isLootedItemsClaimed()){
-                    final Item droppedItem = outcome.droppedItems.pop();
 
-                    tasks.offer(new StandardTask(new DisplayLootPanel(droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f));
+                   BattleCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
+                   StandardTask itemTask = new StandardTask(new DisplayLootPanel(holder.droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f);
+                   tasks.offer(itemTask);
                 }
             }
         }
@@ -112,10 +104,10 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         lootPanel.remove();
     }
 
-    private void moveForward(){
+    private void proceed(){
         try {
             if(!historic.isEmpty()) {
-                if(historic.peek().getActor() != null) {
+                if(historic.peek().getInitiator() != null) {
 
                     if(bim.battlefield.isBattleOver()) {
 
@@ -123,8 +115,8 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                         bim.replace(new BattleOverBIS(bim));
                     }else{
 
-                        int[] actorPos = bim.battlefield.getUnitPos(historic.peek().getActor());
-                        if (historic.peek().getActor().isDone()) {
+                        int[] actorPos = bim.battlefield.getUnitPos(historic.peek().getInitiator());
+                        if (historic.peek().getInitiator().isDone()) {
 
                             // if the unit is visible
                             bim.replace(new EndTurnBIS(bim, actorPos[0], actorPos[1]));
@@ -137,7 +129,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
                 }else{
 
-                    throw new BISException("historic top command has no actor setTiles up");
+                    throw new BISException("historic top command has no initiator set up");
                 }
             }else{
                 throw new BISException("historic empty");
@@ -150,7 +142,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     @Override
     public boolean handleTouchInput(int row, int col) {
         if(tasks.isEmpty()){
-            moveForward();
+            proceed();
         }else{
             bim.scheduler.addTask(tasks.pop());
         }

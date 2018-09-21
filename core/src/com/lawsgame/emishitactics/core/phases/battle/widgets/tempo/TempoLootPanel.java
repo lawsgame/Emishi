@@ -63,7 +63,7 @@ public class TempoLootPanel extends LootPanel {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(TempoSpritePool.getInstance().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
+        batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
         BattlePhase.testFont.draw(batch, description, getX() + X_TEXT_OFFSET, getY() + getHeight() - Y_TEXT_OFFSET);
     }
 }

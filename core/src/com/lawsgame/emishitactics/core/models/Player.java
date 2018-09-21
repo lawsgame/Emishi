@@ -25,6 +25,7 @@ public class Player {
         Unit warchief1 = new Unit("Azamaru", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
         warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warchief1.setLeadership(15);
+        warchief1.setExperience(98);
 
         playerArmy.add(warlord);
         playerArmy.add(warchief1);

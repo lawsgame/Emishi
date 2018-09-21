@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.constants;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -105,6 +106,5 @@ public class UtilsTest {
         int[] rgbaRes = Utils.getRGBA(Utils.getColor32Bits(r,g,b));
         assertTrue(r == rgbaRes[0] && g == rgbaRes[1] && b == rgbaRes[2]);
     }
-
 
 }

@@ -20,7 +20,7 @@ public class SpriteProviderTest {
         tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, false, Data.SpriteSetId.REGULAR_ATTACK, false, false, new TextureRegion[]{});
         tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.MACE, false, Data.SpriteSetId.REGULAR_ATTACK, false, false, new TextureRegion[]{});
 
-        System.out.println(tree.toString());
+        //System.out.println(tree.toString());
 
     }
 

@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -11,8 +12,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class HealCommand extends BattleCommand {
 
-    public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.HEAL, scheduler, false);
+    public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, ActionChoice.HEAL, scheduler, playerInventory, false);
     }
 
     @Override
@@ -25,17 +26,16 @@ public class HealCommand extends BattleCommand {
 
         // update model
         int healPower = getHealPower(rowActor, colActor, rowTarget, colTarget);
-        getActor().treated(healPower);
+        getInitiator().treated(healPower);
 
         // push render task
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getTarget()), getTarget(), healPower));
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimId.HEAL));
+        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
         scheduleRenderTask(task);
 
         // setTiles outcome
-        outcome.receivers.add(getActor());
-        outcome.experienceGained.add(choice.getExperience());
+        outcome.expHolders.add(new ExperiencePointsHolder(getInitiator(), choice.getExperience()));
 
 
     }

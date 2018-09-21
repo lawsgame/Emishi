@@ -83,18 +83,18 @@ public class TempoAreaRenderer extends AreaRenderer {
 
 
                         if(!ltc && !dtc){
-                            spriteRefs.add(TempoSpritePool.getInstance().bottomLeftCorner.get(areaType));
+                            spriteRefs.add(TempoSpritePool.get().bottomLeftCorner.get(areaType));
                         }else if(!(ltc && dtc)){
                             if(ltc) {
-                                spriteRefs.add(TempoSpritePool.getInstance().southStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().southStraight.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().westStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().westStraight.get(areaType));
                             }
                         }else{
                             if(otc){
-                                spriteRefs.add(TempoSpritePool.getInstance().middle.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().middle.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().bottomLeftAnticorner.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().bottomLeftAnticorner.get(areaType));
                             }
                         }
 
@@ -111,18 +111,18 @@ public class TempoAreaRenderer extends AreaRenderer {
                         utc = getModel().contains(r+1, c); // up ...
 
                         if(!ltc && !utc){
-                            spriteRefs.add(TempoSpritePool.getInstance().topLeftCorner.get(areaType));
+                            spriteRefs.add(TempoSpritePool.get().topLeftCorner.get(areaType));
                         }else if(!(ltc && utc)){
                             if(ltc) {
-                                spriteRefs.add(TempoSpritePool.getInstance().northStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().northStraight.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().westStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().westStraight.get(areaType));
                             }
                         }else{
                             if(otc){
-                                spriteRefs.add(TempoSpritePool.getInstance().middle.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().middle.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().topLeftAnticorner.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().topLeftAnticorner.get(areaType));
                             }
                         }
 
@@ -138,18 +138,18 @@ public class TempoAreaRenderer extends AreaRenderer {
                         dtc = getModel().contains(r-1, c); // down ...
 
                         if(!rtc && !dtc){
-                            spriteRefs.add(TempoSpritePool.getInstance().bottomRightCorner.get(areaType));
+                            spriteRefs.add(TempoSpritePool.get().bottomRightCorner.get(areaType));
                         }else if(!(rtc && dtc)){
                             if(rtc) {
-                                spriteRefs.add(TempoSpritePool.getInstance().southStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().southStraight.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().eastStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().eastStraight.get(areaType));
                             }
                         }else{
                             if(otc){
-                                spriteRefs.add(TempoSpritePool.getInstance().middle.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().middle.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().bottomRightAnticorner.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().bottomRightAnticorner.get(areaType));
                             }
                         }
 
@@ -163,18 +163,18 @@ public class TempoAreaRenderer extends AreaRenderer {
                         utc = getModel().contains(r+1, c); // up ...
 
                         if(!rtc && !utc){
-                            spriteRefs.add(TempoSpritePool.getInstance().topRightCorner.get(areaType));
+                            spriteRefs.add(TempoSpritePool.get().topRightCorner.get(areaType));
                         }else if(!(rtc && utc)){
                             if(rtc) {
-                                spriteRefs.add(TempoSpritePool.getInstance().northStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().northStraight.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().eastStraight.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().eastStraight.get(areaType));
                             }
                         }else{
                             if(otc){
-                                spriteRefs.add(TempoSpritePool.getInstance().middle.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().middle.get(areaType));
                             }else{
-                                spriteRefs.add(TempoSpritePool.getInstance().topRightAnticorner.get(areaType));
+                                spriteRefs.add(TempoSpritePool.get().topRightAnticorner.get(areaType));
                             }
                         }
                     }

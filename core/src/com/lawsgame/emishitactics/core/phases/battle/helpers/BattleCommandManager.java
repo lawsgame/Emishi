@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
@@ -28,35 +29,35 @@ import java.util.Stack;
 public class BattleCommandManager {
     private final Array<Array<BattleCommand>> commandPool;
 
-    public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler){
+    public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
         commandPool = new Array<Array<BattleCommand>>();
 
-        setChoice(new MoveCommand(bfr, scheduler));
-        setChoice(new AttackCommand(bfr, scheduler));
+        setChoice(new MoveCommand(bfr, scheduler, playerInventory));
+        setChoice(new AttackCommand(bfr, scheduler, playerInventory));
 
         final Array<BattleCommand>  commands = new Array<BattleCommand>();
         for(int i = 1; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
-            commands.add(new SwitchWeaponCommand(bfr, scheduler, i));
+            commands.add(new SwitchWeaponCommand(bfr, scheduler, playerInventory, i));
         }
         if(commands.size > 0 && commands.get(0) != null)
             commandPool.add(commands);
 
-        setChoice(new PushCommand(bfr, scheduler));
-        setChoice(new SwitchPositionCommand(bfr, scheduler));
+        setChoice(new PushCommand(bfr, scheduler, playerInventory));
+        setChoice(new SwitchPositionCommand(bfr, scheduler, playerInventory));
         setChoice(new BattleCommand[]{
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.NORTH),
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.SOUTH),
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.EAST),
-                new ChooseOrientationCommand(bfr, scheduler, Data.Orientation.WEST),
+                new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.NORTH),
+                new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.SOUTH),
+                new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.EAST),
+                new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.WEST),
         });
         setChoice(new BattleCommand[]{
-                new BuildCommand(bfr, scheduler, Data.TileType.WATCH_TOWER),
-                new BuildCommand(bfr, scheduler, Data.TileType.BRIDGE)
+                new BuildCommand(bfr, scheduler, playerInventory, Data.TileType.WATCH_TOWER),
+                new BuildCommand(bfr, scheduler, playerInventory, Data.TileType.BRIDGE)
         });
-        setChoice(new GuardCommand(bfr, scheduler));
-        setChoice(new HealCommand(bfr, scheduler));
-        setChoice(new StealCommand(bfr, scheduler));
-        setChoice(new EndTurnCommand(bfr, scheduler));
+        setChoice(new GuardCommand(bfr, scheduler, playerInventory));
+        setChoice(new HealCommand(bfr, scheduler, playerInventory));
+        setChoice(new StealCommand(bfr, scheduler, playerInventory));
+        setChoice(new EndTurnCommand(bfr, scheduler, playerInventory));
 
     }
 

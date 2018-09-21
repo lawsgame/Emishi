@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -15,24 +16,23 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
     protected Data.Orientation newOrientation;
     protected BattleUnitRenderer actorRenderer;
 
-    public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.Orientation newOrientation) {
-        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, true);
+    public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Data.Orientation newOrientation) {
+        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, playerInventory, true);
         this.newOrientation = newOrientation;
     }
 
     @Override
     protected void execute() {
-        actorRenderer = battlefieldRenderer.getUnitRenderer(getActor());
+        actorRenderer = battlefieldRenderer.getUnitRenderer(getInitiator());
 
         // register old model state
-        oldOrientation = getActor().getOrientation();
+        oldOrientation = getInitiator().getOrientation();
 
         // update model
-        getActor().setOrientation(newOrientation);
+        getInitiator().setOrientation(newOrientation);
 
         // push render state
-        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), newOrientation));
-
+        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), newOrientation));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data.Ability;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -14,8 +15,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class BuildCommand extends BattleCommand {
     protected Data.TileType buildingType;
 
-    public BuildCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Data.TileType buildingType) {
-        super(bfr, ActionChoice.BUILD, scheduler, false);
+    public BuildCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Data.TileType buildingType) {
+        super(bfr, ActionChoice.BUILD, scheduler,  playerInventory, false);
         this.buildingType = buildingType;
     }
 
@@ -26,11 +27,10 @@ public class BuildCommand extends BattleCommand {
         battlefield.setTile(rowTarget, colTarget, buildingType, false);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, getActor())));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, getInitiator())));
 
-        // setTiles outcome
-        outcome.receivers.add(getActor());
-        outcome.experienceGained.add(choice.getExperience());
+        // set outcome
+        outcome.expHolders.add(new ExperiencePointsHolder(getInitiator(), choice.getExperience()));
 
     }
 

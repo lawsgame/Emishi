@@ -15,11 +15,11 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 
-public abstract class TempoActionPanel extends ActionPanel{
+public abstract class TempoActionInfoPanel extends ActionInfoPanel {
 
 
     private static float X_OFFSET = 15f;
@@ -33,7 +33,7 @@ public abstract class TempoActionPanel extends ActionPanel{
     protected float slideDuration;
     protected StringBuilder builder = new StringBuilder("");
 
-    public TempoActionPanel(Viewport stageViewport, ActionChoice choice){
+    public TempoActionInfoPanel(Viewport stageViewport, ActionChoice choice){
         super(stageViewport, choice);
         setWidth(PANEL_WIDTH);
         setHeight(PANEL_HEIGHT);
@@ -81,7 +81,7 @@ public abstract class TempoActionPanel extends ActionPanel{
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(TempoSpritePool.getInstance().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
+        batch.draw(TempoSpritePool.get().getBlackBGSprite(),getX(), getY(), getWidth(), getHeight() );
         BattlePhase.testFont.draw(batch, description, getX() + X_TEXT_OFFSET, getY() + getHeight() - Y_TEXT_OFFSET);
     }
 
@@ -92,9 +92,9 @@ public abstract class TempoActionPanel extends ActionPanel{
         return builder;
     }
 
-    public static class AttackPanel extends TempoActionPanel{
+    public static class AttackInfoPanel extends TempoActionInfoPanel {
 
-        public AttackPanel(Viewport stageViewport) {
+        public AttackInfoPanel(Viewport stageViewport) {
             super(stageViewport, ActionChoice.ATTACK);
         }
 
@@ -107,7 +107,7 @@ public abstract class TempoActionPanel extends ActionPanel{
 
                 AttackCommand currentCommand = (AttackCommand)command;
                 builder = new StringBuilder();
-                builder.append(command.getActor().getName()+" => "+currentCommand.getTargetDefender().getName());
+                builder.append(command.getInitiator().getName()+" => "+currentCommand.getTargetDefender().getName());
                 builder.append("\nMoral / HP : " + currentCommand.getTargetDefender().getCurrentMoral()+" / "+currentCommand.getTargetDefender().getCurrentHP());
                 builder.append("\nDamage : " + currentCommand.getDealtDamage(false));
                 builder.append("\nHit rate : " + currentCommand.getHitRate(false)+"%");
@@ -123,9 +123,9 @@ public abstract class TempoActionPanel extends ActionPanel{
 
 
 
-    public static class HealPanel extends TempoActionPanel{
+    public static class HealInfoPanel extends TempoActionInfoPanel {
 
-        public HealPanel(Viewport stageViewport) {
+        public HealInfoPanel(Viewport stageViewport) {
             super(stageViewport, ActionChoice.HEAL);
         }
 
@@ -135,16 +135,16 @@ public abstract class TempoActionPanel extends ActionPanel{
                 HealCommand currentCommand = (HealCommand)command;
                 IUnit target = currentCommand.getTarget();
                 builder = new StringBuilder();
-                builder.append(command.getActor().getName()+" => "+command.getTarget().getName());
+                builder.append(command.getInitiator().getName()+" => "+command.getTarget().getName());
                 builder.append("\nHP : "+target.getCurrentHP()+" -> "+(target.getCurrentHP() + currentCommand.getRecoveredHitPoints()));
                 builder.append("\nMP : "+target.getCurrentMoral()+" -> "+(target.getCurrentMoral()+ currentCommand.getRecoveredMoralPoints()));
             }
         }
     }
 
-    public static class SwitchWeaponPanel extends TempoActionPanel{
+    public static class SwitchWeaponInfoPanel extends TempoActionInfoPanel {
 
-        public SwitchWeaponPanel(Viewport stageViewport) {
+        public SwitchWeaponInfoPanel(Viewport stageViewport) {
             super(stageViewport, ActionChoice.SWITCH_WEAPON);
         }
 
@@ -153,15 +153,15 @@ public abstract class TempoActionPanel extends ActionPanel{
             if(command != null && command instanceof SwitchWeaponCommand && command.isTargetValid()){
                 SwitchWeaponCommand swc = (SwitchWeaponCommand)command;
                 builder = new StringBuilder();
-                builder.append(command.getActor().getName());
-                builder.append("\n"+command.getActor().getCurrentWeapon().toString()+" => "+swc.getActor().getWeapon(swc.getWeaponIndex()));
+                builder.append(command.getInitiator().getName());
+                builder.append("\n"+command.getInitiator().getCurrentWeapon().toString()+" => "+swc.getInitiator().getWeapon(swc.getWeaponIndex()));
             }
         }
     }
 
-    public static class StealPanel extends TempoActionPanel{
+    public static class StealInfoPanel extends TempoActionInfoPanel {
 
-        public StealPanel(Viewport stageViewport) {
+        public StealInfoPanel(Viewport stageViewport) {
             super(stageViewport, ActionChoice.STEAL);
         }
 
@@ -171,7 +171,7 @@ public abstract class TempoActionPanel extends ActionPanel{
                 StealCommand sc = (StealCommand)command;
                 IUnit target = sc.getTarget();
                 builder = new StringBuilder();
-                builder.append(command.getActor().getName()+" => "+command.getTarget().getName());
+                builder.append(command.getInitiator().getName()+" => "+command.getTarget().getName());
                 builder.append("\nSteal rate : "+sc.getStealRate()+"%");
                 builder.append("\nStealable items :");
                 Array<Item> items = target.getStealableItems();
@@ -181,9 +181,9 @@ public abstract class TempoActionPanel extends ActionPanel{
         }
     }
 
-    public static class BuildPanel extends TempoActionPanel{
+    public static class BuildInfoPanel extends TempoActionInfoPanel {
 
-        public BuildPanel(Viewport stageViewport) {
+        public BuildInfoPanel(Viewport stageViewport) {
             super(stageViewport, ActionChoice.BUILD);
         }
 
@@ -192,15 +192,15 @@ public abstract class TempoActionPanel extends ActionPanel{
             if(command != null && command instanceof BuildCommand && command.isTargetValid()){
                 BuildCommand bc = (BuildCommand)command;
                 builder = new StringBuilder();
-                builder.append(command.getActor().getName());
+                builder.append(command.getInitiator().getName());
                 builder.append(bc.getTargetTile()+" => "+bc.getBuildingType());
             }
         }
     }
 
-    public static class EndTurnPanel extends TempoActionPanel {
+    public static class EndTurnInfoPanel extends TempoActionInfoPanel {
 
-        public EndTurnPanel(Viewport stageViewport) {
+        public EndTurnInfoPanel(Viewport stageViewport) {
             super(stageViewport, ActionChoice.END_TURN);
         }
 

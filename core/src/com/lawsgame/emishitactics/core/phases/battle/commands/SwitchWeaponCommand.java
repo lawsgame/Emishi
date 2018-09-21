@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
@@ -13,24 +14,24 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class SwitchWeaponCommand extends SelfInflitedCommand {
     private final int weaponIndex;
 
-    public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, int weaponIndex) {
-        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, true);
+    public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, int weaponIndex) {
+        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, playerInventory, true);
         this.weaponIndex = weaponIndex;
     }
 
     @Override
     protected void execute() {
         // update model
-        getActor().switchWeapon(weaponIndex);
+        getInitiator().switchWeapon(weaponIndex);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimId.SWITCH_WEAPON));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
     }
 
     @Override
     public void unexecute() {
-        if(getActor().switchWeapon(weaponIndex)) {
-            scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getActor()), Data.AnimId.SWITCH_WEAPON));
+        if(getInitiator().switchWeapon(weaponIndex)) {
+            scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
         }
 
 

@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
@@ -14,8 +15,8 @@ public class EndTurnCommand extends SelfInflitedCommand {
 
 
 
-    public EndTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, END_TURN, scheduler, true);
+    public EndTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, END_TURN, scheduler, playerInventory, true);
     }
 
     @Override
@@ -26,11 +27,10 @@ public class EndTurnCommand extends SelfInflitedCommand {
     @Override
     protected void execute() {
 
-        getActor().setMoved(true);
-        getActor().setActed(true);
+        getInitiator().setMoved(true);
+        getInitiator().setActed(true);
 
-        final BattleUnitRenderer actorRenderer = battlefieldRenderer.getUnitRenderer(getActor());
-        StandardTask doneTask = new StandardTask(actorRenderer, Notification.Done.get(true));
+        StandardTask doneTask = new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), Notification.Done.get(true));
         this.scheduleRenderTask(doneTask);
 
     }

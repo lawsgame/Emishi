@@ -77,7 +77,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.spriteProvider = spriteProvider;
         this.app = new ActionPanelPool(stageUI.getViewport());
         this.scheduler = new AnimationScheduler();
-        this.bcm = new BattleCommandManager(bfr, scheduler);
+        this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory());
         this.player = player;
         this.multiplexer = new InputMultiplexer();
         this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);

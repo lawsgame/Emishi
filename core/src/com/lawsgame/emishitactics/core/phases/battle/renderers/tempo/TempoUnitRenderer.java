@@ -65,8 +65,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         this.executing = false;
         this.done = false;
         this.visible = true;
-        weapontTexture = TempoSpritePool.getInstance().getWeaponSprite(model.getCurrentWeapon().getTemplate().getWeaponType());
-        orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(model.getOrientation());
+        weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getTemplate().getWeaponType());
+        orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
         display(Data.AnimId.REST);
     }
 
@@ -133,7 +133,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                     display(Data.AnimId.REST);
                 } else {
                     Data.Orientation orientation = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(), remainingPath.get(0)[0], remainingPath.get(0)[1]);
-                    orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(orientation);
+                    orientationTexture = TempoSpritePool.get().getOrientationSprite(orientation);
                 }
             }
         }
@@ -206,8 +206,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             }
 
             Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
-            orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(or);
-            unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
+            orientationTexture = TempoSpritePool.get().getOrientationSprite(or);
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
             executing = true;
 
 
@@ -221,9 +221,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
         if(backstab){
-            unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.BACKSTABED_PUSHED, getModel().getArmy().getAffiliation()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.BACKSTABED_PUSHED, getModel().getArmy().getAffiliation()));
         }else{
-            unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.TAKE_HIT, getModel().getArmy().getAffiliation()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.TAKE_HIT, getModel().getArmy().getAffiliation()));
         }
         countDown.run();
     }
@@ -232,14 +232,14 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTreated(int healedHP) {
 
-        unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
         countDown.run();
     }
 
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
-        orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(pushedTowards);
-        unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.BACKSTABED_PUSHED, getModel().getArmy().getAffiliation()));
+        orientationTexture = TempoSpritePool.get().getOrientationSprite(pushedTowards);
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.BACKSTABED_PUSHED, getModel().getArmy().getAffiliation()));
         pushed = true;
         int x = (int) getCenterX();
         int y = (int) getCenterY();
@@ -254,8 +254,8 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayFlee(Data.Orientation fleeingDirection) {
-        unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
-        orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(fleeingDirection);
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
+        orientationTexture = TempoSpritePool.get().getOrientationSprite(fleeingDirection);
         countDown.run();
     }
 
@@ -263,62 +263,62 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public void display(Data.AnimId id) {
         switch (id){
             case ATTACK:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.REGULAR_ATTACK, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.REGULAR_ATTACK, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case PUSH:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.PUSH, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.PUSH, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case HEAL:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.HEAL, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.HEAL, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case STEAL:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.STEAL, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.STEAL, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case BUILD:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.BUILD, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.BUILD, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case GUARD:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case GUARDED:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case DIE:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.DIE, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.DIE, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case DODGE:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.DODGE, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.DODGE, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case WOUNDED:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.TAKE_HIT, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.TAKE_HIT, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case SPECIAL_MOVE:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.SPECIAL_MOVE, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.SPECIAL_MOVE, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case LEVELUP:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case SWITCH_WEAPON:
-                unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case REST:
                 if(done){
-                    unitSprite.setRegion(TempoSpritePool.getInstance().getDoneUnitSprite());
+                    unitSprite.setRegion(TempoSpritePool.get().getDoneUnitSprite());
                 }else {
-                    unitSprite.setRegion(TempoSpritePool.getInstance().getUnitSprite(Data.SpriteSetId.REST, getModel().getArmy().getAffiliation()));
+                    unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.SpriteSetId.REST, getModel().getArmy().getAffiliation()));
                 }
                 break;
                 default:
@@ -327,18 +327,18 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void setOrientation(Data.Orientation or) {
-        orientationTexture = TempoSpritePool.getInstance().getOrientationSprite(or);
+        orientationTexture = TempoSpritePool.get().getOrientationSprite(or);
     }
 
     @Override
     public void setWeaponType(Data.WeaponType type) {
-        weapontTexture = TempoSpritePool.getInstance().getWeaponSprite(type);
+        weapontTexture = TempoSpritePool.get().getWeaponSprite(type);
     }
 
     @Override
     public void setHorseman(boolean horseman) {
         if (horseman){
-            mountedTexture = TempoSpritePool.getInstance().getMountedSprite();
+            mountedTexture = TempoSpritePool.get().getMountedSprite();
         }else{
             mountedTexture = null;
         }

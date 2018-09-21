@@ -5,6 +5,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -22,17 +23,17 @@ public class AttackCommand extends BattleCommand {
     protected IUnit targetDefender;
     protected IUnit initiatorDefender;
 
-    protected AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, boolean retaliationAllowed) {
-        super(bfr, Data.ActionChoice.ATTACK, scheduler, false);
+    protected AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, boolean retaliationAllowed) {
+        super(bfr, Data.ActionChoice.ATTACK, scheduler, playerInventory, false);
         this.retaliationAllowed = retaliationAllowed;
-        this.moveCommand = new MoveCommand(bfr, scheduler);
-        this.switchPositionCommand = new SwitchPositionCommand(bfr, scheduler);
+        this.moveCommand = new MoveCommand(bfr, scheduler, playerInventory);
+        this.switchPositionCommand = new SwitchPositionCommand(bfr, scheduler, playerInventory);
         this.moveCommand.setFree(true);
         this.switchPositionCommand.setFree(true);
     }
 
-    public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        this(bfr, scheduler, true);
+    public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        this(bfr, scheduler, playerInventory, true);
 
     }
 
@@ -55,7 +56,7 @@ public class AttackCommand extends BattleCommand {
                 && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
 
             switchTargetGuardianPosition(rowActor, colActor, initiatorDefender);
-            Array<ApplyDamage> notifBundleTarget = performAttack(rowTarget, colTarget, rowActor, colActor, getActor(), true);
+            Array<ApplyDamage> notifBundleTarget = performAttack(rowTarget, colTarget, rowActor, colActor, getInitiator(), true);
             addOutcomeData(rowTarget, colTarget, notifBundleTarget);
         }
 
@@ -80,6 +81,7 @@ public class AttackCommand extends BattleCommand {
 
         boolean backstabbed = attacker.getOrientation() == defender.getOrientation() && !retaliate;
         int hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowTarget, colTarget, battlefield);
+
         if(Utils.getMean(2,100) < hitrate){
             BattleUnitRenderer bur;
 
@@ -187,17 +189,16 @@ public class AttackCommand extends BattleCommand {
 
                 IUnit target = notifs.get(0).wounded;
                 experience = Formulas.getGainedExperience(receiver.getLevel(), target.getLevel(), !target.isOutOfAction());
-                outcome.receivers.add(receiver);
-                outcome.experienceGained.add(experience);
+                outcome.expHolders.add(new ExperiencePointsHolder(receiver, experience));
                 lootRate = Formulas.getLootRate(rowReceiver, colReceiver, battlefield);
                 dicesResult = Utils.getMean(1, 100);
                 if(dicesResult < lootRate){
                     droppedItem = target.getRandomlyDroppableItem();
-                    outcome.droppedItems.add(droppedItem);
+                    outcome.droppedItemHolders.add(new DroppedItemHolder(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled()));
                 }
             } else if (notifs.size > 1){
 
-                //getInstance all wounded opponents
+                //get all wounded opponents
                 Array<IUnit> squad = new Array<IUnit>();
                 for(int i = 0; i < notifs.size; i++){
                     if(notifs.get(i).isRelevant())
@@ -214,7 +215,7 @@ public class AttackCommand extends BattleCommand {
                         lootRate = Formulas.getLootRate(rowReceiver, colReceiver, battlefield);
                         if (Utils.getMean(1, 100) < lootRate) {
                             droppedItem = squad.get(i).getRandomlyDroppableItem();
-                            outcome.droppedItems.add(droppedItem);
+                            outcome.droppedItemHolders.add(new DroppedItemHolder(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled()));
                         }
                     }
                 }
@@ -222,8 +223,7 @@ public class AttackCommand extends BattleCommand {
                 // add experience points
                 squad = receiver.getSquad(true);
                 for(int i = 0; i < squad.size; i++) {
-                    outcome.experienceGained.add(experience);
-                    outcome.receivers.add(squad.get(i));
+                    outcome.expHolders.add(new ExperiencePointsHolder(squad.get(i), experience));
                 }
 
             }
@@ -257,7 +257,7 @@ public class AttackCommand extends BattleCommand {
 
 
     public int getHitRate(boolean retaliation){
-        int[] defenderPos = (retaliation) ? battlefield.getUnitPos(targetDefender) : battlefield.getUnitPos(initiatorDefender);
+        int[] defenderPos = (retaliation) ? battlefield.getUnitPos(initiatorDefender) : battlefield.getUnitPos(targetDefender);
         int hitRate = 0;
         if(!retaliation){
             hitRate = Formulas.getHitRate(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield);
@@ -268,13 +268,14 @@ public class AttackCommand extends BattleCommand {
     }
 
     public int getDealtDamage(boolean retaliation){
-        int[] defenderPos = (retaliation) ? battlefield.getUnitPos(targetDefender) : battlefield.getUnitPos(initiatorDefender);
+        int[] defenderPos = (retaliation) ? battlefield.getUnitPos(initiatorDefender) : battlefield.getUnitPos(targetDefender);
         int dealtDamage = 0;
         if(!retaliation){
             dealtDamage = Formulas.getDealtDamage(rowActor, colActor, defenderPos[0], defenderPos[1], battlefield);
         }else if(retaliation && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
             dealtDamage = Formulas.getDealtDamage(rowTarget, colTarget, defenderPos[0], defenderPos[1], battlefield);
         }
+
         return dealtDamage;
     }
 

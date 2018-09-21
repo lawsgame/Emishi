@@ -30,6 +30,7 @@ import java.util.HashMap;
 public class EndTurnBIS extends BattleInteractionState {
     private int colSltdUnit;
     private int rowSltdUnit;
+    EndTurnCommand endTurnCommand;
     private ChoicePanel orientationChoicePanel;
 
     public EndTurnBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit) {
@@ -37,6 +38,7 @@ public class EndTurnBIS extends BattleInteractionState {
         this.rowSltdUnit = rowSltdUnit;
         this.colSltdUnit = colSltdUnit;
         this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
+        this.endTurnCommand = new EndTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
     }
 
     @Override
@@ -64,6 +66,7 @@ public class EndTurnBIS extends BattleInteractionState {
     private void proceed(){
         if(bim.battlefield.isTileOccupied(rowSltdUnit, colSltdUnit) && bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).isMobilized()){
 
+            this.endTurnCommand.apply(rowSltdUnit, colSltdUnit);
             IUnit sltdUnit =  bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
             IArmy currentArmy = sltdUnit.getArmy();
             if(currentArmy.isDone()){
@@ -107,7 +110,7 @@ public class EndTurnBIS extends BattleInteractionState {
                     public void changed(ChangeEvent event, Actor actor) {
 
                         // change the unit orientation
-                        ChooseOrientationCommand orientationCommand = new ChooseOrientationCommand(bis.bim.bfr, bis.bim.scheduler, orientation);
+                        ChooseOrientationCommand orientationCommand = new ChooseOrientationCommand(bis.bim.bfr, bis.bim.scheduler, bis.bim.player.getInventory(), orientation);
                         orientationCommand.apply(bis.rowSltdUnit, bis.colSltdUnit);
 
                         //proceed to the next BIS

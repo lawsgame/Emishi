@@ -11,13 +11,13 @@ import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
 import java.util.HashMap;
 
 /*
- singleton to easily getInstance access to required texture region for rendering purpose
+ singleton to easily get access to required texture region for rendering purpose
  */
 public class TempoSpritePool {
 
     private static TempoSpritePool spritePool;
 
-    public static TempoSpritePool getInstance(){
+    public static TempoSpritePool get(){
         if(spritePool == null)
             spritePool = new TempoSpritePool();
         return spritePool;

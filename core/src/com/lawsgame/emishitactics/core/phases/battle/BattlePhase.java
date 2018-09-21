@@ -82,8 +82,8 @@ public class BattlePhase extends GamePhase {
         battlefield.randomlyDeploy(player.getArmy());
 
         // build up sprite pool and battlefield renderer
-        TempoSpritePool.getInstance().set(asm);
-        BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.getInstance());
+        TempoSpritePool.get().set(asm);
+        BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
         SpriteProvider spriteProvider = new SpriteProvider();
         spriteProvider.set(battlefield, asm);
         //BattlefieldRenderer battlefieldRenderer = new IsoBFR(battlefield, spriteProvider);

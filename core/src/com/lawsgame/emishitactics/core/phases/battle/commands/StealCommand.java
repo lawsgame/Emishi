@@ -4,6 +4,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -14,8 +15,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class StealCommand extends BattleCommand{
 
-    public StealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.STEAL, scheduler, false);
+    public StealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, ActionChoice.STEAL, scheduler, playerInventory, false);
     }
 
     @Override
@@ -50,9 +51,8 @@ public class StealCommand extends BattleCommand{
 
         // setTiles outoome
         if(stealSuccessful){
-            outcome.receivers.add(stealer);
-            outcome.experienceGained.add(choice.getExperience());
-            outcome.droppedItems.add(stoleItem);
+            outcome.expHolders.add(new ExperiencePointsHolder(stealer, choice.getExperience()));
+            outcome.droppedItemHolders.add(new DroppedItemHolder(stoleItem, stealer.isMobilized() && stealer.getArmy().isPlayerControlled()));
         }
 
     }

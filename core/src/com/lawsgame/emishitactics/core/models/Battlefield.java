@@ -652,7 +652,7 @@ public class Battlefield extends Observable {
         private void set( Battlefield bf, int rowActor, int colActor, boolean moveAreaOnly){
             if(bf.isTileOccupied(rowActor, colActor) && bf.getUnit(rowActor, colActor).isMobilized()) {
 
-                // getInstance actor relevant pieces of information
+                // get actor relevant pieces of information
                 IUnit actor = bf.getUnit(rowActor, colActor);
                 this.pathfinder = actor.has(Data.Ability.PATHFINDER);
                 this.moveRange = actor.hasMoved() ? 0 : actor.getAppMobility();
@@ -818,7 +818,7 @@ public class Battlefield extends Observable {
      *
      * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
      *
-     * getInstance the shortest validPath of a target buildingType using the A* algorithm
+     * get the shortest validPath of a target buildingType using the A* algorithm
      *
      * @return an {[row, col]} array  representing the shortest validPath from one buildingType to another,
      * excluding (rowI, colI) and finishing by (rowf, colf). If the path is invalid, the returned array will be empty
@@ -852,7 +852,7 @@ public class Battlefield extends Observable {
                 // validPath found
                 if (current.getRow() == rowf && current.getCol() == colf) break;
 
-                // getInstance available neighbor nodes which are not yet in the closed list
+                // get available neighbor nodes which are not yet in the closed list
                 PathNode node;
                 neighbours = new Array<PathNode>();
                 if (isTileReachable(current.row + 1, current.col, pathfinder)

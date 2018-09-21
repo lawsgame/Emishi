@@ -9,12 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Area;
-import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Weapon;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
@@ -30,24 +25,19 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionComm
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.EndTurnBIS;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.Stack;
 
 public class TestBIS extends BattleInteractionState {
-    ActionPanel actionPanel;
+    ActionInfoPanel actionInfoPanel;
     AreaWidget areaWidget;
     ExperiencePanel experiencePanel;
     LevelUpPanel levelUpPanel;
@@ -145,24 +135,24 @@ public class TestBIS extends BattleInteractionState {
 
                 switch (index){
 
-                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler);break;
-                    case 2 : command = new HealCommand(bim.bfr, bim.scheduler);break;
-                    case 3 : command = new PushCommand(bim.bfr, bim.scheduler); break;
-                    case 4 : command = new SwitchPositionCommand(bim.bfr, bim.scheduler);break;
-                    case 5 : command = new GuardCommand(bim.bfr, bim.scheduler); break;
-                    case 6 : command = new StealCommand(bim.bfr, bim.scheduler);break;
-                    case 7 : command =  new SwitchWeaponCommand(bim.bfr, bim.scheduler, 1); break;
-                    case 8 : command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, Data.Orientation.NORTH);break;
-                    case 9 : command = new EndTurnCommand(bim.bfr, bim.scheduler);break;
-                    default: command = new AttackCommand(bim.bfr, bim.scheduler);
+                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
+                    case 2 : command = new HealCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
+                    case 3 : command = new PushCommand(bim.bfr, bim.scheduler, bim.player.getInventory()); break;
+                    case 4 : command = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
+                    case 5 : command = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory()); break;
+                    case 6 : command = new StealCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
+                    case 7 : command =  new SwitchWeaponCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), 1); break;
+                    case 8 : command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), Data.Orientation.NORTH);break;
+                    case 9 : command = new EndTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
+                    default: command = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
                 }
             } else {
-                command = (index != 9) ? new MoveCommand(bim.bfr, bim.scheduler) : new BuildCommand(bim.bfr, bim.scheduler, Data.TileType.BRIDGE);
+                command = (index != 9) ? new MoveCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) : new BuildCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), Data.TileType.BRIDGE);
 
             }
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
-            if (command.setActor(unitPos[0], unitPos[1])) {
+            if (command.setInitiator(unitPos[0], unitPos[1])) {
                 //command.setDecoupled(true);
 
                 command.setTarget(row, col);
@@ -172,28 +162,28 @@ public class TestBIS extends BattleInteractionState {
                     if(bim.app.isPanelAvailable(command)){
 
 
-                        final ActionPanel actionPanel = bim.app.getPanel(command);
+                        final ActionInfoPanel actionInfoPanel = bim.app.getPanel(command);
 
                         bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
                             @Override
                             public void apply() {
-                                bim.uiStage.addActor(actionPanel);
-                                actionPanel.hide();
-                                actionPanel.show();
+                                bim.uiStage.addActor(actionInfoPanel);
+                                actionInfoPanel.hide();
+                                actionInfoPanel.show();
                             }
                         }, 0f));
                         bim.scheduler.wait(3.5f);
                         bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
                             @Override
                             public void apply() {
-                                actionPanel.hide();
+                                actionInfoPanel.hide();
                             }
                         }, 0f));
                         bim.scheduler.wait(0.2f);
                         bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
                             @Override
                             public void apply() {
-                                actionPanel.remove();
+                                actionInfoPanel.remove();
                             }
                         }, 0f));
 

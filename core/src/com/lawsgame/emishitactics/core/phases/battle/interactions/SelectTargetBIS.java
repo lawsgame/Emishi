@@ -30,7 +30,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
     @Override
     public void init() {
-        System.out.println("SELECT TARGET : "+currentCommand.getActor().getName()+" "+currentCommand.getActionChoice().getName(bim.mainI18nBundle));
+        System.out.println("SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.mainI18nBundle));
 
         bim.bfr.addAreaRenderer(actionArea);
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, true, true, false);

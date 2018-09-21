@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -16,24 +17,24 @@ public class SwitchPositionCommand extends BattleCommand {
     private Data.Orientation oldTargetOrientation;
     private Data.Orientation oldActorOrientation;
 
-    public SwitchPositionCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, true);
+    public SwitchPositionCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, playerInventory, true);
     }
 
     @Override
     protected void execute() {
 
         // store old state
-        actorRenderer = battlefieldRenderer.getUnitRenderer(getActor());
+        actorRenderer = battlefieldRenderer.getUnitRenderer(getInitiator());
         targetRenderer = battlefieldRenderer.getUnitRenderer(getTarget());
-        oldActorOrientation = getActor().getOrientation();
+        oldActorOrientation = getInitiator().getOrientation();
         oldTargetOrientation = getTarget().getOrientation();
 
         //update model
         battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(getActor(), getTarget(), SwitchPosition.Mode.WALK, battlefield)));
+        scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(getInitiator(), getTarget(), SwitchPosition.Mode.WALK, battlefield)));
     }
 
     @Override

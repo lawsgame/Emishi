@@ -550,7 +550,7 @@ public class Unit extends IUnit{
 
     @Override
     public int[] addExpPoints(int exp) {
-        int[] gainLvl = new int[12];
+        int[] gainLvl = new int[13];
         int tempoExp = exp;
         int[] tempoGainLvl;
         while(level < Data.MAX_LEVEL && tempoExp > 0) {
@@ -561,7 +561,8 @@ public class Unit extends IUnit{
                 tempoExp -= Data.EXP_REQUIRED_LD_LEVEL_UP - this.experience;
                 this.experience = 0;
                 tempoGainLvl = levelup();
-                for(int i = 0; i < gainLvl.length; i++)
+                gainLvl[12] = 1;
+                for(int i = 0; i < tempoGainLvl.length; i++)
                     gainLvl[i] += tempoGainLvl[i];
             }
         }

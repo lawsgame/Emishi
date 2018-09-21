@@ -24,7 +24,7 @@ public class BattleOverBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        batch.draw(TempoSpritePool.getInstance().getBlackBGSprite(), 0, 0, bim.gcm.getPortWidth(), bim.gcm.getPortHeight());
+        batch.draw(TempoSpritePool.get().getBlackBGSprite(), 0, 0, bim.gcm.getPortWidth(), bim.gcm.getPortHeight());
     }
 
 

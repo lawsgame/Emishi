@@ -21,7 +21,7 @@ public class AiBIS extends BattleInteractionState {
     public void init() {
         System.out.println("AI");
 
-        //bim.replace( new SelectActorBIS(bim, true));
+        bim.replace( new SelectActorBIS(bim, true));
     }
 
     @Override

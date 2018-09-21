@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -20,6 +21,8 @@ import com.lawsgame.emishitactics.engine.patterns.command.Command;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
+import java.util.Arrays;
+
 /**
  *
  * I - Battle command usage
@@ -28,8 +31,8 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
  *
  *  ActionChoice choice = ...;
  *  if(bcm.canActionBePerformed(...){
- *      BattleCommand command = bcm.getInstance(...); /OR new XCommand(...);
- *      if(command != null && command.setActor(...)){
+ *      BattleCommand command = bcm.get(...); /OR new XCommand(...);
+ *      if(command != null && command.setInitiator(...)){
  *          command.setTarget(...);
  *          if(command.isTargetValid()){
  *              command.apply();
@@ -39,19 +42,19 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
  *
  *  II - battle command flow
  *
- *  1 - getInstance the command
- *  2 - setTiles actor and target
+ *  1 - get the command
+ *  2 - setTiles initiator and target
  *  3 - call isTargetValid
  *  4 - execute the command
  *
  * no need to put back the command in the BCM
  *
  *
- * execute method struture :
+ * BattleCommand.execute() method struture :
  *  0 - (optional) register the old model state to perform undo() if required
  *  1 - update the model
  *  2 - push the render task
- *  3 - setTiles the outcome bundle
+ *  3 - set the outcome bundle
  */
 public abstract class BattleCommand extends Observable implements Command, Observer{
 
@@ -63,7 +66,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     private boolean free;                           // command that does not count as the player choice i.e. setTiles acted and moved as true while being applied nor it costs any OA point
     private boolean decoupled;
 
-    private IUnit actor;
+    private IUnit initiator;
     private IUnit target;
     protected int rowActor;
     protected int colActor;
@@ -79,7 +82,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     private boolean tasksScheduled;
 
 
-    public BattleCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, boolean free){
+    public BattleCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free){
         this.battlefieldRenderer = bfr;
         this.battlefield = bfr.getModel();
         this.scheduler = scheduler;
@@ -88,7 +91,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
         this.colActor = -1;
         this.rowTarget = -1;
         this.colTarget = -1;
-        this.outcome = new EncounterOutcome();
+        this.outcome = new EncounterOutcome(playerInventory);
         this.renderTasks = new Array<Task>();
 
         this.launched = false;
@@ -114,25 +117,26 @@ public abstract class BattleCommand extends Observable implements Command, Obser
 
                 // setTiles as moved or acted if required
                 if(choice.isActedBased()) {
-                    getActor().setActed(true);
+                    getInitiator().setActed(true);
                 }else {
-                    getActor().setMoved( true);
+                    getInitiator().setMoved( true);
                 }
 
                 //handle the cost
-                getActor().addActionPoints(-choice.getCost());
+                getInitiator().addActionPoints(-choice.getCost());
             }
 
 
             execute();
 
-            // remove already OoA units
             outcome.clean();
+            outcome.resolve();
+
         }
     }
 
     public final void apply(int rowActor, int colActor, int rowTarget, int colTarget){
-        if(setActor(rowActor, colActor)) {
+        if(setInitiator(rowActor, colActor)) {
             setTarget(rowTarget, colTarget);
             if (isTargetValid()) {
                 apply();
@@ -149,11 +153,11 @@ public abstract class BattleCommand extends Observable implements Command, Obser
         if(!free){
 
             if (choice.isActedBased())
-                getActor().setActed(false);
+                getInitiator().setActed(false);
             else
-                getActor().setMoved( false);
+                getInitiator().setMoved( false);
 
-            getActor().addActionPoints(choice.getCost());
+            getInitiator().addActionPoints(choice.getCost());
         }
         unexecute();
     }
@@ -205,7 +209,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     protected void unexecute(){ }
 
 
-    // called to checked actor requirements
+    // called to checked initiator requirements
     public boolean canbePerformedBy(IUnit actor){
         return choice.getCost() <= actor.getActionPoints()
                 && (choice.isActedBased() ? !actor.hasActed() : !actor.hasMoved() || free);
@@ -215,8 +219,8 @@ public abstract class BattleCommand extends Observable implements Command, Obser
      * PLAYER ORIENTED METHOD
      *
      * TARGET CHECKING
-     * @return whether or not THIS SPECIFIC TARGET is at range by the actor performing the given action if one's is standing the buildingType (rowActor, colActor)
-     * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
+     * @return whether or not THIS SPECIFIC TARGET is at range by the initiator performing the given action if one's is standing the buildingType (rowActor, colActor)
+     * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public final boolean isTargetValid() {
         boolean valid = false;
@@ -231,7 +235,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     }
 
     /**
-     * especially required to build attributes values required for instanciating the associated ActionPanel
+     * especially required to build attributes values required for instanciating the associated ActionInfoPanel
      */
     protected void init(){
         initialized = true;
@@ -267,8 +271,8 @@ public abstract class BattleCommand extends Observable implements Command, Obser
      *
      * @param row
      * @param col
-     * @return whether or not ANY TARGET is at range by the actor performing the given action if one's is standing the buildingType (row, col)
-     * while ignoring the actor's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
+     * @return whether or not ANY TARGET is at range by the initiator performing the given action if one's is standing the buildingType (row, col)
+     * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public abstract boolean atActionRange(int row, int col, IUnit actor);
 
@@ -305,7 +309,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
 
     /**
      * TESTED
-     * @return the relevantly oriented impact area of an action performed by an actor while targeting the buildingType {rowTarget, colTarget}
+     * @return the relevantly oriented impact area of an action performed by an initiator while targeting the buildingType {rowTarget, colTarget}
      */
     public final Array<int[]> getImpactArea(){
         Array<int[]> orientedArea = choice.getOrientedImpactArea(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
@@ -424,7 +428,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
      *
      * @param rowImpactTile
      * @param colImpactTile
-     * @return getInstance all possible target buildingType knowing that the given buildingType is within the impact area
+     * @return get all possible target buildingType knowing that the given buildingType is within the impact area
      */
     protected final Array<int[]> getTargetFromCollateral(int rowImpactTile, int colImpactTile) {
         Array<int[]> possibleTargetTiles = new Array<int[]>();
@@ -459,13 +463,13 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     }
 
 
-    public final boolean setActor(int rowActor, int colActor) {
+    public final boolean setInitiator(int rowActor, int colActor) {
         if(battlefield.isTileOccupied(rowActor, colActor)) {
             this.launched = false;
             this.initialized = false;
             this.rowActor = rowActor;
             this.colActor = colActor;
-            this.actor = battlefield.getUnit(rowActor, colActor);
+            this.initiator = battlefield.getUnit(rowActor, colActor);
             if(choice.isActorIsTarget()){
                 setTarget(rowActor, colActor);
             }
@@ -474,8 +478,8 @@ public abstract class BattleCommand extends Observable implements Command, Obser
         return false;
     }
 
-    public final IUnit getActor(){
-        return actor;
+    public final IUnit getInitiator(){
+        return initiator;
     }
 
     public final int getRowActor() {
@@ -538,46 +542,66 @@ public abstract class BattleCommand extends Observable implements Command, Obser
 
 
 public static class EncounterOutcome {
-        public Array<IUnit> receivers;
-        public Array<Integer> experienceGained;
-        public Array<Item> droppedItems;
+        public Array<ExperiencePointsHolder> expHolders;
+        public Array<DroppedItemHolder> droppedItemHolders;
+        public Inventory playerInventory;
+        boolean resolved;
 
-        public EncounterOutcome() {
-            reset();
+        public EncounterOutcome(Inventory playerInventory) {
+            this.playerInventory = playerInventory;
+            this.expHolders = new Array<ExperiencePointsHolder>();
+            this.droppedItemHolders = new Array<DroppedItemHolder>();
+            this.resolved = false;
         }
 
         public void reset(){
-            this.receivers = new Array<IUnit>();
-            this.experienceGained = new Array<Integer>();
-            this.droppedItems = new Array<Item>();
+            this.droppedItemHolders.clear();
+            this.expHolders.clear();
+            this.resolved = false;
 
         }
 
-        public boolean isExperienceDistributed(){
-            return receivers.size == 0;
+        public boolean isExperienceShown(){
+            return expHolders.size == 0;
         }
 
-        public boolean isLootedItemsClaimed(){ return droppedItems.size == 0; }
+        public boolean isLootedItemsClaimed(){ return droppedItemHolders.size == 0; }
 
         public boolean isHandled(){
-            return receivers.size == 0 && droppedItems.size == 0;
+            return expHolders.size == 0 && droppedItemHolders.size == 0;
         }
 
-        public void clean(){
-            if(receivers.size != experienceGained.size){
-                receivers.clear();
-                experienceGained.clear();
-                try{
-                    throw new BattleOutcomeException("senders' and experience' arrays size don't match");
-                }catch(Exception e){
-                    e.getStackTrace();
+        void clean(){
+            // remove OOA units
+            for (int i = 0; i < expHolders.size; i++) {
+                if (expHolders.get(i).isIrrelevant()) {
+                    expHolders.removeIndex(i);
+                    i--;
                 }
             }
-            for(int i = 0; i < receivers.size; i++){
-                if(receivers.get(i).isOutOfAction()){
-                    receivers.removeIndex(i);
-                    experienceGained.removeIndex(i);
-                    i--;
+
+            // merges identical receivers and sums the associated exp gains
+            for (int i = 0; i < expHolders.size; i++) {
+                for (int j = i + 1; j < expHolders.size; j++) {
+                    if (expHolders.get(i).receiver == expHolders.get(j).receiver) {
+                        expHolders.get(i).experience += expHolders.get(j).experience;
+                        expHolders.removeIndex(j);
+                        j--;
+                    }
+                }
+            }
+        }
+
+        void resolve(){
+            if(!resolved) {
+                resolved = true;
+                for (int i = 0; i < expHolders.size; i++) {
+                    expHolders.get(i).solve();
+                }
+
+                for (int i = 0; i < droppedItemHolders.size; i++) {
+                    if (droppedItemHolders.get(i).playerOwned)
+                        playerInventory.storeItem(droppedItemHolders.get(i).droppedItem);
                 }
             }
         }
@@ -585,19 +609,51 @@ public static class EncounterOutcome {
         @Override
         public String toString(){
             String str = "\nOUTCOME\n";
-            for(int i = 0; i < receivers.size; i++){
-                str += "\nReceiver : "+receivers.get(i).getName()+" => experience gained : "+experienceGained.get(i);
+            for(int i = 0; i < expHolders.size; i++){
+                str += "\nReceiver : "+ expHolders.get(i).receiver.getName()+" => experience gained : "+ expHolders.get(i).experience;
             }
-            for(int i = 0; i < droppedItems.size; i++){
-                str += "\nStolen item : "+ droppedItems.get(i).toString();
+            for(int i = 0; i < droppedItemHolders.size; i++){
+                str += "\nStolen item : "+ droppedItemHolders.get(i).toString();
             }
             return str+"\n";
         }
     }
 
-    public static class BattleOutcomeException extends Exception{
-        public BattleOutcomeException(String s) {
-            super(s);
+    public static class ExperiencePointsHolder {
+        public IUnit receiver;
+        public int experience;
+        int[] statGained; // the 12 first entries are statistic inscreased while the last entry is a boolean int : 1 == levelup / 0 == not
+
+        public ExperiencePointsHolder(IUnit receiver, int experience){
+            this.receiver = receiver;
+            this.experience = experience;
+            this.statGained = new int[10];
+        }
+
+        void solve(){
+            statGained = receiver.addExpPoints(experience);
+        }
+
+        public int[] getStatGained() {
+            return Arrays.copyOfRange(statGained, 0, 12);
+        }
+
+        public boolean isReceiverLevelup() {
+            return statGained[12] == 1;
+        }
+
+        public boolean isIrrelevant() {
+            return experience == 0 || receiver.isOutOfAction();
+        }
+    }
+
+    public static class DroppedItemHolder {
+        public Item droppedItem;
+        public boolean playerOwned;
+
+        public DroppedItemHolder(Item droppedItem, boolean playerOwned) {
+            this.droppedItem = droppedItem;
+            this.playerOwned = playerOwned;
         }
     }
 
