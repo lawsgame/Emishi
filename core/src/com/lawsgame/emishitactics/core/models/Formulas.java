@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -12,16 +13,56 @@ public class Formulas {
     }
 
     public static int getDealtDamage(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
-        int dealtdamage = getCurrentAttackMight(rowAttacker0, colAttacker0, rowDefender0, colDefender0, battlefield) - getCurrentDefense(rowAttacker0, colAttacker0, rowDefender0, colDefender0, battlefield);
+        int dealtdamage = 0;
+        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0)) {
+            dealtdamage += getRandomlyAttackMight(
+                    getCurrentAttackMightRange(rowAttacker0, colAttacker0, rowDefender0, colDefender0, battlefield),
+                    battlefield.getUnit(rowAttacker0, colAttacker0).getAppDexterity());
+            dealtdamage -= getCurrentDefense(rowAttacker0, colAttacker0, rowDefender0, colDefender0, battlefield);
+        }
         return (dealtdamage > 0) ? dealtdamage : 0;
     }
 
-    public static int getCurrentAttackMight(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
+    public static int getRandomlyAttackMight(int[] attackMightRange, int attackerDexterity){
         int attackMight = 0;
+        float p = 0f;
+        float r = MathUtils.random();
+        for (int am = attackMightRange[0]; am <= attackMightRange[1]; am++) {
+            p += getDamageValueProbability(am - attackMightRange[0] + 1,
+                    attackMightRange[1] - attackMightRange[0] + 1,
+                    attackerDexterity,
+                    Data.DEALT_DAMAGE_LN_RANDOM);
+            System.out.println("am : "+am+" | r : "+r+" | p :"+p);
+            if(r < p){
+                attackMight = am;
+                break;
+            }
+        }
+        return attackMight;
+    }
+
+    /**
+     *
+     * @param k : k possibility
+     * @param n : number of possibilities : 3 - 5 => 3 possibilities
+     * @return probability, between 0.0 and 1.0
+     */
+    public static float getDamageValueProbability(float k, float n, int dexterity, float factor){
+        float res = 0f;
+        if(k > 0 && k <= n)
+            res = (float) (Math.pow(k / n, Math.log(1 + factor*dexterity)) - Math.pow( (k - 1) / n, Math.log(1 + factor*dexterity)));
+        System.out.print("dp : "+res+" => ");
+        return res;
+    }
+
+    public static int[] getCurrentAttackMightRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
+        int[] attackMight = new int[2];
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0) && battlefield.isTileOccupied(rowDefender0, colDefender0)){
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
             attackMight = attacker.getAppAttackMight();
-            attackMight += battlefield.getTile(rowAttacker0, colAttacker0).getAttackMightBonus();
+            for(int i =0; i < attackMight.length; i++) {
+                attackMight[i] += battlefield.getTile(rowAttacker0, colAttacker0).getAttackMightBonus();
+            }
         }
         return attackMight;
     }
@@ -132,18 +173,5 @@ public class Formulas {
             }
         }
         return stealRate;
-    }
-
-    /**
-     *
-     * @param k : k possibility
-     * @param n : number of possibilities : 3 - 5 => 3 possibilities
-     * @return probability, between 0.0 and 1.0
-     */
-    public static float getDamageValueProbability(float k, float n, int dexterity, float factor){
-        float res = 0f;
-        if(k > 0 && k <= n)
-            res = (float) (Math.pow(k / n, Math.log(1 + factor*dexterity)) - Math.pow( (k - 1) / n, Math.log(1 + factor*dexterity)));
-        return res;
     }
 }

@@ -960,8 +960,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getAppAttackMight() {
-        return getCurrentWeapon().getTemplate().getDamage() + getAppStrength();
+    public int[] getAppAttackMight() {
+        return new int[]{getCurrentWeapon().getTemplate().getDamageMin() + getAppStrength(), getCurrentWeapon().getTemplate().getDamageMax() + getAppStrength()};
     }
 
     @Override

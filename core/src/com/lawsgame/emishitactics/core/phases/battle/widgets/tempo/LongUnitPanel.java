@@ -91,7 +91,7 @@ public class LongUnitPanel extends UnitPanel {
         }
         builder.append("\n\n    CURRENT WEAPONS\n");
         builder.append("\nName : "+unit.getCurrentWeapon().toString());
-        builder.append("\nBase damage : "+unit.getCurrentWeapon().getTemplate().getDamage());
+        builder.append("\nBase damage : "+unit.getCurrentWeapon().getTemplate().getDamageMin()+" - "+unit.getCurrentWeapon().getTemplate().getDamageMax());
         builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getTemplate().getAccuracy());
         builder.append("\nRange : ("+unit.getCurrentWeapon().getTemplate().getRangeMin()+", "+unit.getCurrentWeapon().getTemplate().getRangeMax()+")");
         builder.append("\nWeapon type : "+ unit.getCurrentWeapon().getTemplate().getWeaponType().name().toLowerCase());
@@ -121,7 +121,7 @@ public class LongUnitPanel extends UnitPanel {
         builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getBaseLeadership()+")");
         builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getBaseMobility()+")");
 
-        builder.append("\n\nATTACK might : "+unit.getAppAttackMight());
+        builder.append("\n\nATTACK might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
         builder.append("\nATTACK accuracy : "+unit.getAppAttackAccuracy());
         builder.append("\nAvoidance : "+unit.getAppAvoidance());
         builder.append("\nRange : ("+unit.getAppWeaponRangeMin()+", "+unit.getAppWeaponRangeMax()+")");

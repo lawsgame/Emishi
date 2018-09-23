@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 public class FormulasTest {
 
+
     @Test
     public void testGetDamageValueProbability(){
         assertTrue(MathUtils.isEqual(Formulas.getDamageValueProbability(1, 5, 1, 1.5f), 0.23f, 0.01f));

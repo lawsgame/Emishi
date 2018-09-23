@@ -69,7 +69,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
             final ActionInfoPanel actionInfoPanel = bim.app.getPanel(currentCommand);
             bim.scheduler.addTask(new StandardTask(new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.SHOW), 0));
-            this.hideActionPanelCommand = new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.HIDE);
+            hideActionPanelCommand = new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.HIDE);
             removeActionPanelCommand = new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.REMOVE);
             hidingTime = actionInfoPanel.getHidingTime();
         }

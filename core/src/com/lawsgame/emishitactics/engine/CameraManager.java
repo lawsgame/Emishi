@@ -142,7 +142,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
     /**
      * 1) check whether or not the new camera position is inside the world boundaries
      * 2) modify the camera position consequently
-     * 3) update the camera to take the changes into account
+     * 3) update the camera to take the change into account
      * 4) update the clip bounds and the components instances to follow the camera accordingly
      *
      * @return  if the camera has been moved

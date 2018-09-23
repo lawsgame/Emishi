@@ -85,7 +85,7 @@ public class AttackCommand extends BattleCommand {
         if(Utils.getMean(2,100) < hitrate){
             BattleUnitRenderer bur;
 
-            // model-wise changes
+            // model-wise change
             int dealtdamage = Formulas.getDealtDamage(rowAttacker, colAttacker, rowTarget, colTarget, battlefield);
             notifs = defender.applyDamage(dealtdamage, false);
 

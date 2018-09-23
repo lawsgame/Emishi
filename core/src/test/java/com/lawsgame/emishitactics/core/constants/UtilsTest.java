@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
@@ -15,7 +16,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.text.Format;
 import java.util.HashMap;
+
+import sun.reflect.generics.tree.FormalTypeParameter;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +36,14 @@ public class UtilsTest {
 
     @BeforeClass
     public static void testOnfly(){
+        /*
+        for(int i =0; i < 10; i++)
+            System.out.println("     => AM chosen : " +Formulas.getRandomlyAttackMight(new int[]{5,9}, 1)+"\n");
+        */
+        /*
+        for(int i = 1; i < 6; i++)
+            System.out.println(Formulas.getDamageValueProbability(i, 5, 1, Data.DEALT_DAMAGE_LN_RANDOM));
+        */
     }
 
     @Before

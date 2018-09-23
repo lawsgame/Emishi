@@ -118,7 +118,7 @@ public abstract class IUnit extends Observable {
     public abstract int getAppWeaponRangeMax();
     public abstract int getCurrentWeaponRangeMax(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract int getAppAttackAccuracy();
-    public abstract int getAppAttackMight();
+    public abstract int[] getAppAttackMight();
     public abstract int getAppDefense(DamageType damageType);
     public abstract int getAppAvoidance();
     public abstract int getAppAPRecoveryRate();

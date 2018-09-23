@@ -519,7 +519,7 @@ public class Army extends IArmy{
 
 
     /**
-     * update composition if one of members sees changes in critical stat, notably leadership
+     * update composition if one of members sees change in critical stat, notably leadership
      */
     @Override
     public void checkComposition() {

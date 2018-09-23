@@ -33,6 +33,7 @@ public class Data {
     public static final int BASE_DROP_RATE = 5;
     public static final int GUARD_REACTION_RANGE_MIN = 1;
     public static final int GUARD_REACTION_RANGE_MAX = 1;
+    public static final float DEALT_DAMAGE_LN_RANDOM = 1.5f;
 
     // RENDER parameters
         public static final float SPEED_TEMPO_WALK = 3f;  //buildingType/s
@@ -509,14 +510,15 @@ public class Data {
      *  - Great bow
      */
     public enum WeaponTemplate{
-        FIST(           1, 100, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
-        SHORTSWORD(     3,  90, 1, 1, 20, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
-        LANCE(          3,  95, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
-        BROAD_AXE(      5,  80, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
-        CLUB(           4,  85, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
-        HUNTING_BOW(    3,  75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
+        FIST(           1, 1, 100, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
+        SHORTSWORD(     3, 3, 90, 1, 1, 20, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
+        LANCE(          3, 3, 95, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
+        BROAD_AXE(      4, 5, 80, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
+        CLUB(           4, 4, 85, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
+        HUNTING_BOW(    3, 4, 75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
 
-        private int damage;
+        private int damageMin;
+        private int damageMax;
         private int accuracy;
         private int rangeMin;
         private int rangeMax;
@@ -527,8 +529,9 @@ public class Data {
         private DamageType damageType;
         private Ability ability;
 
-        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, int dropRate, int durability, WeaponType weaponType, DamageType damageType, Ability art) {
-            this.damage = damage;
+        WeaponTemplate(int damageMin, int damageMax, int accuracy, int rangeMin, int rangeMax, int dropRate, int durability, WeaponType weaponType, DamageType damageType, Ability art) {
+            this.damageMin = damageMin;
+            this.damageMax = damageMax;
             this.accuracy = accuracy;
             this.rangeMin = rangeMin;
             this.rangeMax = rangeMax;
@@ -540,8 +543,8 @@ public class Data {
             this.unbreakable = false;
         }
 
-        WeaponTemplate(int damage, int accuracy, int rangeMin, int rangeMax, int dropRate, WeaponType weaponType, DamageType damageType, Ability art){
-            this(damage, accuracy, rangeMin, rangeMax, dropRate,1, weaponType, damageType, art);
+        WeaponTemplate(int damageMin, int damageMax, int accuracy, int rangeMin, int rangeMax, int dropRate, WeaponType weaponType, DamageType damageType, Ability art){
+            this(damageMin, damageMax, accuracy, rangeMin, rangeMax, dropRate,1, weaponType, damageType, art);
             this.unbreakable = true;
         }
 
@@ -553,9 +556,9 @@ public class Data {
             return weaponType;
         }
 
-        public int getDamage() {
-            return damage;
-        }
+        public int getDamageMin() { return damageMin; }
+
+        public int getDamageMax() { return damageMax; }
 
         public int getAccuracy() {
             return accuracy;
