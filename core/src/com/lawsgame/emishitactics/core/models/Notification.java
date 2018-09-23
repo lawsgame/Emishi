@@ -6,7 +6,6 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 public class Notification {
 
 
-
     public static class ApplyDamage {
         public Unit wounded;
         public boolean moralOnly;

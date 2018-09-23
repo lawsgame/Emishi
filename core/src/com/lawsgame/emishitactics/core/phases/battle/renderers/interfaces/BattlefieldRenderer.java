@@ -9,6 +9,7 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
 import java.util.LinkedList;
@@ -66,13 +67,8 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     }
 
 
-    /**
-     *
-     *
-     * @param data
-     */
     @Override
-    public final void getNotification(Object data) {
+    public final void getNotification(Observable sender, Object data) {
         if (data instanceof IUnit) {
 
             removeUnitRenderer((IUnit) data);
@@ -84,7 +80,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
             final Notification.SetUnit notif = (Notification.SetUnit)data;
             if (isUnitRendererCreated(notif.unitModel)) {
                 final BattleUnitRenderer bur = getUnitRenderer(notif.unitModel);
-                bur.getNotification(new SimpleCommand() {
+                notif.unitModel.notifyAllObservers(new SimpleCommand() {
 
                     @Override
                     public void apply() {
@@ -106,7 +102,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                     case WALK :
 
 
-                        bur1.getNotification(new SimpleCommand() {
+                        notif.unit1.notifyAllObservers(new SimpleCommand() {
 
                             @Override
                             public void apply() {
@@ -116,7 +112,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                                 bur1.displayWalk(path, true);
                             }
                         });
-                        bur2.getNotification(new SimpleCommand() {
+                        notif.unit2.notifyAllObservers(new SimpleCommand() {
 
                             @Override
                             public void apply() {
@@ -128,7 +124,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                         });
                         break;
                     case INSTANT:
-                        bur1.getNotification(new SimpleCommand() {
+                        notif.unit1.notifyAllObservers(new SimpleCommand() {
 
                             @Override
                             public void apply() {
@@ -136,7 +132,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                                 removeAreaRenderersAssociatedWith(bur1.getModel());
                             }
                         });
-                        bur2.getNotification(new SimpleCommand() {
+                        notif.unit2.notifyAllObservers(new SimpleCommand() {
 
                             @Override
                             public void apply() {
@@ -151,7 +147,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
             final Notification.Walk notif = (Notification.Walk)data;
             final BattleUnitRenderer bur = getUnitRenderer(notif.unit);
-            bur.getNotification(new SimpleCommand() {
+            notif.unit.notifyAllObservers(new SimpleCommand() {
                 @Override
                 public void apply() {
                     bur.displayWalk(notif.path, false);

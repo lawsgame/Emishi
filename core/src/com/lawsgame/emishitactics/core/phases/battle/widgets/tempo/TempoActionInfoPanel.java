@@ -136,8 +136,8 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                 IUnit target = currentCommand.getTarget();
                 builder = new StringBuilder();
                 builder.append(command.getInitiator().getName()+" => "+command.getTarget().getName());
-                builder.append("\nHP : "+target.getCurrentHP()+" -> "+(target.getCurrentHP() + currentCommand.getRecoveredHitPoints()));
-                builder.append("\nMP : "+target.getCurrentMoral()+" -> "+(target.getCurrentMoral()+ currentCommand.getRecoveredMoralPoints()));
+                builder.append("\nHP : "+target.getCurrentHP()+" -> "+currentCommand.getRecoveredHitPoints());
+                builder.append("\nMP : "+target.getCurrentMoral()+" -> "+currentCommand.getRecoveredMoralPoints());
             }
         }
     }
@@ -195,19 +195,6 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                 builder.append(command.getInitiator().getName());
                 builder.append(bc.getTargetTile()+" => "+bc.getBuildingType());
             }
-        }
-    }
-
-    public static class EndTurnInfoPanel extends TempoActionInfoPanel {
-
-        public EndTurnInfoPanel(Viewport stageViewport) {
-            super(stageViewport, ActionChoice.END_TURN);
-        }
-
-        @Override
-        public void set(BattleCommand command) {
-            setWidth(0);
-            setHeight(0);
         }
     }
 }

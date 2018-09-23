@@ -57,4 +57,6 @@ public abstract class IArmy extends Observable{
 
     public abstract void replenishMoral();
     public abstract void updateActionPoints();
+
+    public abstract String toShortString();
 }

@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class IsoAreaRenderer extends AreaRenderer {
     public IsoAreaRenderer(Area model) {
@@ -30,7 +31,7 @@ public class IsoAreaRenderer extends AreaRenderer {
     }
 
     @Override
-    public void getNotification(Object data) {
+    public void getNotification(Observable sender, Object data) {
 
     }
 }

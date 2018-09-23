@@ -12,7 +12,7 @@ public abstract class Observable {
 	
 	public void notifyAllObservers(Object dataBundle){
 		for(int i = 0; i < observers.size; i++){
-			observers.get(i).getNotification(dataBundle);
+			observers.get(i).getNotification(this, dataBundle);
 		}
 	}
 }

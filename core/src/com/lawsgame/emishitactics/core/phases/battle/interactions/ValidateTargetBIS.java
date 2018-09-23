@@ -12,6 +12,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
 import java.util.Stack;
@@ -48,7 +49,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, true, false);
         currentCommand.blink(true);
 
-        //setTiles the new orientation
+        //set the new orientation
         if(!currentCommand.getActionChoice().isActorIsTarget()) {
             Data.Orientation actorOrientation = Utils.getOrientationFromCoords(
                     currentCommand.getRowActor(),
@@ -106,7 +107,8 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
                 //ACTION CANCEL
 
                 //reset orientation of the actor
-                orientationCommand.undo();
+                if(!currentCommand.getActionChoice().isActorIsTarget())
+                    orientationCommand.undo();
 
                 // remove blinking effect of the target
                 currentCommand.blink(false);
@@ -126,8 +128,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
     }
 
     @Override
-    public void getNotification(Object data) {
-        System.out.println("COMMAND completed");
+    public void getNotification(Observable sender, Object data) {
         if(data instanceof BattleCommand && data == currentCommand){
             currentCommand.detach(this);
             if(bim.app.isPanelAvailable(currentCommand))
@@ -154,7 +155,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
         }
     }
 
-    static class ManageActionPanel extends SimpleCommand{
+    public static class ManageActionPanel extends SimpleCommand{
         private Stage uiStage;
         private ActionInfoPanel actionInfoPanel;
         private Request request;

@@ -46,6 +46,7 @@ public class Data {
     public static final float TARGET_BLINK_PERIOD = 1.0f * MathUtils.PI;
     public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
 
+
     // EXP parameter
     public static final double EXP_ALPHA = 0.15;
     public static final double EXP_LVL_GAP_FACTOR = 3;
@@ -55,6 +56,7 @@ public class Data {
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
+    public static final float ACTION_PANEL_DURATION_APPEARANCE = 3.0f;
 
 
     static Random r = new Random();
@@ -715,12 +717,12 @@ public class Data {
     }
 
     public enum UnitTemplate {
-        SOLAIRE(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
+        SOLAIRE(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.HEAL},
                 3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
                 0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
                 0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f),
-        SOLAR_KNIGHT(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{},
+        SOLAR_KNIGHT(1, 4, 6, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.GUARD},
                 3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
                 0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,

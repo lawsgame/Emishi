@@ -160,7 +160,7 @@ public class BattlefieldLoader {
                         }
                     }
                     army = new Army(affiliation);
-                    bf.addArmyId(army.getId());
+                    bf.addArmyId(army);
 
                     // IF: an amry with the relevant battlefield ID
 

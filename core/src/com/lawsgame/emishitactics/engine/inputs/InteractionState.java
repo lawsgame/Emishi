@@ -1,12 +1,11 @@
 package com.lawsgame.emishitactics.engine.inputs;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.State;
 
 public abstract class InteractionState implements GameUpdatableEntity, State, GestureDetector.GestureListener{

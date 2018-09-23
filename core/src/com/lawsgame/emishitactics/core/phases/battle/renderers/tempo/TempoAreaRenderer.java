@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class TempoAreaRenderer extends AreaRenderer {
 
@@ -39,7 +40,7 @@ public class TempoAreaRenderer extends AreaRenderer {
     }
 
     @Override
-    public void getNotification(Object data) {
+    public void getNotification(Observable sender, Object data) {
         if(data == null) {
             change();
         }else if(data instanceof Notification.Visible){

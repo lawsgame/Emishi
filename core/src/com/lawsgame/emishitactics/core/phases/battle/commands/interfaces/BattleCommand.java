@@ -190,18 +190,19 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     }
 
     @Override
-    public void getNotification(Object data) {
-        if(data instanceof Task){
+    public void getNotification(Observable sender, Object data) {
+        if (data instanceof Task) {
 
-            Task completedTask = (Task)data;
+            Task completedTask = (Task) data;
             completedTask.detach(this);
             renderTasks.removeValue(completedTask, true);
 
             // notify that the command is done : the model is updated AND the render tasks are completed
-            if(renderTasks.size == 0){
+            if (renderTasks.size == 0) {
                 notifyAllObservers(this);
             }
         }
+
     }
 
     protected abstract void execute();

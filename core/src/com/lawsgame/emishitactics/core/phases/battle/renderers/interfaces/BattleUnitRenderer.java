@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.GameElement;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
 import java.util.LinkedList;
@@ -100,8 +101,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
      * treat the input data and push animationQueries in the animaition Queue, ready to be rendered
      * @param data
      */
-    @Override
-    public void getNotification(final Object data){
+    public void getNotification(Observable sender, final Object data){
         notificationQueue.offer(data);
         if(data instanceof Notification.ApplyDamage){
             Notification.ApplyDamage notif = (Notification.ApplyDamage)data;

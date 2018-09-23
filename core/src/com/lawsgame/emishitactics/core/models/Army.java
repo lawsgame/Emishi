@@ -307,7 +307,6 @@ public class Army extends IArmy{
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
                 mobilizedTroups.get(i).get(j).setActed(done);
                 mobilizedTroups.get(i).get(j).setMoved(done);
-                System.out.println(mobilizedTroups.get(i).get(j).getName());
                 if(notifyObservers){
                     mobilizedTroups.get(i).get(j).notifyAllObservers(Notification.Done.get(done));
                 }
@@ -319,7 +318,7 @@ public class Army extends IArmy{
     public boolean isDone() {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(!mobilizedTroups.get(i).get(j).isDone()){
+                if(!mobilizedTroups.get(i).get(j).isDone() && !mobilizedTroups.get(i).get(j).isOutOfAction()){
                     return false;
                 }
             }
@@ -617,7 +616,8 @@ public class Army extends IArmy{
     public void replenishMoral() {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                mobilizedTroups.get(i).get(j).resetCurrentMoral();
+                if(!mobilizedTroups.get(i).get(j).isOutOfAction())
+                    mobilizedTroups.get(i).get(j).resetCurrentMoral();
             }
         }
     }
@@ -626,7 +626,8 @@ public class Army extends IArmy{
     public void updateActionPoints() {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                mobilizedTroups.get(i).get(j).addActionPoints(mobilizedTroups.get(i).get(j).getAppAPRecoveryRate());
+                if(!mobilizedTroups.get(i).get(j).isOutOfAction())
+                    mobilizedTroups.get(i).get(j).addActionPoints(mobilizedTroups.get(i).get(j).getAppAPRecoveryRate());
             }
         }
     }
@@ -635,6 +636,7 @@ public class Army extends IArmy{
     @Override
     public String toString(){
         String str = "\n|CURRENT ARMY";
+        str += toShortString();
         for(int i = 0 ; i <  mobilizedTroups.size; i++){
             for(int j = 0; j <  mobilizedTroups.get(i).size; j++){
                 if(j == 0){
@@ -654,6 +656,14 @@ public class Army extends IArmy{
             str += "\n|  "+nonMobTroups.get(i).getName();
         }
         return str+"\n";
+    }
+
+    @Override
+    public String toShortString(){
+        String str = "\nLeader : "+getWarlord();
+        str += "\nMobilized troops : "+getMobilizedUnits(true).size;
+        str += "\nReserve : "+getNonMobilizedUnits().size+"\n";
+        return str;
     }
 }
 

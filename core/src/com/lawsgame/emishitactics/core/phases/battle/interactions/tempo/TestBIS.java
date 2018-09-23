@@ -258,7 +258,7 @@ public class TestBIS extends BattleInteractionState {
             index = 8;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)){
-            System.out.println("action command : end turn / build");
+            System.out.println("action command : endTurn turn / build");
             index = 9;
         }
 

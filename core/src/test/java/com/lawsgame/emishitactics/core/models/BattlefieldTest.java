@@ -31,7 +31,7 @@ public class BattlefieldTest {
 
     @Test
     public void testArmyQueue(){
-        Army army1 = new Army(Data.Affiliation.ALLY);
+        Army army1 = Army.createPlayerArmyTemplate();
         Army army2 = new Army(Data.Affiliation.ALLY);
         Army army3 = new Army(Data.Affiliation.ENEMY_0);
         Army army4 = new Army(Data.Affiliation.ENEMY_0);
@@ -42,7 +42,7 @@ public class BattlefieldTest {
         battlefield.randomlyDeploy(army3);
         battlefield.randomlyDeploy(army4);
 
-        assertTrue(battlefield.getArmyIdsTurnOrderQueue().size() == 4);
+        assertTrue(battlefield.armyTurnOrder.size() == 4);
         assertTrue(battlefield.isBattleOver());
 
         Unit phillipe = new Unit("Phillipe");
@@ -52,17 +52,17 @@ public class BattlefieldTest {
         battlefield.randomlyDeploy(army1);
         battlefield.randomlyDeploy(army3);
 
-        assertTrue(battlefield.getArmyIdsTurnOrderQueue().size() == 4);
+        assertTrue(battlefield.armyTurnOrder.size() == 4);
         assertTrue(battlefield.isBattleOver());
         assertTrue(battlefield.getNextArmy() == null);
-        assertTrue(battlefield.getArmyIdsTurnOrderQueue().size() == 0);
+        assertTrue(battlefield.armyTurnOrder.size() == 0);
 
         army1.appointWarLord(phillipe);
         army3.appointWarLord(debby);
         battlefield.deploy(3, 3, phillipe, false);
         battlefield.deploy(3, 4, debby, false);
 
-        assertTrue(battlefield.getArmyIdsTurnOrderQueue().size() == 2);
+        assertTrue(battlefield.armyTurnOrder.size() == 2);
         assertTrue(!battlefield.isBattleOver());
 
         IArmy army = battlefield.getNextArmy();

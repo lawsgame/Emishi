@@ -1,15 +1,9 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
@@ -17,15 +11,10 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoCommandChoicePanel;
-import com.lawsgame.emishitactics.engine.GameRenderableEntity;
-
-import java.util.HashMap;
 
 public class EndTurnBIS extends BattleInteractionState {
     private int colSltdUnit;
@@ -70,7 +59,7 @@ public class EndTurnBIS extends BattleInteractionState {
             IUnit sltdUnit =  bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
             IArmy currentArmy = sltdUnit.getArmy();
             if(currentArmy.isDone()){
-                bim.end(currentArmy);
+                bim.tm.endTurn(currentArmy);
                 bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Notification.Done.get(false)));
                 bim.replace(new AiBIS(bim));
             }else{

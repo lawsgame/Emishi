@@ -32,7 +32,6 @@ public class Formulas {
                     attackMightRange[1] - attackMightRange[0] + 1,
                     attackerDexterity,
                     Data.DEALT_DAMAGE_LN_RANDOM);
-            System.out.println("am : "+am+" | r : "+r+" | p :"+p);
             if(r < p){
                 attackMight = am;
                 break;
@@ -51,7 +50,6 @@ public class Formulas {
         float res = 0f;
         if(k > 0 && k <= n)
             res = (float) (Math.pow(k / n, Math.log(1 + factor*dexterity)) - Math.pow( (k - 1) / n, Math.log(1 + factor*dexterity)));
-        System.out.print("dp : "+res+" => ");
         return res;
     }
 
@@ -173,5 +171,14 @@ public class Formulas {
             }
         }
         return stealRate;
+    }
+
+    public static int getHealPower(int rowActor, int colActor, int rowTarget, int colTarget, Battlefield battlefield) {
+        int healPower = 0;
+        if(battlefield.isTileOccupied(rowActor, colActor)){
+            IUnit healer = battlefield.getUnit(rowActor, colActor);
+            healPower = Data.HEAL_BASE_POWER + healer.getLevel()/2;
+        }
+        return healPower;
     }
 }

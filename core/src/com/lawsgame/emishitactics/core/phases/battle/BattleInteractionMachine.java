@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -18,14 +17,14 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.ai.DumbAI;
+import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TurnManager;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
@@ -50,6 +49,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final SpriteProvider spriteProvider;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
+    public final TurnManager tm;
     public final I18NBundle mainI18nBundle;
     public final AI ai;
 
@@ -69,8 +69,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public SimpleCommand hideSUP;
 
 
-    public BattleInteractionMachine(Battlefield battlefield, BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player, SpriteProvider spriteProvider) {
-        this.battlefield = battlefield;
+    public BattleInteractionMachine(BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player, SpriteProvider spriteProvider) {
+        this.battlefield = bfr.getModel();
         this.bfr = bfr;
         this.gcm = gcm;
         this.asm = asm;
@@ -81,7 +81,9 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.player = player;
         this.multiplexer = new InputMultiplexer();
         this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
-        this.ai = new DumbAI();
+        this.tm = new TurnManager(bfr, scheduler);
+        this.ai = new PassiveAI(bfr, scheduler, app, player.getInventory(), tm);
+
 
         this.selectedTile = new Area(battlefield, Data.AreaType.SELECTED_UNIT);
         this.touchedTile = new Area(battlefield, Data.AreaType.TOUCHED_TILE);
@@ -239,46 +241,13 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         }
     }
 
-    /**
-     * initiates the given army turn
-     * @param army
-     */
-    public void begin(IArmy army) {
-        army.replenishMoral();
-        army.updateActionPoints();
-    }
-
-    public void end(IArmy army) {
-        //update model
-        army.setDone(false, false);
-
-        //push render tasks
-        Array<Array<IUnit>> mobilizedTroops = army.getAllSquads();
-        StandardTask resetDoneTask = new StandardTask();
-        StandardTask.RendererThread doneThread;
-        BattleUnitRenderer bur;
-        for(int i = 0; i < mobilizedTroops.size; i++){
-            for(int j = 0; j < mobilizedTroops.get(i).size; j++){
-                bur = bfr.getUnitRenderer(mobilizedTroops.get(i).get(j));
-                if(!mobilizedTroops.get(i).get(j).isOutOfAction()) {
-                    if(bur != null) {
-                        doneThread = new StandardTask.RendererThread(bur, Notification.Done.get(false));
-                        resetDoneTask.addThread(doneThread);
-                    }else{
-                        try {
-                            throw new BattleInteractionState.BISException("no BattleUnitRenderer related to the following still active unit: "+mobilizedTroops.get(i).get(j).getName());
-                        } catch (BattleInteractionState.BISException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-        scheduler.addTask(resetDoneTask);
-    }
 
     // --------------------- GETTES & SETTERS ----------------------------
 
+
+    public boolean isStateActive(BattleInteractionState bis){
+        return states.peek() == bis;
+    }
 
     public String toString(){
         String str = "";

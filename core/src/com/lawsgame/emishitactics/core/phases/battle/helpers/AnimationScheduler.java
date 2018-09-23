@@ -15,6 +15,7 @@ import java.util.LinkedList;
 public class AnimationScheduler implements GameUpdatableEntity{
 
     private LinkedList<Task> tasks;
+    private boolean paused;
 
     public AnimationScheduler(){
         tasks = new LinkedList<Task>();

@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
 import java.util.Stack;
@@ -113,7 +114,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     }
 
     @Override
-    public void getNotification(Object data) {
+    public void getNotification(Observable sender, Object data) {
         if(data instanceof BattleCommand && data == currentCommand){
             bim.replace(new HandleOutcomeBIS(bim, historic));
         }

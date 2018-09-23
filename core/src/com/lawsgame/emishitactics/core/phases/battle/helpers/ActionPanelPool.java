@@ -18,7 +18,6 @@ public class ActionPanelPool {
         panels.put(ActionChoice.SWITCH_WEAPON, new TempoActionInfoPanel.SwitchWeaponInfoPanel(UIport));
         panels.put(ActionChoice.STEAL, new TempoActionInfoPanel.StealInfoPanel(UIport));
         panels.put(ActionChoice.BUILD, new TempoActionInfoPanel.BuildInfoPanel(UIport));
-        panels.put(ActionChoice.END_TURN, new TempoActionInfoPanel.EndTurnInfoPanel(UIport));
     }
 
     public boolean isPanelAvailable(BattleCommand command){

@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
@@ -25,12 +26,12 @@ public class HealCommand extends BattleCommand {
     protected void execute() {
 
         // update model
-        int healPower = getHealPower(rowActor, colActor, rowTarget, colTarget);
-        getInitiator().treated(healPower);
+        int healPower = Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, battlefield);
+        boolean treated = getTarget().treated(healPower);
 
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getTarget()), getTarget(), healPower));
+        if(treated) task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getTarget()), getTarget(), healPower));
         task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
         scheduleRenderTask(task);
 
@@ -54,16 +55,7 @@ public class HealCommand extends BattleCommand {
     //-------------------- GETTERS & SETTERS ----------------------
 
     public int getHealPower(){
-        return getHealPower(rowActor, colActor, rowTarget, colTarget);
-    }
-
-    public int getHealPower(int rowActor, int colActor, int rowTarget, int colTarget) {
-        int healPower = 0;
-        if(battlefield.isTileOccupied(rowActor, colActor)){
-            IUnit healer = battlefield.getUnit(rowActor, colActor);
-            healPower +=Data.HEAL_BASE_POWER + healer.getLevel()/2;
-        }
-        return healPower;
+        return Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, battlefield);
     }
 
     public int getRecoveredHitPoints(){

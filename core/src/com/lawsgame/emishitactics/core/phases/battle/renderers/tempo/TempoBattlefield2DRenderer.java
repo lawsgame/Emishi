@@ -110,7 +110,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 TextureRegion tr = sprite2DPool.getBuildInConstructionSprite(notif.tileType);
                 if(tr != null)
                     tileRenderers [notif.row][notif.col] = tr;
-                getUnitRenderer(notif.builder).getNotification(Data.AnimId.BUILD);
+                notif.builder.notifyAllObservers(Data.AnimId.BUILD);
             }
         });
         offerTask(new SimpleCommand() {

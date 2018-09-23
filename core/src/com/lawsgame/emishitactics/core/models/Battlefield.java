@@ -37,7 +37,7 @@ public class Battlefield extends Observable {
     private HashMap<Integer, Item> tombItems;
     private Data.Weather weather;
 
-    private LinkedList<Integer> armyIdsTurnOrderQueue;
+    public LinkedList<IArmy> armyTurnOrder;
 
     public Battlefield (int nbRows, int nbCols, Data.Weather weather){
         if(nbRows > 0 && nbCols > 0) {
@@ -54,7 +54,7 @@ public class Battlefield extends Observable {
         }
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
-        this.armyIdsTurnOrderQueue = new LinkedList<Integer>();
+        this.armyTurnOrder = new LinkedList<IArmy>();
         setWeather(weather, true);
     }
 
@@ -75,70 +75,95 @@ public class Battlefield extends Observable {
         return 0;
     }
 
+    //------------------------ ARMY TURN MANAGEMENT ------------------------------------------------------
+
+
+
     /**
-     * only for loaded AI armies which do not use Battlefield.randomlyDeploy()
-     * @param armyId
+     *
+     * @return true if at least two affiliation are represented by two still well and alive units, AND the player army is still active
      */
-    public void addArmyId(int armyId){
-
-        //check if the army if already deployed
-        boolean armyAlreadyAdded = false;
-        for(int i = 0; i < armyIdsTurnOrderQueue.size(); i++){
-            if(armyIdsTurnOrderQueue.get(i) == armyId) {
-                armyAlreadyAdded = true;
-                break;
-            }
-        }
-
-        if(!armyAlreadyAdded) {
-            armyIdsTurnOrderQueue.offer(armyId);
-        }
-    }
-
     public boolean isBattleOver(){
-        Array<Affiliation> allegeances = new Array<Data.Affiliation>();
+        Array<Affiliation> affiliations = new Array<Data.Affiliation>();
+        boolean playerArmyRemain = false;
         for (int r = 0; r < getNbRows(); r++) {
             for (int c = 0; c < getNbColumns(); c++) {
                 if (isTileOccupied(r, c)) {
                     IUnit unit = getUnit(r, c);
                     if (unit.isMobilized()
                             && !unit.isOutOfAction()
-                            && !allegeances.contains(unit.getArmy().getAffiliation(), true)) {
-                        allegeances.add(unit.getArmy().getAffiliation());
-                    }
-                }
-            }
-        }
-        return allegeances.size < 2;
-    }
-
-    public IArmy getNextArmy(){
-        IArmy army = null;
-        int currentId;
-        while(army == null && !armyIdsTurnOrderQueue.isEmpty()) {
-            currentId = armyIdsTurnOrderQueue.peek();
-            loop :
-            {
-                for (int r = 0; r < getNbRows(); r++) {
-                    for (int c = 0; c < getNbColumns(); c++) {
-                        if (isTileOccupied(r, c)) {
-                            IUnit unit = getUnit(r, c);
-                            if (unit.isMobilized() && unit.getArmy().getId() == currentId
-                                    && !unit.isOutOfAction()) {
-                                army = unit.getArmy();
-                                break loop;
-                            }
+                            && !affiliations.contains(unit.getArmy().getAffiliation(), true)) {
+                        affiliations.add(unit.getArmy().getAffiliation());
+                        if(unit.getArmy().isPlayerControlled()) {
+                            playerArmyRemain = true;
                         }
                     }
                 }
             }
-            if(army == null){
-                armyIdsTurnOrderQueue.pop();
-            }else{
-                armyIdsTurnOrderQueue.offer(armyIdsTurnOrderQueue.pop());
+        }
+        return affiliations.size < 2 || !playerArmyRemain;
+    }
+
+
+    /**
+     * only for loaded AI armies which do not use Battlefield.randomlyDeploy()
+     * @param army
+     */
+    public void addArmyId(IArmy army){
+
+        //check if the army if already deployed
+        boolean armyAlreadyAdded = false;
+        for(int i = 0; i < armyTurnOrder.size(); i++){
+            if(armyTurnOrder.get(i) == army) {
+                armyAlreadyAdded = true;
+                break;
             }
         }
-        return army;
+        if(!armyAlreadyAdded) {
+            armyTurnOrder.offer(army);
+        }
+    }
+
+    /*
+     * scrolls the ring until finding the player controlled army,
+     * then push it down the queue for the next first AI army to beginTurn his turn
+     * useful if AI BIS has been interrupted
+     */
+    public void resetArmyTurnOrder() {
+        IArmy army;
+        if(!isBattleOver()) {
+            for (int i = 0; i < armyTurnOrder.size(); i++) {
+                army = armyTurnOrder.pop();
+                armyTurnOrder.offer(army);
+                if (army.isPlayerControlled()) {
+                    break;
+                }
+            }
+        }
+    }
+
+    /*
+     *
+     * @return get next army contains within the ring with at least one  unit who still fights
+     */
+    public IArmy getNextArmy(){
+        IArmy army;
+        while(!armyTurnOrder.isEmpty()) {
+            army = armyTurnOrder.pop();
+            for (int r = 0; r < getNbRows(); r++) {
+                for (int c = 0; c < getNbColumns(); c++) {
+                    if (isTileOccupied(r, c)) {
+                        IUnit unit = getUnit(r, c);
+                        if (unit.isMobilized() && unit.getArmy() == army
+                                && !unit.isOutOfAction()) {
+                            armyTurnOrder.offer(army);
+                            return army;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -400,7 +425,7 @@ public class Battlefield extends Observable {
                 && unit.isMobilized()){
 
             this.units[row][col] = unit;
-            addArmyId(unit.getArmy().getId());
+            addArmyId(unit.getArmy());
             if(notifyObservers)
                 notifyAllObservers(new  Notification.SetUnit(row, col, unit));
         }
@@ -409,7 +434,7 @@ public class Battlefield extends Observable {
     public void randomlyDeploy(IArmy army){
         if(army != null) {
             randomlyDeploy(army.getMobilizedUnits(true), 0);
-            addArmyId(army.getId());
+            addArmyId(army);
         }
     }
 
@@ -511,12 +536,28 @@ public class Battlefield extends Observable {
         Array<IUnit> activeUnits = new Array<IUnit>();
         for(int r =0; r<getNbRows();r++){
             for(int c = 0; c<getNbColumns(); c++){
-                if(isTileOccupied(r, c) && getUnit(r, c).getArmy().getId() == armyId && !getUnit(r, c).isDone()){
+                if(isTileOccupied(r, c)
+                        && getUnit(r, c).getArmy().getId() == armyId
+                        && !getUnit(r, c).isDone()){
                     activeUnits.add(getUnit(r, c));
                 }
             }
         }
         return activeUnits;
+    }
+
+    public Array<int[]> getStillActiveUnitCoords(int armyId) {
+        Array<int[]> activeUnitCoords = new Array<int[]>();
+        for(int r =0; r<getNbRows();r++){
+            for(int c = 0; c<getNbColumns(); c++){
+                if(isTileOccupied(r, c)
+                        && getUnit(r, c).getArmy().getId() == armyId
+                        && !getUnit(r, c).isDone()){
+                    activeUnitCoords.add(new int[]{r, c});
+                }
+            }
+        }
+        return activeUnitCoords;
     }
 
     public int[] getRandomlyStillActiveUnitsCoords(int armyId){
@@ -950,10 +991,6 @@ public class Battlefield extends Observable {
 
     public int getNumberOfDeploymentAreas(){
         return deploymentAreas.size;
-    }
-
-    public LinkedList<Integer> getArmyIdsTurnOrderQueue() {
-        return armyIdsTurnOrderQueue;
     }
 
     public void setWeather(Data.Weather weather, boolean notifyObservers) {
