@@ -56,7 +56,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         super(model);
 
         this.bfr = bfr;
-        this.animation = new Animation(1,1,false,false);
+        this.animation = new Animation(1,1,false,false, false);
 
         setVisible(true);
 
@@ -344,8 +344,22 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
         // fetch the required sprite build
        Array<Sprite> updatedSet = (getModel().isCharacter()) ?
-                bfr.spriteProvider.charaSpriteTree.getSpriteSet(promoted, getModel().getTemplate(), weaponType, orientation, getModel().isWarChief(), done && animId == AnimId.REST, animId.getSpriteSetId()) :
-                bfr.spriteProvider.genSpriteTree.getSpriteSet(getModel().getArmy().isPlayerControlled(), shieldbearer, horseman, getModel().getTemplate(), weaponType, orientation, getModel().isWarChief(), done && animId == AnimId.REST , animId.getSpriteSetId()) ;
+                bfr.spriteProvider.charaSpriteTree.getSpriteSet(
+                        promoted,
+                        getModel().getTemplate(),
+                        weaponType,
+                        orientation,
+                        done,
+                        animId.getSpriteSetId(getModel().isWarChief())) :
+                bfr.spriteProvider.genSpriteTree.getSpriteSet(
+                        getModel().getArmy().isPlayerControlled(),
+                        shieldbearer,
+                        horseman,
+                        getModel().getTemplate(),
+                        weaponType,
+                        orientation,
+                        done,
+                        animId.getSpriteSetId(getModel().isWarChief())) ;
 
         if(updatedSet != null) {
 
@@ -353,7 +367,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             this.state = animId;
             this.spriteSet = updatedSet;
             updateSpritePos();
-            this.animation.set(updatedSet.size, animId.getSpeed(), animId.isLoop(), animId.isBacknforth());
+            this.animation.set(updatedSet.size, animId.getSpeed(), animId.isLoop(), animId.isBacknforth(), animId.isRandomlyStarted());
             this.animation.stop();
             this.animation.play();
             if(state.isTimeLimited()) {

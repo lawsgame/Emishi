@@ -4,26 +4,26 @@
         <Army affiliation = "ENEMY1">
             <Squad>
                 <Unit row = "14" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
-                    <Attribute id = "weapon" value="HUNTING_BOW" stealable="true"/>
-                    <Attribute id = "right handed" value="true"/>
-                    <Attribute id = "equipement" value ="WARRIOR" stealable="false"/>
-                    <Attribute id = "banner sign" value ="NONE"/>
-                    <Attribute id = "orientation" value="SOUTH"/>
-                    <Attribute id = "behaviour" value="PASSIVE"/>
+                    <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
+                    <Attribute id= "right handed" value="true"/>
+                    <Attribute id= "equipement" value ="WARRIOR" stealable="false"/>
+                    <Attribute id= "banner sign" value ="NONE"/>
+                    <Attribute id= "orientation" value="SOUTH"/>
+                    <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
                 <Unit row = "13" col = "8" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="AXE" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
-                    <Attribute id = "weapon" value="BROAD_AXE" stealable="true" />
-                    <Attribute id = "right handed" value="true"/>
-                    <Attribute id = "orientation" value="SOUTH"/>
-                    <Attribute id = "behaviour" value="PASSIVE"/>
+                    <Attribute id= "weapon" value="BROAD_AXE" stealable="true" />
+                    <Attribute id= "right handed" value="true"/>
+                    <Attribute id= "orientation" value="SOUTH"/>
+                    <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
             </Squad>
             <Squad>
                 <Unit row = "9" col = "7" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="SWORD" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
-                    <Attribute id = "weapon" value="SHORTSWORD" stealable="true"/>
-                    <Attribute id = "right handed" value="true"/>
-                    <Attribute id = "orientation" value="SOUTH"/>
-                    <Attribute id = "behaviour" value="PASSIVE"/>
+                    <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
+                    <Attribute id= "right handed" value="true"/>
+                    <Attribute id= "orientation" value="SOUTH"/>
+                    <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
             </Squad>
         </Army>

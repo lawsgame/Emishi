@@ -113,6 +113,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         if(cameraMoving){
             if( (vTarget.x == camera.position.x && vTarget.y == camera.position.y)){
                 cameraMoving = false;
+                System.out.println("\n");
             }else{
                 // calculate how much the camera shall move during each tick
                 if(Math.abs(vTarget.x - camera.position.x) < Math.abs(vFrom.x - camera.position.x)){
@@ -129,6 +130,9 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
                 if(dl.x < 0 && vTarget.x > dl.x + camera.position.x)    dl.x = vTarget.x - camera.position.x;
                 if(0 < dl.y && vTarget.y < dl.y + camera.position.y)    dl.y = vTarget.y - camera.position.y;
                 if(dl.y < 0 && vTarget.y > dl.y + camera.position.y)    dl.y = vTarget.y - camera.position.y;
+
+
+                System.out.println("dl : "+dl.x+" "+dl.y);
 
                 camera.translate(dl.x, dl.y);
                 camera.update();

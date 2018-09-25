@@ -72,7 +72,6 @@ public abstract class InteractionState implements GameUpdatableEntity, State, Ge
 
         pan(-vector3.x + oldVector3.x, - vector3.y + oldVector3.y);
 
-        //System.out.println(xCenter + " "+ yCenter+" <= +" + deltaX + " & +"+deltaY);
         return true;
     }
 

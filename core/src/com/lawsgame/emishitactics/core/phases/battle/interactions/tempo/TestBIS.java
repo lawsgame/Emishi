@@ -64,40 +64,28 @@ public class TestBIS extends BattleInteractionState {
         index = 1;
         switchmode = false;
 
-        //createTexture();
-
-        //sprites = bim.spriteProvider.genSpriteTree.getSpriteSet(true, false, false,  Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, false, Data.SpriteSetId.WALK_FLEE_SWITCHPOSITION);
-        sprites = bim.spriteProvider.charaSpriteTree.getSpriteSet(false, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, Data.Orientation.SOUTH, true, false, Data.SpriteSetId.PUSH);
+        /*sprites = bim.spriteProvider.genSpriteTree.getSpriteSet(
+                false,
+                false,
+                false,
+                Data.UnitTemplate.SOLAR_KNIGHT,
+                Data.WeaponType.SWORD,
+                Data.Orientation.WEST,
+                true,
+                Data.SpriteSetId.REST);*/
+        sprites = bim.spriteProvider.charaSpriteTree.getSpriteSet(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, Data.Orientation.SOUTH, true, Data.SpriteSetId.REST);
         for(int i = 0; i < sprites.size; i++){
             sprites.get(i).setSize((sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 2 : 1), 2);
             sprites.get(i).setPosition(2 + (sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 0 : 0.5f), 2);
 
         }
         System.out.println(sprites.size);
-        animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false);
+        animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
         animation.play();
-    }
 
-    public void createTexture(){
-        Array<Sprite> as = bim.spriteProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, false, Data.SpriteSetId.REST);
-        madeupTexture = as.get(0).getTexture();
-        madeupTexture.getTextureData().prepare();
-        Pixmap pixmap = madeupTexture.getTextureData().consumePixmap();
-        int colorInt;
-        int average;
-        int[] colorArray;
-        for(int r = 0; r < madeupTexture.getHeight(); r++){
-            for(int c = 0; c < madeupTexture.getWidth(); c++){
-                colorInt = pixmap.getPixel(r, c);
-                colorArray = Utils.getRGBA(colorInt);
-                average = (colorArray[0] + colorArray[1] + colorArray[2])/3;
-                colorInt = Utils.getColor32Bits(average, average, average, colorArray[3]);
-                pixmap.drawPixel(r, c, colorInt);
-            }
-        }
-        pixmap.getPixels().rewind();
-        madeupTexture = new Texture(pixmap);
-        pixmap.dispose();
+
+        //System.out.println(bim.spriteProvider.genSpriteTree);
+
     }
 
 
@@ -110,10 +98,12 @@ public class TestBIS extends BattleInteractionState {
     public void renderAhead(SpriteBatch batch) {
         /*
         if(madeupTexture != null)
-            batch.draw(madeupTexture, 0, 0, 19, 19 );
+            batch.draw(madeupTexture, 0, 0, 19, 19 );*/
         if(sprites != null)
             sprites.get(animation.getCurrentFrame()).draw(batch);
-            */
+
+        batch.draw(bim.spriteProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
+
     }
 
     @Override
@@ -121,12 +111,12 @@ public class TestBIS extends BattleInteractionState {
         // command test
 
         System.out.println("input : "+row+" "+col);
-        //bim.moveCamera(row, col, true);
+        bim.moveCamera(row, col, true);
         //bim.bfr.getUnitRenderer(sltdUnit).setPos(row, col);
 
         // TEST FINAL
 
-
+        /*
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Affiliation.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
 
@@ -202,6 +192,7 @@ public class TestBIS extends BattleInteractionState {
                 }
             }
         }
+        */
 
 
         return true;

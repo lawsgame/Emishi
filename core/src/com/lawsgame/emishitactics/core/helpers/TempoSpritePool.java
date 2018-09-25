@@ -85,11 +85,11 @@ public class TempoSpritePool {
 
             if(asm.isLoaded(Assets.ATLAS_TEMPO_UNITS)) {
                 atlas = asm.get(Assets.ATLAS_TEMPO_UNITS);
-                region = atlas.findRegion(Assets.REGION_UNIT_SPRITES);
+                region = atlas.findRegion(Assets.REGION_TEMPO_UNIT_SPRITES);
                 TextureRegion[][] unitRegions = region.split(32,32);
                 TextureRegion[][] iconRegions = region.split(8,8);
 
-                unitSprites.put(SpriteSetId.REGULAR_ATTACK, unitRegions[3][0]);
+                unitSprites.put(SpriteSetId.ATTACK, unitRegions[3][0]);
                 unitSprites.put(SpriteSetId.PUSH, unitRegions[4][0]);
                 unitSprites.put(SpriteSetId.HEAL, unitRegions[5][0]);
                 unitSprites.put(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, unitRegions[5][0]);
@@ -97,12 +97,12 @@ public class TempoSpritePool {
                 unitSprites.put(SpriteSetId.BUILD, unitRegions[7][0]);
                 unitSprites.put(SpriteSetId.WALK_FLEE_SWITCHPOSITION, unitRegions[8][0]);
                 unitSprites.put(SpriteSetId.DODGE, unitRegions[9][0]);
-                unitSprites.put(SpriteSetId.BACKSTABED_PUSHED, unitRegions[12][0]);
-                unitSprites.put(SpriteSetId.TAKE_HIT, unitRegions[13][0]);
+                unitSprites.put(SpriteSetId.PUSHED_BACKSTABBED, unitRegions[12][0]);
+                unitSprites.put(SpriteSetId.WOUNDED, unitRegions[13][0]);
                 unitSprites.put(SpriteSetId.DIE, unitRegions[14][0]);
                 unitSprites.put(SpriteSetId.REST, unitRegions[0][0]);
 
-                foeSprites.put(SpriteSetId.REGULAR_ATTACK, unitRegions[3][4]);
+                foeSprites.put(SpriteSetId.ATTACK, unitRegions[3][4]);
                 foeSprites.put(SpriteSetId.PUSH, unitRegions[4][4]);
                 foeSprites.put(SpriteSetId.HEAL, unitRegions[5][4]);
                 foeSprites.put(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, unitRegions[5][4]);
@@ -110,8 +110,8 @@ public class TempoSpritePool {
                 foeSprites.put(SpriteSetId.BUILD, unitRegions[7][4]);
                 foeSprites.put(SpriteSetId.WALK_FLEE_SWITCHPOSITION, unitRegions[8][4]);
                 foeSprites.put(SpriteSetId.DODGE, unitRegions[9][4]);
-                foeSprites.put(SpriteSetId.BACKSTABED_PUSHED, unitRegions[12][4]);
-                foeSprites.put(SpriteSetId.TAKE_HIT, unitRegions[13][4]);
+                foeSprites.put(SpriteSetId.PUSHED_BACKSTABBED, unitRegions[12][4]);
+                foeSprites.put(SpriteSetId.WOUNDED, unitRegions[13][4]);
                 foeSprites.put(SpriteSetId.DIE, unitRegions[14][4]);
                 foeSprites.put(SpriteSetId.REST, unitRegions[0][4]);
 

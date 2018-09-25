@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.constants;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -22,14 +23,7 @@ public class UtilsTest {
 
     @BeforeClass
     public static void testOnfly(){
-        /*
-        for(int i =0; i < 10; i++)
-            System.out.println("     => AM chosen : " +Formulas.getRandomlyAttackMight(new int[]{5,9}, 1)+"\n");
-        */
-        /*
-        for(int i = 1; i < 6; i++)
-            System.out.println(Formulas.getDamageValueProbability(i, 5, 1, Data.DEALT_DAMAGE_LN_RANDOM));
-        */
+
     }
 
     @Before

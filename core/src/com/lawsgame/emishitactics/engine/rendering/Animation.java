@@ -1,16 +1,18 @@
 package com.lawsgame.emishitactics.engine.rendering;
 
 
+import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 
 public class Animation extends Observable implements GameUpdatableEntity {
-	private int frameCurrentIndex = 0;
+	private int frameCurrentIndex;
 	private int length;
 	private float speed;
 	private boolean backnforth;
 	private boolean loop;
+	private boolean randomStart;
 
 	private Direction direction = Direction.FORTH;
 	private boolean finish = false;
@@ -28,11 +30,8 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	 * @param speed: dealy before displaying the next frame, in seconds
 	 * @param loop: whether or not the animation loops
 	 */
-	public Animation(int length, float speed, boolean loop, boolean backnforth){
-		this.length = length;
-		this.speed = speed;
-		this.loop = loop;
-		this.backnforth = backnforth;
+	public Animation(int length, float speed, boolean loop, boolean backnforth, boolean randomStart){
+		set(length, speed, loop, backnforth, randomStart);
 	}
 	
 	@Override
@@ -88,7 +87,7 @@ public class Animation extends Observable implements GameUpdatableEntity {
 		playing = false;
 		finish = false;
 		direction = Direction.FORTH;
-		frameCurrentIndex = 0;
+		frameCurrentIndex = (randomStart) ? MathUtils.random(length - 1) : 0;
 	}
 	
 	public int getCurrentFrame(){
@@ -99,13 +98,14 @@ public class Animation extends Observable implements GameUpdatableEntity {
 		return finish;
 	}
 
-	public void set(int length, float speed, boolean loop, boolean backnforth){
-	    stop();
-        this.length = length;
-        this.speed = speed;
-        this.loop = loop;
-        this.backnforth = backnforth;
-    }
+	public void set(int length, float speed, boolean loop, boolean backnforth, boolean randomStart){
+		this.length = length;
+		this.speed = speed;
+		this.loop = loop;
+		this.backnforth = backnforth;
+		this.randomStart = randomStart;
+		stop();
+	}
 
     public int getLength() {
         return length;

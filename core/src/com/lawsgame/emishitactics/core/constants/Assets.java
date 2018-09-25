@@ -1,6 +1,8 @@
 package com.lawsgame.emishitactics.core.constants;
 
-import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.AreaType;
+import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
 
 public class Assets {
 
@@ -36,20 +38,22 @@ public class Assets {
     public static String getRegionMap(int id) {
         return "map"+id;
     }
-    public static String getRegionTile(Data.TileType tileType) { return tileType.name().toLowerCase(); }
-
-    public static String getTileHighlighted(Data.AreaType id){
+    public static String getRegionTile(TileType tileType) { return tileType.name().toLowerCase(); }
+    public static String getTileHighlighted(AreaType id){
         return id.name().toLowerCase();
     }
+
+    public static String getRegionUnitAction(SpriteSetId id, boolean east){
+        return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south");
+    }
+
+    public static final String REGION_TERRAINS_UNDEFINED = "undefined";
+    public static final String REGION_TEMPO_UNIT_SPRITES = "unit_sprites_tempo";
+    public static final String REGION_UNIT_PORTRAIT = "portrait";
+
     public static final String UI_BLACK_BACKGROUND = "black_background";
     public static final String UI_BUTTON_UP = "button_up";
     public static final String UI_BUTTON_DOWN = "button_down";
-    public static final String UI_ARROW = "arrow";
-
-    public static final String REGION_UNIT_SPRITES = "unit_sprites_tempo";
-    public static final String REGION_UNIT_SPRITE_SHEET = "unit_sprite_sheet";
-
-    public static final String REGION_TERRAINS_UNDEFINED = "undefined";
 
 
     //FONT

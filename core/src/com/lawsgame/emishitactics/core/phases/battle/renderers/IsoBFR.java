@@ -163,9 +163,7 @@ public class IsoBFR extends BattlefieldRenderer {
     @Override
     public void addTileRenderer(int row, int col, Data.TileType type) {
         if(spriteProvider != null && getModel().checkIndexes(row, col)){
-            TextureRegion tileTR = spriteProvider.getTileSprite(type);
-            Sprite tileSprite = new Sprite(tileTR);
-            tileSprite.setSize(SPRITE_STD_SIZE, SPRITE_STD_SIZE);
+            Sprite tileSprite = spriteProvider.getTileSprite(type).get(0);
             tileSprite.setPosition(getRenderXFrom(row, col), getRenderYFrom(row, col));
             lowerTileSprites.get(2*row + 2*col).add(tileSprite);
         }

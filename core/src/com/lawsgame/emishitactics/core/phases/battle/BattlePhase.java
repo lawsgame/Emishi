@@ -16,6 +16,7 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestBIS;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.tempo.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
@@ -83,16 +84,16 @@ public class BattlePhase extends GamePhase {
 
         // build up sprite pool and battlefield renderer
         TempoSpritePool.get().set(asm);
-        BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
-        SpriteProvider spriteProvider = new SpriteProvider();
+        //BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
+        SpriteProvider spriteProvider = new SpriteProvider(IsoBFR.SPRITE_STD_SIZE);
         spriteProvider.set(battlefield, asm);
-        //BattlefieldRenderer battlefieldRenderer = new IsoBFR(battlefield, spriteProvider);
+        BattlefieldRenderer battlefieldRenderer = new IsoBFR(battlefield, spriteProvider);
         battlefieldRenderer.setGameCamParameters(this.getGameCM());
 
         //lauch initial BIS
         this.bim = new BattleInteractionMachine(battlefieldRenderer, gameCM, asm, stageUI, player, spriteProvider);
-        //BattleInteractionState initBIS = new TestBIS(bim);
-        BattleInteractionState initBIS = new SceneBIS(bim);
+        BattleInteractionState initBIS = new TestBIS(bim);
+        //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

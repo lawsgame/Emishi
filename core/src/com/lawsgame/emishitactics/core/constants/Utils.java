@@ -1,5 +1,7 @@
 package com.lawsgame.emishitactics.core.constants;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -187,5 +189,26 @@ public class Utils {
             expected += array[i];
         }
         return (array.length > 0) ? expected / array.length : 0;
+    }
+
+    public static Texture createDesaturatedTexture(final Texture originalTexture) {
+        originalTexture.getTextureData().prepare();
+        Pixmap pixmap = originalTexture.getTextureData().consumePixmap();
+        int colorInt;
+        int average;
+        int[] colorArray;
+        for(int r = 0; r < pixmap.getHeight(); r++){
+            for(int c = 0; c < pixmap.getWidth(); c++){
+                colorInt = pixmap.getPixel(r, c);
+                colorArray = Utils.getRGBA(colorInt);
+                average = (colorArray[0] + colorArray[1] + colorArray[2])/3;
+                colorInt = Utils.getColor32Bits(average, average, average, colorArray[3]);
+                pixmap.drawPixel(r, c, colorInt);
+            }
+        }
+        pixmap.getPixels().rewind();
+        Texture madeupTexture = new Texture(pixmap);
+        pixmap.dispose();
+        return madeupTexture;
     }
 }

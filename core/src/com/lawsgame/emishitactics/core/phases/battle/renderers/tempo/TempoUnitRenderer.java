@@ -221,9 +221,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
         if(backstab){
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.BACKSTABED_PUSHED, getModel().getArmy().getAffiliation()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
         }else{
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.TAKE_HIT, getModel().getArmy().getAffiliation()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WOUNDED, getModel().getArmy().getAffiliation()));
         }
         countDown.run();
     }
@@ -239,7 +239,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
         orientationTexture = TempoSpritePool.get().getOrientationSprite(pushedTowards);
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.BACKSTABED_PUSHED, getModel().getArmy().getAffiliation()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
         pushed = true;
         int x = (int) getCenterX();
         int y = (int) getCenterY();
@@ -263,7 +263,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public void display(Data.AnimId id) {
         switch (id){
             case ATTACK:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.REGULAR_ATTACK, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.ATTACK, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case PUSH:
@@ -299,7 +299,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 countDown.run();
                 break;
             case WOUNDED:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.TAKE_HIT, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WOUNDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case SPECIAL_MOVE:

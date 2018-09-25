@@ -92,11 +92,12 @@ public class Data {
     public enum SpriteSetId{
         WALK_FLEE_SWITCHPOSITION,
         LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED,
-        BACKSTABED_PUSHED,
-        REGULAR_ATTACK,
+        PUSHED_BACKSTABBED,
+        ATTACK,
         SPECIAL_MOVE,
-        TAKE_HIT,
+        WOUNDED,
         REST,
+        BANNER,
         DODGE,
         STEAL,
         BUILD,
@@ -106,46 +107,50 @@ public class Data {
     }
 
     public enum AnimId {
-        WALK(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_WALK_SPEED, false),
-        BACKSTAB(   SpriteSetId.BACKSTABED_PUSHED, false, false),
-        TREATED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
-        PUSHED(     SpriteSetId.BACKSTABED_PUSHED, false, false),
-        FLEE(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_FLEE_SPEED, true),
-        PUSH(       SpriteSetId.PUSH, false, false),
-        HEAL(       SpriteSetId.HEAL, false, false),
-        STEAL(      SpriteSetId.STEAL, false, false),
-        BUILD(      SpriteSetId.BUILD, false, false),
-        GUARD(      SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
-        REST(       SpriteSetId.REST, true, true, ANIMATION_NORMAL_SPEED, false),
-        ATTACK(     SpriteSetId.REGULAR_ATTACK, false, false),
-        DODGE(      SpriteSetId.DODGE, false, false),
-        DIE(        SpriteSetId.DIE, false, false),
-        GUARDED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
-        WOUNDED(    SpriteSetId.TAKE_HIT, false, false),
-        LEVELUP(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, false, false),
-        SWITCH_WEAPON(SpriteSetId.WALK_FLEE_SWITCHPOSITION, false, false),
-        SPECIAL_MOVE(SpriteSetId.SPECIAL_MOVE, false, false);
+        WALK(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_WALK_SPEED, false, false),
+        BACKSTAB(   SpriteSetId.PUSHED_BACKSTABBED),
+        TREATED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        PUSHED(     SpriteSetId.PUSHED_BACKSTABBED),
+        FLEE(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_FLEE_SPEED, true, false),
+        PUSH(       SpriteSetId.PUSH),
+        HEAL(       SpriteSetId.HEAL),
+        STEAL(      SpriteSetId.STEAL),
+        BUILD(      SpriteSetId.BUILD),
+        GUARD(      SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        REST(       SpriteSetId.REST, SpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
+        ATTACK(     SpriteSetId.ATTACK),
+        DODGE(      SpriteSetId.DODGE),
+        DIE(        SpriteSetId.DIE),
+        GUARDED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        WOUNDED(    SpriteSetId.WOUNDED),
+        LEVELUP(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        SWITCH_WEAPON(SpriteSetId.WALK_FLEE_SWITCHPOSITION),
+        SPECIAL_MOVE(SpriteSetId.SPECIAL_MOVE);
 
-        SpriteSetId id;
+        SpriteSetId soldierId;
+        SpriteSetId warchiefId;
         boolean loop;
         boolean backnforth;
         float speed;
         boolean timeLimited;
+        boolean randomlyStarted;
 
-        AnimId(SpriteSetId id, boolean loop, boolean backnforth, float speed, boolean timeLimited) {
-            this.id = id;
+        AnimId(SpriteSetId soldierId, SpriteSetId warchiefId, boolean loop, boolean backnforth, float speed, boolean timeLimited, boolean randomlyStarted) {
+            this.soldierId = soldierId;
+            this.warchiefId = warchiefId;
             this.loop = loop;
             this.backnforth = backnforth;
             this.speed = speed;
             this.timeLimited = timeLimited;
+            this.randomlyStarted = randomlyStarted;
         }
 
-        AnimId(SpriteSetId id, boolean loop, boolean backnforth) {
-            this(id, loop, backnforth, Data.ANIMATION_NORMAL_SPEED, true);
+        AnimId(SpriteSetId id) {
+            this(id, id, false, false, Data.ANIMATION_NORMAL_SPEED, true, false);
         }
 
-        public SpriteSetId getSpriteSetId() {
-            return id;
+        public SpriteSetId getSpriteSetId(boolean warchief) {
+            return (warchief) ?  warchiefId : soldierId;
         }
 
         public boolean isLoop() {
@@ -162,6 +167,10 @@ public class Data {
 
         public boolean isTimeLimited() {
             return timeLimited;
+        }
+
+        public boolean isRandomlyStarted() {
+            return randomlyStarted;
         }
     }
 

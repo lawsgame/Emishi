@@ -20,24 +20,24 @@ public class Player {
         warlord.setLeadership(19);
         Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        /*
+
         Unit soldier2 = new Unit("Maro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
         soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         Unit warchief1 = new Unit("Azamaru", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
         warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warchief1.setLeadership(15);
         warchief1.setExperience(98);
-        */
+
 
         playerArmy.add(warlord);
         playerArmy.add(soldier1);
-        //playerArmy.add(warchief1);
-        //playerArmy.add(soldier2);
+        playerArmy.add(warchief1);
+        playerArmy.add(soldier2);
 
         playerArmy.appointWarLord(warlord);
         playerArmy.appointSoldier(soldier1, 0);
-        //playerArmy.appointWarChief(warchief1);
-        //playerArmy.appointSoldier(soldier2, 1);
+        playerArmy.appointWarChief(warchief1);
+        playerArmy.appointSoldier(soldier2, 1);
 
         return new Player(new Inventory(), playerArmy);
     }

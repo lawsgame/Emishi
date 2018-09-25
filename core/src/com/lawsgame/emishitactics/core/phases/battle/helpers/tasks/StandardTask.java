@@ -141,11 +141,11 @@ public class StandardTask extends Task {
         }
 
         public void addQuery(SimpleCommand command, float delay){
-            if(command == null){
-                System.out.println("COMMAND NULL");
+            if(command != null){
+                commands.offer(command);
+                delays.offer(delay);
             }
-            commands.offer(command);
-            delays.offer(delay);
+
         }
 
         @Override

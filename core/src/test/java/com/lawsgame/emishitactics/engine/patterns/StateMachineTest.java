@@ -45,19 +45,16 @@ public class StateMachineTest {
         @Override
         public void init() {
 
-            //System.out.println(tag+" => INIT");
         }
 
         @Override
         public void dispose() {
 
-            //System.out.println(tag+" => DISPOSE");
         }
 
         @Override
         public void end() {
 
-            //System.out.println(tag+" => END");
         }
     }
 
