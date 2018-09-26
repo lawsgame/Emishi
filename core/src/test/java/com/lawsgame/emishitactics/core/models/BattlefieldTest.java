@@ -43,7 +43,7 @@ public class BattlefieldTest {
         battlefield.randomlyDeploy(army4);
 
         assertTrue(battlefield.armyTurnOrder.size() == 4);
-        assertTrue(battlefield.isBattleOver());
+        assertTrue(battlefield.getSolver().isBattleOver());
 
         Unit phillipe = new Unit("Phillipe");
         Unit debby = new Unit("Debby");
@@ -53,7 +53,7 @@ public class BattlefieldTest {
         battlefield.randomlyDeploy(army3);
 
         assertTrue(battlefield.armyTurnOrder.size() == 4);
-        assertTrue(battlefield.isBattleOver());
+        assertTrue(battlefield.getSolver().isBattleOver());
         assertTrue(battlefield.getNextArmy() == null);
         assertTrue(battlefield.armyTurnOrder.size() == 0);
 
@@ -63,7 +63,7 @@ public class BattlefieldTest {
         battlefield.deploy(3, 4, debby, false);
 
         assertTrue(battlefield.armyTurnOrder.size() == 2);
-        assertTrue(!battlefield.isBattleOver());
+        assertTrue(!battlefield.getSolver().isBattleOver());
 
         IArmy army = battlefield.getNextArmy();
 

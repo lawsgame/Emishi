@@ -160,13 +160,7 @@ public class SpriteProvider implements Disposable{
         for(SpriteSetId id : SpriteSetId.values()){
 
             spriteSetName = Assets.getRegionUnitAction(id, false);
-
-            //System.out.print("    "+spriteSetName);
-
             animationSet = unitAtlas.findRegions(spriteSetName);
-
-            //System.out.println((animationSet.size > 0) ? "    => successfully fetched": "");
-
             if(animationSet.size > 0) {
                 animationArray = new TextureRegion[animationSet.size];
                 for(int i = 0; i < animationSet.size; i++) {
@@ -176,13 +170,7 @@ public class SpriteProvider implements Disposable{
             }
 
             spriteSetName = Assets.getRegionUnitAction(id, true);
-
-            //System.out.print("    "+spriteSetName);
-
             animationSet = unitAtlas.findRegions(spriteSetName);
-
-            //System.out.println((animationSet.size > 0) ? "    => successfully fetched": "");
-
             if(animationSet.size > 0) {
 
                 animationArray = new TextureRegion[animationSet.size];

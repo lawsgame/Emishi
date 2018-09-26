@@ -21,9 +21,10 @@ import com.lawsgame.emishitactics.engine.CameraManager;
 public class IsoBFR extends BattlefieldRenderer {
     public static final float RATIO = 0.5f; // <1 : ratio between the the great and little dialogue
     public static final float SPRITE_STD_SIZE = 1.25f;
-    private static final float CAM_VELOCITY = 15.0f;
+    private static final float CAM_VELOCITY = 45.0f;
     private static float X_CAM_BOUNDS_OFFSET = 1f;
     private static float Y_CAM_BOUNDS_OFFSET = RATIO;
+    private CameraManager gcm;
 
     private boolean visible;
     protected SpriteProvider spriteProvider;
@@ -84,6 +85,16 @@ public class IsoBFR extends BattlefieldRenderer {
         }
     }
 
+
+    @Override
+    public void setGameCamParameters(CameraManager cameraManager) {
+        float width = 2*X_CAM_BOUNDS_OFFSET + (getModel().getNbRows() + getModel().getNbColumns()) / 2.0f;
+        float height = 2*Y_CAM_BOUNDS_OFFSET + (getModel().getNbRows() + getModel().getNbColumns()) * RATIO / 2.0f;
+        cameraManager.setCameraBoundaries(width, height);
+        cameraManager.setCameraVelocity(CAM_VELOCITY);
+        this.gcm = cameraManager;
+    }
+
     @Override
     public void prerender() {
         backkgroundRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -105,7 +116,9 @@ public class IsoBFR extends BattlefieldRenderer {
         if(visible) {
             for(int i = lowerTileSprites.size - 1; i >= 0 ; i--){
                 for(int j = 0; j < lowerTileSprites.get(i).size; j++){
-                    lowerTileSprites.get(i).get(j).draw(batch);
+                    if(isSpriteWithinFrame(lowerTileSprites.get(i).get(j))) {
+                        lowerTileSprites.get(i).get(j).draw(batch);
+                    }
                 }
 
             }
@@ -116,6 +129,13 @@ public class IsoBFR extends BattlefieldRenderer {
 
             }
         }
+    }
+
+    protected boolean isSpriteWithinFrame(Sprite sprite) {
+        return gcm.getClipBounds().contains(sprite.getX(), sprite.getY())
+                || gcm.getClipBounds().contains(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight())
+                || gcm.getClipBounds().contains(sprite.getX(), sprite.getY() + sprite.getHeight())
+                || gcm.getClipBounds().contains(sprite.getX() + sprite.getWidth(), sprite.getY()) ;
     }
 
     @Override
@@ -171,15 +191,6 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public void displayDeploymentAreas(boolean visible) {
-
-    }
-
-    @Override
-    public void setGameCamParameters(CameraManager cameraManager) {
-        float width = 2*X_CAM_BOUNDS_OFFSET + (getModel().getNbRows() + getModel().getNbColumns()) / 2.0f;
-        float height = 2*Y_CAM_BOUNDS_OFFSET + (getModel().getNbRows() + getModel().getNbColumns()) * RATIO / 2.0f;
-        cameraManager.setCameraBoundaries(width, height);
-        cameraManager.setCameraVelocity(CAM_VELOCITY);
 
     }
 

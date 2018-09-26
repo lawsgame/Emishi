@@ -36,10 +36,11 @@ public class Battlefield extends Observable {
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
     private Data.Weather weather;
+    private BattleSolver solver;
 
     public LinkedList<IArmy> armyTurnOrder;
 
-    public Battlefield (int nbRows, int nbCols, Data.Weather weather){
+    public Battlefield (int nbRows, int nbCols, Data.Weather weather, BattleSolver solver){
         if(nbRows > 0 && nbCols > 0) {
             this.tiles = new TileType[nbRows][nbCols];
             this.looted = new boolean[nbRows][nbCols];
@@ -56,10 +57,20 @@ public class Battlefield extends Observable {
         this.tombItems = new HashMap<Integer, Item>();
         this.armyTurnOrder = new LinkedList<IArmy>();
         setWeather(weather, true);
+        setSolver(solver);
     }
 
     public Battlefield(int nbRows, int nbCols){
-        this(nbRows, nbCols, Data.Weather.getStandard());
+        this(nbRows, nbCols, Data.Weather.getStandard(), new BattleSolver.KillAll());
+    }
+
+    public BattleSolver getSolver(){
+        return this.solver;
+    }
+
+    public void setSolver(BattleSolver battleSolver) {
+        this.solver = battleSolver;
+        this.solver.setBattlefield(this);
     }
 
     public int getNbRows() {
@@ -79,30 +90,7 @@ public class Battlefield extends Observable {
 
 
 
-    /**
-     *
-     * @return true if at least two affiliation are represented by two still well and alive units, AND the player army is still active
-     */
-    public boolean isBattleOver(){
-        Array<Affiliation> affiliations = new Array<Data.Affiliation>();
-        boolean playerArmyRemain = false;
-        for (int r = 0; r < getNbRows(); r++) {
-            for (int c = 0; c < getNbColumns(); c++) {
-                if (isTileOccupied(r, c)) {
-                    IUnit unit = getUnit(r, c);
-                    if (unit.isMobilized()
-                            && !unit.isOutOfAction()
-                            && !affiliations.contains(unit.getArmy().getAffiliation(), true)) {
-                        affiliations.add(unit.getArmy().getAffiliation());
-                        if(unit.getArmy().isPlayerControlled()) {
-                            playerArmyRemain = true;
-                        }
-                    }
-                }
-            }
-        }
-        return affiliations.size < 2 || !playerArmyRemain;
-    }
+
 
 
     /**
@@ -131,7 +119,7 @@ public class Battlefield extends Observable {
      */
     public void resetArmyTurnOrder() {
         IArmy army;
-        if(!isBattleOver()) {
+        if(!solver.isBattleOver()) {
             for (int i = 0; i < armyTurnOrder.size(); i++) {
                 army = armyTurnOrder.pop();
                 armyTurnOrder.offer(army);
@@ -421,7 +409,7 @@ public class Battlefield extends Observable {
      */
     public void deploy(int row, int col, IUnit unit, boolean notifyObservers){
         if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER))
-                && !isUnitAlreadydeployed(unit)
+                && !isUnitDeployed(unit)
                 && unit.isMobilized()){
 
             this.units[row][col] = unit;
@@ -471,10 +459,10 @@ public class Battlefield extends Observable {
     }
 
 
-    private boolean isUnitAlreadydeployed(IUnit unit){
-        for(int r = 0; r < getNbRows(); r++){
-            for(int c = 0; c < getNbRows(); c++){
-                if(this.units[r][c] == unit){
+    public boolean isUnitDeployed(IUnit unit) {
+        for (int r = 0; r < getNbRows(); r++) {
+            for (int c = 0; c < getNbRows(); c++) {
+                if (this.units[r][c] == unit) {
                     return true;
                 }
             }
@@ -696,28 +684,20 @@ public class Battlefield extends Observable {
                 // get actor relevant pieces of information
                 IUnit actor = bf.getUnit(rowActor, colActor);
                 this.pathfinder = actor.has(Data.Ability.PATHFINDER);
-                this.moveRange = actor.hasMoved() ? 0 : actor.getAppMobility();
+                this.moveRange = actor.getAppMobility();
                 this.affiliation = actor.getArmy().getAffiliation();
                 this.battlefield = bf;
 
-                // addExpGained the check map dimensions and origin point
-                int rows;
-                int colunms;
-                if(moveAreaOnly) {
-                    this.rowOrigin = rowActor - moveRange;
-                    this.colOrigin = colActor - moveRange;
-                    this.rowRelActor = moveRange;
-                    this.colRelActor = moveRange;
-                    rows = 2 * moveRange + 1;
-                    colunms = 2 * moveRange + 1;
-                }else{
-                    this.rowOrigin = 0;
-                    this.colOrigin = 0;
-                    this.rowRelActor = rowActor;
-                    this.colRelActor = colActor;
-                    rows = bf.getNbRows();
-                    colunms = bf.getNbColumns();
-                }
+                // add the check map dimensions and origin point
+
+                //int range = moveRange
+                this.rowOrigin = rowActor - moveRange;
+                this.colOrigin = colActor - moveRange;
+                this.rowRelActor = moveRange;
+                this.colRelActor = moveRange;
+                int rows = 2 * moveRange + 1;
+                int cols = 2 * moveRange + 1;
+
 
                 if (rowOrigin < 0) {
                     rowRelActor += rowOrigin;
@@ -726,17 +706,17 @@ public class Battlefield extends Observable {
                 }
                 if (colOrigin < 0) {
                     colRelActor += colOrigin;
-                    colunms += colOrigin;
+                    cols += colOrigin;
                     colOrigin = 0;
                 }
 
                 if (rowOrigin + rows > bf.getNbRows()) {
                     rows = bf.getNbRows() - rowOrigin;
                 }
-                if (colOrigin + colunms > bf.getNbColumns()) {
-                    colunms = bf.getNbColumns() - colOrigin;
+                if (colOrigin + cols > bf.getNbColumns()) {
+                    cols = bf.getNbColumns() - colOrigin;
                 }
-                checkTiles = new int[rows][colunms];
+                checkTiles = new int[rows][cols];
             }
         }
 

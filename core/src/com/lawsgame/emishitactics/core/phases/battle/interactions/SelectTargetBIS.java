@@ -96,9 +96,6 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
                 colInit = currentCommand.getColActor();
             }
 
-            System.out.println("TRIGER COMMAND : "+currentCommand.toString());
-            System.out.println("BIS : "+this);
-
             if (Utils.undoCommands(historic)){
 
                 if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col) && !bim.battlefield.getUnit(row, col).isDone()) {
@@ -116,7 +113,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     @Override
     public void getNotification(Observable sender, Object data) {
         if(data instanceof BattleCommand && data == currentCommand){
-            bim.replace(new HandleOutcomeBIS(bim, historic));
+            bim.replace(new HandleOutcomeBIS(bim, historic, false));
         }
     }
 }

@@ -10,8 +10,7 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import static com.lawsgame.emishitactics.engine.GamePhase.getAspRatio;
 
 public class CameraManager extends Observable implements GameUpdatableEntity {
-    private static final float CAM_STD_VELOCITY = 15;
-    private static final float CAM_SLOPE_FACTOR = 0.1f; 	// increase it raise the transition period
+    private static final float CAM_STD_VELOCITY = 1;
 
     protected OrthographicCamera camera;     // level camera
     protected float worldWidth;               // defines the rectangle within the camera is allowed to move.
@@ -21,12 +20,11 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
 
     // smooth camera variables
     private Vector vTarget;
-    private Vector vFrom;
-    private Vector gamma;                   // base velocity factor
-    private  float alpha;                   // slope or transition intensity factor
+    private Vector vSpeedFactor;
+    private float time;
+    private float duration;
     private  Vector dl;
     private boolean cameraMoving;
-    private float intensity;
     private float cameraVelocity;
 
     public CameraManager(float worldWidth, float worldHeight, float portWidth){
@@ -37,18 +35,23 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.clipBounds = new Rectangle(0,0,portWidth, gamePortHeight);
         this.setCameraBoundaries(worldWidth, worldHeight);
 
-
         this.camera = new OrthographicCamera();
         this.viewport = new FitViewport(portWidth, gamePortHeight, camera);
         this.camera.setToOrtho(false, portWidth, gamePortHeight);
         this.camera.update();
 
+
+
+
+
+        //--***$$$ OLD MODEL $$$***----
+
         this.vTarget = new Vector(0,0);
-        this.vFrom = new Vector(0,0);
-        this.gamma = new Vector(0,0);
+        this.vSpeedFactor = new Vector(0,0);
         this.dl = new Vector(0,0);
+        this.duration = 0;
+        this.time = 0f;
         this.cameraMoving = false;
-        this.intensity = 0;
         this.cameraVelocity = CAM_STD_VELOCITY;
 
     }
@@ -93,14 +96,17 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
             if(0 > yTarget - getPortHeight()/2)          vTarget.y = getPortHeight()/2f;
             if(yTarget + getPortHeight()/2 > worldHeight) vTarget.y = worldHeight - getPortHeight()/2f;
 
-            vFrom.x = camera.position.x;
-            vFrom.y = camera.position.y;
-            gamma.x = (vTarget.x - vFrom.x);
-            gamma.y = (vTarget.y - vFrom.y);
-            alpha = CAM_SLOPE_FACTOR*gamma.length();
-            gamma.multiply(cameraVelocity);
+            //--***$$$ MODEL $$$***----
+
+            Vector journey = new Vector(vTarget.x - camera.position.x, vTarget.y - camera.position.y);
+
+            time = 0;
+            duration = (float) (2*Math.sqrt(journey.length()/cameraVelocity));
+            vSpeedFactor.x = cameraVelocity * journey.x / journey.length();
+            vSpeedFactor.y = cameraVelocity * journey.y / journey.length();
             cameraMoving = true;
-            intensity = 0;
+
+
         }
     }
 
@@ -113,26 +119,19 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         if(cameraMoving){
             if( (vTarget.x == camera.position.x && vTarget.y == camera.position.y)){
                 cameraMoving = false;
-                System.out.println("\n");
             }else{
-                // calculate how much the camera shall move during each tick
-                if(Math.abs(vTarget.x - camera.position.x) < Math.abs(vFrom.x - camera.position.x)){
-                    intensity += dt;
-                }else{
-                    intensity -=dt;
-                }
-                float f = (float) ((1 - 2*Math.exp(intensity /(2*alpha))) + Math.exp(intensity /alpha));
-                dl.x = gamma.x*f*dt;
-                dl.y = gamma.y*f*dt;
+
+                //--***$$$ MODEL $$$***----
+
+                time += dt;
+                dl.x = (time < duration / 2f ) ? vSpeedFactor.x * time * dt : vSpeedFactor.x * (duration - time) * dt;
+                dl.y = (time < duration / 2f ) ? vSpeedFactor.y * time * dt : vSpeedFactor.y * (duration - time) * dt;
 
                 //fix the camera ultimate translation to perfectly fit the target position
                 if(0 < dl.x && vTarget.x < dl.x + camera.position.x)    dl.x = vTarget.x - camera.position.x;
                 if(dl.x < 0 && vTarget.x > dl.x + camera.position.x)    dl.x = vTarget.x - camera.position.x;
                 if(0 < dl.y && vTarget.y < dl.y + camera.position.y)    dl.y = vTarget.y - camera.position.y;
                 if(dl.y < 0 && vTarget.y > dl.y + camera.position.y)    dl.y = vTarget.y - camera.position.y;
-
-
-                System.out.println("dl : "+dl.x+" "+dl.y);
 
                 camera.translate(dl.x, dl.y);
                 camera.update();

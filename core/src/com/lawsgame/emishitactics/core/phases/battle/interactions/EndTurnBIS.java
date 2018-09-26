@@ -17,28 +17,35 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePa
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 
 public class EndTurnBIS extends BattleInteractionState {
-    private int colSltdUnit;
-    private int rowSltdUnit;
+    private IUnit actor;
     EndTurnCommand endTurnCommand;
     private ChoicePanel orientationChoicePanel;
 
-    public EndTurnBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit) {
+    public EndTurnBIS(BattleInteractionMachine bim, IUnit actor) {
         super(bim, true, false, true);
-        this.rowSltdUnit = rowSltdUnit;
-        this.colSltdUnit = colSltdUnit;
+        this.actor = actor;
         this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
         this.endTurnCommand = new EndTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
     }
 
     @Override
     public void init() {
-        System.out.println("END TURN : "+rowSltdUnit+" "+colSltdUnit+" => "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
+        System.out.println("END TURN of "+actor.getName());
 
-        this.orientationChoicePanel.build(new OrientationButtonHandler(this));
-        this.orientationChoicePanel.setVisible(true);
-        bim.uiStage.addActor(orientationChoicePanel);
+        if(actor.isOutOfAction()){
 
-        bim.focusOn(rowSltdUnit, colSltdUnit, true, false, false,true, false);
+            proceed();
+        }else {
+
+            this.orientationChoicePanel.build(new OrientationButtonHandler(this));
+            this.orientationChoicePanel.setVisible(true);
+            bim.uiStage.addActor(orientationChoicePanel);
+
+            if(bim.battlefield.isUnitDeployed(actor)) {
+                int[] actorPos = bim.battlefield.getUnitPos(actor);
+                bim.focusOn(actorPos[0], actorPos[1], true, false, false, true, false);
+            }
+        }
     }
 
     @Override
@@ -53,18 +60,22 @@ public class EndTurnBIS extends BattleInteractionState {
     }
 
     private void proceed(){
-        if(bim.battlefield.isTileOccupied(rowSltdUnit, colSltdUnit) && bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).isMobilized()){
+        if(actor.isMobilized()){
 
-            this.endTurnCommand.apply(rowSltdUnit, colSltdUnit);
-            IUnit sltdUnit =  bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
-            IArmy currentArmy = sltdUnit.getArmy();
-            if(currentArmy.isDone()){
+            if(!actor.isOutOfAction()){
+                int[] actorPos = bim.battlefield.getUnitPos(actor);
+                this.endTurnCommand.apply(actorPos[0], actorPos[1]);
+            }
+
+            IArmy currentArmy = actor.getArmy();
+            if (currentArmy.isDone()) {
+
                 bim.tm.endTurn(currentArmy);
-                bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Notification.Done.get(false)));
+                bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(actor), Notification.Done.get(false)));
                 bim.replace(new AiBIS(bim));
-            }else{
+            } else {
 
-                bim.replace(new SelectActorBIS(bim, rowSltdUnit, colSltdUnit, false));
+                bim.replace(new SelectActorBIS(bim, false));
             }
         }
     }
@@ -92,7 +103,9 @@ public class EndTurnBIS extends BattleInteractionState {
 
         private TextButton createButton (final Data.Orientation orientation, TextButton.TextButtonStyle style){
             TextButton button = null;
-            if (bis.bim.battlefield.isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
+
+            if (bis.bim.battlefield.isUnitDeployed(bis.actor)) {
+                final int[] actorPos = bis.bim.battlefield.getUnitPos(bis.actor);
                 button = new TextButton(orientation.getName(bis.bim.mainI18nBundle), style);
                 button.addListener(new ChangeListener() {
                     @Override
@@ -100,7 +113,7 @@ public class EndTurnBIS extends BattleInteractionState {
 
                         // change the unit orientation
                         ChooseOrientationCommand orientationCommand = new ChooseOrientationCommand(bis.bim.bfr, bis.bim.scheduler, bis.bim.player.getInventory(), orientation);
-                        orientationCommand.apply(bis.rowSltdUnit, bis.colSltdUnit);
+                        orientationCommand.apply(actorPos[0], actorPos[1]);
 
                         //proceed to the next BIS
                         bis.proceed();

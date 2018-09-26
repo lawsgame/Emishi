@@ -133,7 +133,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
             currentCommand.detach(this);
             if(bim.app.isPanelAvailable(currentCommand))
                 bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
-            bim.replace(new HandleOutcomeBIS(bim, historic));
+            bim.replace(new HandleOutcomeBIS(bim, historic, false));
         }
     }
 

@@ -57,11 +57,16 @@ public class AiBIS extends BattleInteractionState implements Observer {
                     }, Data.ACTION_PANEL_DURATION_APPEARANCE));
                     command.pushRenderTasks();
 
-                    //TODO : manage outcomes => HandleOutcomeBIS
 
 
-
-
+                    if(bim.battlefield.getSolver().isBattleOver()){
+                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                bim.replace(new BattleOverBIS(bim));
+                            }
+                        }, 0f));
+                    }
 
                 }
             }

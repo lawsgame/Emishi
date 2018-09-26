@@ -47,7 +47,7 @@ public class TestBIS extends BattleInteractionState {
     private Array<Sprite> sprites;
     private TextureRegion[] spriteSet;
 
-    private Texture madeupTexture = null;
+    private AreaWidget moveAW;
 
     IUnit sltdUnit;
     int index;
@@ -79,13 +79,12 @@ public class TestBIS extends BattleInteractionState {
             sprites.get(i).setPosition(2 + (sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 0 : 0.5f), 2);
 
         }
-        System.out.println(sprites.size);
         animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
         animation.play();
 
-
-        //System.out.println(bim.spriteProvider.genSpriteTree);
-
+        moveAW = new AreaWidget(bim.battlefield, Data.AreaType.SQUAD_MEMBER);
+        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
+        moveAW.setTiles(Utils.getEreaFromRange(bim.battlefield, actorPos[0], actorPos[1], 1,2), true);
     }
 
 
@@ -96,13 +95,9 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        /*
-        if(madeupTexture != null)
-            batch.draw(madeupTexture, 0, 0, 19, 19 );*/
-        if(sprites != null)
-            sprites.get(animation.getCurrentFrame()).draw(batch);
-
-        batch.draw(bim.spriteProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
+        moveAW.render(batch);
+        //if(sprites != null) sprites.get(animation.getCurrentFrame()).draw(batch);
+        //batch.draw(bim.spriteProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
 
     }
 
@@ -112,14 +107,12 @@ public class TestBIS extends BattleInteractionState {
 
         System.out.println("input : "+row+" "+col);
         bim.moveCamera(row, col, true);
-        //bim.bfr.getUnitRenderer(sltdUnit).setPos(row, col);
+
 
         // TEST FINAL
 
-        /*
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Affiliation.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
-
         }else{
             if(bim.battlefield.isTileOccupied(row, col)){
 
@@ -149,51 +142,18 @@ public class TestBIS extends BattleInteractionState {
                 if (command.isTargetValid()) {
 
                     command.blink(true);
-                    if(bim.app.isPanelAvailable(command)){
-
-
-                        final ActionInfoPanel actionInfoPanel = bim.app.getPanel(command);
-
-                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
-                            @Override
-                            public void apply() {
-                                bim.uiStage.addActor(actionInfoPanel);
-                                actionInfoPanel.hide();
-                                actionInfoPanel.show();
-                            }
-                        }, 0f));
-                        bim.scheduler.wait(3.5f);
-                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
-                            @Override
-                            public void apply() {
-                                actionInfoPanel.hide();
-                            }
-                        }, 0f));
-                        bim.scheduler.wait(0.2f);
-                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
-                            @Override
-                            public void apply() {
-                                actionInfoPanel.remove();
-                            }
-                        }, 0f));
-
-                    }
-
-
-
-                    bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
-                        @Override
-                        public void apply() {
-                            command.apply();
-                        }
-                    }, 0f));
-
+                    command.apply();
                     historic.push(command);
                 }
             }
         }
-        */
 
+        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
+        System.out.println("\nMOVE TILES");
+        Array<int[]> moveTiles = bim.battlefield.getMoveArea(actorPos[0], actorPos[1]);
+        for(int i = 0; i <moveTiles.size; i++)
+            System.out.println(moveTiles.get(i)[0]+" "+moveTiles.get(i)[1]);
+        moveAW.setTiles(moveTiles, true);
 
         return true;
     }

@@ -12,7 +12,7 @@ import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
 public class Data {
 
 
-    public static final float GAME_PORT_WIDTH = 9f;
+    public static final float GAME_PORT_WIDTH = 15f;
 
     //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;

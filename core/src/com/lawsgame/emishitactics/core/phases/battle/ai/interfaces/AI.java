@@ -39,7 +39,7 @@ public abstract class AI extends Observable implements Runnable {
         IArmy currentArmy;
         int[] actorPos;
         CommandBundle bundle;
-        if(!bf.isBattleOver()) {
+        if(!bf.getSolver().isBattleOver()) {
             loop :
             {
                 bf.resetArmyTurnOrder();
@@ -51,7 +51,7 @@ public abstract class AI extends Observable implements Runnable {
                         actorPos = nextUnit(currentArmy);
                         bundle = getCommandPackage(actorPos);
                         notifyAllObservers(bundle);
-                        if (bf.isBattleOver()) {
+                        if (bf.getSolver().isBattleOver()) {
                             break loop;
                         }
                     }

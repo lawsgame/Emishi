@@ -27,6 +27,7 @@ public class Player {
         warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warchief1.setLeadership(15);
         warchief1.setExperience(98);
+        warchief1.setCurrentHitPoints(3);
 
 
         playerArmy.add(warlord);

@@ -1153,7 +1153,7 @@ public class Unit extends IUnit{
 
     @Override
     public boolean isOutOfAction() {
-        return currentMoral == 0;
+        return currentMoral == 0 || currentHitPoints == 0;
     }
 
     @Override
@@ -1222,46 +1222,34 @@ public class Unit extends IUnit{
         ApplyDamage notification = new ApplyDamage(this, moralDamageOnly, damageTaken);
         notifications.add(notification);
 
-        if(this.currentMoral > damageTaken){
-            // the unit survive
-            if(!has(Data.Ability.UNBREAKABLE)) {
+        // moral damaga
+        if (!has(Data.Ability.UNBREAKABLE)) {
+            if(this.currentMoral > damageTaken) {
                 notification.state = ApplyDamage.State.WOUNDED;
                 this.currentMoral -= damageTaken;
-            }
-            if(!moralDamageOnly) {
-                notification.state = ApplyDamage.State.WOUNDED;
-                this.currentHitPoints -= damageTaken;
-            }
-
-
-        }else{
-            // the unit dies or flies
-            if(this.currentHitPoints > damageTaken){
-                if(!has(Data.Ability.UNBREAKABLE)) {
-                    this.currentMoral = 0;
-                    notification.state = ApplyDamage.State.FLED;
-                }
-                if(!moralDamageOnly)
-                    this.currentHitPoints -= damageTaken;
             }else{
-                if(!has(Data.Ability.UNBREAKABLE)) {
-                    this.currentMoral = 0;
-                    notification.state = ApplyDamage.State.FLED;
-                }
-                if(!moralDamageOnly){
-                    this.currentHitPoints = 0;
-                    notification.state = ApplyDamage.State.DIED;
-                }
-            }
+                notification.state = ApplyDamage.State.FLED;
+                this.currentMoral = 0;
 
-            // if the unit is a war chief, the consequences deepens
-            if(isWarChief()){
-                int moralDamage = getChiefMoralBonus();
-                Array<IUnit> squad = getArmy().getSquad(this, true);
-                for(int i = 1; i < squad.size; i++){
-                    if(!squad.get(i).isOutOfAction())
-                        notifications.addAll(squad.get(i).applyDamage(moralDamage, true));
-                }
+            }
+        }
+
+        // physical damage
+        if(!moralDamageOnly){
+            if(this.currentHitPoints > damageTaken) {
+                this.currentHitPoints -= damageTaken;
+            }else{
+                notification.state = ApplyDamage.State.DIED;
+                this.currentHitPoints = 0;
+
+            }
+        }
+
+        if(isOutOfAction() && isWarChief()){
+            int moralDamage = getChiefMoralBonus();
+            Array<IUnit> squad = getArmy().getSquad(this, true);
+            for(int i = 0; i < squad.size; i++){
+                notifications.addAll(squad.get(i).applyDamage(moralDamage, true));
             }
         }
         return notifications;

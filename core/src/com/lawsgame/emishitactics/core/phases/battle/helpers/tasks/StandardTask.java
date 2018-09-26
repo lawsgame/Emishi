@@ -154,13 +154,6 @@ public class StandardTask extends Task {
         }
 
         private void launch(){
-            /*
-            System.out.println("DIAGNOSIS ");
-            System.out.println("commands size: "+commands.size());
-            System.out.println("commands top element: "+commands.peek());
-            SimpleCommand command = commands.peek();
-            System.out.println("simple command peek :"+command);
-            */
 
             if(!isEmpty()) {
                 commands.peek().apply();

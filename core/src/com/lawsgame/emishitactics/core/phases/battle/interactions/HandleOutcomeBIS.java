@@ -34,8 +34,10 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     private LootPanel lootPanel;
 
     private LinkedList<Task> tasks;
+    private LinkedList<Boolean> levelPanelShown;
+    private boolean aiTurn;
 
-    public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<BattleCommand> historic) {
+    public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<BattleCommand> historic, boolean aiTurn) {
         super(bim, true, false, false);
 
         this.historic = historic;
@@ -50,6 +52,8 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         bim.uiStage.addActor(lootPanel);
 
         this.tasks = new LinkedList<Task>();
+        this.levelPanelShown = new LinkedList<Boolean>();
+        this.aiTurn = aiTurn;
 
     }
 
@@ -105,37 +109,27 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     }
 
     private void proceed(){
-        try {
-            if(!historic.isEmpty()) {
-                if(historic.peek().getInitiator() != null) {
+        if(aiTurn) {
+            bim.rollback();
+        }else if(bim.battlefield.getSolver().isBattleOver()) {
+            bim.replace(new BattleOverBIS(bim));
+        }else{
+            if(!historic.isEmpty()&& historic.peek().getInitiator() != null) {
 
-                    if(bim.battlefield.isBattleOver()) {
-
-                        // if the battle is over
-                        bim.replace(new BattleOverBIS(bim));
-                    }else{
-
-                        int[] actorPos = bim.battlefield.getUnitPos(historic.peek().getInitiator());
-                        if (historic.peek().getInitiator().isDone()) {
-
-                            // if the unit is visible
-                            bim.replace(new EndTurnBIS(bim, actorPos[0], actorPos[1]));
-                        } else {
-
-                            // the unit is not yet visible
-                            bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));
-                        }
-                    }
-
+                IUnit actor = historic.peek().getInitiator();
+                if(actor.isOutOfAction() || actor.isDone()) {
+                        bim.replace(new EndTurnBIS(bim, actor));
                 }else{
-
-                    throw new BISException("historic top command has no initiator set up");
+                    int[] actorPos = bim.battlefield.getUnitPos(actor);
+                    bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));
                 }
             }else{
-                throw new BISException("historic empty");
+                try {
+                    throw new BISException("historic empty or initiator null");
+                } catch (BISException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (BISException e) {
-            e.printStackTrace();
         }
     }
 
@@ -144,7 +138,17 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         if(tasks.isEmpty()){
             proceed();
         }else{
-            bim.scheduler.addTask(tasks.pop());
+            if(aiTurn){
+                while(!tasks.isEmpty() && !levelPanelShown.pop()){
+                    bim.scheduler.addTask(tasks.pop());
+                }
+                if(!tasks.isEmpty()){
+                    levelPanelShown.pop();
+                    bim.scheduler.addTask(tasks.pop());
+                }
+            }else {
+                bim.scheduler.addTask(tasks.pop());
+            }
         }
         return true;
     }
