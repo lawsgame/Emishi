@@ -9,7 +9,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
@@ -48,7 +51,9 @@ public class TestBIS extends BattleInteractionState {
     private TextureRegion[] spriteSet;
 
     private AreaWidget moveAW;
+    private AreaWidget actionAW;
 
+    private Army army;
     IUnit sltdUnit;
     int index;
     boolean switchmode;
@@ -58,9 +63,9 @@ public class TestBIS extends BattleInteractionState {
 
     public TestBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true);
+        setArmy();
 
-
-        sltdUnit = bim.player.getArmy().getWarlord();
+        sltdUnit = army.getWarlord();
         index = 1;
         switchmode = false;
 
@@ -83,8 +88,65 @@ public class TestBIS extends BattleInteractionState {
         animation.play();
 
         moveAW = new AreaWidget(bim.battlefield, Data.AreaType.SQUAD_MEMBER);
-        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
-        moveAW.setTiles(Utils.getEreaFromRange(bim.battlefield, actorPos[0], actorPos[1], 1,2), true);
+        actionAW = new AreaWidget(bim.battlefield, Data.AreaType.ACTION_AREA);
+
+
+    }
+
+    private void setArmy(){
+        army = Army.createPlayerArmyTemplate();
+
+        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 18, Data.WeaponType.BOW, true, false, false, false, false);
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
+        warlord.setLeadership(19);
+        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
+        soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+
+        Unit soldier2 = new Unit("Maro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
+        soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        Unit soldier3 = new Unit("Ken", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
+        soldier3.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+
+        Unit soldier4 = new Unit("Loth", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
+        soldier4.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        Unit soldier5 = new Unit("Caro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
+        soldier5.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+
+
+        Unit warchief1 = new Unit("Azamaru", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
+        warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        warchief1.setLeadership(15);
+        warchief1.setExperience(98);
+        warchief1.setCurrentHitPoints(3);
+
+
+        army.add(warlord);
+        army.add(soldier1);
+        army.add(soldier4);
+        army.add(soldier5);
+        army.add(warchief1);
+        army.add(soldier2);
+        army.add(soldier3);
+
+        army.appointWarLord(warlord);
+        army.appointSoldier(soldier1, 0);
+        army.appointSoldier(soldier4, 0);
+        army.appointSoldier(soldier5, 0);
+        army.appointWarChief(warchief1);
+        army.appointSoldier(soldier2, 1);
+        army.appointSoldier(soldier3, 1);
+
+        bim.battlefield.deploy(11,11, soldier1, true);
+        bim.battlefield.deploy(10,11, soldier2, true);
+        bim.battlefield.deploy(9,11, soldier3, true);
+        bim.battlefield.deploy(10,12, warchief1, true);
+
+        bim.battlefield.deploy(14,4, soldier4, true);
+        bim.battlefield.deploy(15,4, soldier5, true);
+
+        bim.battlefield.deploy(11, 4, warlord, true);
     }
 
 
@@ -95,6 +157,7 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
+        actionAW.render(batch);
         moveAW.render(batch);
         //if(sprites != null) sprites.get(animation.getCurrentFrame()).draw(batch);
         //batch.draw(bim.spriteProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
@@ -106,7 +169,7 @@ public class TestBIS extends BattleInteractionState {
         // command test
 
         System.out.println("input : "+row+" "+col);
-        bim.moveCamera(row, col, true);
+        //bim.moveCamera(row, col, true);
 
 
         // TEST FINAL
@@ -149,11 +212,10 @@ public class TestBIS extends BattleInteractionState {
         }
 
         int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
-        System.out.println("\nMOVE TILES");
-        Array<int[]> moveTiles = bim.battlefield.getMoveArea(actorPos[0], actorPos[1]);
-        for(int i = 0; i <moveTiles.size; i++)
-            System.out.println(moveTiles.get(i)[0]+" "+moveTiles.get(i)[1]);
-        moveAW.setTiles(moveTiles, true);
+        Array<int[]> tiles = bim.battlefield.getMoveArea(actorPos[0], actorPos[1]);
+        moveAW.setTiles(tiles, true);
+        tiles = bim.battlefield.getActionArea(actorPos[0], actorPos[1]);
+        actionAW.setTiles(tiles, true);
 
         return true;
     }

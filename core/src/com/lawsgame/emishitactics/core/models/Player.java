@@ -13,10 +13,10 @@ public class Player {
     public static Player create(){
         Army playerArmy = Army.createPlayerArmyTemplate();
 
-        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 18, Data.WeaponType.SWORD, true, false, false, false, false);
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 18, Data.WeaponType.BOW, true, false, false, false, false);
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
+        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.setLeadership(19);
         Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));

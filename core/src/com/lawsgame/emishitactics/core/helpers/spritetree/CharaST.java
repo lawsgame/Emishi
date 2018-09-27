@@ -86,6 +86,7 @@ public class CharaST {
         populate(promoted, template, type, east, id, false, spriteSet);
     }
 
+    boolean once = true;
     public Array<Sprite> getSpriteSet(boolean promoted, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.SpriteSetId id){
 
         Array<Sprite> spriteset;
@@ -95,8 +96,9 @@ public class CharaST {
                 tra = children.get(i).getSpriteSet(template, type, or, done, id);
             }
         }
+
         if(tra == null) {
-            spriteset = getSpriteSet(or, id);
+            spriteset = getSpriteSet(promoted, or, done, id);
         }else {
             spriteset = new Array<Sprite>();
             Sprite sprite;
@@ -114,8 +116,8 @@ public class CharaST {
         return spriteset;
     }
 
-    private Array<Sprite> getSpriteSet(Data.Orientation or, Data.SpriteSetId id) {
-        return getSpriteSet(false, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, or, false, id);
+    private Array<Sprite> getSpriteSet(boolean promoted, Data.Orientation or, boolean done, Data.SpriteSetId id) {
+        return getSpriteSet(promoted, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, or, done, id);
     }
 
     public String toString(){

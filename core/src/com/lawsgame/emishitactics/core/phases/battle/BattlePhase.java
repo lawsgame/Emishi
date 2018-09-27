@@ -80,7 +80,7 @@ public class BattlePhase extends GamePhase {
 
         // load the battlefield
         Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
-        battlefield.randomlyDeploy(player.getArmy());
+        //battlefield.randomlyDeploy(player.getArmy());
 
         // build up sprite pool and battlefield renderer
         TempoSpritePool.get().set(asm);

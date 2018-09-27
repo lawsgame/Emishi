@@ -667,18 +667,61 @@ public class Battlefield extends Observable {
 
         CheckMoveMap(){ }
 
-        public Array<int[]> getMoveArea(Battlefield bf, int rowActor, int colActor){
+
+        public Array<int[]> getActionArea(Battlefield bf, int rowActor, int colActor, boolean moveOnly){
             Array<int[]> moveArea = new Array<int[]>();
             if(bf.isTileOccupied(rowActor, colActor)) {
-                set(bf, rowActor, colActor, true);
+
+
+                set(bf, rowActor, colActor);
                 setTilesMRP();
                 condemnTiles();
-                moveArea = getArea(true);
+                if(!moveOnly) {
+                    IUnit actor = battlefield.getUnit(rowActor, colActor);
+                    addAttackTiles(actor);
+                }
+                moveArea = getTiles(moveOnly);
             }
+            System.out.println(this.toString());
             return moveArea;
         }
 
-        private void set( Battlefield bf, int rowActor, int colActor, boolean moveAreaOnly){
+        private void addAttackTiles(IUnit actor) {
+
+            int dist;
+            int rangeMin;
+            int rangeMax;
+            for(int rUnit = 0; rUnit < checkTiles.length; rUnit++){
+                for(int cUnit = 0; cUnit < checkTiles[0].length; cUnit++){
+                    if(checkTiles[rUnit][cUnit] > 0){
+
+                        rangeMin = actor.getCurrentWeaponRangeMin(rUnit, cUnit, battlefield);
+                        rangeMax = actor.getCurrentWeaponRangeMax(rUnit, cUnit, battlefield);
+                        for(int r = rUnit - rangeMax; r <= rUnit + rangeMax; r++){
+                            for(int c = cUnit - rangeMax; c <= cUnit + rangeMax; c++){
+
+                                dist = Utils.dist(r, c, rUnit, cUnit);
+                                if(checkIndexes(r, c)
+                                        && checkTiles[r][c] == 0
+                                        && dist <= rangeMax
+                                        && dist >= rangeMin ){
+                                    checkTiles[r][c] = -1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * instanciate relevatn attributes and create a blank checkmap
+         *
+         * @param bf
+         * @param rowActor
+         * @param colActor
+         */
+        private void set( Battlefield bf, int rowActor, int colActor){
             if(bf.isTileOccupied(rowActor, colActor) && bf.getUnit(rowActor, colActor).isMobilized()) {
 
                 // get actor relevant pieces of information
@@ -690,13 +733,13 @@ public class Battlefield extends Observable {
 
                 // add the check map dimensions and origin point
 
-                //int range = moveRange
-                this.rowOrigin = rowActor - moveRange;
-                this.colOrigin = colActor - moveRange;
-                this.rowRelActor = moveRange;
-                this.colRelActor = moveRange;
-                int rows = 2 * moveRange + 1;
-                int cols = 2 * moveRange + 1;
+                int range = moveRange + 6;
+                this.rowOrigin = rowActor - range;
+                this.colOrigin = colActor - range;
+                this.rowRelActor = range;
+                this.colRelActor = range;
+                int rows = 2 * range + 1;
+                int cols = 2 * range + 1;
 
 
                 if (rowOrigin < 0) {
@@ -786,6 +829,8 @@ public class Battlefield extends Observable {
             }
         }
 
+
+
         private int getMoveAreaSize(){
             int size = 0;
             for(int r = 0; r < checkTiles.length; r++){
@@ -798,11 +843,11 @@ public class Battlefield extends Observable {
             return size;
         }
 
-        private Array<int[]> getArea(boolean moveArea){
+        private Array<int[]> getTiles(boolean moveOnly){
             Array<int[]> area = new Array<int[]>();
             for(int r = 0; r < checkTiles.length; r++){
                 for(int c = 0; c < checkTiles[0].length; c++){
-                    if (checkTiles[r][c] > 0) {
+                    if (checkTiles[r][c] > 0 || (checkTiles[r][c] < 0 && !moveOnly)) {
                         area.add(new int[]{r + rowOrigin, c + colOrigin});
                     }
                 }
@@ -816,7 +861,12 @@ public class Battlefield extends Observable {
             String str ="\nOrigin :"+rowOrigin+" "+colOrigin+"\n\n";
             for(int r = checkTiles.length - 1 ; r > -1 ; r--){
                 for(int c = 0; c < checkTiles[0].length; c++){
-                    str += " "+checkTiles[r][c];
+                    if(checkTiles[r][c] < 0)
+                        str += " "+ checkTiles[r][c];
+                    else if(checkTiles[r][c] > 0)
+                        str += "  "+checkTiles[r][c];
+                    else
+                        str += "   ";
                 }
                 str+="\n";
             }
@@ -831,7 +881,18 @@ public class Battlefield extends Observable {
      * @return fetch all tiles where the given unit can moved on
      */
     public Array<int[]> getMoveArea(int rowActor, int colActor){
-        return checkmap.getMoveArea(this, rowActor, colActor);
+        return checkmap.getActionArea(this, rowActor, colActor, true);
+    }
+
+
+    /**
+     *
+     * @param rowActor
+     * @param colActor
+     * @return
+     */
+    public Array<int[]> getActionArea(int rowActor, int colActor){
+        return checkmap.getActionArea(this, rowActor, colActor, false);
     }
 
 

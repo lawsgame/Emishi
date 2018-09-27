@@ -184,6 +184,16 @@ public class SpriteProvider implements Disposable{
 
     private Array<String[]> getFileNames(Battlefield battlefield) {
         Array<String[]> filenames = new Array<String[]>();
+
+        // default unit sprites
+        filenames.add(new String[]{ "solaire", "sword", "promoted_active"});
+        filenames.add(new String[]{ "solaire", "sword", "promoted_done"});
+        filenames.add(new String[]{ "solaire", "sword", "recruit_active"});
+        filenames.add(new String[]{ "solaire", "sword", "recruit_done"});
+        filenames.add(new String[]{ "solar_knight", "sword_F", "ai"});
+        filenames.add(new String[]{ "solar_knight", "sword_F", "pc"});
+        filenames.add(new String[]{ "solar_knight", "sword_F", "done"});
+
         String[] filename;
         for(int r = 0; r < battlefield.getNbRows(); r++){
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
