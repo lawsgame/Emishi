@@ -171,9 +171,14 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("input : "+row+" "+col);
         //bim.moveCamera(row, col, true);
 
+        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
+        Array<int[]> path = bim.battlefield.getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation(), 3);
+        System.out.println("path : "+path.size);
+        moveAW.setTiles(path, true);
 
         // TEST FINAL
 
+        /*
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Affiliation.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
         }else{
@@ -216,6 +221,7 @@ public class TestBIS extends BattleInteractionState {
         moveAW.setTiles(tiles, true);
         tiles = bim.battlefield.getActionArea(actorPos[0], actorPos[1]);
         actionAW.setTiles(tiles, true);
+        */
 
         return true;
     }

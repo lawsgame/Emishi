@@ -76,13 +76,13 @@ public class BattlePhase extends GamePhase {
 
         // load assets
         loadRequiredAssets();
-        setFontParams();
 
         // load the battlefield
         Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
-        //battlefield.randomlyDeploy(player.getArmy());
+        battlefield.randomlyDeploy(player.getArmy());
 
         // build up sprite pool and battlefield renderer
+        setFontParams();
         TempoSpritePool.get().set(asm);
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
         SpriteProvider spriteProvider = new SpriteProvider(IsoBFR.SPRITE_STD_SIZE);
@@ -92,8 +92,8 @@ public class BattlePhase extends GamePhase {
 
         //lauch initial BIS
         this.bim = new BattleInteractionMachine(battlefieldRenderer, gameCM, asm, stageUI, player, spriteProvider);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

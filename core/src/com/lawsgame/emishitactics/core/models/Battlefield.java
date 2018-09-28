@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.math.Path;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
@@ -996,6 +997,105 @@ public class Battlefield extends Observable {
         return res;
     }
 
+    /**
+     * AI oriented method
+     *
+     * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
+     *
+     * get the shortest validPath of a target buildingType using the A* algorithm
+     *
+     * @return an {[row, col]} array  representing the shortest validPath from one tile to another,
+     * excluding (rowActor, colActor) and finishing by a tile at range of {rowTarget, colTarget}. If the path is invalid, the returned array will be empty
+     *
+     */
+    public Array<int[]>  getShortestPath(int rowActor, int colActor, int rowTarget, int colTarget, boolean pathfinder, Affiliation affiliation, int rangeMax){
+        Array<int[]> res = new Array<int[]>();
+
+        if(affiliation != null) {
+
+            Array<PathAreaNode> path = new Array<PathAreaNode>();
+            Array<PathAreaNode> opened = new Array<PathAreaNode>();
+            Array<PathAreaNode> closed = new Array<PathAreaNode>();
+            opened.add(new PathAreaNode(rowTarget, colTarget, rowActor, colActor, rangeMax, null, this));
+            PathAreaNode current;
+            Array<PathAreaNode> neighbours;
+            while (true) {
+
+                //no solution
+                if (opened.size == 0) break;
+
+                current = opened.get(0);
+                for (int i = 0; i < opened.size; i++) {
+                    if (opened.get(i).better(current)) {
+                        current = opened.get(i);
+                    }
+                }
+                opened.removeValue(current, true);
+                closed.add(current);
+
+                // validPath found
+                if (current.getRow() == rowActor && current.getCol() == colActor) break;
+
+                // get available neighbor nodes which are not yet in the closed list
+                PathAreaNode node;
+                neighbours = new Array<PathAreaNode>();
+                if (current.remainingRange > 1 || (isTileReachable(current.row + 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row + 1, current.col, affiliation))) {
+                    node = new PathAreaNode(current.row + 1, current.col, rowActor, colActor, rangeMax, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
+                }
+                if (current.remainingRange > 1 || (isTileReachable(current.row, current.col + 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col + 1, affiliation))) {
+                    node = new PathAreaNode(current.row, current.col + 1, rowActor, colActor, rangeMax, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
+                }
+                if (current.remainingRange > 1 || (isTileReachable(current.row - 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row - 1, current.col, affiliation))) {
+                    node = new PathAreaNode(current.row - 1, current.col, rowActor, colActor, rangeMax, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
+                }
+                if (current.remainingRange > 1 || (isTileReachable(current.row, current.col - 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col - 1, affiliation))) {
+                    node = new PathAreaNode(current.row, current.col - 1, rowActor, colActor, rangeMax, current, this);
+                    if (!closed.contains(node, false)) {
+                        neighbours.add(node);
+                    }
+                }
+
+                boolean isNotInOpened = true;
+                for (int i = 0; i < neighbours.size; i++) {
+                    node = neighbours.get(i);
+                    for (int j = 0; j < opened.size; j++) {
+                        if (opened.get(j).equals(node)) {
+                            isNotInOpened = false;
+                            if (node.better(opened.get(j))) {
+                                opened.removeIndex(j);
+                                opened.add(node);
+                            }
+                        }
+                    }
+                    if (isNotInOpened) {
+                        opened.add(node);
+                    }
+                    isNotInOpened = true;
+                }
+            }
+
+            if (closed.get(closed.size - 1).getRow() == rowActor && closed.get(closed.size - 1).getCol() == colActor) {
+                path = closed.get(closed.size - 1).getPath();
+            }
+            for (int i = path.size - 2; i > -1 ; i--) {
+                if(path.get(i).remainingRange < 1) {
+                    res.add(new int[]{path.get(i).getRow(), path.get(i).getCol()});
+                }
+            }
+        }
+
+        return res;
+    }
+
 
 
 
@@ -1117,6 +1217,46 @@ public class Battlefield extends Observable {
             Array<PathNode> bestpath;
             if(this.parent == null){
                 bestpath = new Array<PathNode>();
+                bestpath.add(this);
+                return bestpath;
+            }
+            bestpath = parent.getPath();
+            bestpath.add(this);
+            return bestpath;
+
+        }
+
+
+        public String toString(){
+            return row+" "+col+" "+" cost: "+ (distSource + distTarget);
+        }
+
+
+    }
+
+    public static class PathAreaNode extends Node<PathAreaNode>{
+        protected int distTarget;
+        protected PathAreaNode parent;
+        protected int remainingRange;
+
+        public PathAreaNode(int row, int col, int rowf, int colf, int rangeMax, PathAreaNode parent, Battlefield bf) {
+            super(row, col, bf);
+            this.parent = parent;
+            this.remainingRange = (parent != null) ? parent.remainingRange - 1 : rangeMax;
+            this.distSource = (parent != null  && remainingRange == 0) ? this.parent.distSource + 1 : 0;
+            this.distTarget = Utils.dist(row, col, rowf, colf);
+        }
+
+        @Override
+        boolean better(PathAreaNode node){
+            return distSource + distTarget < node.distSource + node.distTarget
+                    || ((distSource + distTarget == node.distSource + node.distTarget) && distTarget < node.distTarget);
+        }
+
+        public Array<PathAreaNode> getPath(){
+            Array<PathAreaNode> bestpath;
+            if(this.parent == null){
+                bestpath = new Array<PathAreaNode>();
                 bestpath.add(this);
                 return bestpath;
             }
