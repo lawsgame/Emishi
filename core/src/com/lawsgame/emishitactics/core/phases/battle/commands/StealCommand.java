@@ -7,13 +7,13 @@ import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class StealCommand extends BattleCommand{
+public class StealCommand extends ActorCommand {
 
     public StealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, ActionChoice.STEAL, scheduler, playerInventory, false);
@@ -40,9 +40,9 @@ public class StealCommand extends BattleCommand{
 
         // push render taks
         StandardTask task = new StandardTask();
-        RendererThread stealerRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(stealer), stealer.getOrientation());
+        RendererThread stealerRendererThread = new RendererThread(bfr.getUnitRenderer(stealer), stealer.getOrientation());
         stealerRendererThread.addQuery(stealer, Data.AnimId.STEAL);
-        RendererThread stolenRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
+        RendererThread stolenRendererThread = new RendererThread(bfr.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
         stolenRendererThread.addQuery(stolen, (stealSuccessful) ? Data.AnimId.WOUNDED : Data.AnimId.DODGE);
         stolenRendererThread.addQuery(stolen, stolen.getOrientation());
         task.addThread(stolenRendererThread);

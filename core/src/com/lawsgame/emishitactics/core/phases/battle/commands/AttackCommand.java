@@ -9,14 +9,14 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class AttackCommand extends BattleCommand {
+public class AttackCommand extends ActorCommand {
     protected boolean retaliationAllowed;
     protected MoveCommand moveCommand;
     protected SwitchPositionCommand switchPositionCommand;
@@ -69,8 +69,8 @@ public class AttackCommand extends BattleCommand {
         IUnit defender = battlefield.getUnit(rowTarget, colTarget);
 
         StandardTask task = new StandardTask();
-        RendererThread attackerRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(attacker));
-        RendererThread targetRendererThread = new RendererThread(battlefieldRenderer.getUnitRenderer(defender));
+        RendererThread attackerRendererThread = new RendererThread(bfr.getUnitRenderer(attacker));
+        RendererThread targetRendererThread = new RendererThread(bfr.getUnitRenderer(defender));
         Array<RendererThread> defendersThreads = new Array<RendererThread>();
 
         Data.Orientation attackerReorientation = Utils.getOrientationFromCoords(rowAttacker, colAttacker, rowTarget, colTarget);
@@ -98,7 +98,7 @@ public class AttackCommand extends BattleCommand {
                 notifs.get(i).backstab = backstabbed && i == 0;
                 notifs.get(i).fleeingOrientation = attacker.getOrientation();
                 if(i != 0){
-                    bur = battlefieldRenderer.getUnitRenderer(notifs.get(i).wounded);
+                    bur = bfr.getUnitRenderer(notifs.get(i).wounded);
 
                     defendersThreads.add(new RendererThread(bur, notifs.get(i)));
                 }
@@ -146,16 +146,16 @@ public class AttackCommand extends BattleCommand {
                 removeOutOfActionUnits();
                 moveCommand.apply(targetPos[0], targetPos[1], rowTarget0, colTarget0);
 
-                scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
+                scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(target0), target0.getOrientation()));
             } else {
 
                 switchPositionCommand.apply(targetPos[0], targetPos[1], rowTarget0, colTarget0);
                 Area.UnitArea area = battlefield.addGuardedArea(targetPos[0], targetPos[1]);
 
                 StandardTask task = new StandardTask();
-                task.addThread(new RendererThread(battlefieldRenderer, area));
-                task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(defender), defender.getOrientation()));
-                task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(target0), target0.getOrientation()));
+                task.addThread(new RendererThread(bfr, area));
+                task.addThread(new RendererThread(bfr.getUnitRenderer(defender), defender.getOrientation()));
+                task.addThread(new RendererThread(bfr.getUnitRenderer(target0), target0.getOrientation()));
                 scheduleRenderTask(task);
             }
         }
@@ -237,7 +237,7 @@ public class AttackCommand extends BattleCommand {
         battlefield.removeOOAUnits(false);
         StandardTask removeOOAUnitTask = new StandardTask();
         for(int i = 0; i < OOAUnits.size; i++)
-            removeOOAUnitTask.addThread(new RendererThread(battlefieldRenderer, OOAUnits.get(i)));
+            removeOOAUnitTask.addThread(new RendererThread(bfr, OOAUnits.get(i)));
         scheduleRenderTask(removeOOAUnitTask);
     }
 

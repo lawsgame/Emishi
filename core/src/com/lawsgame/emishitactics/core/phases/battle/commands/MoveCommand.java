@@ -9,14 +9,14 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.Walk;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 
-public class MoveCommand extends BattleCommand{
+public class MoveCommand extends ActorCommand {
     protected BattleUnitRenderer walkerRenderer;
     protected Array<int[]> validPath;
     protected Data.Orientation oldWalkerOrientation;
@@ -29,7 +29,7 @@ public class MoveCommand extends BattleCommand{
     protected void execute() {
 
         //store old state info
-        walkerRenderer = battlefieldRenderer.getUnitRenderer(getInitiator());
+        walkerRenderer = bfr.getUnitRenderer(getInitiator());
         oldWalkerOrientation = getInitiator().getOrientation();
 
         // update model
@@ -40,7 +40,7 @@ public class MoveCommand extends BattleCommand{
         getInitiator().setOrientation(or);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefield, battlefieldRenderer.getUnitRenderer(getInitiator()), new Walk(getInitiator(), validPath)));
+        scheduleRenderTask(new StandardTask(battlefield, bfr.getUnitRenderer(getInitiator()), new Walk(getInitiator(), validPath)));
 
 
     }

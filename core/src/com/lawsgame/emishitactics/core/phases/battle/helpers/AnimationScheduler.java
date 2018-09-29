@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.WaitTask;
 import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;

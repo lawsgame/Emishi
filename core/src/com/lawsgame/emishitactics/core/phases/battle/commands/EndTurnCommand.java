@@ -6,7 +6,6 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import static com.lawsgame.emishitactics.core.models.Data.ActionChoice.END_TURN;
@@ -30,7 +29,7 @@ public class EndTurnCommand extends SelfInflitedCommand {
         getInitiator().setMoved(true);
         getInitiator().setActed(true);
 
-        StandardTask doneTask = new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), Notification.Done.get(true));
+        StandardTask doneTask = new StandardTask(bfr.getUnitRenderer(getInitiator()), Notification.Done.get(true));
         this.scheduleRenderTask(doneTask);
 
     }

@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public abstract class SelfInflitedCommand extends BattleCommand{
+public abstract class SelfInflitedCommand extends ActorCommand {
 
     public SelfInflitedCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free) {
         super(bfr, choice, scheduler, playerInventory, free);

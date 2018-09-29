@@ -14,7 +14,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
@@ -100,7 +100,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
 
 
         @Override
-        public void set(BattleCommand command) {
+        public void set(ActorCommand command) {
 
             if(command != null && command instanceof AttackCommand && command.isTargetValid()) {
                 setHeight(220);
@@ -130,7 +130,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
         }
 
         @Override
-        public void set(BattleCommand command) {
+        public void set(ActorCommand command) {
             if(command != null && command instanceof HealCommand && command.isTargetValid()) {
                 HealCommand currentCommand = (HealCommand)command;
                 IUnit target = currentCommand.getTarget();
@@ -149,7 +149,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
         }
 
         @Override
-        public void set(BattleCommand command) {
+        public void set(ActorCommand command) {
             if(command != null && command instanceof SwitchWeaponCommand && command.isTargetValid()){
                 SwitchWeaponCommand swc = (SwitchWeaponCommand)command;
                 builder = new StringBuilder();
@@ -166,7 +166,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
         }
 
         @Override
-        public void set(BattleCommand command) {
+        public void set(ActorCommand command) {
             if(command != null && command instanceof StealCommand && command.isTargetValid()){
                 StealCommand sc = (StealCommand)command;
                 IUnit target = sc.getTarget();
@@ -188,7 +188,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
         }
 
         @Override
-        public void set(BattleCommand command) {
+        public void set(ActorCommand command) {
             if(command != null && command instanceof BuildCommand && command.isTargetValid()){
                 BuildCommand bc = (BuildCommand)command;
                 builder = new StringBuilder();

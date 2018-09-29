@@ -56,7 +56,8 @@ public class Data {
 
     //UI parameters
     public static final float PANEL_SLIDE_SPEED = 600;
-    public static final float ACTION_PANEL_DURATION_APPEARANCE = 3.0f;
+    public static final float AIBIS_ACTION_PANEL_DURATION_APPEARANCE = 3.0f;
+    public static final float AIBIS_DELAY_CAMERA_FOCUS = 1.5f;
 
 
     static Random r = new Random();

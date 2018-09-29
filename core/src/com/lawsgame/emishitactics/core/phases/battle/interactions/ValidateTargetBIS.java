@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -18,8 +18,8 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import java.util.Stack;
 
 public class ValidateTargetBIS extends BattleInteractionState implements Observer {
-    private Stack<BattleCommand> historic;
-    private BattleCommand currentCommand;
+    private Stack<ActorCommand> historic;
+    private ActorCommand currentCommand;
     private Area impactArea;
 
     private ChooseOrientationCommand orientationCommand;
@@ -27,7 +27,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
     private SimpleCommand removeActionPanelCommand;
     private float hidingTime;
 
-    public ValidateTargetBIS(BattleInteractionMachine bim, BattleCommand currentCommand, Stack<BattleCommand> historic) {
+    public ValidateTargetBIS(BattleInteractionMachine bim, ActorCommand currentCommand, Stack<ActorCommand> historic) {
         super(bim, true, false, false);
         this.historic = historic;
         this.currentCommand = currentCommand;
@@ -129,7 +129,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
     @Override
     public void getNotification(Observable sender, Object data) {
-        if(data instanceof BattleCommand && data == currentCommand){
+        if(data instanceof ActorCommand && data == currentCommand){
             currentCommand.detach(this);
             if(bim.app.isPanelAvailable(currentCommand))
                 bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
@@ -139,11 +139,11 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
 
     static class GetBackToSelectAction extends SimpleCommand{
-        private BattleCommand currentCommand;
+        private ActorCommand currentCommand;
         private BattleInteractionMachine bim;
-        private Stack<BattleCommand> historic;
+        private Stack<ActorCommand> historic;
 
-        public GetBackToSelectAction(BattleCommand currentCommand, BattleInteractionMachine bim, Stack<BattleCommand> historic) {
+        public GetBackToSelectAction(ActorCommand currentCommand, BattleInteractionMachine bim, Stack<ActorCommand> historic) {
             this.currentCommand = currentCommand;
             this.bim = bim;
             this.historic = historic;

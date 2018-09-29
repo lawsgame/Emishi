@@ -2,39 +2,23 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.Stack;
@@ -58,8 +42,8 @@ public class TestBIS extends BattleInteractionState {
     int index;
     boolean switchmode;
 
-    Stack<BattleCommand> historic = new Stack<BattleCommand>();
-    BattleCommand command = null;
+    Stack<ActorCommand> historic = new Stack<ActorCommand>();
+    ActorCommand command = null;
 
     public TestBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true);
@@ -232,7 +216,7 @@ public class TestBIS extends BattleInteractionState {
             animation.update(dt);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
-            BattleCommand command = historic.peek();
+            ActorCommand command = historic.peek();
             if(command.getActionChoice().isUndoable()){
                 command.undo();
                 historic.pop();

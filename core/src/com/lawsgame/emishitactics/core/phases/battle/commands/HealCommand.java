@@ -5,13 +5,13 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class HealCommand extends BattleCommand {
+public class HealCommand extends ActorCommand {
 
     public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, ActionChoice.HEAL, scheduler, playerInventory, false);
@@ -31,8 +31,8 @@ public class HealCommand extends BattleCommand {
 
         // push render task
         StandardTask task = new StandardTask();
-        if(treated) task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getTarget()), getTarget(), healPower));
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
+        if(treated) task.addThread(new RendererThread(bfr.getUnitRenderer(getTarget()), getTarget(), healPower));
+        task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
         scheduleRenderTask(task);
 
         // setTiles outcome

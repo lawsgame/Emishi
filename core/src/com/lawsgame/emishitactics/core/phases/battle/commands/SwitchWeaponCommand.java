@@ -25,13 +25,13 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
         getInitiator().switchWeapon(weaponIndex);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
+        scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
     }
 
     @Override
     public void unexecute() {
         if(getInitiator().switchWeapon(weaponIndex)) {
-            scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
+            scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
         }
 
 

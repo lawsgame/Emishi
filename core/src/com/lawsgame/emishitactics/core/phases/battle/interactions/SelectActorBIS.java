@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BeginArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
 public class SelectActorBIS extends BattleInteractionState {
@@ -13,7 +14,8 @@ public class SelectActorBIS extends BattleInteractionState {
         this.rowInit = rowInit;
         this.colInit = colInit;
         if(newPlayerTurn){
-            bim.tm.beginTurn(bim.player.getArmy());
+            BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bim.bfr, bim.scheduler, bim.player.getArmy());
+            beginCommand.apply();
         }
 
     }

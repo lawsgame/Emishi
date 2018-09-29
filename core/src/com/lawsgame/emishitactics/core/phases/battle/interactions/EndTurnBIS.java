@@ -10,6 +10,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EndArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -70,7 +71,8 @@ public class EndTurnBIS extends BattleInteractionState {
             IArmy currentArmy = actor.getArmy();
             if (currentArmy.isDone()) {
 
-                bim.tm.endTurn(currentArmy);
+                EndArmyTurnCommand endCommand = new EndArmyTurnCommand(bim.bfr, bim.scheduler, currentArmy);
+                endCommand.apply();
                 bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(actor), Notification.Done.get(false)));
                 bim.replace(new AiBIS(bim));
             } else {

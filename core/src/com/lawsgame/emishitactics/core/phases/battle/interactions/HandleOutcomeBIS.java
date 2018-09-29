@@ -6,8 +6,8 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine.FocusOn;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand.EncounterOutcome;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand.EncounterOutcome;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 public class HandleOutcomeBIS extends BattleInteractionState{
-    private Stack<BattleCommand> historic;
+    private Stack<ActorCommand> historic;
     private EncounterOutcome outcome;
 
     private static EncounterOutcome emptyOutcome;
@@ -37,7 +37,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     private LinkedList<Boolean> levelPanelShown;
     private boolean aiTurn;
 
-    public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<BattleCommand> historic, boolean aiTurn) {
+    public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<ActorCommand> historic, boolean aiTurn) {
         super(bim, true, false, false);
 
         this.historic = historic;
@@ -62,6 +62,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName()+"\n" +outcome.toString());
 
         if(outcome.isHandled()){
+
             if(tasks.isEmpty()) {
                 proceed();
             }
@@ -70,7 +71,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
                 if(!outcome.isExperienceShown()){
 
-                    BattleCommand.ExperiencePointsHolder holder = outcome.expHolders.pop();
+                    ActorCommand.ExperiencePointsHolder holder = outcome.expHolders.pop();
                     int[] receiverPos = bim.battlefield.getUnitPos(holder.receiver);
 
                     StandardTask experienceTask = new StandardTask();
@@ -89,7 +90,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                     }
                 }else if(!outcome.isLootedItemsClaimed()){
 
-                   BattleCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
+                   ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
                    StandardTask itemTask = new StandardTask(new DisplayLootPanel(holder.droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f);
                    tasks.offer(itemTask);
                 }

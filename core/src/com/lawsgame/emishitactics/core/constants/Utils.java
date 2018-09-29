@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 
 import java.util.Stack;
 
@@ -164,7 +164,7 @@ public class Utils {
      * @param historic
      * @return true if all commands has been undone, false otherwise
      */
-    public static boolean undoCommands(Stack<BattleCommand> historic){
+    public static boolean undoCommands(Stack<ActorCommand> historic){
         while(!historic.isEmpty() && historic.peek().getActionChoice().isUndoable()){
             historic.pop().undo();
         }

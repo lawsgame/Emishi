@@ -6,13 +6,13 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class PushCommand extends BattleCommand{
+public class PushCommand extends ActorCommand {
 
     public PushCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, ActionChoice.PUSH, scheduler, playerInventory, false);
@@ -40,8 +40,8 @@ public class PushCommand extends BattleCommand{
 
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(actor), Data.AnimId.PUSH));
-        task.addThread(new RendererThread(battlefieldRenderer.getUnitRenderer(pushed), Notification.Pushed.get(pushOr)));
+        task.addThread(new RendererThread(bfr.getUnitRenderer(actor), Data.AnimId.PUSH));
+        task.addThread(new RendererThread(bfr.getUnitRenderer(pushed), Notification.Pushed.get(pushOr)));
         scheduleRenderTask(task);
 
     }

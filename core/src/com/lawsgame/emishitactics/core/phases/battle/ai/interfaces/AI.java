@@ -3,10 +3,13 @@ package com.lawsgame.emishitactics.core.phases.battle.ai.interfaces;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BeginArmyTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EndArmyTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.TurnManager;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -19,14 +22,12 @@ public abstract class AI extends Observable implements Runnable {
     protected AnimationScheduler scheduler;
     protected ActionPanelPool app;
     protected Inventory playerInventory;
-    protected TurnManager tm;
 
-    public AI(BattlefieldRenderer bfr, AnimationScheduler scheduler, ActionPanelPool app, Inventory playerInventory, TurnManager tm) {
+    public AI(BattlefieldRenderer bfr, AnimationScheduler scheduler, ActionPanelPool app, Inventory playerInventory) {
         this.bfr = bfr;
         this.scheduler = scheduler;
         this.app = app;
         this.playerInventory = playerInventory;
-        this.tm =tm;
     }
 
 
@@ -35,10 +36,13 @@ public abstract class AI extends Observable implements Runnable {
 
     @Override
     public void run() {
+
         Battlefield bf = bfr.getModel();
         IArmy currentArmy;
         int[] actorPos;
         CommandBundle bundle;
+        BeginArmyTurnCommand beginCommand;
+        EndArmyTurnCommand endCommand;
         if(!bf.getSolver().isBattleOver()) {
             loop :
             {
@@ -46,7 +50,14 @@ public abstract class AI extends Observable implements Runnable {
                 currentArmy = bf.getNextArmy();
 
                 while (!currentArmy.isPlayerControlled()) {
-                    tm.beginTurn(currentArmy);
+
+                    beginCommand = new BeginArmyTurnCommand(bfr, scheduler, currentArmy);
+                    beginCommand.setDecoupled(true);
+                    beginCommand.apply();
+                    bundle = new CommandBundle();
+                    bundle.offer(beginCommand, null);
+                    notifyAllObservers(bundle);
+
                     while (!currentArmy.isDone()) {
                         actorPos = nextUnit(currentArmy);
                         bundle = getCommandPackage(actorPos);
@@ -55,12 +66,20 @@ public abstract class AI extends Observable implements Runnable {
                             break loop;
                         }
                     }
-                    tm.endTurn(currentArmy);
+
+                    endCommand = new EndArmyTurnCommand(bfr, scheduler, currentArmy);
+                    endCommand.setDecoupled(true);
+                    endCommand.apply();
+                    bundle = new CommandBundle();
+                    bundle.offer(endCommand, null);
+                    notifyAllObservers(bundle);
+
+
                     currentArmy = bf.getNextArmy();
                 }
             }
         }
-        notifyAllObservers(null);
+        notifyAllObservers(this);
 
     }
 
@@ -71,6 +90,13 @@ public abstract class AI extends Observable implements Runnable {
         public CommandBundle() {
             this.commands = new LinkedList<BattleCommand>();
             this.panels = new LinkedList<ActionInfoPanel>();
+        }
+
+        public void offer(BattleCommand command, ActionInfoPanel panel){
+            if(command != null) {
+                commands.offer(command);
+                panels.offer(panel);
+            }
         }
 
         public boolean isEmpty() {

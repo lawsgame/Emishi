@@ -87,7 +87,7 @@ public class BattlePhase extends GamePhase {
         BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
         SpriteProvider spriteProvider = new SpriteProvider(IsoBFR.SPRITE_STD_SIZE);
         spriteProvider.set(battlefield, asm);
-        //BattlefieldRenderer battlefieldRenderer = new IsoBFR(battlefield, spriteProvider);
+        //BattlefieldRenderer bfr = new IsoBFR(battlefield, spriteProvider);
         battlefieldRenderer.setGameCamParameters(this.getGameCM());
 
         //lauch initial BIS

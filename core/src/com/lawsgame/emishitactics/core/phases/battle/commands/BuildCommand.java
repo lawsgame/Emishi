@@ -7,12 +7,12 @@ import com.lawsgame.emishitactics.core.models.Data.Ability;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class BuildCommand extends BattleCommand {
+public class BuildCommand extends ActorCommand {
     protected Data.TileType buildingType;
 
     public BuildCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Data.TileType buildingType) {
@@ -27,7 +27,7 @@ public class BuildCommand extends BattleCommand {
         battlefield.setTile(rowTarget, colTarget, buildingType, false);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer, new Build(rowTarget, colTarget, buildingType, getInitiator())));
+        scheduleRenderTask(new StandardTask(bfr, new Build(rowTarget, colTarget, buildingType, getInitiator())));
 
         // set outcome
         outcome.expHolders.add(new ExperiencePointsHolder(getInitiator(), choice.getExperience()));

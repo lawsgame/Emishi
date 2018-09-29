@@ -13,19 +13,14 @@ import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.TurnManager;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
@@ -49,7 +44,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final SpriteProvider spriteProvider;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
-    public final TurnManager tm;
     public final I18NBundle mainI18nBundle;
     public final AI ai;
 
@@ -81,8 +75,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.player = player;
         this.multiplexer = new InputMultiplexer();
         this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
-        this.tm = new TurnManager(bfr, scheduler);
-        this.ai = new PassiveAI(bfr, scheduler, app, player.getInventory(), tm);
+        this.ai = new PassiveAI(bfr, scheduler, app, player.getInventory());
 
 
         this.selectedTile = new Area(battlefield, Data.AreaType.SELECTED_UNIT);

@@ -5,13 +5,13 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class SwitchPositionCommand extends BattleCommand {
+public class SwitchPositionCommand extends ActorCommand {
     private BattleUnitRenderer actorRenderer;
     private BattleUnitRenderer targetRenderer;
     private Data.Orientation oldTargetOrientation;
@@ -25,8 +25,8 @@ public class SwitchPositionCommand extends BattleCommand {
     protected void execute() {
 
         // store old state
-        actorRenderer = battlefieldRenderer.getUnitRenderer(getInitiator());
-        targetRenderer = battlefieldRenderer.getUnitRenderer(getTarget());
+        actorRenderer = bfr.getUnitRenderer(getInitiator());
+        targetRenderer = bfr.getUnitRenderer(getTarget());
         oldActorOrientation = getInitiator().getOrientation();
         oldTargetOrientation = getTarget().getOrientation();
 
@@ -34,7 +34,7 @@ public class SwitchPositionCommand extends BattleCommand {
         battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(getInitiator(), getTarget(), SwitchPosition.Mode.WALK, battlefield)));
+        scheduleRenderTask(new StandardTask(bfr, new SwitchPosition(getInitiator(), getTarget(), SwitchPosition.Mode.WALK, battlefield)));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SwitchPositionCommand extends BattleCommand {
             actor.setOrientation(oldActorOrientation);
             target.setOrientation(oldTargetOrientation);
             battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
-            scheduleRenderTask(new StandardTask(battlefieldRenderer, new SwitchPosition(actor, target, SwitchPosition.Mode.INSTANT, battlefield)));
+            scheduleRenderTask(new StandardTask(bfr, new SwitchPosition(actor, target, SwitchPosition.Mode.INSTANT, battlefield)));
             scheduleRenderTask(new StandardTask(targetRenderer, oldTargetOrientation));
             scheduleRenderTask(new StandardTask(actorRenderer, oldActorOrientation));
         }

@@ -1,29 +1,25 @@
-package com.lawsgame.emishitactics.core.phases.battle.helpers;
+package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class TurnManager {
-    private BattlefieldRenderer bfr;
-    private AnimationScheduler scheduler;
+public class EndArmyTurnCommand extends BattleCommand {
+    protected IArmy army;
 
-    public TurnManager(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        this.bfr = bfr;
-        this.scheduler = scheduler;
+    public EndArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, IArmy army) {
+        super(bfr, scheduler);
+        this.army = army;
     }
 
-    public void beginTurn(IArmy army) {
-        army.replenishMoral();
-        army.updateActionPoints();
-    }
-
-    public void endTurn(IArmy army) {
+    @Override
+    protected void execute() {
         //update model
         army.setDone(false, false);
 
@@ -39,16 +35,20 @@ public class TurnManager {
                     if(bur != null) {
                         doneThread = new StandardTask.RendererThread(bur, Notification.Done.get(false));
                         resetDoneTask.addThread(doneThread);
-                    }else{
-                        try {
-                            throw new BattleInteractionState.BISException("no BattleUnitRenderer related to the following still active unit: "+mobilizedTroops.get(i).get(j).getName());
-                        } catch (BattleInteractionState.BISException e) {
-                            e.printStackTrace();
-                        }
                     }
                 }
             }
         }
-        scheduler.addTask(resetDoneTask);
+        scheduleRenderTask(resetDoneTask);
+    }
+
+    @Override
+    public void undo() {
+
+    }
+
+    @Override
+    public void redo() {
+
     }
 }

@@ -23,7 +23,7 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
 
     @Override
     protected void execute() {
-        actorRenderer = battlefieldRenderer.getUnitRenderer(getInitiator());
+        actorRenderer = bfr.getUnitRenderer(getInitiator());
 
         // register old model state
         oldOrientation = getInitiator().getOrientation();
@@ -32,7 +32,7 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
         getInitiator().setOrientation(newOrientation);
 
         // push render state
-        scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(getInitiator()), newOrientation));
+        scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), newOrientation));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
             IUnit actor = battlefield.getUnit(rowActor, colActor);
             if(actorRenderer.getModel() == actor) {
                 actor.setOrientation(oldOrientation);
-                scheduleRenderTask(new StandardTask(battlefieldRenderer.getUnitRenderer(actor), oldOrientation));
+                scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(actor), oldOrientation));
             }
         }
     }

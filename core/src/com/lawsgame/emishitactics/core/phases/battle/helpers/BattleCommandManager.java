@@ -17,7 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import java.util.HashMap;
@@ -27,15 +27,15 @@ import java.util.Stack;
 /*
  */
 public class BattleCommandManager {
-    private final Array<Array<BattleCommand>> commandPool;
+    private final Array<Array<ActorCommand>> commandPool;
 
     public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
-        commandPool = new Array<Array<BattleCommand>>();
+        commandPool = new Array<Array<ActorCommand>>();
 
         setChoice(new MoveCommand(bfr, scheduler, playerInventory));
         setChoice(new AttackCommand(bfr, scheduler, playerInventory));
 
-        final Array<BattleCommand>  commands = new Array<BattleCommand>();
+        final Array<ActorCommand>  commands = new Array<ActorCommand>();
         for(int i = 1; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
             commands.add(new SwitchWeaponCommand(bfr, scheduler, playerInventory, i));
         }
@@ -44,13 +44,13 @@ public class BattleCommandManager {
 
         setChoice(new PushCommand(bfr, scheduler, playerInventory));
         setChoice(new SwitchPositionCommand(bfr, scheduler, playerInventory));
-        setChoice(new BattleCommand[]{
+        setChoice(new ActorCommand[]{
                 new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.NORTH),
                 new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.SOUTH),
                 new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.EAST),
                 new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.WEST),
         });
-        setChoice(new BattleCommand[]{
+        setChoice(new ActorCommand[]{
                 new BuildCommand(bfr, scheduler, playerInventory, Data.TileType.WATCH_TOWER),
                 new BuildCommand(bfr, scheduler, playerInventory, Data.TileType.BRIDGE)
         });
@@ -62,15 +62,15 @@ public class BattleCommandManager {
     }
 
 
-    private void setChoice(BattleCommand command){
-        Array<BattleCommand>  commands = new Array<BattleCommand>();
+    private void setChoice(ActorCommand command){
+        Array<ActorCommand>  commands = new Array<ActorCommand>();
         commands.add(command);
         commandPool.add(commands);
     }
 
-    private void setChoice(BattleCommand[] battleCommands){
-        Array<BattleCommand>  commands = new Array<BattleCommand>();
-        commands.addAll(battleCommands);
+    private void setChoice(ActorCommand[] actorCommands){
+        Array<ActorCommand>  commands = new Array<ActorCommand>();
+        commands.addAll(actorCommands);
         commandPool.add(commands);
     }
 
@@ -80,7 +80,7 @@ public class BattleCommandManager {
 
 
 
-    public Array<ActionChoice> getAvailableChoices(IUnit actor, Stack<BattleCommand> history){
+    public Array<ActionChoice> getAvailableChoices(IUnit actor, Stack<ActorCommand> history){
         Array<ActionChoice> choices = new Array<ActionChoice>();
         ActionChoice choice;
         for (int  i = 0; i < commandPool.size; i++) {
@@ -100,11 +100,11 @@ public class BattleCommandManager {
         return choices;
     }
 
-    public Array<BattleCommand> getAvailableCommands(IUnit actor, ActionChoice choice, boolean checkPerformable){
-        Array<BattleCommand> availableCommands = new Array<BattleCommand>();
+    public Array<ActorCommand> getAvailableCommands(IUnit actor, ActionChoice choice, boolean checkPerformable){
+        Array<ActorCommand> availableCommands = new Array<ActorCommand>();
         for(int i = 0; i < commandPool.size ;i++) {
             if(commandPool.get(i).size > 0 && commandPool.get(i).get(0).getActionChoice() == choice) {
-                Array<BattleCommand> chosenCommands = commandPool.get(i);
+                Array<ActorCommand> chosenCommands = commandPool.get(i);
                 for (int j = 0; j < chosenCommands.size; j++) {
                     if (!checkPerformable || chosenCommands.get(j).canbePerformedBy(actor)) {
                         availableCommands.add(chosenCommands.get(j));
@@ -115,8 +115,8 @@ public class BattleCommandManager {
         return availableCommands;
     }
 
-    public HashMap<ActionChoice, Array<BattleCommand>> getAllCommands(IUnit actor, Stack<BattleCommand> history, boolean checkFlavorPerformable) {
-        HashMap<ActionChoice, Array<BattleCommand>> commands = new HashMap<ActionChoice, Array<BattleCommand>>();
+    public HashMap<ActionChoice, Array<ActorCommand>> getAllCommands(IUnit actor, Stack<ActorCommand> history, boolean checkFlavorPerformable) {
+        HashMap<ActionChoice, Array<ActorCommand>> commands = new HashMap<ActionChoice, Array<ActorCommand>>();
         if(actor != null && history != null) {
             Array<ActionChoice> availableChoices = getAvailableChoices(actor, history);
             for (int i = 0; i < availableChoices.size; i++) {
@@ -129,13 +129,13 @@ public class BattleCommandManager {
     //-------------------------  GETTERS & SETTERS ---------------------------
 
 
-    public String toString(IUnit actor, Stack<BattleCommand> history, boolean checkFlavorPerformable){
-        HashMap<ActionChoice, Array<BattleCommand>> allcommands = getAllCommands(actor, history, checkFlavorPerformable);
+    public String toString(IUnit actor, Stack<ActorCommand> history, boolean checkFlavorPerformable){
+        HashMap<ActionChoice, Array<ActorCommand>> allcommands = getAllCommands(actor, history, checkFlavorPerformable);
         String str = "Availables commands : \n";
-        Array<BattleCommand> commands;
+        Array<ActorCommand> commands;
         for (ActionChoice choice : allcommands.keySet()) {
             commands = allcommands.get(choice);
-            for(BattleCommand bc : commands){
+            for(ActorCommand bc : commands){
                 str += "\n"+bc.toString();
             }
         }
@@ -144,10 +144,10 @@ public class BattleCommandManager {
 
     public String toString(){
         String str = "command pool : \n";
-        Array<BattleCommand> commands;
+        Array<ActorCommand> commands;
         for (int i = 0; i < commandPool.size; i++) {
             commands = commandPool.get(i);
-            for(BattleCommand bc : commands){
+            for(ActorCommand bc : commands){
                 str += "\n"+bc.toString();
             }
         }

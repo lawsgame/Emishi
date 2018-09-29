@@ -683,7 +683,6 @@ public class Battlefield extends Observable {
                 }
                 moveArea = getTiles(moveOnly);
             }
-            System.out.println(this.toString());
             return moveArea;
         }
 

@@ -5,7 +5,7 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -13,11 +13,11 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import java.util.Stack;
 
 public class SelectTargetBIS extends BattleInteractionState implements Observer {
-    final Stack<BattleCommand> historic;
-    final BattleCommand currentCommand;
+    final Stack<ActorCommand> historic;
+    final ActorCommand currentCommand;
     Area actionArea;
 
-    public SelectTargetBIS(BattleInteractionMachine bim, Stack<BattleCommand> historic, BattleCommand command) {
+    public SelectTargetBIS(BattleInteractionMachine bim, Stack<ActorCommand> historic, ActorCommand command) {
         super(bim, true, true, true);
         this.historic = historic;
         this.currentCommand = command;
@@ -112,7 +112,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
     @Override
     public void getNotification(Observable sender, Object data) {
-        if(data instanceof BattleCommand && data == currentCommand){
+        if(data instanceof ActorCommand && data == currentCommand){
             bim.replace(new HandleOutcomeBIS(bim, historic, false));
         }
     }

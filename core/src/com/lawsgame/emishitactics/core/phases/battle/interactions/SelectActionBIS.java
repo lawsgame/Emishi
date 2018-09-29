@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
@@ -20,11 +20,11 @@ import java.util.Stack;
 public class SelectActionBIS extends BattleInteractionState {
     int rowSltdUnit;
     int colSltdUnit;
-    Stack<BattleCommand> historic;
+    Stack<ActorCommand> historic;
     private ChoicePanel choicePanel;
     private ChoicePanel commandPanel;
 
-    public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit, Stack<BattleCommand> historic) {
+    public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit, Stack<ActorCommand> historic) {
         super(bim, true, true, true);
         this.rowSltdUnit = rowSltdUnit;
         this.colSltdUnit = colSltdUnit;
@@ -35,7 +35,7 @@ public class SelectActionBIS extends BattleInteractionState {
     }
 
     public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit) {
-        this(bim, rowSltdUnit, colSltdUnit, new Stack<BattleCommand>());
+        this(bim, rowSltdUnit, colSltdUnit, new Stack<ActorCommand>());
     }
 
     @Override
@@ -113,7 +113,7 @@ public class SelectActionBIS extends BattleInteractionState {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
 
-                            Array<BattleCommand> flavors = bis.bim.bcm.getAvailableCommands(sltdUnit, choice, true);
+                            Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(sltdUnit, choice, true);
 
                             if(flavors.size == 1){
 
@@ -164,16 +164,16 @@ public class SelectActionBIS extends BattleInteractionState {
             if (bis.bim.battlefield.isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
 
                 IUnit sltdUnit = bis.bim.battlefield.getUnit(bis.rowSltdUnit, bis.colSltdUnit);
-                Array<BattleCommand> flavors = bis.bim.bcm.getAvailableCommands(sltdUnit, actionChoice, true);
+                Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(sltdUnit, actionChoice, true);
                 for (int i = 0; i < flavors.size; i++) {
 
-                    final BattleCommand battleCommand = flavors.get(i);
-                    if(battleCommand.setInitiator(bis.rowSltdUnit, bis.colSltdUnit)) {
-                        TextButton button = new TextButton(battleCommand.getName(bis.bim.mainI18nBundle), style);
+                    final ActorCommand actorCommand = flavors.get(i);
+                    if(actorCommand.setInitiator(bis.rowSltdUnit, bis.colSltdUnit)) {
+                        TextButton button = new TextButton(actorCommand.getName(bis.bim.mainI18nBundle), style);
                         button.addListener(new ChangeListener() {
                             @Override
                             public void changed(ChangeEvent event, Actor actor) {
-                                bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, battleCommand));
+                                bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, actorCommand));
                             }
                         });
                         buttons.add(button);
