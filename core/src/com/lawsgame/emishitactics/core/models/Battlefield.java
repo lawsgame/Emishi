@@ -1,11 +1,11 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.badlogic.gdx.math.Path;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data.Affiliation;
-import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
+import com.lawsgame.emishitactics.core.models.Data.Affiliation;
+import com.lawsgame.emishitactics.core.models.Data.Weather;
+import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -32,11 +32,11 @@ public class Battlefield extends Observable {
     private TileType[][] tiles;
     private IUnit[][] units;
     private boolean[][] looted;
-    private Array<Area> deploymentAreas;
-    private HashMap<Affiliation, Array<UnitArea>> guardedAreas;
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
-    private Data.Weather weather;
+    private Array<Area> deploymentAreas;
+    private HashMap<Affiliation, Array<UnitArea>> guardedAreas;
+    private Weather weather;
     private BattleSolver solver;
 
     public LinkedList<IArmy> armyTurnOrder;
@@ -269,7 +269,7 @@ public class Battlefield extends Observable {
                     area = areas.removeIndex(i);
                     if(notifyObservers)
                         notifyAllObservers(area);
-                    continue;
+                    break;
                 }
             }
         }
@@ -668,22 +668,15 @@ public class Battlefield extends Observable {
 
         CheckMoveMap(){ }
 
-
-        public Array<int[]> getActionArea(Battlefield bf, int rowActor, int colActor, boolean moveOnly){
-            Array<int[]> moveArea = new Array<int[]>();
-            if(bf.isTileOccupied(rowActor, colActor)) {
-
-
-                set(bf, rowActor, colActor);
-                setTilesMRP();
-                condemnTiles();
-                if(!moveOnly) {
-                    IUnit actor = battlefield.getUnit(rowActor, colActor);
-                    addAttackTiles(actor);
-                }
-                moveArea = getTiles(moveOnly);
+        public Array<int[]> getActionArea(Battlefield bf, int rowActor, int colActor, IUnit actor, boolean moveOnly){
+            if(actor != null) {
+                set(bf, rowActor, colActor, actor);
+                setTilesMRP(actor);
+                condemnTiles(actor);
+                if (!moveOnly) addAttackTiles(actor);
+                return getTiles(moveOnly);
             }
-            return moveArea;
+            return new Array<int[]>();
         }
 
         private void addAttackTiles(IUnit actor) {
@@ -695,8 +688,8 @@ public class Battlefield extends Observable {
                 for(int cUnit = 0; cUnit < checkTiles[0].length; cUnit++){
                     if(checkTiles[rUnit][cUnit] > 0){
 
-                        rangeMin = actor.getCurrentWeaponRangeMin(rUnit, cUnit, battlefield);
-                        rangeMax = actor.getCurrentWeaponRangeMax(rUnit, cUnit, battlefield);
+                        rangeMin = actor.getCurrentWeaponRangeMin(rowOrigin + rUnit, colOrigin + cUnit, battlefield);
+                        rangeMax = actor.getCurrentWeaponRangeMax( rowOrigin + rUnit, colOrigin + cUnit, battlefield);
                         for(int r = rUnit - rangeMax; r <= rUnit + rangeMax; r++){
                             for(int c = cUnit - rangeMax; c <= cUnit + rangeMax; c++){
 
@@ -721,11 +714,10 @@ public class Battlefield extends Observable {
          * @param rowActor
          * @param colActor
          */
-        private void set( Battlefield bf, int rowActor, int colActor){
-            if(bf.isTileOccupied(rowActor, colActor) && bf.getUnit(rowActor, colActor).isMobilized()) {
+        private void set( Battlefield bf, int rowActor, int colActor, IUnit actor){
+            if(actor.isMobilized()) {
 
                 // get actor relevant pieces of information
-                IUnit actor = bf.getUnit(rowActor, colActor);
                 this.pathfinder = actor.has(Data.Ability.PATHFINDER);
                 this.moveRange = actor.getAppMobility();
                 this.affiliation = actor.getArmy().getAffiliation();
@@ -768,38 +760,39 @@ public class Battlefield extends Observable {
         }
 
         // MRP = mobility remaining points
-        private void setTilesMRP(){
+        private void setTilesMRP(IUnit actor){
             checkTiles[rowRelActor][colRelActor] = moveRange;
             if(moveRange > 0){
                 if(checkIndexes(rowRelActor + 1, colRelActor))
-                    updateTilesMRP(rowRelActor + 1, colRelActor, moveRange  , Data.Orientation.SOUTH);
+                    updateTilesMRP(rowRelActor + 1, colRelActor, moveRange  , actor, Data.Orientation.SOUTH);
                 if(checkIndexes(rowRelActor - 1, colRelActor))
-                    updateTilesMRP(rowRelActor - 1, colRelActor, moveRange , Data.Orientation.NORTH);
+                    updateTilesMRP(rowRelActor - 1, colRelActor, moveRange , actor, Data.Orientation.NORTH);
                 if(checkIndexes(rowRelActor, colRelActor + 1))
-                    updateTilesMRP(rowRelActor , colRelActor + 1, moveRange , Data.Orientation.WEST);
+                    updateTilesMRP(rowRelActor , colRelActor + 1, moveRange , actor, Data.Orientation.WEST);
                 if(checkIndexes(rowRelActor , colRelActor - 1))
-                    updateTilesMRP(rowRelActor , colRelActor - 1, moveRange , Data.Orientation.EAST);
+                    updateTilesMRP(rowRelActor , colRelActor - 1, moveRange , actor, Data.Orientation.EAST);
             }
 
         }
 
-        private void updateTilesMRP(int row, int col, int remainingMovePoints, Data.Orientation comefrom) {
+        private void updateTilesMRP(int row, int col, int remainingMovePoints, IUnit actor, Data.Orientation comefrom) {
             if(remainingMovePoints > checkTiles[row][col]) {
                 if (remainingMovePoints == 1) {
-                    if (battlefield.isTileAvailable(rowOrigin + row, colOrigin + col, pathfinder)) {
+                    if (battlefield.isTileAvailable(rowOrigin + row, colOrigin + col, pathfinder)
+                            || (battlefield.getUnit(rowOrigin + row, colOrigin + col) == actor )) {
                         checkTiles[row][col] = remainingMovePoints;
                     }
                 } else if (remainingMovePoints > 1) {
                     if(battlefield.isTileReachable(rowOrigin+row, colOrigin+col, pathfinder) && !battlefield.isTileOccupiedByFoe(rowOrigin+row, colOrigin+col, affiliation)){
                         checkTiles[row][col] = remainingMovePoints;
                         if(comefrom != Data.Orientation.NORTH && checkIndexes(row + 1, col))
-                            updateTilesMRP(row + 1, col, remainingMovePoints - 1  , Data.Orientation.SOUTH);
+                            updateTilesMRP(row + 1, col, remainingMovePoints - 1  , actor, Data.Orientation.SOUTH);
                         if(comefrom != Data.Orientation.SOUTH && checkIndexes(row - 1, colRelActor))
-                            updateTilesMRP(row - 1, col, remainingMovePoints - 1 , Data.Orientation.NORTH);
+                            updateTilesMRP(row - 1, col, remainingMovePoints - 1 , actor, Data.Orientation.NORTH);
                         if(comefrom != Data.Orientation.EAST && checkIndexes(row, col + 1))
-                            updateTilesMRP(row , col + 1, remainingMovePoints - 1 , Data.Orientation.WEST);
+                            updateTilesMRP(row , col + 1, remainingMovePoints - 1 , actor, Data.Orientation.WEST);
                         if(comefrom != Data.Orientation.WEST && checkIndexes(row , col - 1))
-                            updateTilesMRP(row , col - 1, remainingMovePoints - 1 , Data.Orientation.EAST);
+                            updateTilesMRP(row , col - 1, remainingMovePoints - 1 , actor, Data.Orientation.EAST);
                     }
                 }
             }
@@ -808,7 +801,7 @@ public class Battlefield extends Observable {
         /**
          * condemn tiles occupied by allies and therefore unreachable.
          */
-        private void condemnTiles(){
+        private void condemnTiles(IUnit actor){
             int oldMoveAreaSize = 0;
             int moveAreaSize = getMoveAreaSize();
             while(oldMoveAreaSize != moveAreaSize){
@@ -821,7 +814,9 @@ public class Battlefield extends Observable {
                             if(checkIndexes(r - 1, c) && checkTiles[r-1][c] > 0 && checkTiles[r-1][c] < checkTiles[r][c]) continue;
                             if(checkIndexes(r, c + 1) && checkTiles[r][c+1] > 0 && checkTiles[r][c+1] < checkTiles[r][c]) continue;
                             if(checkIndexes(r, c - 1) && checkTiles[r][c-1] > 0 && checkTiles[r][c-1] < checkTiles[r][c]) continue;
-                            if(battlefield.isTileOccupied(r + rowOrigin, c + colOrigin)) checkTiles[r][c] = 0;
+                            if(battlefield.isTileOccupied(r + rowOrigin, c + colOrigin)
+                                    && (battlefield.getUnit(r + rowOrigin, c + colOrigin ) != actor ))
+                                checkTiles[r][c] = 0;
                         }
                     }
                 }
@@ -881,7 +876,11 @@ public class Battlefield extends Observable {
      * @return fetch all tiles where the given unit can moved on
      */
     public Array<int[]> getMoveArea(int rowActor, int colActor){
-        return checkmap.getActionArea(this, rowActor, colActor, true);
+        return checkmap.getActionArea(this, rowActor, colActor, getUnit(rowActor, colActor), true);
+    }
+
+    public Array<int[]> getMoveArea(int row, int col, IUnit actor){
+        return checkmap.getActionArea(this, row, col, actor,true);
     }
 
 
@@ -889,10 +888,14 @@ public class Battlefield extends Observable {
      *
      * @param rowActor
      * @param colActor
-     * @return
+     * @return fetch all tiles where the given unit can act upon
      */
     public Array<int[]> getActionArea(int rowActor, int colActor){
-        return checkmap.getActionArea(this, rowActor, colActor, false);
+        return checkmap.getActionArea(this, rowActor, colActor, getUnit(rowActor, colActor), false);
+    }
+
+    public Array<int[]> getActionArea(int row, int col, IUnit actor){
+        return checkmap.getActionArea(this, row, col, actor,false);
     }
 
 

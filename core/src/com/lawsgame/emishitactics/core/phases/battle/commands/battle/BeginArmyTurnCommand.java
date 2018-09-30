@@ -1,7 +1,7 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.phases.battle.commands.battle;
 
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 

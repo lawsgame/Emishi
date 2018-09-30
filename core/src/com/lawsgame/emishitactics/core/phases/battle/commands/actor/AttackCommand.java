@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
@@ -247,10 +247,9 @@ public class AttackCommand extends ActorCommand {
     }
 
     @Override
-    public boolean atActionRange(int row, int col, IUnit actor) {
-        return isEnemyAtActionRange(row, col, actor, false);
+    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+        return getFoesAtRange(row, col, actor, false);
     }
-
 
     // -------------------- COMODITY BATTLE PANEL METHODS ------------------
 

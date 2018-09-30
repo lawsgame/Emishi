@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -217,7 +217,9 @@ public abstract class ActorCommand extends BattleCommand{
      * @return whether or not ANY TARGET is at range by the initiator performing the given action if one's is standing the buildingType (row, col)
      * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public abstract boolean atActionRange(int row, int col, IUnit actor);
+    public final boolean atActionRange(int row, int col, IUnit actor){
+        return getTargetsAtRange(row, col, actor).size > 0;
+    }
 
     public final boolean atActionRange(){
         if(battlefield.isTileOccupied(rowActor, colActor))
@@ -228,15 +230,16 @@ public abstract class ActorCommand extends BattleCommand{
     /**
      * AI oriented method
      *
-
-    public abstract boolean getAvailablesTarget(int row, int col, IUnit actor);
-
-    public final boolean atActionRange(){
-        if(battlefield.isTileOccupied(rowActor, colActor))
-            return atActionRange(rowActor, colActor, battlefield.getUnit(rowActor, colActor));
-        return false;
-    }
+     * return : all tile coords of available targets
      */
+    public abstract Array<int[]> getTargetsAtRange(int row, int col, IUnit actor);
+
+    public final Array<int[]> getTargetsAtRange(){
+        if(battlefield.isTileOccupied(rowActor, colActor))
+            return getTargetsAtRange(rowActor, colActor, battlefield.getUnit(rowActor, colActor));
+        return new Array<int[]>();
+    }
+
 
 
     /**
@@ -329,56 +332,51 @@ public abstract class ActorCommand extends BattleCommand{
         return valid;
     }
 
-    protected final boolean isAllyAtActionRange(int row, int col, IUnit actor, boolean woundedRequired){
-        boolean targetAtRange = false;
+    protected final Array<int[]> getAlliesAtRange(int row, int col, IUnit actor, boolean woundedRequired){
+        Array<int[]>  targetsAtRange = new Array<int[]>();
         if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
             int[] unitPos = battlefield.getUnitPos(actor);
             int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
             int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
             int dist;
-            loop:
-            {
-                for (int r = row - rangeMin; r <= row + rangeMax; r++) {
-                    for (int c = col - rangeMin; c <= col + rangeMax; c++) {
-                        dist = Utils.dist(row, col, r, c);
-                        if (rangeMin <= dist && dist <= rangeMax
-                                && battlefield.isTileOccupiedByAlly(r, c, actor.getArmy().getAffiliation())
-                                && (!woundedRequired || battlefield.getUnit(r, c).isWounded())) {
-                            targetAtRange = true;
-                            break loop;
+            for (int r = row - rangeMin; r <= row + rangeMax; r++) {
+                for (int c = col - rangeMin; c <= col + rangeMax; c++) {
+                    dist = Utils.dist(row, col, r, c);
+                    if (rangeMin <= dist && dist <= rangeMax
+                            && battlefield.isTileOccupiedByAlly(r, c, actor.getArmy().getAffiliation())
+                            && (!woundedRequired || battlefield.getUnit(r, c).isWounded())) {
 
-                        }
+                        targetsAtRange.add(new int[]{r, c});
                     }
                 }
             }
+
         }
-        return targetAtRange;
+        return targetsAtRange;
     }
 
-    protected final boolean isEnemyAtActionRange(int row, int col, IUnit actor, boolean stealableRequired){
-        boolean targetAtRange = false;
+    protected final Array<int[]> getFoesAtRange(int row, int col, IUnit actor, boolean stealableRequired){
+        Array<int[]>  targetsAtRange = new Array<int[]>();
         if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
             int[] unitPos = battlefield.getUnitPos(actor);
             int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
             int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
             int dist;
-            loop:
-            {
-                for (int r = row - rangeMin; r <= row + rangeMax; r++) {
-                    for (int c = col - rangeMin; c <= col + rangeMax; c++) {
-                        dist = Utils.dist(row, col, r, c);
-                        if (rangeMin <= dist
-                                && dist <= rangeMax
-                                && battlefield.isTileOccupiedByFoe(r, c, actor.getArmy().getAffiliation())
-                                && (!stealableRequired || battlefield.getUnit(r, c).isStealable())) {
-                            targetAtRange = true;
-                            break loop;
-                        }
+
+            for (int r = row - rangeMin; r <= row + rangeMax; r++) {
+                for (int c = col - rangeMin; c <= col + rangeMax; c++) {
+                    dist = Utils.dist(row, col, r, c);
+                    if (rangeMin <= dist
+                            && dist <= rangeMax
+                            && battlefield.isTileOccupiedByFoe(r, c, actor.getArmy().getAffiliation())
+                            && (!stealableRequired || battlefield.getUnit(r, c).isStealable())) {
+
+                        targetsAtRange.add(new int[]{r, c});
                     }
                 }
             }
         }
-        return targetAtRange;
+        return targetsAtRange;
     }
 
     /**

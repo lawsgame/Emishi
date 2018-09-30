@@ -9,9 +9,9 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EndArmyTurnCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.battle.EndArmyTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
@@ -19,14 +19,14 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePa
 
 public class EndTurnBIS extends BattleInteractionState {
     private IUnit actor;
-    EndTurnCommand endTurnCommand;
+    EndUnitTurnCommand endUnitTurnCommand;
     private ChoicePanel orientationChoicePanel;
 
     public EndTurnBIS(BattleInteractionMachine bim, IUnit actor) {
         super(bim, true, false, true);
         this.actor = actor;
         this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
-        this.endTurnCommand = new EndTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        this.endUnitTurnCommand = new EndUnitTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class EndTurnBIS extends BattleInteractionState {
 
             if(!actor.isOutOfAction()){
                 int[] actorPos = bim.battlefield.getUnitPos(actor);
-                this.endTurnCommand.apply(actorPos[0], actorPos[1]);
+                this.endUnitTurnCommand.apply(actorPos[0], actorPos[1]);
             }
 
             IArmy currentArmy = actor.getArmy();

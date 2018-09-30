@@ -1,5 +1,6 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -24,8 +25,10 @@ public abstract class SelfInflitedCommand extends ActorCommand {
     }
 
     @Override
-    public boolean atActionRange(int row, int col, IUnit actor) {
-        return true;
+    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+        Array<int[]> target = new Array<int[]>();
+        target.add(new int[]{row, col});
+        return target;
     }
 
 }

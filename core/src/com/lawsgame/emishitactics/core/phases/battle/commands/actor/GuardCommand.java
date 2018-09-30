@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;

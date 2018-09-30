@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.ai;
 
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -22,14 +22,13 @@ public class AggressiveAI extends PassiveAI{
 
 
 
-
-            EndTurnCommand endTurnCommand = new EndTurnCommand(bfr, scheduler, playerInventory);
-            if(endTurnCommand.setInitiator(actorPos[0], actorPos[1])){
-                if(endTurnCommand.isTargetValid()){
-                    endTurnCommand.setDecoupled(true);
-                    endTurnCommand.apply();
-                    bundle.commands.add(endTurnCommand);
-                    bundle.panels.add(app.getPanel(endTurnCommand));
+            EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory);
+            if(endUnitTurnCommand.setInitiator(actorPos[0], actorPos[1])){
+                if(endUnitTurnCommand.isTargetValid()){
+                    endUnitTurnCommand.setDecoupled(true);
+                    endUnitTurnCommand.apply();
+                    bundle.commands.add(endUnitTurnCommand);
+                    bundle.panels.add(app.getPanel(endUnitTurnCommand));
                 }
             }
         }

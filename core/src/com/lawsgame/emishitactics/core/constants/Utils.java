@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 
 import java.util.Stack;
 

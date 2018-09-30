@@ -6,18 +6,18 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ChooseOrientationCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EndTurnCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.MoveCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.PushCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchPositionCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PushCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class BattleCommandManager {
         setChoice(new GuardCommand(bfr, scheduler, playerInventory));
         setChoice(new HealCommand(bfr, scheduler, playerInventory));
         setChoice(new StealCommand(bfr, scheduler, playerInventory));
-        setChoice(new EndTurnCommand(bfr, scheduler, playerInventory));
+        setChoice(new EndUnitTurnCommand(bfr, scheduler, playerInventory));
 
     }
 

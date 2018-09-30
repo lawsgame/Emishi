@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionInfoPanel;
 

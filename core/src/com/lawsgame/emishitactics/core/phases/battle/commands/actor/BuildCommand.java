@@ -1,5 +1,6 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
@@ -7,7 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data.Ability;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -64,40 +65,35 @@ public class BuildCommand extends ActorCommand {
     }
 
     @Override
-    public boolean atActionRange(int row, int col, IUnit actor) {
-        boolean targetAtRange = false;
+    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+        Array<int[]> targetsAtRange = new Array<int[]>();
         int rangeMin = choice.getRangeMin();
         int rangeMax = choice.getRangeMax();
         int dist;
-        loop:
-        {
-            for (int r = row - rangeMin; r <= row + rangeMax; r++) {
-                for (int c = col - rangeMin; c <= col + rangeMax; c++) {
-                    dist = Utils.dist(row, col, r, c);
-                    if (rangeMin <= dist && dist <= rangeMax
-                            && battlefield.isTileExisted(r, c)) {
 
+        for (int r = row - rangeMin; r <= row + rangeMax; r++) {
+            for (int c = col - rangeMin; c <= col + rangeMax; c++) {
+                dist = Utils.dist(row, col, r, c);
+                if (rangeMin <= dist && dist <= rangeMax && battlefield.isTileExisted(r, c)) {
 
-                        if (buildingType == Data.TileType.WATCH_TOWER
-                                && battlefield.isTileOfType(r, c, Data.TileType.PLAIN)) {
+                    if (buildingType == Data.TileType.WATCH_TOWER
+                            && battlefield.isTileOfType(r, c, Data.TileType.PLAIN)) {
 
-                            targetAtRange = true;
-                            break loop;
-                        } else if (buildingType == Data.TileType.BRIDGE
-                                && battlefield.isTileOfType(r, c, Data.TileType.SHALLOWS)
-                                && ((battlefield.isTileOfType(r, c + 1, Data.TileType.PLAIN) && battlefield.isTileOfType(r, c - 1, Data.TileType.PLAIN))
-                                || (battlefield.isTileOfType(r + 1, c, Data.TileType.PLAIN) && battlefield.isTileOfType(r - 1, c, Data.TileType.PLAIN)))) {
+                        targetsAtRange.add(new int[]{r, c});
+                    } else if (buildingType == Data.TileType.BRIDGE
+                            && battlefield.isTileOfType(r, c, Data.TileType.SHALLOWS)
+                            && ((battlefield.isTileOfType(r, c + 1, Data.TileType.PLAIN) && battlefield.isTileOfType(r, c - 1, Data.TileType.PLAIN))
+                            || (battlefield.isTileOfType(r + 1, c, Data.TileType.PLAIN) && battlefield.isTileOfType(r - 1, c, Data.TileType.PLAIN)))) {
 
-                            targetAtRange = true;
-                            break loop;
-                        }
-
+                        targetsAtRange.add(new int[]{r, c});
                     }
+
                 }
             }
         }
 
-        return targetAtRange;
+
+        return targetsAtRange;
     }
 
     public Data.TileType getBuildingType() {

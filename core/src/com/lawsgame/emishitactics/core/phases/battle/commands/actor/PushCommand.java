@@ -1,12 +1,13 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
@@ -69,27 +70,31 @@ public class PushCommand extends ActorCommand {
     }
 
     @Override
-    public boolean atActionRange(int row, int col, IUnit actor) {
-        boolean targetAtRange = false;
+    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+        Array<int[]> targetsAtRange = new Array<int[]>();
         if(actor.isMobilized()) {
             if (battlefield.isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAffiliation())
                     && battlefield.isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER))) {
-                targetAtRange = true;
-            } else {
-                if (battlefield.isTileOccupiedByAlly(row - 1, col, actor.getArmy().getAffiliation())
-                        && battlefield.isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))) {
-                    targetAtRange = true;
-                } else {
-                    if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getArmy().getAffiliation())
-                            && battlefield.isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))) {
-                        targetAtRange = true;
-                    } else if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getArmy().getAffiliation())
-                            && battlefield.isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))) {
-                        targetAtRange = true;
-                    }
-                }
+                targetsAtRange.add(new int[]{row + 1, col});
             }
+
+            if (battlefield.isTileOccupiedByAlly(row - 1, col, actor.getArmy().getAffiliation())
+                    && battlefield.isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))) {
+                targetsAtRange.add(new int[]{row - 1, col});
+            }
+
+            if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getArmy().getAffiliation())
+                    && battlefield.isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))) {
+                targetsAtRange.add(new int[]{row, col + 1});
+            }
+
+            if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getArmy().getAffiliation())
+                    && battlefield.isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))) {
+                targetsAtRange.add(new int[]{row, col - 1});
+            }
+
+
         }
-        return targetAtRange;
+        return targetsAtRange;
     }
 }

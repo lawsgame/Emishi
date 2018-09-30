@@ -1,11 +1,12 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -63,7 +64,7 @@ public class SwitchPositionCommand extends ActorCommand {
     }
 
     @Override
-    public boolean atActionRange(int row, int col, IUnit actor) {
-        return isAllyAtActionRange(row, col, actor, false);
+    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+        return getAlliesAtRange(row, col, actor, false);
     }
 }

@@ -1,20 +1,20 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.SelfInflitedCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 import static com.lawsgame.emishitactics.core.models.Data.ActionChoice.END_TURN;
 
-public class EndTurnCommand extends SelfInflitedCommand {
+public class EndUnitTurnCommand extends SelfInflitedCommand {
 
 
 
-    public EndTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+    public EndUnitTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, END_TURN, scheduler, playerInventory, true);
     }
 

@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;

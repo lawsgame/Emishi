@@ -9,12 +9,12 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.commands.AttackCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BuildCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.StealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.SwitchWeaponCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;

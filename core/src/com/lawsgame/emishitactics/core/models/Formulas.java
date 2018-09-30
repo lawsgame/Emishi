@@ -24,6 +24,9 @@ public class Formulas {
     }
 
     public static int getRandomlyAttackMight(int[] attackMightRange, int attackerDexterity){
+        /*
+        // ELABORED DEX-ORIENTED PROBA
+
         int attackMight = 0;
         float p = 0f;
         float r = MathUtils.random();
@@ -36,8 +39,8 @@ public class Formulas {
                 attackMight = am;
                 break;
             }
-        }
-        return attackMight;
+        }*/
+        return MathUtils.random(attackMightRange[0], attackMightRange[1]);
     }
 
     /**
@@ -47,10 +50,10 @@ public class Formulas {
      * @return probability, between 0.0 and 1.0
      */
     public static float getDamageValueProbability(float k, float n, int dexterity, float factor){
-        float res = 0f;
+        float p = 0f;
         if(k > 0 && k <= n)
-            res = (float) (Math.pow(k / n, Math.log(1 + factor*dexterity)) - Math.pow( (k - 1) / n, Math.log(1 + factor*dexterity)));
-        return res;
+            p = (float) (Math.pow(k / n, Math.log(1 + factor*dexterity)) - Math.pow( (k - 1) / n, Math.log(1 + factor*dexterity)));
+        return p;
     }
 
     public static int[] getCurrentAttackMightRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){

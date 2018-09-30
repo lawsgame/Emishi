@@ -12,7 +12,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.interfaces.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
@@ -155,10 +155,6 @@ public class TestBIS extends BattleInteractionState {
         System.out.println("input : "+row+" "+col);
         //bim.moveCamera(row, col, true);
 
-        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
-        Array<int[]> path = bim.battlefield.getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation(), 3);
-        System.out.println("path : "+path.size);
-        moveAW.setTiles(path, true);
 
         // TEST FINAL
 
@@ -178,7 +174,7 @@ public class TestBIS extends BattleInteractionState {
                     case 6 : command = new StealCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
                     case 7 : command =  new SwitchWeaponCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), 1); break;
                     case 8 : command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), Data.Orientation.NORTH);break;
-                    case 9 : command = new EndTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
+                    case 9 : command = new EndUnitTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
                     default: command = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
                 }
             } else {
@@ -198,14 +194,20 @@ public class TestBIS extends BattleInteractionState {
                     historic.push(command);
                 }
             }
+        }*/
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
+            bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
+
+            Array<int[]> tiles = bim.battlefield.getMoveArea(row, col);
+            moveAW.setTiles(tiles, true);
+            tiles = bim.battlefield.getActionArea(row, col);
+            actionAW.setTiles(tiles, true);
         }
 
-        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
-        Array<int[]> tiles = bim.battlefield.getMoveArea(actorPos[0], actorPos[1]);
-        moveAW.setTiles(tiles, true);
-        tiles = bim.battlefield.getActionArea(actorPos[0], actorPos[1]);
-        actionAW.setTiles(tiles, true);
-        */
+
 
         return true;
     }

@@ -55,12 +55,14 @@ public abstract class BattleInteractionState extends InteractionState {
     @Override
     public void onTouch(float gameX, float gameY) {
         if(!bim.gcm.isCameraMoving()) {
+
             rowTouch = bim.bfr.getRow(gameX, gameY);
             colTouch = bim.bfr.getCol(gameX, gameY);
             if (!handleTouchInput(rowTouch, colTouch) && bim.battlefield.isTileExisted(rowTouch, colTouch)) {
+
                 bim.focusOn(rowTouch, colTouch, true, true, true, false, false);
                 if (bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, Data.Affiliation.ALLY)) {
-                    //TODO: add or remove selected foe action area to those of its alleageanca alreadt registered
+                    //TODO: add or remove selected foe action area to those of its alleageanca already registered
 
 
                 }
