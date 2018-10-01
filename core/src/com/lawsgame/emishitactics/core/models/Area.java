@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
@@ -11,10 +12,10 @@ public  class Area extends Observable {
     private int colInit;
     private boolean[][] checkmap;
     private Battlefield battlefield;
-    private Data.AreaType type;
+    private AreaType type;
     private String tag;
 
-    public Area(Battlefield battlefield, Data.AreaType type){
+    public Area(Battlefield battlefield, AreaType type){
         this.battlefield = battlefield;
         this.type = type;
         this.rowInit = -1;
@@ -23,22 +24,30 @@ public  class Area extends Observable {
         this.tag = "";
     }
 
-    public Area(Battlefield battlefield, Data.AreaType type, int row, int col){
+    public Area(Battlefield battlefield, AreaType type, int row, int col){
         this.battlefield = battlefield;
         setType(type, false);
         setTiles(row, col, false);
         this.tag = "";
     }
 
-    public Area(Battlefield battlefield, Data.AreaType type, Array<int[]> tiles){
+    public Area(Battlefield battlefield, AreaType type, Array<int[]> tiles){
         this.battlefield = battlefield;
         setType(type, false);
         setTiles(tiles, false);
         this.tag = "";
     }
 
-    public Area(Battlefield battlefield, Data.AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax){
+    public Area(Battlefield battlefield, AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax){
         this(battlefield , type, Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax));
+    }
+
+    public static UnitAttachedArea createGuardedArea(Battlefield bf, int rowActor, int colActor, IUnit actor){
+        return new UnitAttachedArea(bf,
+                Data.AreaType.GUARD_AREA,
+                Utils.getEreaFromRange(bf, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX),
+                actor,
+                true);
     }
 
 
@@ -105,7 +114,7 @@ public  class Area extends Observable {
             notifyAllObservers(null);
     }
 
-    public void setType(Data.AreaType type, boolean notifyObservers){
+    public void setType(AreaType type, boolean notifyObservers){
         this.type = type;
         if(notifyObservers)
             notifyAllObservers(null);
@@ -143,7 +152,7 @@ public  class Area extends Observable {
         return battlefield;
     }
 
-    public Data.AreaType getType() {
+    public AreaType getType() {
         return type;
     }
 
@@ -186,24 +195,23 @@ public  class Area extends Observable {
 
     // --------------- SPECIFIC IMPLEMENTATION OF THE AREA CLASS
 
-    public static class UnitArea extends Area{
+    public static class UnitAttachedArea extends Area{
         private IUnit actor;
+        private boolean removedUponMovingUnit;
 
-        public UnitArea(Battlefield battlefield, Data.AreaType type, Array<int[]> tiles, IUnit actor) {
+        public UnitAttachedArea(Battlefield battlefield, AreaType type, Array<int[]> tiles, IUnit actor, boolean removedUponMovingUnit) {
             super(battlefield, type, tiles);
             this.actor = actor;
-        }
-
-        public UnitArea(Battlefield battlefield, Data.AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax, IUnit actor) {
-            super(battlefield, type, rCenter, cCenter, rangeMin, rangeMax);
-            this.actor = actor;
+            this.removedUponMovingUnit = removedUponMovingUnit;
         }
 
         public IUnit getActor(){
             return actor;
         }
 
-
+        public boolean isRemovedUponMovingUnit() {
+            return removedUponMovingUnit;
+        }
     }
 
 

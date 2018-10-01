@@ -12,7 +12,7 @@ public class PassiveAI extends AI {
 
 
     public PassiveAI(BattlefieldRenderer bfr, AnimationScheduler scheduler, ActionPanelPool app, Inventory playerInventory) {
-        super(bfr, scheduler, app, playerInventory);
+        super(bfr, scheduler, app, playerInventory, bfr.getModel().getCurrentArmy());
     }
 
     @Override

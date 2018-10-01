@@ -45,7 +45,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle mainI18nBundle;
-    public final AI ai;
 
     private Area selectedTile;
     private Area touchedTile;
@@ -75,8 +74,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.player = player;
         this.multiplexer = new InputMultiplexer();
         this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
-        this.ai = new PassiveAI(bfr, scheduler, app, player.getInventory());
-
 
         this.selectedTile = new Area(battlefield, Data.AreaType.SELECTED_UNIT);
         this.touchedTile = new Area(battlefield, Data.AreaType.TOUCHED_TILE);

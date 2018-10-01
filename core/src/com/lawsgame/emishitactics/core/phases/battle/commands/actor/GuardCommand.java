@@ -1,8 +1,10 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
-import com.lawsgame.emishitactics.core.models.Area.UnitArea;
+import com.lawsgame.emishitactics.core.models.Area.UnitAttachedArea;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -33,7 +35,8 @@ public class GuardCommand extends SelfInflitedCommand {
         actor = battlefield.getUnit(rowActor, colActor);
 
         // update model
-        UnitArea area = battlefield.addGuardedArea(rowActor, colActor);
+        UnitAttachedArea area = Area.createGuardedArea(battlefield, rowActor, colActor, actor);
+        battlefield.addUnitAttachedArea(area, false);
 
 
         // push render task
@@ -64,9 +67,10 @@ public class GuardCommand extends SelfInflitedCommand {
     @Override
     public void unexecute() {
         if(actor != null){
-            UnitArea area = battlefield.removeGuardedArea(actor, false);
-            if(area != null)
-                scheduleRenderTask(new StandardTask(bfr, area));
+            Array<UnitAttachedArea> areas = battlefield.removeUnitAttachedArea(actor, Data.AreaType.GUARD_AREA, false);
+            for(int i = 0; i < areas.size; i++) {
+                scheduleRenderTask(new StandardTask(bfr, areas.get(i)));
+            }
         }
     }
 }

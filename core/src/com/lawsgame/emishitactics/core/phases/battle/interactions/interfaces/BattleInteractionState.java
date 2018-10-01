@@ -16,7 +16,6 @@ public abstract class BattleInteractionState extends InteractionState {
     // on touch variables
     private int rowTouch;
     private int colTouch;
-    private boolean inputNotHandled;
 
     public BattleInteractionState(BattleInteractionMachine bim,
                                   boolean BFDisplayable,

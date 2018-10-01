@@ -2,10 +2,11 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Area.UnitArea;
+import com.lawsgame.emishitactics.core.models.Area.UnitAttachedArea;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
-import com.lawsgame.emishitactics.core.models.Data.Weather;
+import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -35,11 +36,12 @@ public class Battlefield extends Observable {
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
     private Array<Area> deploymentAreas;
-    private HashMap<Affiliation, Array<UnitArea>> guardedAreas;
+    private Array<UnitAttachedArea> unitAttachedAreas;
     private Weather weather;
     private BattleSolver solver;
 
     public LinkedList<IArmy> armyTurnOrder;
+
 
     public Battlefield (int nbRows, int nbCols, Data.Weather weather, BattleSolver solver){
         if(nbRows > 0 && nbCols > 0) {
@@ -50,15 +52,13 @@ public class Battlefield extends Observable {
         this.deploymentAreas = new Array<Area>();
         this.deploymentAreas.add(new Area(this, Data.AreaType.DEPLOYMENT_AREA));
 
-        this.guardedAreas = new HashMap<Affiliation, Array<UnitArea>>();
-        for(Data.Affiliation a: Affiliation.values()){
-            this.guardedAreas.put(a, new Array<UnitArea>());
-        }
+        this.unitAttachedAreas = new Array<UnitAttachedArea>();
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
-        this.armyTurnOrder = new LinkedList<IArmy>();
         setWeather(weather, true);
         setSolver(solver);
+
+        this.armyTurnOrder = new LinkedList<IArmy>();
     }
 
     public Battlefield(int nbRows, int nbCols){
@@ -87,11 +87,21 @@ public class Battlefield extends Observable {
         return 0;
     }
 
-    //------------------------ ARMY TURN MANAGEMENT ------------------------------------------------------
+    //----------------- ARMY TURN MANAGEMENT --------------------------------
 
+    /**
+     * is required to be called after all parties are deployed.
+     */
+    public void pushPlayerArmyTurnForward(){
+        if(!armyTurnOrder.isEmpty()) {
+            IArmy army = armyTurnOrder.peek();
+            while (!army.isPlayerControlled()) {
+                armyTurnOrder.offer(armyTurnOrder.pop());
+                army = armyTurnOrder.peek();
+            }
+        }
 
-
-
+    }
 
 
     /**
@@ -99,7 +109,6 @@ public class Battlefield extends Observable {
      * @param army
      */
     public void addArmyId(IArmy army){
-
         //check if the army if already deployed
         boolean armyAlreadyAdded = false;
         for(int i = 0; i < armyTurnOrder.size(); i++){
@@ -113,47 +122,27 @@ public class Battlefield extends Observable {
         }
     }
 
-    /*
-     * scrolls the ring until finding the player controlled army,
-     * then push it down the queue for the next first AI army to beginTurn his turn
-     * useful if AI BIS has been interrupted
-     */
-    public void resetArmyTurnOrder() {
-        IArmy army;
-        if(!solver.isBattleOver()) {
-            for (int i = 0; i < armyTurnOrder.size(); i++) {
-                army = armyTurnOrder.pop();
-                armyTurnOrder.offer(army);
-                if (army.isPlayerControlled()) {
-                    break;
-                }
-            }
-        }
+
+    public IArmy getCurrentArmy() {
+        return armyTurnOrder.peek();
     }
 
     /*
      *
      * @return get next army contains within the ring with at least one  unit who still fights
      */
-    public IArmy getNextArmy(){
-        IArmy army;
-        while(!armyTurnOrder.isEmpty()) {
-            army = armyTurnOrder.pop();
-            for (int r = 0; r < getNbRows(); r++) {
-                for (int c = 0; c < getNbColumns(); c++) {
-                    if (isTileOccupied(r, c)) {
-                        IUnit unit = getUnit(r, c);
-                        if (unit.isMobilized() && unit.getArmy() == army
-                                && !unit.isOutOfAction()) {
-                            armyTurnOrder.offer(army);
-                            return army;
-                        }
-                    }
-                }
+    public void nextArmy(){
+
+        if(!armyTurnOrder.isEmpty()) {
+            armyTurnOrder.offer(armyTurnOrder.pop());
+            IArmy army = armyTurnOrder.peek();
+            while (!armyTurnOrder.isEmpty() && !army.isDeployedTroopsStillFighting(this)) {
+               armyTurnOrder.pop();
+               army = armyTurnOrder.peek();
             }
         }
-        return null;
     }
+
 
 
     // ---------------- TILE MANAGEMENT ------------------------------------
@@ -246,41 +235,59 @@ public class Battlefield extends Observable {
         return c + getNbColumns() * r;
     }
 
-    public UnitArea addGuardedArea(int rowActor, int colActor){
-        Area.UnitArea area = null;
-        if(isTileOccupied(rowActor, colActor)) {
-            IUnit actor = getUnit(rowActor, colActor);
-            if(actor.isMobilized()) {
-                Array<int[]> tiles = Utils.getEreaFromRange(this, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX);
-                area = new Area.UnitArea(this, Data.AreaType.GUARD_AREA, tiles, actor);
-                this.guardedAreas.get(actor.getArmy().getAffiliation()).add(area);
 
+
+    //------------------ AREAS MAGEMETNS --------------------------------------
+
+    public void addUnitAttachedArea(UnitAttachedArea area, boolean notifyObservers){
+        if(area != null && area.getActor() != null) {
+            unitAttachedAreas.add(area);
+            if(notifyObservers) {
+                notifyAllObservers(area);
             }
         }
-        return area;
     }
 
-    public UnitArea removeGuardedArea(IUnit actor, boolean notifyObservers){
-        UnitArea area = null;
-        if(actor != null && actor.isMobilized()){
-            Array<Area.UnitArea> areas = this.guardedAreas.get(actor.getArmy().getAffiliation());
-            for (int i = 0; i < areas.size; i++) {
-                if (areas.get(i).getActor() == actor) {
-                    area = areas.removeIndex(i);
-                    if(notifyObservers)
-                        notifyAllObservers(area);
-                    break;
+    public Array<UnitAttachedArea> removeUnitAttachedArea(IUnit actor, AreaType type, boolean notifyObservers){
+        Array<UnitAttachedArea> removedAreas = new Array<UnitAttachedArea>();
+        for(int i = 0; i < unitAttachedAreas.size; i++){
+            if(unitAttachedAreas.get(i).getActor() == actor && unitAttachedAreas.get(i).getType() == type){
+                removedAreas.add(unitAttachedAreas.removeIndex(i));
+                i--;
+                if(notifyObservers) {
+                    notifyAllObservers(removedAreas.peek());
                 }
             }
         }
-        return area;
+        return removedAreas;
+    }
+
+    public Array<UnitAttachedArea> removeAllAttachedArea(IUnit actor, boolean moved, boolean notifyObservers){
+        Array<UnitAttachedArea> removedAreas = new Array<UnitAttachedArea>();
+        for(int i = 0; i < unitAttachedAreas.size; i++){
+            if(unitAttachedAreas.get(i).getActor() == actor && (!moved || unitAttachedAreas.get(i).isRemovedUponMovingUnit())){
+                removedAreas.add(unitAttachedAreas.removeIndex(i));
+                i--;
+                if(notifyObservers) {
+                    notifyAllObservers(removedAreas.peek());
+                }
+            }
+        }
+        return removedAreas;
+    }
+
+    public Array<UnitAttachedArea> getUnitAttachedAreas() {
+        return unitAttachedAreas;
     }
 
     public Array<IUnit> getAvailableGuardians(int row, int col, Affiliation alleageance){
         Array<IUnit> guardians =  new Array<IUnit>();
-        for (int k = 0; k < guardedAreas.get(alleageance).size; k++) {
-            if (guardedAreas.get(alleageance).get(k).contains(row, col)) {
-                guardians.add(guardedAreas.get(alleageance).get(k).getActor());
+        for (int k = 0; k < unitAttachedAreas.size; k++) {
+            if (unitAttachedAreas.get(k).getType() == AreaType.GUARD_AREA
+                    && unitAttachedAreas.get(k).getActor() != null
+                    && unitAttachedAreas.get(k).getActor().isAllyWith(alleageance)
+                    && unitAttachedAreas.get(k).contains(row, col)) {
+                guardians.add(unitAttachedAreas.get(k).getActor());
             }
         }
         return guardians;
@@ -385,9 +392,12 @@ public class Battlefield extends Observable {
 
     public boolean isTileGuarded(int row, int col, Affiliation alliedAffiliation){
         boolean res = false;
-        Array<Area.UnitArea> allyGuardedArea = guardedAreas.get(alliedAffiliation);
-        for(int i = 0; i < allyGuardedArea.size; i++){
-            if(allyGuardedArea.get(i).contains(row, col)){
+        for(int i = 0; i < unitAttachedAreas.size; i++){
+            if (unitAttachedAreas.get(i).getType() == AreaType.GUARD_AREA
+                    && unitAttachedAreas.get(i).getActor() != null
+                    && unitAttachedAreas.get(i).getActor().isAllyWith(alliedAffiliation)
+                    && unitAttachedAreas.get(i).contains(row, col)) {
+
                 res = true;
                 break;
             }
@@ -471,51 +481,54 @@ public class Battlefield extends Observable {
         return false;
     }
 
-    public boolean switchUnitPositions(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
+    public void switchUnitPositions(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
         if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2)){
             IUnit unit1 = getUnit(rowUnit1, colUnit1);
             IUnit unit2 = getUnit(rowUnit2, colUnit2);
             if(isTileReachable(rowUnit1, colUnit1, unit2.has(Data.Ability.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(Data.Ability.PATHFINDER)))){
-                removeGuardedArea(unit1, false);
-                removeGuardedArea(unit2, false);
+                removeAllAttachedArea(unit1,  true,false);
+                removeAllAttachedArea(unit2, true, false);
                 this.units[rowUnit2][colUnit2] = unit1;
                 this.units[rowUnit1][colUnit1] = unit2;
-                return true;
+
             }
         }
-        return false;
     }
 
-    public boolean moveUnit(int rowI, int colI, int rowf, int colf, boolean notifyObservers){
+    public void moveUnit(int rowI, int colI, int rowf, int colf, boolean notifyObservers){
 
         if(isTileOccupied(rowI, colI)) {
             IUnit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(Data.Ability.PATHFINDER))){
-                removeGuardedArea(unit, notifyObservers);
+                removeAllAttachedArea(unit,true,  notifyObservers);
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
                 if(notifyObservers)
                     notifyAllObservers(new Notification.SetUnit(rowf, colf, unit));
-                return true;
             }
         }
-        return false;
     }
 
     public boolean isUnitGuarding(int rowUnit, int colUnit){
         if(isTileOccupied(rowUnit, colUnit)){
             IUnit unit = getUnit(rowUnit, colUnit);
             if(unit.isMobilized()) {
-                Array<UnitArea> areas = getGuardedAreas().get(unit.getArmy().getAffiliation());
-                for(int i = 0; i < areas.size; i++){
-                    if(areas.get(i).getActor() == unit){
+                for(int i = 0; i < unitAttachedAreas.size; i++){
+                    if (unitAttachedAreas.get(i).getType() == AreaType.GUARD_AREA
+                            && unitAttachedAreas.get(i).getActor() != null
+                            && unitAttachedAreas.get(i).getActor().isAllyWith(unit.getArmy().getAffiliation())
+                            && unitAttachedAreas.get(i).contains(rowUnit, colUnit)) {
+
                         return true;
                     }
                 }
             }
         }
+
         return false;
     }
+
+
 
     public IUnit getUnit(int row, int col){
         return this.units[row][col];
@@ -565,7 +578,7 @@ public class Battlefield extends Observable {
     public IUnit removeUnit(int row, int col, boolean notifyObservers){
         IUnit unit = this.units[row][col];
         this.units[row][col] = null;
-        removeGuardedArea(unit, notifyObservers);
+        removeAllAttachedArea(unit, false, notifyObservers);
         if(notifyObservers)
             notifyAllObservers(getUnit(row, col));
         return unit;
@@ -1126,10 +1139,6 @@ public class Battlefield extends Observable {
         if(0 <= areaIndex && areaIndex < deploymentAreas.size)
             return deploymentAreas.get(areaIndex);
         return null;
-    }
-
-    public HashMap<Affiliation, Array<Area.UnitArea>> getGuardedAreas() {
-        return guardedAreas;
     }
 
     public int getNumberOfDeploymentAreas(){

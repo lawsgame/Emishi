@@ -54,7 +54,10 @@ public class BattlefieldTest {
 
         assertTrue(battlefield.armyTurnOrder.size() == 4);
         assertTrue(battlefield.getSolver().isBattleOver());
-        assertTrue(battlefield.getNextArmy() == null);
+
+        battlefield.nextArmy();
+
+        assertTrue(battlefield.getCurrentArmy() == null);
         assertTrue(battlefield.armyTurnOrder.size() == 0);
 
         army1.appointWarLord(phillipe);
@@ -65,31 +68,37 @@ public class BattlefieldTest {
         assertTrue(battlefield.armyTurnOrder.size() == 2);
         assertTrue(!battlefield.getSolver().isBattleOver());
 
-        IArmy army = battlefield.getNextArmy();
+        //battlefield.nextArmy();
+        IArmy army = battlefield.getCurrentArmy();
 
         assertTrue(army == army1);
 
-        army = battlefield.getNextArmy();
+        battlefield.nextArmy();
+        army = battlefield.getCurrentArmy();
 
         assertTrue(army == army3);
 
-        army = battlefield.getNextArmy();
+        battlefield.nextArmy();
+        army = battlefield.getCurrentArmy();
 
         assertTrue(army == army1);
 
         army3.setDone(true, false);
-        army = battlefield.getNextArmy();
+        battlefield.nextArmy();
+        army = battlefield.getCurrentArmy();
 
         assertTrue(debby.isDone());
         assertTrue(army == army3);
 
         phillipe.applyDamage(300, false);
-        army = battlefield.getNextArmy();
+        battlefield.nextArmy();
+        army = battlefield.getCurrentArmy();
 
         assertTrue(phillipe.isDead());
         assertTrue(army == army3);
 
-        army = battlefield.getNextArmy();
+        battlefield.nextArmy();
+        army = battlefield.getCurrentArmy();
 
 
         assertTrue(army == army3);

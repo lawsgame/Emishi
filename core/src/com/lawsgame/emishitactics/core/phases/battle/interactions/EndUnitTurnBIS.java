@@ -17,12 +17,12 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.Bat
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 
-public class EndTurnBIS extends BattleInteractionState {
+public class EndUnitTurnBIS extends BattleInteractionState {
     private IUnit actor;
     EndUnitTurnCommand endUnitTurnCommand;
     private ChoicePanel orientationChoicePanel;
 
-    public EndTurnBIS(BattleInteractionMachine bim, IUnit actor) {
+    public EndUnitTurnBIS(BattleInteractionMachine bim, IUnit actor) {
         super(bim, true, false, true);
         this.actor = actor;
         this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
@@ -68,13 +68,9 @@ public class EndTurnBIS extends BattleInteractionState {
                 this.endUnitTurnCommand.apply(actorPos[0], actorPos[1]);
             }
 
-            IArmy currentArmy = actor.getArmy();
-            if (currentArmy.isDone()) {
+            if (bim.battlefield.getCurrentArmy().isDone()) {
 
-                EndArmyTurnCommand endCommand = new EndArmyTurnCommand(bim.bfr, bim.scheduler, currentArmy);
-                endCommand.apply();
-                bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(actor), Notification.Done.get(false)));
-                bim.replace(new AiBIS(bim));
+                bim.replace(new EndArmyTurnBIS(bim));
             } else {
 
                 bim.replace(new SelectActorBIS(bim, false));
@@ -83,9 +79,9 @@ public class EndTurnBIS extends BattleInteractionState {
     }
 
     static class OrientationButtonHandler implements ChoicePanel.ButtonHandler{
-        private EndTurnBIS bis;
+        private EndUnitTurnBIS bis;
 
-        public OrientationButtonHandler(EndTurnBIS bis) {
+        public OrientationButtonHandler(EndUnitTurnBIS bis) {
             this.bis = bis;
         }
 

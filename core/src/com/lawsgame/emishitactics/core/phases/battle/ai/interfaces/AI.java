@@ -20,12 +20,19 @@ public abstract class AI extends Observable implements Runnable {
     protected AnimationScheduler scheduler;
     protected ActionPanelPool app;
     protected Inventory playerInventory;
+    protected IArmy army;
 
-    public AI(BattlefieldRenderer bfr, AnimationScheduler scheduler, ActionPanelPool app, Inventory playerInventory) {
+    public AI(
+            BattlefieldRenderer bfr,
+            AnimationScheduler scheduler,
+            ActionPanelPool app,
+            Inventory playerInventory,
+            IArmy army) {
         this.bfr = bfr;
         this.scheduler = scheduler;
         this.app = app;
         this.playerInventory = playerInventory;
+        this.army = army;
     }
 
 
@@ -36,47 +43,28 @@ public abstract class AI extends Observable implements Runnable {
     public void run() {
 
         Battlefield bf = bfr.getModel();
-        IArmy currentArmy;
         int[] actorPos;
         CommandBundle bundle;
-        BeginArmyTurnCommand beginCommand;
-        EndArmyTurnCommand endCommand;
         if(!bf.getSolver().isBattleOver()) {
-            loop :
-            {
-                bf.resetArmyTurnOrder();
-                currentArmy = bf.getNextArmy();
-
-                while (!currentArmy.isPlayerControlled()) {
-
-                    beginCommand = new BeginArmyTurnCommand(bfr, scheduler, currentArmy);
-                    beginCommand.setDecoupled(true);
-                    beginCommand.apply();
-                    bundle = new CommandBundle();
-                    bundle.offer(beginCommand, null);
-                    notifyAllObservers(bundle);
-
-                    while (!currentArmy.isDone()) {
-                        actorPos = nextUnit(currentArmy);
-                        bundle = getCommandPackage(actorPos);
-                        notifyAllObservers(bundle);
-                        if (bf.getSolver().isBattleOver()) {
-                            break loop;
-                        }
-                    }
-
-                    endCommand = new EndArmyTurnCommand(bfr, scheduler, currentArmy);
-                    endCommand.setDecoupled(true);
-                    endCommand.apply();
-                    bundle = new CommandBundle();
-                    bundle.offer(endCommand, null);
-                    notifyAllObservers(bundle);
 
 
-                    currentArmy = bf.getNextArmy();
+            BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bfr, scheduler,army);
+            beginCommand.setDecoupled(true);
+            beginCommand.apply();
+            bundle = new CommandBundle();
+            bundle.offer(beginCommand, null);
+            notifyAllObservers(bundle);
+
+            while (!army.isDone()) {
+                actorPos = nextUnit(army);
+                bundle = getCommandPackage(actorPos);
+                notifyAllObservers(bundle);
+                if (bf.getSolver().isBattleOver()) {
+                    break;
                 }
             }
         }
+
         notifyAllObservers(this);
 
     }

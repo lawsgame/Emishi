@@ -119,7 +119,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
                 IUnit actor = historic.peek().getInitiator();
                 if(actor.isOutOfAction() || actor.isDone()) {
-                        bim.replace(new EndTurnBIS(bim, actor));
+                        bim.replace(new EndUnitTurnBIS(bim, actor));
                 }else{
                     int[] actorPos = bim.battlefield.getUnitPos(actor);
                     bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));

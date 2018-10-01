@@ -71,10 +71,8 @@ public class IsoBFR extends BattlefieldRenderer {
             }
 
             // build up area renderers
-            for (Data.Affiliation a : Data.Affiliation.values()) {
-                for (int i = 0; i < getModel().getGuardedAreas().get(a).size; i++) {
-                    addAreaRenderer(getModel().getGuardedAreas().get(a).get(i));
-                }
+            for (int i = 0; i < getModel().getUnitAttachedAreas().size ; i++) {
+                addAreaRenderer(getModel().getUnitAttachedAreas().get(i));
             }
             for (int i = 0; i < battlefield.getDeploymentAreas().size; i++) {
                 addAreaRenderer(battlefield.getDeploymentAreas().get(i));

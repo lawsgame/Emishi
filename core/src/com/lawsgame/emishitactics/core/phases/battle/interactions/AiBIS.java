@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
@@ -17,6 +18,7 @@ import java.util.Stack;
 
 public class AiBIS extends BattleInteractionState implements Observer {
 
+    private AI ai;
     private Thread threadAI;
     private LinkedList<AI.CommandBundle> bundleQueue;
     private Stack<ActorCommand> trackrecord;
@@ -24,13 +26,15 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
     public AiBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false);
-        this.threadAI = new Thread(bim.ai, "AI Thread");
+
+        this.ai = new PassiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory());
+        this.threadAI = new Thread(ai, "AI Thread");
         this.bundleQueue = new LinkedList<AI.CommandBundle>();
         this.trackrecord = new Stack<ActorCommand>();
         this.waitForCommand = true;
 
         this.threadAI.start();
-        bim.ai.attach(this);
+        this.ai.attach(this);
     }
 
     @Override
@@ -70,7 +74,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
         if(bim.battlefield.getSolver().isBattleOver()){
             bim.replace(new BattleOverBIS(bim));
         }else{
-            bim.replace(new SelectActorBIS(bim, true));
+            bim.replace(new EndArmyTurnBIS(bim));
         }
     }
 
@@ -94,7 +98,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
             } else if (data == sender) {
 
                 System.out.println("        > getNotification.ai_thread_finished");
-                bim.ai.detach(this);
+                this.ai.detach(this);
             }
         }else if(sender instanceof BattleCommand){
             System.out.println("    > getNotification : "+sender);

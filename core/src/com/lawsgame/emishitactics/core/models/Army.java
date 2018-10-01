@@ -290,10 +290,12 @@ public class Army extends IArmy{
     }
 
     @Override
-    public boolean isArmyStillFighting() {
-        for(int i = 0; i < mobilizedTroups.size; i++){
-            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(!mobilizedTroups.get(i).get(j).isOutOfAction()){
+    public boolean isDeployedTroopsStillFighting(Battlefield battlefield) {
+        for(int r = 0; r < battlefield.getNbRows(); r++){
+            for(int c = 0; c < battlefield.getNbColumns(); c++){
+                if(battlefield.isTileOccupied(r, c)
+                        && isUnitMobilized(battlefield.getUnit(r,c ))
+                        && !battlefield.getUnit(r,c ).isOutOfAction()){
                     return true;
                 }
             }

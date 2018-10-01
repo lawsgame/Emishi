@@ -90,6 +90,9 @@ public class BattlePhase extends GamePhase {
         //BattlefieldRenderer bfr = new IsoBFR(battlefield, spriteProvider);
         battlefieldRenderer.setGameCamParameters(this.getGameCM());
 
+
+        battlefield.pushPlayerArmyTurnForward();
+
         //lauch initial BIS
         this.bim = new BattleInteractionMachine(battlefieldRenderer, gameCM, asm, stageUI, player, spriteProvider);
         //BattleInteractionState initBIS = new TestBIS(bim);

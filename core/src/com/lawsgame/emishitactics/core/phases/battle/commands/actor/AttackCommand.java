@@ -150,10 +150,11 @@ public class AttackCommand extends ActorCommand {
             } else {
 
                 switchPositionCommand.apply(targetPos[0], targetPos[1], rowTarget0, colTarget0);
-                Area.UnitArea area = battlefield.addGuardedArea(targetPos[0], targetPos[1]);
+                Area.UnitAttachedArea guardedArea = Area.createGuardedArea(battlefield, targetPos[0], targetPos[1], target0);
+                 battlefield.addUnitAttachedArea( guardedArea, false);
 
                 StandardTask task = new StandardTask();
-                task.addThread(new RendererThread(bfr, area));
+                task.addThread(new RendererThread(bfr, guardedArea));
                 task.addThread(new RendererThread(bfr.getUnitRenderer(defender), defender.getOrientation()));
                 task.addThread(new RendererThread(bfr.getUnitRenderer(target0), target0.getOrientation()));
                 scheduleRenderTask(task);

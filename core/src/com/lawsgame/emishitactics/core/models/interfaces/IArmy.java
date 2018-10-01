@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Banner;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
@@ -38,7 +39,7 @@ public abstract class IArmy extends Observable{
     public abstract boolean isThereStillbuildingResources();
     public abstract void decrementBuildingResources();
     public abstract void resetBuildingResources();
-    public abstract boolean isArmyStillFighting();
+    public abstract boolean isDeployedTroopsStillFighting(Battlefield battlefield);
     public abstract void setDone(boolean done, boolean notifyObserves);
     public abstract boolean isDone();
 
