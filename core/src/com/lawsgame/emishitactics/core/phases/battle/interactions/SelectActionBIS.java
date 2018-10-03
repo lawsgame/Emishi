@@ -25,7 +25,7 @@ public class SelectActionBIS extends BattleInteractionState {
     private ChoicePanel commandPanel;
 
     public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit, Stack<ActorCommand> historic) {
-        super(bim, true, true, true);
+        super(bim, true, true, true, false, true);
         this.rowSltdUnit = rowSltdUnit;
         this.colSltdUnit = colSltdUnit;
         this.historic = historic;
@@ -42,6 +42,7 @@ public class SelectActionBIS extends BattleInteractionState {
     public void init() {
         System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
+        super.init();
         resetChoicePanel();
         bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, true);
 

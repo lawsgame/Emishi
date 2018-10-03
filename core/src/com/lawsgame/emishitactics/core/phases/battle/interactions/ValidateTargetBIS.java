@@ -28,7 +28,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
     private float hidingTime;
 
     public ValidateTargetBIS(BattleInteractionMachine bim, ActorCommand currentCommand, Stack<ActorCommand> historic) {
-        super(bim, true, false, false);
+        super(bim, true, false, false, true, false);
         this.historic = historic;
         this.currentCommand = currentCommand;
 
@@ -45,6 +45,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
                 +((currentCommand.getTarget() != null) ? currentCommand.getTarget().getName() : "("+currentCommand.getRowTarget()+", "+currentCommand.getColTarget()+")")+" : "
                 +currentCommand.getName(bim.mainI18nBundle));
 
+        super.init();
         bim.bfr.addAreaRenderer(impactArea);
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, true, false);
         currentCommand.blink(true);

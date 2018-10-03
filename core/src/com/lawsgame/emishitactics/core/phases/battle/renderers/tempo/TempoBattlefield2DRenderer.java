@@ -49,8 +49,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
 
         // setTiles up area renderers
-        for (int i = 0; i < getModel().getUnitAttachedAreas().size ; i++) {
-            addAreaRenderer(getModel().getUnitAttachedAreas().get(i));
+        for (int i = 0; i < getModel().getUnitAreas().size ; i++) {
+            addAreaRenderer(getModel().getUnitAreas().get(i));
         }
         for(int i = 0; i < battlefield.getDeploymentAreas().size; i++){
            addAreaRenderer(battlefield.getDeploymentAreas().get(i));
@@ -150,10 +150,10 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     public void removeAreaRenderersAssociatedWith(IUnit unit){
-        Area.UnitAttachedArea areaModel;
+        Area.UnitArea areaModel;
         for(int i = 0; i < areaRenderers.size; i++){
-            if(areaRenderers.get(i).getModel() instanceof Area.UnitAttachedArea){
-                areaModel = (Area.UnitAttachedArea)areaRenderers.get(i).getModel();
+            if(areaRenderers.get(i).getModel() instanceof Area.UnitArea){
+                areaModel = (Area.UnitArea)areaRenderers.get(i).getModel();
                 if(areaModel.getActor() == unit){
                     areaRenderers.removeIndex(i);
                     i--;

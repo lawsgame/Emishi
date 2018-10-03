@@ -29,6 +29,8 @@ public abstract class IArmy extends Observable{
     public abstract boolean isSquadIndexValid(int squadIndex);
 
     public abstract Data.Affiliation getAffiliation();
+    public abstract Data.Allegiance getAllegiance();
+    public abstract void setAllegiance(Data.Allegiance a);
     public abstract boolean isAlliedWith(Data.Affiliation affiliation);
     public abstract boolean isPlayerControlled();
     public abstract boolean hasSquadStandardBearer(int squadId, boolean stillFighting);

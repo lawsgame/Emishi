@@ -3,10 +3,8 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -71,8 +69,8 @@ public class IsoBFR extends BattlefieldRenderer {
             }
 
             // build up area renderers
-            for (int i = 0; i < getModel().getUnitAttachedAreas().size ; i++) {
-                addAreaRenderer(getModel().getUnitAttachedAreas().get(i));
+            for (int i = 0; i < getModel().getUnitAreas().size ; i++) {
+                addAreaRenderer(getModel().getUnitAreas().get(i));
             }
             for (int i = 0; i < battlefield.getDeploymentAreas().size; i++) {
                 addAreaRenderer(battlefield.getDeploymentAreas().get(i));

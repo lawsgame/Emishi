@@ -11,7 +11,7 @@ public class EndArmyTurnBIS extends BattleInteractionState implements Observer {
     protected EndArmyTurnCommand endArmyTurnCommand;
 
     public EndArmyTurnBIS(BattleInteractionMachine bim) {
-        super(bim, true, false, false);
+        super(bim, true, false, false, true, false);
         endArmyTurnCommand = new EndArmyTurnCommand(bim.bfr, bim.scheduler, bim.battlefield.getCurrentArmy());
     }
 
@@ -24,6 +24,7 @@ public class EndArmyTurnBIS extends BattleInteractionState implements Observer {
     public void init() {
         System.out.println("EndTurnArmy BIS");
 
+        super.init();
         endArmyTurnCommand.attach(this);
         endArmyTurnCommand.apply();
     }

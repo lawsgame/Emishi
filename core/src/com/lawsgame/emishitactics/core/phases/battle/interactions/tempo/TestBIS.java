@@ -21,6 +21,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpP
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
+import java.util.LinkedList;
 import java.util.Stack;
 
 public class TestBIS extends BattleInteractionState {
@@ -37,6 +38,9 @@ public class TestBIS extends BattleInteractionState {
     private AreaWidget moveAW;
     private AreaWidget actionAW;
 
+    private LinkedList<Array<int[]>> awUpdates;
+    private AreaWidget subaddAW;
+
     private Army army;
     IUnit sltdUnit;
     int index;
@@ -46,7 +50,7 @@ public class TestBIS extends BattleInteractionState {
     ActorCommand command = null;
 
     public TestBIS(BattleInteractionMachine bim) {
-        super(bim, true, true, true);
+        super(bim, true, true, true, true, false);
         setArmy();
 
         sltdUnit = army.getWarlord();
@@ -74,6 +78,28 @@ public class TestBIS extends BattleInteractionState {
         moveAW = new AreaWidget(bim.battlefield, Data.AreaType.SQUAD_MEMBER);
         actionAW = new AreaWidget(bim.battlefield, Data.AreaType.ACTION_AREA);
 
+
+
+        subaddAW = new AreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
+        this.awUpdates = new LinkedList<Array<int[]>>();
+
+        Array<int[]> tiles = new Array<int[]>();
+        tiles.add(new int[]{5,5});
+        tiles.add(new int[]{5,6});
+        tiles.add(new int[]{6,5});
+        subaddAW.setTiles(tiles, true);
+
+        tiles = new Array<int[]>();
+        tiles.add(new int[]{6,5});
+        tiles.add(new int[]{6,6});
+        tiles.add(new int[]{6,7});
+        awUpdates.offer(tiles);
+
+        tiles = new Array<int[]>();
+        tiles.add(new int[]{6,5});
+        tiles.add(new int[]{6,6});
+        tiles.add(new int[]{7,6});
+        awUpdates.offer(tiles);
 
     }
 
@@ -143,6 +169,7 @@ public class TestBIS extends BattleInteractionState {
     public void renderAhead(SpriteBatch batch) {
         actionAW.render(batch);
         moveAW.render(batch);
+        //subaddAW.render(batch);
         //if(sprites != null) sprites.get(animation.getCurrentFrame()).draw(batch);
         //batch.draw(bim.spriteProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
 
@@ -285,6 +312,20 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             this.done = ! done;
             bim.bfr.getUnitRenderer(sltdUnit.getArmy().getAllSquads().get(0).get(0)).setDone(done);
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
+            subaddAW.getModel().add(awUpdates.peek(), true);
+            awUpdates.offer(awUpdates.pop());
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.J)){
+            subaddAW.getModel().substract(awUpdates.peek(), true);
+            awUpdates.offer(awUpdates.pop());
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.G)){
+            subaddAW.getModel().clear(true);
         }
 
     }

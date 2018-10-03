@@ -22,6 +22,7 @@ public class Army extends IArmy{
     private int id;
     private boolean playerControlled;
     private final Data.Affiliation affiliation;
+    private Data.Allegiance allegiance;
     private int buildingResources;
     private Array<Array<IUnit>> mobilizedTroups;
     private Array<IUnit> nonMobTroups;
@@ -34,6 +35,7 @@ public class Army extends IArmy{
         this.mobilizedTroups = new Array<Array<IUnit>>();
         this.nonMobTroups = new Array<IUnit>();
         this.ldCondEnabled = false;
+        this.allegiance = Data.Allegiance.getStandard();
     }
 
     private static boolean firstCall = true;
@@ -233,6 +235,16 @@ public class Army extends IArmy{
     @Override
     public Affiliation getAffiliation() {
         return affiliation;
+    }
+
+    @Override
+    public Data.Allegiance getAllegiance() {
+        return allegiance;
+    }
+
+    @Override
+    public void setAllegiance(Data.Allegiance a) {
+        this.allegiance = a;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -70,7 +71,6 @@ public class BattlePhase extends GamePhase {
         testFont.getData().setScale(requiredSize/testFont.getData().lineHeight);
     }
 
-
     public BattlePhase(GPM gsm, Player player, int chapterId ){
         super(gsm, Data.GAME_PORT_WIDTH);
 
@@ -84,19 +84,19 @@ public class BattlePhase extends GamePhase {
         // build up sprite pool and battlefield renderer
         setFontParams();
         TempoSpritePool.get().set(asm);
-        BattlefieldRenderer battlefieldRenderer = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
+        //BattlefieldRenderer bfr = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
         SpriteProvider spriteProvider = new SpriteProvider(IsoBFR.SPRITE_STD_SIZE);
         spriteProvider.set(battlefield, asm);
-        //BattlefieldRenderer bfr = new IsoBFR(battlefield, spriteProvider);
-        battlefieldRenderer.setGameCamParameters(this.getGameCM());
+        BattlefieldRenderer bfr = new IsoBFR(battlefield, spriteProvider);
+        bfr.setGameCamParameters(this.getGameCM());
 
 
         battlefield.pushPlayerArmyTurnForward();
 
         //lauch initial BIS
-        this.bim = new BattleInteractionMachine(battlefieldRenderer, gameCM, asm, stageUI, player, spriteProvider);
-        //BattleInteractionState initBIS = new TestBIS(bim);
-        BattleInteractionState initBIS = new SceneBIS(bim);
+        this.bim = new BattleInteractionMachine(bfr, gameCM, asm, stageUI, player, spriteProvider);
+        BattleInteractionState initBIS = new TestBIS(bim);
+        //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

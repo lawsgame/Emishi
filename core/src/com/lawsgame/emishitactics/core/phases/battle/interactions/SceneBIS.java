@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
@@ -8,7 +7,7 @@ public class SceneBIS extends BattleInteractionState {
 
 
     public SceneBIS(BattleInteractionMachine BISys) {
-        super(BISys, true, false, false);
+        super(BISys, true, false, false, true, false);
     }
 
 
@@ -21,7 +20,7 @@ public class SceneBIS extends BattleInteractionState {
 
     @Override
     public void init() {
-
+        super.init();
     }
 
 }

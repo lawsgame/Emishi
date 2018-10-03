@@ -10,7 +10,7 @@ public class SelectActorBIS extends BattleInteractionState {
     int colInit;
 
     public SelectActorBIS(BattleInteractionMachine bim, int rowInit, int colInit, boolean newPlayerTurn) {
-        super(bim, true, true, true);
+        super(bim, true, true, true, false, true);
         this.rowInit = rowInit;
         this.colInit = colInit;
         if(newPlayerTurn){
@@ -28,7 +28,7 @@ public class SelectActorBIS extends BattleInteractionState {
     public void init() {
         System.out.println("SELECT ACTOR");
 
-
+        super.init();
         int[] activeUnitPos = new int[2];
         if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(rowInit, colInit)){
             activeUnitPos[0] = rowInit;

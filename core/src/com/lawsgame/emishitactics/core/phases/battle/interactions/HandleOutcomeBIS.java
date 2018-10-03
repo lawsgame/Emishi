@@ -38,7 +38,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     private boolean aiTurn;
 
     public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<ActorCommand> historic, boolean aiTurn) {
-        super(bim, true, false, false);
+        super(bim, true, false, false, true, false);
 
         this.historic = historic;
         if(emptyOutcome == null) emptyOutcome = new EncounterOutcome(bim.player.getInventory());
@@ -61,6 +61,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     public void init() {
         System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName()+"\n" +outcome.toString());
 
+        super.init();
         if(outcome.isHandled()){
 
             if(tasks.isEmpty()) {

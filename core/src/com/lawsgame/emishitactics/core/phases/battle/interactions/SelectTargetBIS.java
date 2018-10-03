@@ -18,7 +18,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     Area actionArea;
 
     public SelectTargetBIS(BattleInteractionMachine bim, Stack<ActorCommand> historic, ActorCommand command) {
-        super(bim, true, true, true);
+        super(bim, true, true, true, true , false);
         this.historic = historic;
         this.currentCommand = command;
 
@@ -33,6 +33,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     public void init() {
         System.out.println("SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.mainI18nBundle));
 
+        super.init();
         bim.bfr.addAreaRenderer(actionArea);
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, true, true, false);
 

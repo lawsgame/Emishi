@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Area.UnitAttachedArea;
+import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
@@ -36,7 +36,7 @@ public class Battlefield extends Observable {
     private HashMap<Integer, IUnit> recruits;
     private HashMap<Integer, Item> tombItems;
     private Array<Area> deploymentAreas;
-    private Array<UnitAttachedArea> unitAttachedAreas;
+    private Array<UnitArea> unitAreas;
     private Weather weather;
     private BattleSolver solver;
 
@@ -52,7 +52,7 @@ public class Battlefield extends Observable {
         this.deploymentAreas = new Array<Area>();
         this.deploymentAreas.add(new Area(this, Data.AreaType.DEPLOYMENT_AREA));
 
-        this.unitAttachedAreas = new Array<UnitAttachedArea>();
+        this.unitAreas = new Array<UnitArea>();
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
         setWeather(weather, true);
@@ -239,20 +239,20 @@ public class Battlefield extends Observable {
 
     //------------------ AREAS MAGEMETNS --------------------------------------
 
-    public void addUnitAttachedArea(UnitAttachedArea area, boolean notifyObservers){
-        if(area != null && area.getActor() != null) {
-            unitAttachedAreas.add(area);
+    public void addUnitArea(UnitArea area, boolean notifyObservers){
+        if(area != null && area.getActor() != null && !isUnitAreaExisted(area)) {
+            unitAreas.add(area);
             if(notifyObservers) {
                 notifyAllObservers(area);
             }
         }
     }
 
-    public Array<UnitAttachedArea> removeUnitAttachedArea(IUnit actor, AreaType type, boolean notifyObservers){
-        Array<UnitAttachedArea> removedAreas = new Array<UnitAttachedArea>();
-        for(int i = 0; i < unitAttachedAreas.size; i++){
-            if(unitAttachedAreas.get(i).getActor() == actor && unitAttachedAreas.get(i).getType() == type){
-                removedAreas.add(unitAttachedAreas.removeIndex(i));
+    public Array<UnitArea> removeUnitAreas(IUnit actor, AreaType type, boolean notifyObservers){
+        Array<UnitArea> removedAreas = new Array<UnitArea>();
+        for(int i = 0; i < unitAreas.size; i++){
+            if(unitAreas.get(i).getActor() == actor && unitAreas.get(i).getType() == type){
+                removedAreas.add(unitAreas.removeIndex(i));
                 i--;
                 if(notifyObservers) {
                     notifyAllObservers(removedAreas.peek());
@@ -262,11 +262,11 @@ public class Battlefield extends Observable {
         return removedAreas;
     }
 
-    public Array<UnitAttachedArea> removeAllAttachedArea(IUnit actor, boolean moved, boolean notifyObservers){
-        Array<UnitAttachedArea> removedAreas = new Array<UnitAttachedArea>();
-        for(int i = 0; i < unitAttachedAreas.size; i++){
-            if(unitAttachedAreas.get(i).getActor() == actor && (!moved || unitAttachedAreas.get(i).isRemovedUponMovingUnit())){
-                removedAreas.add(unitAttachedAreas.removeIndex(i));
+    public Array<UnitArea> removeAllAttachedArea(IUnit actor, boolean moved, boolean notifyObservers){
+        Array<UnitArea> removedAreas = new Array<UnitArea>();
+        for(int i = 0; i < unitAreas.size; i++){
+            if(unitAreas.get(i).getActor() == actor && (!moved || unitAreas.get(i).isRemovedUponMovingUnit())){
+                removedAreas.add(unitAreas.removeIndex(i));
                 i--;
                 if(notifyObservers) {
                     notifyAllObservers(removedAreas.peek());
@@ -276,18 +276,50 @@ public class Battlefield extends Observable {
         return removedAreas;
     }
 
-    public Array<UnitAttachedArea> getUnitAttachedAreas() {
-        return unitAttachedAreas;
+    public Array<UnitArea> removeAllAreaType(AreaType type, boolean notifyObservers){
+        Array<UnitArea> removedAreas = new Array<UnitArea>();
+        for(int i = 0; i < unitAreas.size; i++){
+            if(unitAreas.get(i).getType() == type){
+                removedAreas.add(unitAreas.removeIndex(i));
+                i--;
+                if(notifyObservers) {
+                    notifyAllObservers(removedAreas.peek());
+                }
+            }
+        }
+        return removedAreas;
+    }
+
+    public Array<UnitArea> getUnitAreas() {
+        return unitAreas;
+    }
+
+    public boolean isUnitAreaExisted(IUnit actor, AreaType type){
+        for(int i = 0; i < unitAreas.size; i++){
+            if(unitAreas.get(i).getActor() == actor && unitAreas.get(i).getType() == type){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isUnitAreaExisted(UnitArea area){
+        for(int i = 0; i < unitAreas.size; i++){
+            if(unitAreas.get(i).getActor() == area.getActor() && unitAreas.get(i).getType() == area.getType()){
+                return true;
+            }
+        }
+        return false;
     }
 
     public Array<IUnit> getAvailableGuardians(int row, int col, Affiliation alleageance){
         Array<IUnit> guardians =  new Array<IUnit>();
-        for (int k = 0; k < unitAttachedAreas.size; k++) {
-            if (unitAttachedAreas.get(k).getType() == AreaType.GUARD_AREA
-                    && unitAttachedAreas.get(k).getActor() != null
-                    && unitAttachedAreas.get(k).getActor().isAllyWith(alleageance)
-                    && unitAttachedAreas.get(k).contains(row, col)) {
-                guardians.add(unitAttachedAreas.get(k).getActor());
+        for (int k = 0; k < unitAreas.size; k++) {
+            if (unitAreas.get(k).getType() == AreaType.GUARD_AREA
+                    && unitAreas.get(k).getActor() != null
+                    && unitAreas.get(k).getActor().isAllyWith(alleageance)
+                    && unitAreas.get(k).contains(row, col)) {
+                guardians.add(unitAreas.get(k).getActor());
             }
         }
         return guardians;
@@ -392,11 +424,11 @@ public class Battlefield extends Observable {
 
     public boolean isTileGuarded(int row, int col, Affiliation alliedAffiliation){
         boolean res = false;
-        for(int i = 0; i < unitAttachedAreas.size; i++){
-            if (unitAttachedAreas.get(i).getType() == AreaType.GUARD_AREA
-                    && unitAttachedAreas.get(i).getActor() != null
-                    && unitAttachedAreas.get(i).getActor().isAllyWith(alliedAffiliation)
-                    && unitAttachedAreas.get(i).contains(row, col)) {
+        for(int i = 0; i < unitAreas.size; i++){
+            if (unitAreas.get(i).getType() == AreaType.GUARD_AREA
+                    && unitAreas.get(i).getActor() != null
+                    && unitAreas.get(i).getActor().isAllyWith(alliedAffiliation)
+                    && unitAreas.get(i).contains(row, col)) {
 
                 res = true;
                 break;
@@ -513,11 +545,11 @@ public class Battlefield extends Observable {
         if(isTileOccupied(rowUnit, colUnit)){
             IUnit unit = getUnit(rowUnit, colUnit);
             if(unit.isMobilized()) {
-                for(int i = 0; i < unitAttachedAreas.size; i++){
-                    if (unitAttachedAreas.get(i).getType() == AreaType.GUARD_AREA
-                            && unitAttachedAreas.get(i).getActor() != null
-                            && unitAttachedAreas.get(i).getActor().isAllyWith(unit.getArmy().getAffiliation())
-                            && unitAttachedAreas.get(i).contains(rowUnit, colUnit)) {
+                for(int i = 0; i < unitAreas.size; i++){
+                    if (unitAreas.get(i).getType() == AreaType.GUARD_AREA
+                            && unitAreas.get(i).getActor() != null
+                            && unitAreas.get(i).getActor().isAllyWith(unit.getArmy().getAffiliation())
+                            && unitAreas.get(i).contains(rowUnit, colUnit)) {
 
                         return true;
                     }

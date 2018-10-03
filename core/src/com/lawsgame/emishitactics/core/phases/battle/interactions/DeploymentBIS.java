@@ -27,7 +27,7 @@ public class DeploymentBIS extends BattleInteractionState {
     private boolean initialized;
 
     public DeploymentBIS(final BattleInteractionMachine bim) {
-        super(bim, true, true, true);
+        super(bim, true, true, true, false, true);
         this.initialized = false;
 
         this.sltdUnit = bim.player.getArmy().getWarlord();
@@ -46,6 +46,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
     @Override
     public void init() {
+        super.init();
         bim.uiStage.addActor(startButton);
         bim.bfr.displayDeploymentAreas(true);
         updateSltdUnit();
@@ -65,7 +66,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
     @Override
     public boolean handleTouchInput(int row, int col) {
-        if(bim.battlefield.isTileOccupied(row, col)){
+        if(bim.battlefield.isTileOccupiedByAlly(row, col, bim.player.getArmy().getAffiliation())){
             IUnit touchedUnit = bim.battlefield.getUnit(row, col);
             if (touchedUnit != sltdUnit || !initialized) {
 

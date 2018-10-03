@@ -42,16 +42,45 @@ public  class Area extends Observable {
         this(battlefield , type, Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax));
     }
 
-    public static UnitAttachedArea createGuardedArea(Battlefield bf, int rowActor, int colActor, IUnit actor){
-        return new UnitAttachedArea(bf,
+    public static UnitArea createGuardedArea(Battlefield bf, int rowActor, int colActor, IUnit actor){
+        return new UnitArea(bf,
                 Data.AreaType.GUARD_AREA,
                 Utils.getEreaFromRange(bf, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX),
                 actor,
                 true);
     }
 
+    public void substract(Array<int[]> removedTiles, boolean notifyObservers){
+        Array<int[]> tiles = getTiles();
+        int r;
+        int c;
+        for(int i = 0; i < removedTiles.size; i++){
+            r = removedTiles.get(i)[0];
+            c = removedTiles.get(i)[1];
+            if(battlefield.isTileExisted(r, c) && Utils.arrayContains(tiles, r, c)){
+                Utils.arrayRemove(tiles, r, c);
+            }
+        }
+        setTiles(tiles, notifyObservers);
+    }
 
+    public void clear(boolean notifyObservers){
+        setTiles(new Array<int[]>(), notifyObservers);
+    }
 
+    public void add(Array<int[]> addedTiles, boolean notifyObservers){
+        Array<int[]> tiles = getTiles();
+        int r;
+        int c;
+        for(int i = 0; i < addedTiles.size; i++){
+            r = addedTiles.get(i)[0];
+            c = addedTiles.get(i)[1];
+            if(battlefield.isTileExisted(r, c) && !Utils.arrayContains(tiles, r, c)){
+                tiles.add( new int[]{ r, c});
+            }
+        }
+        setTiles(tiles, notifyObservers);
+    }
 
     public void addTile(int row, int col, boolean notifyObservers){
         if(checkIndexes(row, col)) {
@@ -195,11 +224,11 @@ public  class Area extends Observable {
 
     // --------------- SPECIFIC IMPLEMENTATION OF THE AREA CLASS
 
-    public static class UnitAttachedArea extends Area{
+    public static class UnitArea extends Area{
         private IUnit actor;
         private boolean removedUponMovingUnit;
 
-        public UnitAttachedArea(Battlefield battlefield, AreaType type, Array<int[]> tiles, IUnit actor, boolean removedUponMovingUnit) {
+        public UnitArea(Battlefield battlefield, AreaType type, Array<int[]> tiles, IUnit actor, boolean removedUponMovingUnit) {
             super(battlefield, type, tiles);
             this.actor = actor;
             this.removedUponMovingUnit = removedUponMovingUnit;

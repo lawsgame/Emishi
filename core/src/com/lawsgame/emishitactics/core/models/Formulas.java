@@ -3,7 +3,6 @@ package com.lawsgame.emishitactics.core.models;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Area.UnitAttachedArea;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Formulas {

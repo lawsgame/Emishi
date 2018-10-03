@@ -1,7 +1,11 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Area;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.InfoBIS;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
@@ -10,26 +14,37 @@ public abstract class BattleInteractionState extends InteractionState {
     protected final BattleInteractionMachine bim;
 
     private boolean battlefieldDisplayed;             // if true, the battlefield is displayed
-    private boolean longPanelDisplayable;                  // if true, a long click on a tile while launch the InfoIS
+    private boolean longPanelDisplayable;             // if true, a long click on a tile while launch the InfoIS
     private boolean mapSlidable;                      // if true, sliding will allow the player the move around the map
+    private boolean FAAUpdatable;                     // FFA : foe action area
+    private boolean clearFAA;                     // FFA : foe action area
 
     // on touch variables
     private int rowTouch;
     private int colTouch;
 
+
     public BattleInteractionState(BattleInteractionMachine bim,
                                   boolean BFDisplayable,
                                   boolean longPanelDisplayable,
-                                  boolean mapSlidable) {
+                                  boolean mapSlidable,
+                                  boolean clearFAA,
+                                  boolean FAAUpdatable) {
         super(bim.gcm.getCamera());
         this.bim = bim;
 
         this.battlefieldDisplayed = BFDisplayable;
         this.longPanelDisplayable = longPanelDisplayable;
         this.mapSlidable = mapSlidable;
-
+        this.clearFAA = clearFAA;
+        this.FAAUpdatable = FAAUpdatable;
     }
 
+    @Override
+    public void init() {
+        if(clearFAA)
+            bim.ffa.clear();
+    }
 
     @Override
     public void update(float dt) {
@@ -60,10 +75,9 @@ public abstract class BattleInteractionState extends InteractionState {
             if (!handleTouchInput(rowTouch, colTouch) && bim.battlefield.isTileExisted(rowTouch, colTouch)) {
 
                 bim.focusOn(rowTouch, colTouch, true, true, true, false, false);
-                if (bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, Data.Affiliation.ALLY)) {
-                    //TODO: add or remove selected foe action area to those of its alleageanca already registered
+                if (FAAUpdatable && bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, bim.player.getArmy().getAffiliation())) {
 
-
+                    bim.ffa.update(rowTouch, colTouch);
                 }
             }
         }
@@ -103,8 +117,6 @@ public abstract class BattleInteractionState extends InteractionState {
     public final void setMapSlidable(boolean mapSlidable) {
         this.mapSlidable = mapSlidable;
     }
-
-
 
     public static class BISException extends Exception{
 

@@ -25,7 +25,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
     private boolean waitForCommand;
 
     public AiBIS(BattleInteractionMachine bim) {
-        super(bim, true, false, false);
+        super(bim, true, false, false, true, false);
 
         this.ai = new PassiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory());
         this.threadAI = new Thread(ai, "AI Thread");
@@ -38,13 +38,14 @@ public class AiBIS extends BattleInteractionState implements Observer {
     }
 
     @Override
-    public synchronized void init() {
+    public  void init() {
         System.out.println("AI BIS");
 
+        super.init();
         next();
     }
 
-    private synchronized void next(){
+    private  void next(){
         System.out.println("    > next()");
         if(isFinished()){
             System.out.println("    > next.proceed()");
@@ -66,11 +67,11 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
     }
 
-    private synchronized boolean isFinished(){
+    private boolean isFinished(){
         return bundleQueue.isEmpty() && !threadAI.isAlive();
     }
 
-    private synchronized void proceed(){
+    private void proceed(){
         if(bim.battlefield.getSolver().isBattleOver()){
             bim.replace(new BattleOverBIS(bim));
         }else{
@@ -121,7 +122,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
     }
 
 
-    private synchronized boolean executeNextCommand(){
+    private boolean executeNextCommand(){
         boolean noCommandAvailable = true;
         System.out.println("    > AIBIS.waitForCommand ? "+bundleQueue.isEmpty());
         if(!bundleQueue.isEmpty()) {

@@ -8,12 +8,14 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.Bat
 public class BattleOverBIS extends BattleInteractionState {
 
     public BattleOverBIS(BattleInteractionMachine bim) {
-        super(bim, true, false, false);
+        super(bim, true, false, false, true, false);
     }
 
     @Override
     public void init() {
+
         System.out.println("BATTLE OVER!");
+        super.init();
     }
 
     @Override

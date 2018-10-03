@@ -12,7 +12,7 @@ import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
 public class Data {
 
 
-    public static final float GAME_PORT_WIDTH = 15f;
+    public static final float GAME_PORT_WIDTH = 7f;
 
     //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;
@@ -667,6 +667,18 @@ public class Data {
 
         public String getName(I18NBundle bundle) {
             return bundle.get(name());
+        }
+    }
+
+    /**
+     * lore-oriented data
+     * if lord the army fight for
+     */
+    public enum Allegiance{
+        NO_ALLIGEANCE;
+
+        public static Allegiance getStandard(){
+            return NO_ALLIGEANCE;
         }
     }
 

@@ -23,7 +23,7 @@ public class EndUnitTurnBIS extends BattleInteractionState {
     private ChoicePanel orientationChoicePanel;
 
     public EndUnitTurnBIS(BattleInteractionMachine bim, IUnit actor) {
-        super(bim, true, false, true);
+        super(bim, true, true, true, false, true);
         this.actor = actor;
         this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
         this.endUnitTurnCommand = new EndUnitTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -33,6 +33,7 @@ public class EndUnitTurnBIS extends BattleInteractionState {
     public void init() {
         System.out.println("END TURN of "+actor.getName());
 
+        super.init();
         if(actor.isOutOfAction()){
 
             proceed();

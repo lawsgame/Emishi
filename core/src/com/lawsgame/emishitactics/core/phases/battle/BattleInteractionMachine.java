@@ -15,8 +15,6 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
-import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
@@ -49,6 +47,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     private Area selectedTile;
     private Area touchedTile;
     private Array<Area> touchedRelatedUnitTiles;
+
+    public FoeActionArea ffa;
 
     public Stage uiStage;
     public final TilePanel shortTilePanel;
@@ -90,6 +90,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
              bfr.getAreaRenderer(area).setVisible(false);
         }
 
+        this.ffa = new FoeActionArea(bfr);
 
         // UI
         this.uiStage = stageUI;
@@ -253,6 +254,9 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     }
 
 
+
+    // ----------- UTILITY CLASS -----------------------------
+
     public static class FocusOn extends SimpleCommand{
         private BattleInteractionMachine bim;
         private int rowFocus;
@@ -295,6 +299,46 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         @Override
         public void apply() {
             panel.hide();
+        }
+    }
+
+
+    public static class FoeActionArea{
+        private Area actionArea;
+        private Array<IUnit> foes;
+
+        public FoeActionArea(BattlefieldRenderer bfr){
+            this.actionArea = new Area(bfr.getModel(), Data.AreaType.FOE_ACTION_AREA);
+            this.foes = new Array<IUnit>();
+            bfr.addAreaRenderer(this.actionArea);
+        }
+
+        public void update(int rowFoe, int colFoe){
+            Battlefield bf = actionArea.getBattlefield();
+            if(bf.isTileOccupied(rowFoe, colFoe)) {
+                IUnit foe  = bf.getUnit(rowFoe, colFoe);
+                if (foes.contains(foe, true)) {
+
+                    this.foes.removeValue(foe, true);
+                    this.actionArea.clear(false);
+                    int[] foePos;
+                    Array<int[]> tiles = new Array<int[]>();
+                    for(int i = 0; i < foes.size; i++) {
+                        foePos = bf.getUnitPos(foes.get(i));
+                        tiles.addAll(bf.getActionArea(foePos[0], foePos[1]));
+                    }
+                    actionArea.add(tiles, true);
+                } else {
+
+                    foes.add(foe);
+                    actionArea.add(bf.getActionArea(rowFoe, colFoe), true);
+                }
+            }
+        }
+
+        public void clear(){
+            actionArea.clear(true);
+            foes.clear();
         }
     }
 

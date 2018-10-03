@@ -8,13 +8,15 @@ public class InfoBIS extends BattleInteractionState{
     int col;
 
     public InfoBIS(BattleInteractionMachine bim, int row, int col) {
-        super(bim, true, false, false);
+        super(bim, true, false, false, false, false);
         this.row = row;
         this.col = col;
     }
 
     @Override
     public void init() {
+
+        super.init();
         bim.shortUnitPanel.hide();
         bim.shortTilePanel.hide();
         if(bim.battlefield.isTileOccupied(row, col)) {
