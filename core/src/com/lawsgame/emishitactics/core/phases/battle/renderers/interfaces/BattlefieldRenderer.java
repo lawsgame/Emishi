@@ -17,16 +17,15 @@ import java.util.LinkedList;
 public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
     private LinkedList<SimpleCommand> notificationQueue;
-    protected Array<AreaRenderer> areaRenderers;
     protected Data.Weather renderedWeather;
 
     public BattlefieldRenderer(Battlefield model) {
 
         super(model);
-        this.areaRenderers = new Array<AreaRenderer>();
         this.notificationQueue = new LinkedList<SimpleCommand>();
     }
 
+    public abstract void updateAreaRenderers(float dt);
     public abstract void prerender();
     public abstract void render(SpriteBatch batch);
 
@@ -34,7 +33,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract int getCol(float gameX, float gameY);
     public abstract float getCenterX(int row, int col);
     public abstract float getCenterY(int row, int col);
-    public abstract void displayDeploymentAreas(boolean visible);
     public abstract void setGameCamParameters(CameraManager cameraManager);
 
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
@@ -45,10 +43,20 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract void removeUnitRenderer(IUnit model);
     public abstract void removeAreaRenderer(Area model);
     protected abstract boolean isUnitRendererCreated(IUnit model);
+    protected abstract boolean isAreaRendererCreated(Area model);
     protected abstract void removeAreaRenderersAssociatedWith(IUnit model);
+
 
     protected abstract boolean isCurrentTaskCompleted();
     protected abstract void setBuildTask(Notification.Build build);
+
+
+    public void displayDeploymentAreas(boolean visible) {
+        Array<Area> deploymentArea = getModel().getDeploymentAreas();
+        for(int i = 0; i< deploymentArea.size; i++){
+            getAreaRenderer(deploymentArea.get(i)).setVisible(visible);
+        }
+    }
 
     public final void offerTask(SimpleCommand command){
         if(command != null)
@@ -60,10 +68,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         if(!isCurrentTaskCompleted() && ! notificationQueue.isEmpty()){
             notificationQueue.pop().apply();
         }
-
-        for(int i = 0; i < areaRenderers.size; i++) {
-            areaRenderers.get(i).update(dt);
-        }
+        updateAreaRenderers(dt);
     }
 
 
@@ -168,15 +173,9 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }else if(data instanceof Area){
 
             Area area = (Area)data;
-            boolean areaRemoved = false;
-            for(int i = 0; i < areaRenderers.size; i++){
-                if(area == areaRenderers.get(i).getModel()){
-                    removeAreaRenderer(area);
-                    areaRemoved = true;
-                    break;
-                }
-            }
-            if(!areaRemoved){
+            if(isAreaRendererCreated(area)){
+                removeAreaRenderer(area);
+            }else{
                 addAreaRenderer(area);
             }
         }

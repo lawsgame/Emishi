@@ -7,19 +7,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
+import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestBIS;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.tempo.TempoBattlefield2DRenderer;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
 
@@ -35,11 +32,10 @@ public class BattlePhase extends GamePhase {
         asm.load(Assets.ATLAS_TEMPO_UI, TextureAtlas.class);
         asm.load(Assets.ATLAS_TEMPO_UNITS, TextureAtlas.class);
         asm.load(Assets.ATLAS_TEMPO_TILES, TextureAtlas.class);
-
         asm.load(Assets.FONT_MAIN, BitmapFont.class);
         asm.load(Assets.FONT_UI, BitmapFont.class);
+
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
-        asm.load(Assets.ATLAS_TILES, TextureAtlas.class);
         asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class); //, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
         asm.finishLoading();
 
@@ -71,8 +67,14 @@ public class BattlePhase extends GamePhase {
         testFont.getData().setScale(requiredSize/testFont.getData().lineHeight);
     }
 
+    private static float getPixelPerfectGamePortWidth(int spritePixelWidth){
+        return Gdx.app.getGraphics().getWidth() * IsoBFR.SPRITE_STD_SIZE/ spritePixelWidth;
+    }
+
     public BattlePhase(GPM gsm, Player player, int chapterId ){
-        super(gsm, Data.GAME_PORT_WIDTH);
+        super(gsm, getPixelPerfectGamePortWidth(128));
+
+        System.out.println(getPixelPerfectGamePortWidth(128));
 
         // load assets
         loadRequiredAssets();
@@ -85,16 +87,16 @@ public class BattlePhase extends GamePhase {
         setFontParams();
         TempoSpritePool.get().set(asm);
         //BattlefieldRenderer bfr = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
-        SpriteProvider spriteProvider = new SpriteProvider(IsoBFR.SPRITE_STD_SIZE);
-        spriteProvider.set(battlefield, asm);
-        BattlefieldRenderer bfr = new IsoBFR(battlefield, spriteProvider);
+        AssetProvider assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
+        assetProvider.set(battlefield, asm);
+        BattlefieldRenderer bfr = new IsoBFR(battlefield, assetProvider);
         bfr.setGameCamParameters(this.getGameCM());
 
 
         battlefield.pushPlayerArmyTurnForward();
 
         //lauch initial BIS
-        this.bim = new BattleInteractionMachine(bfr, gameCM, asm, stageUI, player, spriteProvider);
+        this.bim = new BattleInteractionMachine(bfr, gameCM, asm, stageUI, player, assetProvider);
         BattleInteractionState initBIS = new TestBIS(bim);
         //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);

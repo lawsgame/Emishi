@@ -12,7 +12,7 @@ import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
 public class Data {
 
 
-    public static final float GAME_PORT_WIDTH = 7f;
+    public static final float GAME_PORT_WIDTH = 15f;
 
     //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;
@@ -65,6 +65,14 @@ public class Data {
         return r.nextInt(n);
     }
 
+
+    public enum Environment{
+        PRINCIPALITY;
+
+        public static Environment getStandard(){
+            return PRINCIPALITY;
+        }
+    }
 
     public enum Weather {
         SUNNY(new Color(195f/255f, 236/255f, 240/255f, 1), new Color(89f/255f, 184/255f, 219/255f, 1));
@@ -203,7 +211,7 @@ public class Data {
         private RangedBasedType rangedBasedType;
         private boolean endTurnActionOnly;
         /**
-         * AreaWidget of impact :
+         * TempoAreaWidget of impact :
          * ( 0, 0) = targeted buildingType
          * ( 1, 0) = in front of targeted buildingType
          * ( 0, 1) = right of targeted buildingType
@@ -323,16 +331,57 @@ public class Data {
         }
     }
 
+    public enum AreaColor {
+        LIGHT_BLUE,
+        LIGHT_BROWN,
+        DEEP_BLUE,
+        TURQUOISE,
+        ORANGE,
+        YELLOW,
+        RED_ORANGE,
+        RED_PURPLE,
+        WHITE
+    }
+
     public enum AreaType {
-        TOUCHED_TILE,
-        SELECTED_UNIT,
-        SQUAD_MEMBER,
-        MOVE_AREA,
-        ACTION_AREA,
-        GUARD_AREA,
-        DEPLOYMENT_AREA,
-        VANGUARD_DEPLOYMENT_AREA,
-        FOE_ACTION_AREA
+        TOUCHED_TILE            (3, true, AreaColor.WHITE),
+        SELECTED_UNIT           (0, true, AreaColor.LIGHT_BLUE),
+        BANNER_RANGE            (0, true, AreaColor.LIGHT_BROWN),
+        MOVE_AREA               (1, false, AreaColor.TURQUOISE),
+        ACTION_AREA             (1, false, AreaColor.RED_ORANGE),
+        GUARD_AREA              (0, true, AreaColor.DEEP_BLUE),
+        DEPLOYMENT_AREA         (2, true, AreaColor.ORANGE),
+        VANGUARD_DEPLOYMENT_AREA(2, true, AreaColor.YELLOW),
+        FOE_ACTION_AREA         (0, true, AreaColor.RED_PURPLE);
+
+
+        private int layerIndex;
+        private boolean rectangular;
+        private AreaColor color;
+
+        AreaType(){
+            this.color = AreaColor.LIGHT_BLUE;
+            this.layerIndex = 0;
+            this.rectangular = false;
+        }
+
+        AreaType(int layerIndex, boolean rectangular, AreaColor color){
+            this.layerIndex = layerIndex;
+            this.rectangular = rectangular;
+            this.color = color;
+        }
+
+        public AreaColor getColor(){
+            return color;
+        }
+
+        public int getLayerIndex() {
+            return layerIndex;
+        }
+
+        public boolean isRectangular() {
+            return rectangular;
+        }
     }
 
     public enum TileType {

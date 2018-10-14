@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
+import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -39,7 +39,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final CameraManager gcm;
     public final AssetManager asm;
     public final ActionPanelPool app;
-    public final SpriteProvider spriteProvider;
+    public final AssetProvider assetProvider;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle mainI18nBundle;
@@ -62,12 +62,12 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public SimpleCommand hideSUP;
 
 
-    public BattleInteractionMachine(BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player, SpriteProvider spriteProvider) {
+    public BattleInteractionMachine(BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player, AssetProvider assetProvider) {
         this.battlefield = bfr.getModel();
         this.bfr = bfr;
         this.gcm = gcm;
         this.asm = asm;
-        this.spriteProvider = spriteProvider;
+        this.assetProvider = assetProvider;
         this.app = new ActionPanelPool(stageUI.getViewport());
         this.scheduler = new AnimationScheduler();
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory());
@@ -84,7 +84,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.touchedRelatedUnitTiles = new Array<Area>();
         Area area;
         for(int i = 1; i < Data.MAX_UNITS_UNDER_WARLORD; i++){
-            area = new Area(battlefield, Data.AreaType.SQUAD_MEMBER );
+            area = new Area(battlefield, Data.AreaType.BANNER_RANGE);
             this.touchedRelatedUnitTiles.add(area);
             this.bfr.addAreaRenderer(area);
              bfr.getAreaRenderer(area).setVisible(false);
@@ -196,19 +196,24 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         if(allSquad && battlefield.isTileOccupied(row, col)) {
 
             IUnit sltdUnit = battlefield.getUnit(row, col);
-            Array<IUnit> squad = sltdUnit.getSquad(true);
-            Data.AreaType type = Data.AreaType.SQUAD_MEMBER ;
-            int[] squadMemberPos;
-            for (int i = 0; i < squad.size; i++) {
-                if(squad.get(i) != sltdUnit){
-                    squadMemberPos = battlefield.getUnitPos(squad.get(i));
-                    if(squad.get(i).isStandardBearer()){
-                        touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit), true);
-                    }else {
-                        touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], true);
+            if(sltdUnit.isMobilized()) {
+
+
+
+                Array<IUnit> squad = sltdUnit.getSquad(true);
+                Data.AreaType type = Data.AreaType.BANNER_RANGE;
+                int[] squadMemberPos;
+                for (int i = 0; i < squad.size; i++) {
+                    if (squad.get(i) != sltdUnit || !selected) {
+                        squadMemberPos = battlefield.getUnitPos(squad.get(i));
+                        if (squad.get(i).isStandardBearer() && squad.get(i) != sltdUnit) {
+                            touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit), true);
+                        } else {
+                            touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], true);
+                        }
+                        touchedRelatedUnitTiles.get(i).setType(type, true);
+                        bfr.getAreaRenderer(touchedRelatedUnitTiles.get(i)).setVisible(true);
                     }
-                    touchedRelatedUnitTiles.get(i).setType(type, true);
-                    bfr.getAreaRenderer(touchedRelatedUnitTiles.get(i)).setVisible(true);
                 }
             }
         }
@@ -216,10 +221,9 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         if(selected){
             selectedTile.setTiles(row, col, true);
             bfr.getAreaRenderer(selectedTile).setVisible(true);
-        }else {
-            touchedTile.setTiles(row, col, true);
-            bfr.getAreaRenderer(touchedTile).setVisible(true);
         }
+        touchedTile.setTiles(row, col, true);
+        bfr.getAreaRenderer(touchedTile).setVisible(true);
 
     }
 
@@ -250,7 +254,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     @Override
     public void dispose() {
-        spriteProvider.dispose();
+        assetProvider.dispose();
     }
 
 

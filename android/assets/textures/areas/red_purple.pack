@@ -1,0 +1,68 @@
+
+red_purple.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anti_inside_acute
+  rotate: false
+  xy: 0, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+anti_inside_obtuse
+  rotate: false
+  xy: 100, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+anti_outside_acute
+  rotate: false
+  xy: 200, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+anti_outside_obtuse
+  rotate: false
+  xy: 300, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+anti_side
+  rotate: false
+  xy: 400, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+anti_side_upside_down
+  rotate: false
+  xy: 500, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+border
+  rotate: false
+  xy: 600, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+corner_acute
+  rotate: false
+  xy: 700, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1
+corner_obtuse
+  rotate: false
+  xy: 800, 0
+  size: 100, 50
+  orig: 100, 50
+  offset: 0, 0
+  index: -1

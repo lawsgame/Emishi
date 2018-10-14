@@ -115,17 +115,21 @@ public abstract class ActorCommand extends BattleCommand{
         }
     }
 
-    public final void apply(int rowActor, int colActor, int rowTarget, int colTarget){
+    public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){
+        boolean successfullyApplied = false;
         if(setInitiator(rowActor, colActor)) {
             setTarget(rowTarget, colTarget);
             if (isTargetValid()) {
+                successfullyApplied = true;
                 apply();
+
             }
         }
+        return successfullyApplied;
     }
 
-    public final void apply(int rowActor, int colActor){
-        apply(rowActor, colActor, rowActor, colActor);
+    public final boolean apply(int rowActor, int colActor){
+        return apply(rowActor, colActor, rowActor, colActor);
     }
 
     @Override
@@ -335,9 +339,8 @@ public abstract class ActorCommand extends BattleCommand{
     protected final Array<int[]> getAlliesAtRange(int row, int col, IUnit actor, boolean woundedRequired){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
-            int[] unitPos = battlefield.getUnitPos(actor);
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, battlefield) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, battlefield) : choice.getRangeMax();
             int dist;
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
                 for (int c = col - rangeMin; c <= col + rangeMax; c++) {
@@ -358,9 +361,8 @@ public abstract class ActorCommand extends BattleCommand{
     protected final Array<int[]> getFoesAtRange(int row, int col, IUnit actor, boolean stealableRequired){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
-            int[] unitPos = battlefield.getUnitPos(actor);
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(unitPos[0], unitPos[1], battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(unitPos[0], unitPos[1], battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, battlefield) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, battlefield) : choice.getRangeMax();
             int dist;
 
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
@@ -482,6 +484,17 @@ public abstract class ActorCommand extends BattleCommand{
         this.free = free;
     }
 
+
+    @Override
+    public String toString() {
+        String str = "\nActorCommand  : " +getActionChoice().name();
+        str += "\n    initiator : "+getInitiator().getName();
+        str += "\n    target : "+((battlefield.isTileOccupied(rowTarget, colTarget)) ?  battlefield.getUnit(rowTarget, colTarget).getName(): " ("+rowTarget+" "+colTarget+") ");
+        str += "\n    executable ? "+isTargetValid();
+        return str;
+    }
+
+
     // ----------------- Encounter outcome CLASS -----------------
 
 
@@ -600,11 +613,6 @@ public static class EncounterOutcome {
             this.droppedItem = droppedItem;
             this.playerOwned = playerOwned;
         }
-    }
-
-    @Override
-    public String toString() {
-        return getActionChoice().name();
     }
 
 

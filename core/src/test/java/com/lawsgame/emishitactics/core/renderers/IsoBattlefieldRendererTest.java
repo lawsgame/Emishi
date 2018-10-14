@@ -1,6 +1,6 @@
 package com.lawsgame.emishitactics.core.renderers;
 
-import com.lawsgame.emishitactics.core.helpers.SpriteProvider;
+import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
@@ -24,7 +24,7 @@ public class IsoBattlefieldRendererTest {
                 battlefield.getTiles()[r][c] = Data.TileType.PLAIN;
             }
         }
-        bfr0 = new IsoBFR(battlefield, new SpriteProvider(IsoBFR.SPRITE_STD_SIZE), true);
+        bfr0 = new IsoBFR(battlefield, new AssetProvider(IsoBFR.SPRITE_STD_SIZE), true);
 
     }
 

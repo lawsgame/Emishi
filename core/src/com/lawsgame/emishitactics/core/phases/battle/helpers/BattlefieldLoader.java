@@ -140,6 +140,12 @@ public class BattlefieldLoader {
                         break;
                     }
                 }
+                for(Environment environment : Environment.values()){
+                    if(battleElt.get("env").equals(environment.name())){
+                        bf.setEnvironment(environment);
+                        break;
+                    }
+                }
 
 
                 // DEPLOY ARMIES

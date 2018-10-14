@@ -2,11 +2,12 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
+import com.lawsgame.emishitactics.core.phases.battle.ai.AggressiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -27,7 +28,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
     public AiBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false, true, false);
 
-        this.ai = new PassiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory());
+        this.ai = new AggressiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory());
         this.threadAI = new Thread(ai, "AI Thread");
         this.bundleQueue = new LinkedList<AI.CommandBundle>();
         this.trackrecord = new Stack<ActorCommand>();
@@ -149,7 +150,10 @@ public class AiBIS extends BattleInteractionState implements Observer {
                 // focus the camera on the target and show the action pan
                 if(command instanceof ActorCommand) {
                     final ActorCommand actorCommand = (ActorCommand)command;
-                    bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                    StandardTask showAction = new StandardTask();
+                    CommandThread commandThread = new CommandThread();
+
+                    commandThread.addQuery(new SimpleCommand() {
                         @Override
                         public void apply() {
                             bim.focusOn(actorCommand.getRowActor(), actorCommand.getColActor(), true, false, false, true, false);
@@ -158,7 +162,26 @@ public class AiBIS extends BattleInteractionState implements Observer {
                                 panel.show();
                             }
                         }
-                    }, (panel != null) ? Data.AIBIS_ACTION_PANEL_DURATION_APPEARANCE : Data.AIBIS_DELAY_CAMERA_FOCUS));
+                    }, (panel != null) ? Data.AIBIS_ACTION_PANEL_DURATION_APPEARANCE : Data.AIBIS_DELAY_CAMERA_FOCUS);
+
+                    if(panel != null) {
+
+                        commandThread.addQuery(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                panel.hide();
+                            }
+                        }, panel.getHidingTime());
+
+                        commandThread.addQuery(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                panel.remove();
+                            }
+                        },0);
+                    }
+                    showAction.addThread(commandThread);
+                    bim.scheduler.addTask(showAction);
                 }
 
                 // push the action render task OR trigger
@@ -184,5 +207,4 @@ public class AiBIS extends BattleInteractionState implements Observer {
         trackrecord.push(command);
         bim.push(new HandleOutcomeBIS(bim, trackrecord, true));
     }
-
 }

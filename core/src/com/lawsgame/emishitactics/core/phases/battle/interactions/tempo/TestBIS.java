@@ -6,40 +6,46 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.ai.AggressiveAI;
+import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.AreaWidget;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoAreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoAreaWidget;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
-import java.util.LinkedList;
 import java.util.Stack;
 
 public class TestBIS extends BattleInteractionState {
     ActionInfoPanel actionInfoPanel;
-    AreaWidget areaWidget;
     ExperiencePanel experiencePanel;
     LevelUpPanel levelUpPanel;
     LootPanel lootPanel;
+    Sprite areaSprite;
+    AreaRenderer areaRenderer;
+
+    private AggressiveAI aggressiveAI;
 
     private Animation animation;
     private Array<Sprite> sprites;
     private TextureRegion[] spriteSet;
 
-    private AreaWidget moveAW;
-    private AreaWidget actionAW;
-
-    private LinkedList<Array<int[]>> awUpdates;
-    private AreaWidget subaddAW;
+    private TempoAreaWidget moveAW;
+    private TempoAreaWidget actionAW;
 
     private Army army;
     IUnit sltdUnit;
@@ -53,11 +59,20 @@ public class TestBIS extends BattleInteractionState {
         super(bim, true, true, true, true, false);
         setArmy();
 
+        //areaSprite = bim.assetProvider.getAreaTR(Data.AreaColor.LIGHT_BLUE, AssetProvider.AreaSpriteType.BORDER);
+        //areaSprite.setPosition(3, 3);
+
+        Array<int[]> tiles = new Array<int[]>();
+        tiles.addAll(Utils.getEreaFromRange(bim.battlefield, 5, 5, 2, 2));
+        Area area = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA, tiles);
+        this.areaRenderer = new IsoAreaRenderer(area, bim.bfr, bim.assetProvider);
+        //this.areaRenderer = new TempoAreaRenderer(area);
+
         sltdUnit = army.getWarlord();
         index = 1;
         switchmode = false;
 
-        /*sprites = bim.spriteProvider.genSpriteTree.getSpriteSet(
+        /*sprites = bim.assetProvider.genSpriteTree.getSpriteSet(
                 false,
                 false,
                 false,
@@ -65,8 +80,8 @@ public class TestBIS extends BattleInteractionState {
                 Data.WeaponType.SWORD,
                 Data.Orientation.WEST,
                 true,
-                Data.SpriteSetId.REST);*/
-        sprites = bim.spriteProvider.charaSpriteTree.getSpriteSet(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, Data.Orientation.SOUTH, true, Data.SpriteSetId.REST);
+                Data.SpriteSetId.REST);
+        sprites = bim.assetProvider.charaSpriteTree.getSpriteSet(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, Data.Orientation.SOUTH, true, Data.SpriteSetId.REST);
         for(int i = 0; i < sprites.size; i++){
             sprites.get(i).setSize((sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 2 : 1), 2);
             sprites.get(i).setPosition(2 + (sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 0 : 0.5f), 2);
@@ -74,32 +89,13 @@ public class TestBIS extends BattleInteractionState {
         }
         animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
         animation.play();
+        */
 
-        moveAW = new AreaWidget(bim.battlefield, Data.AreaType.SQUAD_MEMBER);
-        actionAW = new AreaWidget(bim.battlefield, Data.AreaType.ACTION_AREA);
+        moveAW = new TempoAreaWidget(bim.battlefield, Data.AreaType.BANNER_RANGE);
+        actionAW = new TempoAreaWidget(bim.battlefield, Data.AreaType.ACTION_AREA);
 
 
-
-        subaddAW = new AreaWidget(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
-        this.awUpdates = new LinkedList<Array<int[]>>();
-
-        Array<int[]> tiles = new Array<int[]>();
-        tiles.add(new int[]{5,5});
-        tiles.add(new int[]{5,6});
-        tiles.add(new int[]{6,5});
-        subaddAW.setTiles(tiles, true);
-
-        tiles = new Array<int[]>();
-        tiles.add(new int[]{6,5});
-        tiles.add(new int[]{6,6});
-        tiles.add(new int[]{6,7});
-        awUpdates.offer(tiles);
-
-        tiles = new Array<int[]>();
-        tiles.add(new int[]{6,5});
-        tiles.add(new int[]{6,6});
-        tiles.add(new int[]{7,6});
-        awUpdates.offer(tiles);
+        this.aggressiveAI = new AggressiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory());
 
     }
 
@@ -169,9 +165,14 @@ public class TestBIS extends BattleInteractionState {
     public void renderAhead(SpriteBatch batch) {
         actionAW.render(batch);
         moveAW.render(batch);
+        if(areaSprite != null)
+            areaSprite.draw(batch);
+        if(areaRenderer != null)
+            areaRenderer.render(batch);
+
         //subaddAW.render(batch);
         //if(sprites != null) sprites.get(animation.getCurrentFrame()).draw(batch);
-        //batch.draw(bim.spriteProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
+        //batch.draw(bim.assetProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
 
     }
 
@@ -181,6 +182,11 @@ public class TestBIS extends BattleInteractionState {
 
         System.out.println("input : "+row+" "+col);
         //bim.moveCamera(row, col, true);
+
+        //MOVE UNIT
+
+        //int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
+        //bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
 
 
         // TEST FINAL
@@ -224,6 +230,7 @@ public class TestBIS extends BattleInteractionState {
         }*/
 
 
+        /*
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
             bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
@@ -233,14 +240,20 @@ public class TestBIS extends BattleInteractionState {
             tiles = bim.battlefield.getActionArea(row, col);
             actionAW.setTiles(tiles, true);
         }
+        */
 
 
-
-        return true;
+        return false;
     }
 
+    int i = 0;
+    float time = 0;
     @Override
     public void update60(float dt) {
+        time += dt;
+
+
+
         if(animation != null)
             animation.update(dt);
 
@@ -305,37 +318,19 @@ public class TestBIS extends BattleInteractionState {
         if(Gdx.input.isKeyJustPressed(Input.Keys.V)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.NORTH);
         if(Gdx.input.isKeyJustPressed(Input.Keys.N)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.SOUTH);
         if(Gdx.input.isKeyJustPressed(Input.Keys.B)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.EAST);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-            this.targeted = ! targeted;
-            bim.bfr.getUnitRenderer(sltdUnit).setTargeted(targeted);
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.M)) {
-            this.done = ! done;
-            bim.bfr.getUnitRenderer(sltdUnit.getArmy().getAllSquads().get(0).get(0)).setDone(done);
-        }
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
-            subaddAW.getModel().add(awUpdates.peek(), true);
-            awUpdates.offer(awUpdates.pop());
-        }
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.J)){
-            subaddAW.getModel().substract(awUpdates.peek(), true);
-            awUpdates.offer(awUpdates.pop());
-        }
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.G)){
-            subaddAW.getModel().clear(true);
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+            AI.CommandBundle bundle = aggressiveAI.getCommandPackage(bim.battlefield.getUnitPos(sltdUnit));
+            for(BattleCommand command : bundle.commands)
+                command.pushRenderTasks();
         }
 
     }
-    private boolean targeted = false;
-    private boolean done = false;
-
     /*
     @Override
     public void renderBetween(SpriteBatch batch) {
-        areaWidget.render(batch);
+        tempoAreaWidget.render(batch);
     }
     */
 

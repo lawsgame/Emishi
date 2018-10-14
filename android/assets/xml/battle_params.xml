@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Battles>
-    <Battle battlefieldId = "0" weather="SUNNY">
+    <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY">
         <Army affiliation = "ENEMY1">
             <Squad>
                 <Unit row = "14" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">

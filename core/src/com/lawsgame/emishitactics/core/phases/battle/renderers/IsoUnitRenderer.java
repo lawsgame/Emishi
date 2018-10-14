@@ -344,14 +344,14 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
         // fetch the required sprite build
        Array<Sprite> updatedSet = (getModel().isCharacter()) ?
-                bfr.spriteProvider.charaSpriteTree.getSpriteSet(
+                bfr.assetProvider.charaSpriteTree.getSpriteSet(
                         promoted,
                         getModel().getTemplate(),
                         weaponType,
                         orientation,
                         done,
                         animId.getSpriteSetId(getModel().isWarChief())) :
-                bfr.spriteProvider.genSpriteTree.getSpriteSet(
+                bfr.assetProvider.genSpriteTree.getSpriteSet(
                         getModel().getArmy().isPlayerControlled(),
                         shieldbearer,
                         horseman,

@@ -6,11 +6,13 @@ import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.Environment;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
+
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,12 +40,13 @@ public class Battlefield extends Observable {
     private Array<Area> deploymentAreas;
     private Array<UnitArea> unitAreas;
     private Weather weather;
+    private Environment environment;
     private BattleSolver solver;
 
     public LinkedList<IArmy> armyTurnOrder;
 
 
-    public Battlefield (int nbRows, int nbCols, Data.Weather weather, BattleSolver solver){
+    public Battlefield (int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
         if(nbRows > 0 && nbCols > 0) {
             this.tiles = new TileType[nbRows][nbCols];
             this.looted = new boolean[nbRows][nbCols];
@@ -55,6 +58,8 @@ public class Battlefield extends Observable {
         this.unitAreas = new Array<UnitArea>();
         this.recruits = new HashMap<Integer, IUnit>();
         this.tombItems = new HashMap<Integer, Item>();
+
+        this.environment = env;
         setWeather(weather, true);
         setSolver(solver);
 
@@ -62,7 +67,7 @@ public class Battlefield extends Observable {
     }
 
     public Battlefield(int nbRows, int nbCols){
-        this(nbRows, nbCols, Data.Weather.getStandard(), new BattleSolver.KillAll());
+        this(nbRows, nbCols, Data.Weather.getStandard(), Environment.getStandard(), new BattleSolver.KillAll());
     }
 
     public BattleSolver getSolver(){
@@ -1186,6 +1191,14 @@ public class Battlefield extends Observable {
 
     public Data.Weather getWeather() {
         return weather;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
     @Override

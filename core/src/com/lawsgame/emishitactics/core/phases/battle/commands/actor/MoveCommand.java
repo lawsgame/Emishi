@@ -75,7 +75,7 @@ public class MoveCommand extends ActorCommand {
     }
 
     @Override
-    public void unexecute() {
+    protected void unexecute() {
         if(battlefield.isTileOccupied(rowTarget, colTarget)){
             IUnit actor = battlefield.getUnit(rowTarget, colTarget);
             if(actor == walkerRenderer.getModel()) {

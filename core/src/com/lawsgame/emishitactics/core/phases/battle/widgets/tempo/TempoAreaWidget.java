@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
@@ -8,22 +8,22 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.tempo.TempoAreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 
-public class AreaWidget {
+public class TempoAreaWidget {
     public Area model;
     public AreaRenderer renderer;
 
 
-    public AreaWidget(Battlefield battlefield, Data.AreaType color){
+    public TempoAreaWidget(Battlefield battlefield, Data.AreaType color){
         this(battlefield, color, new Array<int[]>());
     }
 
 
-    public AreaWidget(Battlefield battlefield, Data.AreaType areaType, Array<int[]> tiles){
+    public TempoAreaWidget(Battlefield battlefield, Data.AreaType areaType, Array<int[]> tiles){
         model = new Area(battlefield, areaType, tiles);
         renderer = new TempoAreaRenderer(model);
     }
 
-    public AreaWidget(Area area){
+    public TempoAreaWidget(Area area){
         model = area;
         renderer = new TempoAreaRenderer(area);
     }

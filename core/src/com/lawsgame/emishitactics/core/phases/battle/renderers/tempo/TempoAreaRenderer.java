@@ -16,7 +16,6 @@ public class TempoAreaRenderer extends AreaRenderer {
     private Array<Sprite> spriteRefs;             // sprites to render associated with the coordinates above
 
 
-    protected boolean visible = true;
 
     public TempoAreaRenderer(Area model) {
         super(model);
@@ -26,40 +25,17 @@ public class TempoAreaRenderer extends AreaRenderer {
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    @Override
-    public boolean isExecuting() {
-        return false;
-    }
-    @Override
-    public void update(float dt) {
-
-    }
-
-    @Override
-    public void getNotification(Observable sender, Object data) {
-        if(data == null) {
-            change();
-        }else if(data instanceof Notification.Visible){
-            setVisible(((Notification.Visible) data).visible);
+    protected void renderArea(SpriteBatch batch) {
+        for (int i = 0; i < spriteCoords.size; i++) {
+            spriteRefs.get(i).setCenterX(spriteCoords.get(i)[0]);
+            spriteRefs.get(i).setCenterY(spriteCoords.get(i)[1]);
+            spriteRefs.get(i).draw(batch);
         }
-    }
 
-    @Override
-    public void render(SpriteBatch batch) {
-        if(visible) {
-            for (int i = 0; i < spriteCoords.size; i++) {
-                spriteRefs.get(i).setCenterX(spriteCoords.get(i)[0]);
-                spriteRefs.get(i).setCenterY(spriteCoords.get(i)[1]);
-                spriteRefs.get(i).draw(batch);
-            }
-        }
     }
 
     public void change(){
+
         spriteRefs.clear();
         spriteCoords.clear();
         if(getModel().getCheckmap() != null){
@@ -183,6 +159,5 @@ public class TempoAreaRenderer extends AreaRenderer {
             }
         }
     }
-
 
 }

@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SpriteProviderTest {
+public class AssetProviderTest {
 
     CharaST tree;
 

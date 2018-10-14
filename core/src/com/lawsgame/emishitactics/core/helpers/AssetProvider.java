@@ -15,16 +15,30 @@ import com.lawsgame.emishitactics.core.helpers.spritetree.GenUnitST;
 import com.lawsgame.emishitactics.core.helpers.spritetree.WeaponBranch;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.AreaColor;
 import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.engine.datastructures.Map2;
 
 import java.util.HashMap;
 
-public class SpriteProvider implements Disposable{
+public class AssetProvider implements Disposable{
     private static String EXT_PACK = ".pack";
+
+    public enum AreaSpriteType{
+        ANTI_INSIDE_ACUTE,
+        ANTI_INSIDE_OBTUSE,
+        ANTI_OUTSIDE_ACUTE,
+        ANTI_OUTSIDE_OBTUSE,
+        ANTI_SIDE,
+        ANTI_SIDE_UPSIDE_DOWN,
+        BORDER,
+        CORNER_ACUTE,
+        CORNER_OBTUSE
+    }
 
     private float spriteStdSize;
     private TextureRegion undefinedTileSprite = null;
@@ -34,7 +48,11 @@ public class SpriteProvider implements Disposable{
     public GenUnitST genSpriteTree = new GenUnitST();
     public CharaST charaSpriteTree = new CharaST();
 
-    public SpriteProvider(float spriteStdSize){
+    public Map2<AreaColor, AreaSpriteType, TextureRegion> areaTextureRegions = new Map2<AreaColor, AreaSpriteType, TextureRegion>();
+
+
+
+    public AssetProvider(float spriteStdSize){
         this.spriteStdSize = spriteStdSize;
     }
 
@@ -51,14 +69,25 @@ public class SpriteProvider implements Disposable{
     public void set(Battlefield battlefield, AssetManager asm){
 
         if(asm != null) {
-
+            FileHandle dirHandle;
+            FileHandle fileHandle;
+            String filepath = "";
             TextureRegion region;
             String regionName;
             TextureAtlas atlas;
 
-            // build tiles sprite pool
-            if (asm.isLoaded(Assets.ATLAS_TILES)) {
-                atlas = asm.get(Assets.ATLAS_TILES);
+            // LOAD TILE SET
+            dirHandle = Gdx.files.internal(Assets.TILE_SPRITES_DIR);
+            if(dirHandle.child(battlefield.getEnvironment().name().toLowerCase()+EXT_PACK).exists()) {
+                filepath = String.format("%s/%s%s", Assets.TILE_SPRITES_DIR, battlefield.getEnvironment().name().toLowerCase(), EXT_PACK);
+            }else{
+                filepath = String.format("%s/%s%s", Assets.TILE_SPRITES_DIR, Data.Environment.getStandard().name().toLowerCase(), EXT_PACK);
+            }
+
+            asm.load(filepath, TextureAtlas.class);
+            asm.finishLoading();
+            if (asm.isLoaded(filepath)) {
+                atlas = asm.get(filepath);
                 this.undefinedTileSprite = atlas.findRegion(Assets.REGION_TERRAINS_UNDEFINED);
                 for (Data.TileType tileType : Data.TileType.values()) {
                     regionName = Assets.getRegionTile(tileType);
@@ -71,11 +100,38 @@ public class SpriteProvider implements Disposable{
             }
 
 
-            // load units
+            // LOAD AREA SETS
+
+            dirHandle = Gdx.files.internal(Assets.AREA_SPRITES_DIR);
+            Data.AreaColor color;
+            for(int i = 0; i < AreaColor.values().length; i++ ){
+
+                color = AreaColor.values()[i];
+                filepath = String.format("%s/%s%s", Assets.AREA_SPRITES_DIR, color.name().toLowerCase(), EXT_PACK);;
+                if(dirHandle.child(AreaColor.values()[i].name().toLowerCase()+EXT_PACK).exists()) {
+                    asm.load(filepath, TextureAtlas.class);
+                    asm.finishLoading();
+                    if (asm.isLoaded(filepath)) {
+                        atlas = asm.get(filepath);
+                        for (int j = 0; j < AreaSpriteType.values().length; j++) {
+                            region = atlas.findRegion(AreaSpriteType.values()[j].name().toLowerCase());
+                            if (region != null) {
+
+                                region.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                                areaTextureRegions.put(color, AreaSpriteType.values()[j], region);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+
+
+            // LOAD UNITS SS
+
             Array<String[]> filenames = getFileNames(battlefield);
-            FileHandle unitsDirHandle = Gdx.files.internal(Assets.UNIT_SPRITES_DIR);
-            FileHandle unitFileHandle;
-            String filepath;
+            dirHandle = Gdx.files.internal(Assets.UNIT_SPRITES_DIR);
             TextureAtlas unitAtlas;
             TextureRegion unitPortrait;
             WeaponBranch weaponTypeNode;
@@ -83,14 +139,12 @@ public class SpriteProvider implements Disposable{
 
                 // CHECK FILE EXISTENCE
 
-                unitFileHandle = unitsDirHandle.child(filenames.get(i)[0]).child(filenames.get(i)[1]).child(filenames.get(i)[2]+EXT_PACK);
-
-                if(unitFileHandle.exists()) {
+                fileHandle = dirHandle.child(filenames.get(i)[0]).child(filenames.get(i)[1]).child(filenames.get(i)[2]+EXT_PACK);
+                if(fileHandle.exists()) {
 
                     // LOAD FILE
 
                     filepath = String.format("%s/%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenames.get(i)[0], filenames.get(i)[1], filenames.get(i)[2], EXT_PACK);
-
                     asm.load(filepath, TextureAtlas.class);
                     asm.finishLoading();
 
@@ -273,12 +327,16 @@ public class SpriteProvider implements Disposable{
     public void dispose() { }
 
 
-
-
-
-    // ------------------ SPRITE TREE CLASS -------------------------
-
-
-
+    public Sprite getAreaTR(AreaColor color, AreaSpriteType type){
+        Sprite sprite;
+        TextureRegion region = areaTextureRegions.get(color, type);
+        if(region == null) {
+            sprite = new Sprite(areaTextureRegions.get(AreaColor.LIGHT_BLUE, type));
+        }else{
+            sprite = new Sprite(region);
+        }
+        sprite.setSize(0.5f, 0.25f);
+        return sprite;
+    }
 
 }

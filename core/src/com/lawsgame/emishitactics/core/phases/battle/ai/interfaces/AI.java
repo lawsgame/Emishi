@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.ai.interfaces;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.EndArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
@@ -69,6 +70,34 @@ public abstract class AI extends Observable implements Runnable {
 
     }
 
+    /**
+     *
+     *
+     * @param command
+     * @param bundle
+     * @return true if the command is successfully applied and bundle updated
+     */
+    protected boolean applyAndStore(ActorCommand command, CommandBundle bundle){
+        if(command.isTargetValid()){
+            bundle.offer(command, app.getPanel(command));
+            command.setDecoupled(true);
+            command.apply();
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean applyAndStore(ActorCommand command, int rowTarget, int colTarget, CommandBundle bundle){
+        command.setTarget(rowTarget, colTarget);
+        if(command.isTargetValid()){
+            bundle.offer(command, app.getPanel(command));
+            command.setDecoupled(true);
+            command.apply();
+            return true;
+        }
+        return false;
+    }
+
     public class CommandBundle {
         public LinkedList<BattleCommand> commands;
         public LinkedList<ActionInfoPanel> panels;
@@ -87,6 +116,14 @@ public abstract class AI extends Observable implements Runnable {
 
         public boolean isEmpty() {
             return commands.isEmpty() || panels.isEmpty();
+        }
+
+        @Override
+        public String toString() {
+            String str = "\nAI COMMAND BUNDLE : \n";
+            for(int i = 0; i < commands.size(); i++)
+                str += commands.get(i).toString();
+            return str;
         }
     }
 

@@ -27,12 +27,14 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     protected TextureRegion[][] tileRenderers;
     protected TempoSpritePool sprite2DPool;
     protected boolean visible;
+    protected Array<AreaRenderer> areaRenderers;
 
     protected CountDown countDown = new CountDown(2f);
 
     public TempoBattlefield2DRenderer(Battlefield battlefield, TempoSpritePool spritePool) {
         super(battlefield);
         this.unitRenderers = new Array<BattleUnitRenderer>();
+        this.areaRenderers = new Array<AreaRenderer>();
 
         this.visible = true;
         this.sprite2DPool = spritePool;
@@ -54,6 +56,13 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
         for(int i = 0; i < battlefield.getDeploymentAreas().size; i++){
            addAreaRenderer(battlefield.getDeploymentAreas().get(i));
+        }
+    }
+
+    @Override
+    public void updateAreaRenderers(float dt) {
+        for(int i = 0; i < areaRenderers.size; i++) {
+            areaRenderers.get(i).update(dt);
         }
     }
 
@@ -190,6 +199,16 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return false;
     }
 
+    @Override
+    protected boolean isAreaRendererCreated(Area model) {
+        boolean existed = false;
+        for(int i = 0; i < areaRenderers.size; i++){
+            if(areaRenderers.get(i).getModel() == model)
+                return true;
+        }
+        return existed;
+    }
+
 
     @Override
     public BattleUnitRenderer getUnitRenderer(IUnit model) {
@@ -229,18 +248,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return row + 0.5f;
     }
 
-
-    @Override
-    public void displayDeploymentAreas(boolean visible) {
-        Array<Area> deploymentArea = getModel().getDeploymentAreas();
-        for(int i = 0; i< deploymentArea.size; i++){
-            for(int j = 0 ; j < areaRenderers.size; j++){
-                if(deploymentArea.get(i) == areaRenderers.get(j).getModel()){
-                    areaRenderers.get(j).setVisible(visible);
-                }
-            }
-        }
-    }
 
     @Override
     public void setGameCamParameters(CameraManager cameraManager) {

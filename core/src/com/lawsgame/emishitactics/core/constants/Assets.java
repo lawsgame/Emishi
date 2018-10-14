@@ -29,8 +29,9 @@ public class Assets {
     public static final String ATLAS_TEMPO_UI = "textures/tempo/ui_skin.pack";
     public static final String ATLAS_TEMPO_TILES = "textures/tempo/tiles.pack";
     public static final String ATLAS_MAPS = "textures/maps.pack";
-    public static final String ATLAS_TILES = "textures/tiles.pack";
+    public static final String TILE_SPRITES_DIR = "textures/tiles";
     public static final String UNIT_SPRITES_DIR = "textures/units";
+    public static final String AREA_SPRITES_DIR = "textures/areas";
 
 
     // regions
@@ -50,6 +51,8 @@ public class Assets {
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";
     public static final String REGION_TEMPO_UNIT_SPRITES = "unit_sprites_tempo";
     public static final String REGION_UNIT_PORTRAIT = "portrait";
+    public static final String REGION_UNIT_GUARD_ICON = "guard_icon";
+    public static final String REGION_UNIT_SHADOW = "shadow";
 
     public static final String UI_BLACK_BACKGROUND = "black_background";
     public static final String UI_BUTTON_UP = "button_up";
