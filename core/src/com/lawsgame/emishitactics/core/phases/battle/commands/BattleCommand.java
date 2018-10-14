@@ -13,7 +13,7 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     protected final Battlefield battlefield;
     protected final BattlefieldRenderer bfr;
 
-    private final AnimationScheduler scheduler;
+    protected final AnimationScheduler scheduler;
     private boolean decoupled;
     private boolean launched;
     private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed AND usefull for decoupling view and model updates
@@ -58,17 +58,28 @@ public abstract class BattleCommand extends Observable implements Command, Obser
     }
 
     public final void pushRenderTasks(){
+
         if(containPushableRenderTasks()) {
+
             this.tasksScheduled = true;
             for (int i = 0; i < renderTasks.size; i++) {
                 renderTasks.get(i).attach(this);
                 scheduler.addTask(renderTasks.get(i));
+
             }
+            System.out.println("");
         }
+    }
+
+    public boolean containPushableRenderTasks() {
+        return decoupled && !tasksScheduled && renderTasks.size > 0;
     }
 
     @Override
     public void getNotification(Observable sender, Object data) {
+
+
+
         if (data instanceof Task) {
 
             Task completedTask = (Task) data;
@@ -91,7 +102,8 @@ public abstract class BattleCommand extends Observable implements Command, Obser
         this.decoupled = decoupled;
     }
 
-    public boolean containPushableRenderTasks() {
-        return decoupled && !tasksScheduled && renderTasks.size > 0;
+    public String toShortString(){
+        return toString();
     }
+
 }

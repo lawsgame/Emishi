@@ -18,7 +18,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     Area actionArea;
 
     public SelectTargetBIS(BattleInteractionMachine bim, Stack<ActorCommand> historic, ActorCommand command) {
-        super(bim, true, true, true, true , false);
+        super(bim, true, true, true, false , false);
         this.historic = historic;
         this.currentCommand = command;
 
@@ -67,7 +67,6 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
             if(currentCommand.getActionChoice().isUndoable()){
 
                 // remove blinking and other highlighting target affect
-                currentCommand.blink(false);
                 currentCommand.attach(this);
                 currentCommand.apply();
                 historic.push(currentCommand);

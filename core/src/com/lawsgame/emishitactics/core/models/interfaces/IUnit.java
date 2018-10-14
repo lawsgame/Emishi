@@ -152,6 +152,7 @@ public abstract class IUnit extends Observable {
     public abstract boolean sameSquadAs(IUnit unit);
     public abstract boolean sameArmyAs(IUnit unit);
     public abstract void setLeadership(int leadership);
+    public abstract IUnit getWarchief();
     public abstract int getChiefCharisma();
     public abstract int getChiefMoralBonus();
     public abstract int getSquadIndex();
@@ -174,7 +175,4 @@ public abstract class IUnit extends Observable {
     public abstract int getRecoveredMoralPoints(int healPower);
     public abstract boolean treated(int healPower);
     public abstract Array<Notification.ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly);
-
-
-
 }

@@ -18,6 +18,8 @@ public class BeginArmyTurnCommand extends BattleCommand {
         if(army != null) {
             army.replenishMoral();
             army.updateActionPoints();
+            if(army.isPlayerControlled())
+                battlefield.incrementTurn();
         }
     }
 

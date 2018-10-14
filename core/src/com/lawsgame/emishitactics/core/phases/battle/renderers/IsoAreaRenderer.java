@@ -92,10 +92,12 @@ public class IsoAreaRenderer extends AreaRenderer {
                         }else{
                             if(wtc){
                                 if(stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
-                                    sprite.setPosition(xCenter - 0.25f, yCenter - 0.5f );
-                                    sprite.setFlip(false, true);
-                                    sprites.add(sprite);
+                                    if(!this.getModel().getType().isRectangular()) {
+                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
+                                        sprite.setPosition(xCenter - 0.25f, yCenter - 0.5f);
+                                        sprite.setFlip(false, true);
+                                        sprites.add(sprite);
+                                    }
                                     sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_OBTUSE));
                                     sprite.setFlip(false, true);
                                 }else{
@@ -161,9 +163,11 @@ public class IsoAreaRenderer extends AreaRenderer {
                         }else{
                             if(wtc){
                                 if(ntc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
-                                    sprite.setPosition(xCenter - 1f, yCenter - 0.125f );
-                                    sprites.add(sprite);
+                                    if(!this.getModel().getType().isRectangular()) {
+                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
+                                        sprite.setPosition(xCenter - 1f, yCenter - 0.125f);
+                                        sprites.add(sprite);
+                                    }
                                     sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_ACUTE));
                                 }else{
                                     sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
@@ -223,10 +227,12 @@ public class IsoAreaRenderer extends AreaRenderer {
                         }else{
                             if(etc){
                                 if(stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
-                                    sprite.setPosition(xCenter + 0.5f, yCenter - 0.125f );
-                                    sprite.setFlip(true, false);
-                                    sprites.add(sprite);
+                                    if(!this.getModel().getType().isRectangular()) {
+                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
+                                        sprite.setPosition(xCenter + 0.5f, yCenter - 0.125f);
+                                        sprite.setFlip(true, false);
+                                        sprites.add(sprite);
+                                    }
                                     sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_ACUTE));
                                     sprite.setFlip(true, false);
 
@@ -290,9 +296,11 @@ public class IsoAreaRenderer extends AreaRenderer {
                             if(etc){
                                 if(ntc){
 
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
-                                    sprite.setPosition(xCenter - 0.25f, yCenter + 0.25f );
-                                    sprites.add(sprite);
+                                    if(!this.getModel().getType().isRectangular()) {
+                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
+                                        sprite.setPosition(xCenter - 0.25f, yCenter + 0.25f);
+                                        sprites.add(sprite);
+                                    }
                                     sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_OBTUSE));
                                     sprite.setFlip(false,false);
 

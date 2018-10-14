@@ -97,8 +97,8 @@ public class BattlePhase extends GamePhase {
 
         //lauch initial BIS
         this.bim = new BattleInteractionMachine(bfr, gameCM, asm, stageUI, player, assetProvider);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

@@ -123,7 +123,7 @@ public abstract class AI extends Observable implements Runnable {
             String str = "\nAI COMMAND BUNDLE : \n";
             for(int i = 0; i < commands.size(); i++)
                 str += commands.get(i).toString();
-            return str;
+            return str+"\n";
         }
     }
 

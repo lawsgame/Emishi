@@ -346,7 +346,7 @@ public class Data {
     public enum AreaType {
         TOUCHED_TILE            (3, true, AreaColor.WHITE),
         SELECTED_UNIT           (0, true, AreaColor.LIGHT_BLUE),
-        BANNER_RANGE            (0, true, AreaColor.LIGHT_BROWN),
+        BANNER_AREA             (0, true, AreaColor.LIGHT_BROWN),
         MOVE_AREA               (1, false, AreaColor.TURQUOISE),
         ACTION_AREA             (1, false, AreaColor.RED_ORANGE),
         GUARD_AREA              (0, true, AreaColor.DEEP_BLUE),

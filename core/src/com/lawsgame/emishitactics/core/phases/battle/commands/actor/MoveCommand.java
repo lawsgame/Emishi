@@ -17,7 +17,6 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 
 public class MoveCommand extends ActorCommand {
-    protected BattleUnitRenderer walkerRenderer;
     protected Array<int[]> validPath;
     protected Data.Orientation oldWalkerOrientation;
 
@@ -29,7 +28,7 @@ public class MoveCommand extends ActorCommand {
     protected void execute() {
 
         //store old state info
-        walkerRenderer = bfr.getUnitRenderer(getInitiator());
+        BattleUnitRenderer walkerRenderer = bfr.getUnitRenderer(getInitiator());
         oldWalkerOrientation = getInitiator().getOrientation();
 
         // update model
@@ -77,11 +76,12 @@ public class MoveCommand extends ActorCommand {
     @Override
     protected void unexecute() {
         if(battlefield.isTileOccupied(rowTarget, colTarget)){
-            IUnit actor = battlefield.getUnit(rowTarget, colTarget);
-            if(actor == walkerRenderer.getModel()) {
+            IUnit unit = battlefield.getUnit(rowTarget, colTarget);
+            if(unit == getInitiator()) {
+                BattleUnitRenderer walkerRenderer = bfr.getUnitRenderer(getInitiator());
                 battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor, false);
-                actor.setOrientation(oldWalkerOrientation);
-                scheduleRenderTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, actor)));
+                unit.setOrientation(oldWalkerOrientation);
+                scheduleRenderTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, unit)));
                 scheduleRenderTask(new StandardTask(walkerRenderer, oldWalkerOrientation));
             }
 

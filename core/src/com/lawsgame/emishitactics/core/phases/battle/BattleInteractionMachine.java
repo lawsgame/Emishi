@@ -31,6 +31,8 @@ import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
+import java.util.Arrays;
+
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
     public final Player player;
     public final Battlefield battlefield;
@@ -46,7 +48,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     private Area selectedTile;
     private Area touchedTile;
-    private Array<Area> touchedRelatedUnitTiles;
+    private Area warchiefBannerCoveredArea;
 
     public FoeActionArea ffa;
 
@@ -77,18 +79,13 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         this.selectedTile = new Area(battlefield, Data.AreaType.SELECTED_UNIT);
         this.touchedTile = new Area(battlefield, Data.AreaType.TOUCHED_TILE);
+        this.warchiefBannerCoveredArea = new Area(battlefield, Data.AreaType.BANNER_AREA);
         this.bfr.addAreaRenderer(selectedTile);
         this.bfr.addAreaRenderer(touchedTile);
+        this.bfr.addAreaRenderer(warchiefBannerCoveredArea);
         this.bfr.getAreaRenderer(touchedTile).setVisible(false);
         this.bfr.getAreaRenderer(selectedTile).setVisible(false);
-        this.touchedRelatedUnitTiles = new Array<Area>();
-        Area area;
-        for(int i = 1; i < Data.MAX_UNITS_UNDER_WARLORD; i++){
-            area = new Area(battlefield, Data.AreaType.BANNER_RANGE);
-            this.touchedRelatedUnitTiles.add(area);
-            this.bfr.addAreaRenderer(area);
-             bfr.getAreaRenderer(area).setVisible(false);
-        }
+        this.bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(false);
 
         this.ffa = new FoeActionArea(bfr);
 
@@ -187,53 +184,42 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         }
     }
 
-    public void moveCamera(int row, int col, boolean smoothly){
+    protected void moveCamera(int row, int col, boolean smoothly){
         gcm.focusOn(bfr.getCenterX(row, col), bfr.getCenterY(row, col) , smoothly);
     }
 
-    public void highlight(int row, int col, boolean allSquad, boolean selected){
+    protected void highlight(int row, int col, boolean bannerShown, boolean selected){
         removeTileHighlighting(true);
-        if(allSquad && battlefield.isTileOccupied(row, col)) {
 
-            IUnit sltdUnit = battlefield.getUnit(row, col);
-            if(sltdUnit.isMobilized()) {
+        // touch feed back
+        touchedTile.setTiles(row, col, true);
+        bfr.getAreaRenderer(touchedTile).setVisible(true);
 
-
-
-                Array<IUnit> squad = sltdUnit.getSquad(true);
-                Data.AreaType type = Data.AreaType.BANNER_RANGE;
-                int[] squadMemberPos;
-                for (int i = 0; i < squad.size; i++) {
-                    if (squad.get(i) != sltdUnit || !selected) {
-                        squadMemberPos = battlefield.getUnitPos(squad.get(i));
-                        if (squad.get(i).isStandardBearer() && squad.get(i) != sltdUnit) {
-                            touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], 0, sltdUnit.getArmy().getBannerRange(sltdUnit), true);
-                        } else {
-                            touchedRelatedUnitTiles.get(i).setTiles(squadMemberPos[0], squadMemberPos[1], true);
-                        }
-                        touchedRelatedUnitTiles.get(i).setType(type, true);
-                        bfr.getAreaRenderer(touchedRelatedUnitTiles.get(i)).setVisible(true);
-                    }
-                }
-            }
-        }
-
+        // set selected tile
         if(selected){
             selectedTile.setTiles(row, col, true);
             bfr.getAreaRenderer(selectedTile).setVisible(true);
         }
-        touchedTile.setTiles(row, col, true);
-        bfr.getAreaRenderer(touchedTile).setVisible(true);
+
+        // show warchief posiiton and his banner covered area
+        if(bannerShown && battlefield.isTileOccupied(row, col)) {
+            IUnit warchief = battlefield.getUnit(row, col).getWarchief();
+            if (warchief != battlefield.getUnit(row, col)) {
+                int[] warchiefPos = battlefield.getUnitPos(warchief);
+                warchiefBannerCoveredArea.setTiles(warchiefPos[0], warchiefPos[1], 0, warchief.getArmy().getBannerRange(warchief), true);
+                bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(true);
+            }
+        }
+
+
 
     }
 
     public void removeTileHighlighting(boolean exceptSelectedTile){
         bfr.getAreaRenderer(touchedTile).setVisible(false);
-        if(!exceptSelectedTile)
-            bfr.getAreaRenderer(selectedTile).setVisible(false);
-        for(int i = 0; i < touchedRelatedUnitTiles.size; i++){
-            bfr.getAreaRenderer(touchedRelatedUnitTiles.get(i)).setVisible(false);
-        }
+        bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(false);
+        if(!exceptSelectedTile) bfr.getAreaRenderer(selectedTile).setVisible(false);
+
     }
 
 

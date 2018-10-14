@@ -8,7 +8,6 @@ import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine.FocusOn;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand.EncounterOutcome;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -19,6 +18,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperien
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS.HandleOutcomeTask.HOTType;
 
 import java.util.LinkedList;
 import java.util.Stack;
@@ -33,12 +33,12 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     private LevelUpPanel levelUpPanel;
     private LootPanel lootPanel;
 
-    private LinkedList<Task> tasks;
-    private LinkedList<Boolean> levelPanelShown;
+    private LinkedList<HandleOutcomeTask> tasks;
+    //private LinkedList<Boolean> levelPanelShown;
     private boolean aiTurn;
 
     public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<ActorCommand> historic, boolean aiTurn) {
-        super(bim, true, false, false, true, false);
+        super(bim, true, false, false, false, false);
 
         this.historic = historic;
         if(emptyOutcome == null) emptyOutcome = new EncounterOutcome(bim.player.getInventory());
@@ -51,8 +51,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         bim.uiStage.addActor(levelUpPanel);
         bim.uiStage.addActor(lootPanel);
 
-        this.tasks = new LinkedList<Task>();
-        this.levelPanelShown = new LinkedList<Boolean>();
+        this.tasks = new LinkedList<HandleOutcomeTask>();
         this.aiTurn = aiTurn;
 
     }
@@ -70,30 +69,31 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         }else {
             while (!outcome.isHandled()) {
 
-                if(!outcome.isExperienceShown()){
+                if(!outcome.isExperienceGainHandled()){
 
                     ActorCommand.ExperiencePointsHolder holder = outcome.expHolders.pop();
                     int[] receiverPos = bim.battlefield.getUnitPos(holder.receiver);
 
-                    StandardTask experienceTask = new StandardTask();
+                    HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
                     experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
                     experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, holder.experience), 0f));
                     tasks.add(experienceTask);
 
                     if(holder.isReceiverLevelup()){
                         // of the unit has leveled up
-                        StandardTask levelUpTask = new StandardTask();
+                        HandleOutcomeTask levelUpTask = new HandleOutcomeTask(HOTType.LEVELUP);
                         levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
                         if (holder.receiver.isMobilized() || holder.receiver.getArmy().isPlayerControlled()) {
                             levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(holder.receiver, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel, holder.getStatGained()), 0f));
                         }
                         tasks.add(levelUpTask);
                     }
-                }else if(!outcome.isLootedItemsClaimed()){
+                }else if(!outcome.isLootedItemsClaimingHandled()){
 
                    ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
-                   StandardTask itemTask = new StandardTask(new DisplayLootPanel(holder.droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f);
-                   tasks.offer(itemTask);
+                    HandleOutcomeTask lootTask = new HandleOutcomeTask(HOTType.LOOT);
+                    lootTask.addThread(new StandardTask.CommandThread(new DisplayLootPanel(holder.droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f));
+                   tasks.offer(lootTask);
                 }
             }
         }
@@ -141,11 +141,10 @@ public class HandleOutcomeBIS extends BattleInteractionState{
             proceed();
         }else{
             if(aiTurn){
-                while(!tasks.isEmpty() && !levelPanelShown.pop()){
+                while(!tasks.isEmpty() && !(tasks.peek().type == HOTType.LEVELUP)){
                     bim.scheduler.addTask(tasks.pop());
                 }
                 if(!tasks.isEmpty()){
-                    levelPanelShown.pop();
                     bim.scheduler.addTask(tasks.pop());
                 }
             }else {
@@ -153,6 +152,25 @@ public class HandleOutcomeBIS extends BattleInteractionState{
             }
         }
         return true;
+    }
+
+
+
+    //----------------- HELPER CLASS ---------------------------------------
+
+    static class HandleOutcomeTask extends StandardTask{
+        public enum HOTType{
+            EXPERIENCE,
+            LEVELUP,
+            LOOT
+        }
+        public final HOTType type;
+
+        public HandleOutcomeTask(HOTType type){
+            super();
+            this.type = type;
+
+        }
     }
 
 

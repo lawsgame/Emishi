@@ -16,8 +16,6 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class GuardCommand extends SelfInflitedCommand {
 
-    protected IUnit actor;
-
     public GuardCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, ActionChoice.GUARD, scheduler, playerInventory, false);
     }
@@ -31,18 +29,15 @@ public class GuardCommand extends SelfInflitedCommand {
     @Override
     protected void execute() {
 
-        // register old state
-        actor = battlefield.getUnit(rowActor, colActor);
-
         // update model
-        UnitArea area = Area.createGuardedArea(battlefield, rowActor, colActor, actor);
+        UnitArea area = Area.createGuardedArea(battlefield, rowActor, colActor, getInitiator());
         battlefield.addUnitArea(area, false);
 
 
         // push render task
         StandardTask task = new StandardTask();
         task.addThread(new RendererThread(bfr, area));
-        task.addThread(new RendererThread(bfr.getUnitRenderer(actor), Data.AnimId.GUARD));
+        task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.GUARD));
         // animated guarded units as well
         IUnit guardedUnit;
         int dist;
@@ -51,7 +46,7 @@ public class GuardCommand extends SelfInflitedCommand {
         for(int r = rowActor - rangeMax; r <= rowActor + rangeMax; r++){
             for(int c = colActor - rangeMax; c <= colActor + rangeMax; c++){
                 dist = Utils.dist(rowActor, colActor, r, c);
-                if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, actor.getArmy().getAffiliation())){
+                if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, getInitiator().getArmy().getAffiliation())){
                     guardedUnit = battlefield.getUnit(r,c);
                     task.addThread(new RendererThread(bfr.getUnitRenderer(guardedUnit), Data.AnimId.GUARDED));
                 }
@@ -66,8 +61,8 @@ public class GuardCommand extends SelfInflitedCommand {
 
     @Override
     public void unexecute() {
-        if(actor != null){
-            Array<UnitArea> areas = battlefield.removeUnitAreas(actor, Data.AreaType.GUARD_AREA, false);
+        if(getInitiator() != null){
+            Array<UnitArea> areas = battlefield.removeUnitAreas(getInitiator(), Data.AreaType.GUARD_AREA, false);
             for(int i = 0; i < areas.size; i++) {
                 scheduleRenderTask(new StandardTask(bfr, areas.get(i)));
             }

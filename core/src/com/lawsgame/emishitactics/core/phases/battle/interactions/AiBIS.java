@@ -17,6 +17,14 @@ import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import java.util.LinkedList;
 import java.util.Stack;
 
+/**
+ * HOW IT WORKS :
+ *
+ * the AI which runs on a other thread provide asynchronously all the already applied commmands performed the AI controlled units
+ * AIBIS task is to handle the visual feedback od the AI controlled units actions
+ *
+ *
+ */
 public class AiBIS extends BattleInteractionState implements Observer {
 
     private AI ai;
@@ -87,10 +95,9 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
     @Override
     public synchronized void getNotification(Observable sender, Object data) {
-
+        System.out.println("    > getNotification() : "+sender.getClass().getName());
 
         if(sender instanceof AI) {
-            System.out.println("        > getNotification : "+sender);
 
             if (data instanceof AI.CommandBundle) {
 
@@ -103,7 +110,6 @@ public class AiBIS extends BattleInteractionState implements Observer {
                 this.ai.detach(this);
             }
         }else if(sender instanceof BattleCommand){
-            System.out.println("    > getNotification : "+sender);
 
             if(data instanceof ActorCommand) {
 
@@ -149,8 +155,8 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
                 // focus the camera on the target and show the action pan
                 if(command instanceof ActorCommand) {
+
                     final ActorCommand actorCommand = (ActorCommand)command;
-                    StandardTask showAction = new StandardTask();
                     CommandThread commandThread = new CommandThread();
 
                     commandThread.addQuery(new SimpleCommand() {
@@ -161,25 +167,34 @@ public class AiBIS extends BattleInteractionState implements Observer {
                                 bim.uiStage.addActor(panel);
                                 panel.show();
                             }
+                            actorCommand.highlightTargets(true);
                         }
                     }, (panel != null) ? Data.AIBIS_ACTION_PANEL_DURATION_APPEARANCE : Data.AIBIS_DELAY_CAMERA_FOCUS);
 
                     if(panel != null) {
-
                         commandThread.addQuery(new SimpleCommand() {
                             @Override
                             public void apply() {
                                 panel.hide();
                             }
                         }, panel.getHidingTime());
-
-                        commandThread.addQuery(new SimpleCommand() {
-                            @Override
-                            public void apply() {
-                                panel.remove();
-                            }
-                        },0);
                     }
+
+                    commandThread.addQuery(new SimpleCommand() {
+                        @Override
+                        public void apply() {
+                            /*
+                            Normally, applying the command would remove the highlighting.
+                            But in the AI case, the command has been applied BEFORE the highlighting has been triggered.
+                            Therefore, the blinking should be shut off manually here
+                             */
+                            actorCommand.highlightTargets(false);
+                            if(panel != null)
+                                panel.remove();
+                        }
+                    },0);
+
+                    StandardTask showAction = new StandardTask();
                     showAction.addThread(commandThread);
                     bim.scheduler.addTask(showAction);
                 }
@@ -189,8 +204,8 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
                     System.out.println("    > executeCommand.pushRenderTasks()");
 
-                    command.pushRenderTasks();
                     command.attach(this);
+                    command.pushRenderTasks();
                 }else{
 
                     System.out.println("    > executeCommand.next() : no pushable tasks");

@@ -48,7 +48,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
         super.init();
         bim.bfr.addAreaRenderer(impactArea);
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, true, false);
-        currentCommand.blink(true);
+        currentCommand.highlightTargets(true);
 
         //set the new orientation
         if(!currentCommand.getActionChoice().isActorIsTarget()) {
@@ -96,7 +96,6 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
                     bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
                 bim.bfr.getAreaRenderer(impactArea).setVisible(false);
                 bim.removeTileHighlighting(false);
-                currentCommand.blink(false);
                 currentCommand.attach(this);
 
                 currentCommand.apply();
@@ -112,7 +111,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
                     orientationCommand.undo();
 
                 // remove blinking effect of the target
-                currentCommand.blink(false);
+                currentCommand.highlightTargets(false);
 
                 // hide action panel before removing it
                 if(bim.app.isPanelAvailable(currentCommand)) {

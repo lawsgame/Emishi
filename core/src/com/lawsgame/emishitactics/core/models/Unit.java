@@ -513,12 +513,16 @@ public class Unit extends IUnit{
     public void setCurrentHitPoints(int hitPoints) {
         if(0<= hitPoints && hitPoints <= getAppHitpoints()){
             this.currentHitPoints = hitPoints;
+            if(this.currentMoral > this.currentHitPoints)
+                this.currentMoral = currentHitPoints;
         }
     }
 
     @Override
     public void resetCurrentMoral() {
         this.currentMoral = getAppMoral();
+        if(this.currentMoral > this.currentHitPoints)
+            this.currentMoral = currentHitPoints;
     }
 
     @Override
@@ -1084,6 +1088,13 @@ public class Unit extends IUnit{
     @Override
     public void setLeadership(int leadership) {
         this.leadership = leadership;
+    }
+
+    @Override
+    public IUnit getWarchief() {
+        if(isMobilized())
+            return army.getWarchief(this);
+        return null;
     }
 
     @Override

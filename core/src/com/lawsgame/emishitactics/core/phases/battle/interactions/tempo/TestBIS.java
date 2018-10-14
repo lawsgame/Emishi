@@ -18,6 +18,17 @@ import com.lawsgame.emishitactics.core.phases.battle.ai.AggressiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PushCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoAreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
@@ -26,83 +37,40 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionIn
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
+import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
+import java.util.LinkedList;
 import java.util.Stack;
 
-public class TestBIS extends BattleInteractionState {
-    ActionInfoPanel actionInfoPanel;
-    ExperiencePanel experiencePanel;
-    LevelUpPanel levelUpPanel;
-    LootPanel lootPanel;
-    Sprite areaSprite;
-    AreaRenderer areaRenderer;
+public class TestBIS extends BattleInteractionState implements Observer{
 
-    private AggressiveAI aggressiveAI;
-
-    private Animation animation;
-    private Array<Sprite> sprites;
-    private TextureRegion[] spriteSet;
-
-    private TempoAreaWidget moveAW;
-    private TempoAreaWidget actionAW;
 
     private Army army;
     IUnit sltdUnit;
     int index;
     boolean switchmode;
 
-    Stack<ActorCommand> historic = new Stack<ActorCommand>();
+    LinkedList<ActorCommand> historic = new LinkedList<ActorCommand>();
     ActorCommand command = null;
 
     public TestBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true, true, false);
         setArmy();
 
-        //areaSprite = bim.assetProvider.getAreaTR(Data.AreaColor.LIGHT_BLUE, AssetProvider.AreaSpriteType.BORDER);
-        //areaSprite.setPosition(3, 3);
-
-        Array<int[]> tiles = new Array<int[]>();
-        tiles.addAll(Utils.getEreaFromRange(bim.battlefield, 5, 5, 2, 2));
-        Area area = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA, tiles);
-        this.areaRenderer = new IsoAreaRenderer(area, bim.bfr, bim.assetProvider);
-        //this.areaRenderer = new TempoAreaRenderer(area);
-
         sltdUnit = army.getWarlord();
         index = 1;
         switchmode = false;
 
-        /*sprites = bim.assetProvider.genSpriteTree.getSpriteSet(
-                false,
-                false,
-                false,
-                Data.UnitTemplate.SOLAR_KNIGHT,
-                Data.WeaponType.SWORD,
-                Data.Orientation.WEST,
-                true,
-                Data.SpriteSetId.REST);
-        sprites = bim.assetProvider.charaSpriteTree.getSpriteSet(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, Data.Orientation.SOUTH, true, Data.SpriteSetId.REST);
-        for(int i = 0; i < sprites.size; i++){
-            sprites.get(i).setSize((sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 2 : 1), 2);
-            sprites.get(i).setPosition(2 + (sprites.get(i).getRegionHeight() == sprites.get(i).getRegionWidth() ? 0 : 0.5f), 2);
 
-        }
-        animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
-        animation.play();
-        */
-
-        moveAW = new TempoAreaWidget(bim.battlefield, Data.AreaType.BANNER_RANGE);
-        actionAW = new TempoAreaWidget(bim.battlefield, Data.AreaType.ACTION_AREA);
-
-
-        this.aggressiveAI = new AggressiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory());
 
     }
 
     private void setArmy(){
         army = Army.createPlayerArmyTemplate();
 
-        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 18, Data.WeaponType.BOW, true, false, false, false, false);
+        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 1, Data.WeaponType.BOW, true, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
@@ -163,16 +131,6 @@ public class TestBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        actionAW.render(batch);
-        moveAW.render(batch);
-        if(areaSprite != null)
-            areaSprite.draw(batch);
-        if(areaRenderer != null)
-            areaRenderer.render(batch);
-
-        //subaddAW.render(batch);
-        //if(sprites != null) sprites.get(animation.getCurrentFrame()).draw(batch);
-        //batch.draw(bim.assetProvider.portraits.get("solar_knight_ai"), 1, 4, 2, 2);
 
     }
 
@@ -191,7 +149,7 @@ public class TestBIS extends BattleInteractionState {
 
         // TEST FINAL
 
-        /*
+
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Affiliation.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
         }else{
@@ -217,45 +175,26 @@ public class TestBIS extends BattleInteractionState {
 
             int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
             if (command.setInitiator(unitPos[0], unitPos[1])) {
-                //command.setDecoupled(true);
+                command.setDecoupled(true);
+                command.attach(this);
 
                 command.setTarget(row, col);
                 if (command.isTargetValid()) {
-
-                    command.blink(true);
                     command.apply();
-                    historic.push(command);
+                    historic.offer(command);
                 }
             }
-        }*/
-
-
-        /*
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
-            bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
-
-            Array<int[]> tiles = bim.battlefield.getMoveArea(row, col);
-            moveAW.setTiles(tiles, true);
-            tiles = bim.battlefield.getActionArea(row, col);
-            actionAW.setTiles(tiles, true);
         }
-        */
+
+
 
 
         return false;
     }
 
-    int i = 0;
-    float time = 0;
     @Override
     public void update60(float dt) {
-        time += dt;
 
-
-
-        if(animation != null)
-            animation.update(dt);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
             ActorCommand command = historic.peek();
@@ -321,12 +260,13 @@ public class TestBIS extends BattleInteractionState {
 
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            AI.CommandBundle bundle = aggressiveAI.getCommandPackage(bim.battlefield.getUnitPos(sltdUnit));
-            for(BattleCommand command : bundle.commands)
-                command.pushRenderTasks();
+            if(!historic.isEmpty())
+                historic.pop().pushRenderTasks();
         }
 
     }
+
+
     /*
     @Override
     public void renderBetween(SpriteBatch batch) {
@@ -337,5 +277,12 @@ public class TestBIS extends BattleInteractionState {
     @Override
     public void init() {
 
+    }
+
+    @Override
+    public void getNotification(Observable sender, Object data) {
+        System.out.println(sender+"\n");
+        if(sender == data)
+            sender.detach(this);
     }
 }

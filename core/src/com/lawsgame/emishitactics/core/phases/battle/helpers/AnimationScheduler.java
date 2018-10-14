@@ -44,7 +44,9 @@ public class AnimationScheduler implements GameUpdatableEntity{
     }
 
     public void addTask(Task task){
-        if(!task.isIrrelevant()) {
+        if(task.isIrrelevant()) {
+            task.notifyAllObservers(task);
+        }else{
             tasks.offer(task);
         }
     }

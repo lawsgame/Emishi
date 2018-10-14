@@ -41,9 +41,10 @@ public class Battlefield extends Observable {
     private Array<UnitArea> unitAreas;
     private Weather weather;
     private Environment environment;
-    private BattleSolver solver;
 
+    private int turn;
     public LinkedList<IArmy> armyTurnOrder;
+    private BattleSolver solver;
 
 
     public Battlefield (int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
@@ -61,9 +62,11 @@ public class Battlefield extends Observable {
 
         this.environment = env;
         setWeather(weather, true);
-        setSolver(solver);
 
+
+        setSolver(solver);
         this.armyTurnOrder = new LinkedList<IArmy>();
+        this.turn = 0;
     }
 
     public Battlefield(int nbRows, int nbCols){
@@ -1199,6 +1202,19 @@ public class Battlefield extends Observable {
 
     public void setEnvironment(Environment environment) {
         this.environment = environment;
+    }
+
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public void incrementTurn(){
+        this.turn++;
     }
 
     @Override

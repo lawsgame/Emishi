@@ -14,7 +14,6 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class ChooseOrientationCommand extends SelfInflitedCommand {
     protected Data.Orientation oldOrientation;
     protected Data.Orientation newOrientation;
-    protected BattleUnitRenderer actorRenderer;
 
     public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Data.Orientation newOrientation) {
         super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, playerInventory, true);
@@ -23,7 +22,6 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
 
     @Override
     protected void execute() {
-        actorRenderer = bfr.getUnitRenderer(getInitiator());
 
         // register old model state
         oldOrientation = getInitiator().getOrientation();
@@ -38,10 +36,10 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
     @Override
     public void unexecute() {
         if(oldOrientation != null && battlefield.isTileOccupied(rowActor, colActor)) {
-            IUnit actor = battlefield.getUnit(rowActor, colActor);
-            if(actorRenderer.getModel() == actor) {
-                actor.setOrientation(oldOrientation);
-                scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(actor), oldOrientation));
+            IUnit unit = battlefield.getUnit(rowActor, colActor);
+            if(getInitiator() == unit) {
+                unit.setOrientation(oldOrientation);
+                scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(unit), oldOrientation));
             }
         }
     }

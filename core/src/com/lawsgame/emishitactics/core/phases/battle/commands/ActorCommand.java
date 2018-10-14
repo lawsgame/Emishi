@@ -67,8 +67,6 @@ public abstract class ActorCommand extends BattleCommand{
 
     protected EncounterOutcome outcome;
 
-    private boolean initialized;
-
 
     public ActorCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free){
         super(bfr, scheduler);
@@ -79,7 +77,6 @@ public abstract class ActorCommand extends BattleCommand{
         this.colTarget = -1;
         this.outcome = new EncounterOutcome(playerInventory);
         this.free = free;
-        this.initialized = false;
     }
 
 
@@ -87,6 +84,8 @@ public abstract class ActorCommand extends BattleCommand{
     public final void apply() {
         if(isTargetValid()) {
 
+            // disable the blinking of the target
+            this.highlightTargets(false);
 
             // Outcome and animation scheduler cleared.
             this.outcome.reset();
@@ -146,12 +145,6 @@ public abstract class ActorCommand extends BattleCommand{
         unexecute();
     }
 
-
-
-
-
-
-
     protected void unexecute(){ }
 
 
@@ -169,24 +162,17 @@ public abstract class ActorCommand extends BattleCommand{
      * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public final boolean isTargetValid() {
-        boolean valid = false;
         if(isTargetValid(rowActor, colActor, rowTarget, colTarget)){
-            valid = true;
-            if(!initialized) {
-                init();
-            }
-        }else{
-            initialized = false;
+            init();
+            return true;
         }
-        return valid;
+        return false;
     }
 
     /**
      * especially required to build attributes values required for instanciating the associated ActionInfoPanel
      */
-    protected void init(){
-        initialized = true;
-    }
+    protected void init(){};
 
 
         /*
@@ -196,13 +182,13 @@ public abstract class ActorCommand extends BattleCommand{
     public abstract boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0);
 
 
-    public void blink(final boolean enable){
-        if(battlefield.isTileOccupied(rowTarget, colTarget)){
+    public void highlightTargets(final boolean enable){
+        if(target != null){
 
-            final BattleUnitRenderer targetRenderer = bfr.getUnitRenderer(battlefield.getUnit(rowTarget, colTarget));
+            final BattleUnitRenderer targetRenderer = bfr.getUnitRenderer(target);
             StandardTask blinkTask = new StandardTask(targetRenderer, Notification.Blink.get(enable));
-            blinkTask.tag("blink ("+enable+")");
-            scheduleRenderTask(blinkTask);
+            blinkTask.tag("highlightTargets ("+enable+")");
+            scheduler.addTask(blinkTask);
 
         }
     }
@@ -226,9 +212,8 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     public final boolean atActionRange(){
-        if(battlefield.isTileOccupied(rowActor, colActor))
-            return atActionRange(rowActor, colActor, battlefield.getUnit(rowActor, colActor));
-        return false;
+        return battlefield.isTileOccupied(rowActor, colActor)
+                && atActionRange(rowActor, colActor, battlefield.getUnit(rowActor, colActor));
     }
 
     /**
@@ -272,7 +257,7 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     /**
-     * TESTED
+     *
      * @return the relevantly oriented impact area of an action performed by an initiator while targeting the buildingType {rowTarget, colTarget}
      */
     public final Array<int[]> getImpactArea(){
@@ -422,7 +407,6 @@ public abstract class ActorCommand extends BattleCommand{
 
     public final boolean setInitiator(int rowActor, int colActor) {
         if(battlefield.isTileOccupied(rowActor, colActor)) {
-            this.initialized = false;
             this.rowActor = rowActor;
             this.colActor = colActor;
             this.initiator = battlefield.getUnit(rowActor, colActor);
@@ -449,7 +433,6 @@ public abstract class ActorCommand extends BattleCommand{
 
     public final void setTarget(int rowTarget, int colTarget){
         if(battlefield.isTileExisted(rowTarget, colTarget)){
-            this.initialized = false;
             this.rowTarget = rowTarget;
             this.colTarget = colTarget;
             this.target = battlefield.getUnit(rowTarget, colTarget);
@@ -494,6 +477,10 @@ public abstract class ActorCommand extends BattleCommand{
         return str;
     }
 
+    @Override
+    public String toShortString() {
+        return "ActorCommand  : " +getActionChoice().name();
+    }
 
     // ----------------- Encounter outcome CLASS -----------------
 
@@ -519,11 +506,11 @@ public static class EncounterOutcome {
 
         }
 
-        public boolean isExperienceShown(){
+        public boolean isExperienceGainHandled(){
             return expHolders.size == 0;
         }
 
-        public boolean isLootedItemsClaimed(){ return droppedItemHolders.size == 0; }
+        public boolean isLootedItemsClaimingHandled(){ return droppedItemHolders.size == 0; }
 
         public boolean isHandled(){
             return expHolders.size == 0 && droppedItemHolders.size == 0;

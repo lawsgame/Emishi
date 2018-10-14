@@ -59,7 +59,7 @@ selected_unit
   orig: 64, 64
   offset: 0, 0
   index: -1
-squad_member
+banner_area
   rotate: false
   xy: 320, 0
   size: 64, 64
