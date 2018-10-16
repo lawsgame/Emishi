@@ -166,7 +166,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
                     rowFocus = rowTarget;
                     colFocus = colTarget;
                     shortTilePanel.hide();
-                    shortTilePanel.set(battlefield.getTile(rowTarget, colTarget));
+                    shortTilePanel.set(battlefield.getTile(rowTarget, colTarget).getType());
                     shortTilePanel.show();
                 }
 

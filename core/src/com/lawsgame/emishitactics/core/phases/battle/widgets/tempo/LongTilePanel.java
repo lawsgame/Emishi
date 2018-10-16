@@ -35,7 +35,9 @@ public class LongTilePanel extends TilePanel {
         if(tileType.isUrbanArea()) builder.append("urban ");
         if(tileType.isPlunderable()) builder.append("plunderable ");
         if(tileType.isLootable()) builder.append("lootable ");
-        if(tileType.isReachable()) builder.append("reachable "); else builder.append("unreachable ");
+        if(tileType.isReachable(false)) builder.append("reachable ");
+        else if(tileType.isReachable(true)) builder.append("reachable only by pathfinder");
+        else builder.append("unreachable ");
         builder.append("buildingType");
 
         builder.append("\n\nHeal / turn : "+tileType.getHealPower());

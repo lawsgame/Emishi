@@ -62,7 +62,7 @@ public class Formulas {
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
             attackMight = attacker.getAppAttackMight();
             for(int i =0; i < attackMight.length; i++) {
-                attackMight[i] += battlefield.getTile(rowAttacker0, colAttacker0).getAttackMightBonus();
+                attackMight[i] += battlefield.getTile(rowAttacker0, colAttacker0).getType().getAttackMightBonus();
             }
         }
         return attackMight;
@@ -73,7 +73,7 @@ public class Formulas {
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0)){
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
             attackAccuracy = attacker.getAppAttackAccuracy();
-            attackAccuracy += battlefield.getTile(rowAttacker0, colAttacker0).getAttackAccBonus();
+            attackAccuracy += battlefield.getTile(rowAttacker0, colAttacker0).getType().getAttackAccBonus();
             if(isBackstabAttack(rowAttacker0, colAttacker0, rowDefender0, colDefender0, battlefield)) {
                 attackAccuracy += Data.HIT_RATE_BACK_ACC_BONUS;
             }
@@ -98,7 +98,7 @@ public class Formulas {
             IUnit defender = battlefield.getUnit(rowDefender0, colDefender0);
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
             defense += defender.getAppDefense(attacker.getCurrentWeapon().getTemplate().getDamageType());
-            defense += battlefield.getTile(rowDefender0, colDefender0).getDefenseBonus();
+            defense += battlefield.getTile(rowDefender0, colDefender0).getType().getDefenseBonus();
         }
         return defense;
     }
@@ -108,7 +108,7 @@ public class Formulas {
         if(battlefield.isTileOccupied(rowDefender0, colDefender0)){
             IUnit target = battlefield.getUnit(rowDefender0, colDefender0);
             avoidance += target.getAppAvoidance();
-            avoidance += battlefield.getTile(rowDefender0, colDefender0).getAvoidBonus();
+            avoidance += battlefield.getTile(rowDefender0, colDefender0).getType().getAvoidBonus();
         }
         return avoidance;
     }
@@ -156,7 +156,7 @@ public class Formulas {
         if(battlefield.isTileOccupied(rowAttacker0, colAttacker0)){
             IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
             if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled())
-                lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharisma()/2;
+                lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharismaBonus()/2;
         }
         return lootRate;
     }

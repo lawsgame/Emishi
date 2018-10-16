@@ -23,7 +23,7 @@ public class InfoBIS extends BattleInteractionState{
             bim.longUnitPanel.set(bim.battlefield.getUnit(row, col));
             bim.longUnitPanel.show();
         }else{
-            bim.longTilePanel.set(bim.battlefield.getTile(row, col));
+            bim.longTilePanel.set(bim.battlefield.getTile(row, col).getType());
             bim.longTilePanel.show();
         }
     }

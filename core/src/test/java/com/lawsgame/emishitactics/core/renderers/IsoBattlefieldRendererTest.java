@@ -21,7 +21,7 @@ public class IsoBattlefieldRendererTest {
         Battlefield battlefield = new Battlefield(nbRows,nbCols);
         for(int r = 0; r < nbRows; r++){
             for(int c = 0; c < nbCols; c++){
-                battlefield.getTiles()[r][c] = Data.TileType.PLAIN;
+                battlefield.setTile(r,c, Data.TileType.PLAIN, true);
             }
         }
         bfr0 = new IsoBFR(battlefield, new AssetProvider(IsoBFR.SPRITE_STD_SIZE), true);

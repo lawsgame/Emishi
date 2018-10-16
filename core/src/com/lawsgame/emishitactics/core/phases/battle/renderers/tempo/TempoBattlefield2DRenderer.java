@@ -43,7 +43,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         this.tileRenderers = new TextureRegion[battlefield.getNbRows()][battlefield.getNbColumns()];
         for (int r = 0; r < battlefield.getNbRows(); r++) {
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
-                addTileRenderer(r, c, getModel().getTile(r, c));
+                addTileRenderer(r, c, getModel().getTile(r, c).getType());
                 if(battlefield.isTileOccupied(r, c)) {
                     addUnitRenderer(r, c, getModel().getUnit(r, c));
                 }

@@ -32,11 +32,8 @@ import java.util.LinkedList;
  */
 
 public class Battlefield extends Observable {
-    private TileType[][] tiles;
+    private Tile[][] tiles;
     private IUnit[][] units;
-    private boolean[][] looted;
-    private HashMap<Integer, IUnit> recruits;
-    private HashMap<Integer, Item> tombItems;
     private Array<Area> deploymentAreas;
     private Array<UnitArea> unitAreas;
     private Weather weather;
@@ -49,20 +46,14 @@ public class Battlefield extends Observable {
 
     public Battlefield (int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
         if(nbRows > 0 && nbCols > 0) {
-            this.tiles = new TileType[nbRows][nbCols];
-            this.looted = new boolean[nbRows][nbCols];
+            this.tiles = new Tile[nbRows][nbCols];
             this.units = new IUnit[nbRows][nbCols];
         }
         this.deploymentAreas = new Array<Area>();
         this.deploymentAreas.add(new Area(this, Data.AreaType.DEPLOYMENT_AREA));
-
         this.unitAreas = new Array<UnitArea>();
-        this.recruits = new HashMap<Integer, IUnit>();
-        this.tombItems = new HashMap<Integer, Item>();
-
         this.environment = env;
         setWeather(weather, true);
-
 
         setSolver(solver);
         this.armyTurnOrder = new LinkedList<IArmy>();
@@ -169,39 +160,23 @@ public class Battlefield extends Observable {
      */
 
 
-
-    public boolean setTile(int r, int c, TileType type, boolean notifyObservers){
-        if(checkIndexes(r,c) && type != null){
-            //reset buildingType
-            recruits.remove(_getLootId(r, c));
-            tombItems.remove(_getLootId(r, c));
-            looted[r][c] = false;
-
-            //addExpGained buildingType
-            tiles[r][c] = type;
+    public boolean setTile(int r, int c, Tile tile, boolean notifyObservers){
+        if(checkIndexes(r,c) && tile != null){
+            tiles[r][c] = tile;
             if(notifyObservers)
-                notifyAllObservers( new Notification.SetTile(r, c, type));
+                notifyAllObservers( new Notification.SetTile(r, c, tile.getType()));
             return true;
         }
         return false;
     }
 
-    public void setTileAs(int r, int c, TileType type, Object obj, boolean notifyObservers){
-        if(obj != null && type != null){
-            if(obj instanceof IUnit && type == TileType.VILLAGE && setTile(r,c, type, notifyObservers)){
-                recruits.put(_getLootId(r,c), (Unit)obj);
-                this.looted[r][c] = true;
-            }
-            if(obj instanceof Item && type == TileType.ANCIENT_SITE && setTile(r,c, type, notifyObservers)){
-                tombItems.put(_getLootId(r, c), (Item)obj);
-                this.looted[r][c] = true;
-            }
-        }
+    public boolean setTile(int r, int c, TileType type, boolean notifyObservers){
+        return setTile(r, c, Tile.get(type), notifyObservers);
     }
 
-    public TileType getTile(int r, int c) {
+    public Tile getTile(int r, int c) {
         if(checkIndexes(r,c)){
-            return getTiles()[r][c];
+            return tiles[r][c];
         }
         return null;
     }
@@ -221,26 +196,6 @@ public class Battlefield extends Observable {
             return true;
         }
         return false;
-    }
-
-    public IUnit getVillageRecruit(int r, int c){
-        if(isTileLooted(r,c)){
-            IUnit recruit = recruits.get(_getLootId(r,c));
-            return  recruit;
-        }
-        return null;
-    }
-
-    public Item getTombItem(int r, int c){
-        if(isTileLooted(r,c)){
-            Item loot = tombItems.get(_getLootId(r,c));
-            return  loot;
-        }
-        return null;
-    }
-
-    private int _getLootId(int r, int c){
-        return c + getNbColumns() * r;
     }
 
 
@@ -381,7 +336,7 @@ public class Battlefield extends Observable {
     }
 
     public boolean isTileLooted(int row, int col){
-        return checkIndexes(row,col) && this.looted[row][col];
+        return checkIndexes(row,col) && tiles[row][col] != null && tiles[row][col].isLooted();
     }
 
     public boolean isTileExisted(int r, int c){
@@ -389,16 +344,16 @@ public class Battlefield extends Observable {
     }
 
     public boolean isTileOfType(int r, int c, TileType tileType){
-        return isTileExisted(r,c) && getTile(r,c) == tileType;
+        return isTileExisted(r,c) && getTile(r,c).getType() == tileType;
     }
 
     public boolean isTilePlunderable(int r, int c){
-        return isTileExisted(r,c) && getTile(r,c).isPlunderable();
+        return isTileExisted(r,c) && getTile(r,c).getType().isPlunderable();
     }
 
     public boolean isTileReachable(int row, int col, boolean pathfinder) {
         if(isTileExisted(row, col)){
-            return getTile(row, col).isReachable() || (pathfinder && (getTile(row,col) == TileType.MOUNTAINS || getTile(row, col) == TileType.FOREST));
+            return getTile(row, col).getType().isReachable(pathfinder);
         }
         return false;
     }
@@ -1159,7 +1114,7 @@ public class Battlefield extends Observable {
 
 
 
-    public TileType[][] getTiles() {
+    public Tile[][] getTiles() {
         return tiles;
     }
 

@@ -28,7 +28,6 @@ public class MoveCommand extends ActorCommand {
     protected void execute() {
 
         //store old state info
-        BattleUnitRenderer walkerRenderer = bfr.getUnitRenderer(getInitiator());
         oldWalkerOrientation = getInitiator().getOrientation();
 
         // update model

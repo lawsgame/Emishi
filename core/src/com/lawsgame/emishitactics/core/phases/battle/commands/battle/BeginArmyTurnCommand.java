@@ -16,7 +16,7 @@ public class BeginArmyTurnCommand extends BattleCommand {
     @Override
     protected void execute() {
         if(army != null) {
-            army.replenishMoral();
+            army.replenishMoral(true);
             army.updateActionPoints();
             if(army.isPlayerControlled())
                 battlefield.incrementTurn();

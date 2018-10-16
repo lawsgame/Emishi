@@ -153,8 +153,7 @@ public abstract class IUnit extends Observable {
     public abstract boolean sameArmyAs(IUnit unit);
     public abstract void setLeadership(int leadership);
     public abstract IUnit getWarchief();
-    public abstract int getChiefCharisma();
-    public abstract int getChiefMoralBonus();
+    public abstract int getChiefCharismaBonus();
     public abstract int getSquadIndex();
 
 

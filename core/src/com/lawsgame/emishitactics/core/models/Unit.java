@@ -527,7 +527,7 @@ public class Unit extends IUnit{
 
     @Override
     public int getAppMoral() {
-        return getAppBravery() + getChiefMoralBonus();
+        return getAppBravery() + getChiefCharismaBonus();
     }
 
     @Override
@@ -951,7 +951,7 @@ public class Unit extends IUnit{
         int rangeMax = getCurrentWeapon().getTemplate().getRangeMax();
         if(battlefield.isTileExisted(rowUnit, colUnit)){
             if(rangeMax > 1) {
-                TileType tileType = battlefield.getTile(rowUnit, colUnit);
+                TileType tileType = battlefield.getTile(rowUnit, colUnit).getType();
                 if(tileType.enhanceRange()) rangeMax++;
             }
         }
@@ -960,7 +960,7 @@ public class Unit extends IUnit{
 
     @Override
     public int getAppAttackAccuracy() {
-        return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + getChiefCharisma();
+        return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + Data.WC_CHARISMA_BONUS_ATT_ACC*getChiefCharismaBonus();
     }
 
     @Override
@@ -1098,13 +1098,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getChiefCharisma() {
-        return isMobilized() ? army.getWarchief(this).getAppCharisma() : 0;
-    }
-
-    @Override
-    public int getChiefMoralBonus() {
-        return getChiefCharisma();
+    public int getChiefCharismaBonus() {
+        return isMobilized() ? army.getWarchief(this).getAppCharisma() - Data.SQUAD_SIZE_EXCEEDANCE_CHA_MALUS * getArmy().getSquadExceedingCapacity(this) : 0;
     }
 
     @Override
@@ -1257,7 +1252,7 @@ public class Unit extends IUnit{
         }
 
         if(isOutOfAction() && isWarChief()){
-            int moralDamage = getChiefMoralBonus();
+            int moralDamage = getWarchief().getAppCharisma();
             Array<IUnit> squad = getArmy().getSquad(this, true);
             for(int i = 0; i < squad.size; i++){
                 notifications.addAll(squad.get(i).applyDamage(moralDamage, true));

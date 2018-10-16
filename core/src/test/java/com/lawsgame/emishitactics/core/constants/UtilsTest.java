@@ -31,7 +31,7 @@ public class UtilsTest {
         bf = new Battlefield(9,9);
         for(int r = 0; r < 9; r++){
             for(int c = 0; c < 9; c++){
-                bf.getTiles()[r][c] = Data.TileType.PLAIN;
+                bf.setTile(r,c, Data.TileType.PLAIN, false);
             }
         }
     }

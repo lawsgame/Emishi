@@ -50,16 +50,18 @@ public abstract class IArmy extends Observable{
     public abstract void appointWarLord(IUnit unit);
     public abstract void appointWarChief(IUnit unit, int squadId);
     public abstract void appointWarChief(IUnit unit);
-    public abstract void appointSoldier(IUnit unit, int squadId, int unitId);
-    public abstract void appointSoldier(IUnit unit, int squadId);
+    public abstract boolean appointSoldier(IUnit unit, int squadId, int unitId);
+    public abstract boolean appointSoldier(IUnit unit, int squadId);
     public abstract boolean disengage(IUnit unit);
     public abstract void disbandAllSquads();
 
     public abstract void checkComposition();
     public abstract void setLeadershipConditionEnabled(boolean enabled);
 
-    public abstract void replenishMoral();
+    public abstract void replenishMoral(boolean turnBeginning);
     public abstract void updateActionPoints();
+    public abstract int getSquadExceedingCapacity(IUnit unit);
+    public abstract boolean isSquadOversized(IUnit unit);
 
     public abstract String toShortString();
 }

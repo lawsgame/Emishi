@@ -15,7 +15,7 @@ public class BattlefieldTest {
         battlefield = new Battlefield(9,9);
         for(int r = 0; r < 7; r++){
             for(int c = 0; c < 7; c++){
-                battlefield.getTiles()[r][c] = Data.TileType.PLAIN;
+                battlefield.setTile(r, c, Data.TileType.PLAIN, false);
             }
         }
     }

@@ -448,7 +448,7 @@ public abstract class ActorCommand extends BattleCommand{
     public final int getColTarget() { return colTarget; }
 
     public final TileType getTargetTile() {
-        return battlefield.getTile(rowTarget, colTarget);
+        return battlefield.getTile(rowTarget, colTarget).getType();
     }
 
     public final EncounterOutcome getOutcome(){

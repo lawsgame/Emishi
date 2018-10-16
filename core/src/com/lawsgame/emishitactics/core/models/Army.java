@@ -410,7 +410,7 @@ public class Army extends IArmy{
             nonMobTroups.removeValue(warlord, true);
             mobilizedTroups.add(new Array<IUnit>());
             mobilizedTroups.get(0).add(warlord);
-            replenishMoral();
+            replenishMoral(false);
         }
     }
 
@@ -456,7 +456,7 @@ public class Army extends IArmy{
                         newSquad.add(unit);
                         mobilizedTroups.add(newSquad);
                     }
-                    replenishMoral();
+                    replenishMoral(false);
                 }
             }
         }
@@ -476,10 +476,11 @@ public class Army extends IArmy{
      *
      *
      * @param soldier
-     * @return
+     * @return return true if the squad is over capacity
      */
     @Override
-    public void appointSoldier(IUnit soldier, int squadID, int unitID) {
+    public boolean appointSoldier(IUnit soldier, int squadID, int unitID) {
+        boolean squadOversized = false;
         if(isUnitReserve(soldier)) {
             if (unitID == 0) {
                 if (squadID == 0) {
@@ -510,24 +511,27 @@ public class Army extends IArmy{
                         this.mobilizedTroups.get(squadID).insert(unitID, soldier);
                         nonMobTroups.removeValue(soldier, true);
 
-                    } else if (mobilizedTroups.get(squadID).size < mobilizedTroups.get(squadID).get(0).getMaxSoldiersAs(squadID == 0) || !ldCondEnabled) {
+                    } else  {
                     /*CASE 2 :
                     IF : the squad has a slot available for a new recruit
                      - the newbie is added
                      */
+
                         this.mobilizedTroups.get(squadID).add(soldier);
                         nonMobTroups.removeValue(soldier, true);
+                        squadOversized = mobilizedTroups.get(squadID).size > getWarchief(squadID).getMaxSoldiersAs(squadID == 0);
                     }
-                    replenishMoral();
+                    replenishMoral(false);
 
                 }
             }
         }
+        return squadOversized;
     }
 
     @Override
-    public void appointSoldier(IUnit unit, int squadIndex) {
-        appointSoldier(unit, squadIndex, -1);
+    public boolean appointSoldier(IUnit unit, int squadIndex) {
+        return appointSoldier(unit, squadIndex, -1);
     }
 
 
@@ -627,10 +631,10 @@ public class Army extends IArmy{
     }
 
     @Override
-    public void replenishMoral() {
+    public void replenishMoral(boolean turnBeginning) {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(!mobilizedTroups.get(i).get(j).isOutOfAction())
+                if(!mobilizedTroups.get(i).get(j).isOutOfAction() || ! turnBeginning)
                     mobilizedTroups.get(i).get(j).resetCurrentMoral();
             }
         }
@@ -644,6 +648,21 @@ public class Army extends IArmy{
                     mobilizedTroups.get(i).get(j).addActionPoints(mobilizedTroups.get(i).get(j).getAppAPRecoveryRate());
             }
         }
+    }
+
+    @Override
+    public int getSquadExceedingCapacity(IUnit unit) {
+        int exceedance = 0;
+        IUnit warchief = getWarchief(unit);
+        if(warchief != null){
+            exceedance = warchief.getMaxSoldiersAs(warchief.isWarlord()) - getSquadSize(unit, false);
+        }
+        return (exceedance > 0 ) ? exceedance : 0;
+    }
+
+    @Override
+    public boolean isSquadOversized(IUnit unit) {
+        return getSquadExceedingCapacity(unit) > 0;
     }
 
 

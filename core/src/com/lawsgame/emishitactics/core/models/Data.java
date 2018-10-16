@@ -12,7 +12,7 @@ import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
 public class Data {
 
 
-    public static final float GAME_PORT_WIDTH = 15f;
+    //public static final float GAME_PORT_WIDTH = 15f;
 
     //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;
@@ -34,6 +34,8 @@ public class Data {
     public static final int GUARD_REACTION_RANGE_MIN = 1;
     public static final int GUARD_REACTION_RANGE_MAX = 1;
     public static final float DEALT_DAMAGE_LN_RANDOM = 1.5f;
+    public static final int WC_CHARISMA_BONUS_ATT_ACC = 3;
+    public static final int SQUAD_SIZE_EXCEEDANCE_CHA_MALUS = 3;
 
     // RENDER parameters
         public static final float SPEED_TEMPO_WALK = 3f;  //buildingType/s
@@ -385,23 +387,23 @@ public class Data {
     }
 
     public enum TileType {
-        VILLAGE(        "village", 204, 143, 37,                    true, true, true, true,         5, 0, 1, 0, 0, false),
-        SANCTUARY(      "sanctuary", 228, 56, 56,                   true, true, true, true,         5, 0, 1, 0, 0, false),
-        STOCKADE(       "stockade", 204, 112, 37,                   true, true, false, true,        5, 0, 2, 0, 0, false),
-        CASTLE(         "castle", 204, 73 ,37 ,                     true, true, false, true,        5, 0, 3, 20, 0, false),
-        ANCIENT_SITE(   "ancient site", 38 ,67, 47,                 true, true, true, true,         0, 1, 0, 0, 0, true),
-        RUINS(          "ruins", 152, 152, 152,                     true, false, false, true,       0, 0, 1, 0, 0, false),
-        MOUNTAINS(      "mountain", 101, 91, 16,                    false, false, false, false,     0, 0, 0, 0, 0, false),
-        FOREST(         "deep forest", 5, 96, 34,                   false, false, false, false,     0, 0, 0, 0, 0, false),
-        OCEAN(          "deep waters", 25, 157, 197,                false, false, false, false,     0, 0, 0, 0, 0, false),
-        SHALLOWS(       "shallows", 30, 211, 227,                   false, false, false, false,     0, 0, 0, 0, 0, false),
-        HILLS(          "hill", 146, 134, 40,                       false, false, false, true,      0, 1, 0, 0, 0, true),
-        WOODS(          "woods", 10, 158, 57,                       false, false, false, true,      0, 0, 0, 15, 0, false),
-        SWAMP(          "swamp", 112, 155, 80,                      false, false, false, true,      0, 0, 0, 0, -15, false),
-        PLAIN(          "plain", 17, 215, 80,                       false, false, false, true,      0, 0, 0, 0, 0, false),
-        BRIDGE(         "wooden bridge", 85, 96, 134,               false, false, false, true,      0, 0, 0, 0, 0, false),
-        BROKEN_BRIDGE(  "broken wooden bridge", 95, 101, 124,       false, false, false, false,     0, 0, 0, 0, 0, false),
-        WATCH_TOWER(    "future bridge", 193, 26, 137,              true, true, false, true,      3, 0, 1, 0, 0, true);
+        VILLAGE(        "village", 204, 143, 37,                    true, true, true, true, true,         5, 0, 1, 0, 0, false),
+        SANCTUARY(      "sanctuary", 228, 56, 56,                   true, true, true, true, true,         5, 0, 1, 0, 0, false),
+        STOCKADE(       "stockade", 204, 112, 37,                   true, true, false, true, true,        5, 0, 2, 0, 0, false),
+        CASTLE(         "castle", 204, 73 ,37 ,                     true, true, false, true, true,        5, 0, 3, 20, 0, false),
+        ANCIENT_SITE(   "ancient site", 38 ,67, 47,                 true, true, true, true, true,         0, 1, 0, 0, 0, true),
+        RUINS(          "ruins", 152, 152, 152,                     true, false, false, true, true,       0, 0, 1, 0, 0, false),
+        MOUNTAINS(      "mountain", 101, 91, 16,                    false, false, false, false, true,     0, 0, 3, 10, 0, false),
+        FOREST(         "deep forest", 5, 96, 34,                   false, false, false, false, true,     0, 0, 1, 30, 0, false),
+        OCEAN(          "deep waters", 25, 157, 197,                false, false, false, false,false,     0, 0, 0, 0, 0, false),
+        SHALLOWS(       "shallows", 30, 211, 227,                   false, false, false, false, true,     0, 0, 0, 0, 0, false),
+        HILLS(          "hill", 146, 134, 40,                       false, false, false, true, true,      0, 1, 0, 0, 0, true),
+        WOODS(          "woods", 10, 158, 57,                       false, false, false, true, true,      0, 0, 0, 15, 0, false),
+        SWAMP(          "swamp", 112, 155, 80,                      false, false, false, true, true,      0, 0, 0, 0, -15, false),
+        PLAIN(          "plain", 17, 215, 80,                       false, false, false, true, true,      0, 0, 0, 0, 0, false),
+        BRIDGE(         "wooden bridge", 85, 96, 134,               false, false, false, true, true,      0, 0, 0, 0, 0, false),
+        BROKEN_BRIDGE(  "broken wooden bridge", 95, 101, 124,       false, false, false, false, false,    0, 0, 0, 0, 0, false),
+        WATCH_TOWER(    "future bridge", 193, 26, 137,              true, true, false, true, true,        3, 0, 1, 0, 0, true);
 
         private String name;
 
@@ -413,6 +415,7 @@ public class Data {
         private boolean plunderable;        // can be turn into ruins
         private boolean lootable;           // possess a valuable element
         private boolean reachable;          // can be traversable by standard unit
+        private boolean reachableForPathFinder;
 
         private int healPower;
         private int attackMightBonus;
@@ -421,7 +424,7 @@ public class Data {
         private int attackAccBonus;
         private boolean rangeBonus;
 
-        TileType(String name, int r, int g, int b, boolean urbanArea, boolean plunderable, boolean lootable, boolean reachable, int healPower, int attackMightBonus, int defenseBonus, int avoidBonus, int attackAccBonus, boolean rangeBonus) {
+        TileType(String name, int r, int g, int b, boolean urbanArea, boolean plunderable, boolean lootable, boolean reachable, boolean reachableForPathfinder, int healPower, int attackMightBonus, int defenseBonus, int avoidBonus, int attackAccBonus, boolean rangeBonus) {
             this.name = name;
             this.r = r;
             this.g = g;
@@ -431,6 +434,7 @@ public class Data {
             this.lootable = lootable;
             this.healPower = healPower;
             this.reachable = reachable;
+            this.reachableForPathFinder = reachableForPathfinder;
             this.attackMightBonus = attackMightBonus;
             this.defenseBonus = defenseBonus;
             this.avoidBonus = avoidBonus;
@@ -471,8 +475,8 @@ public class Data {
             return lootable;
         }
 
-        public boolean isReachable() {
-            return reachable;
+        public boolean isReachable(boolean pathfinder) {
+            return (pathfinder) ? reachableForPathFinder: reachable;
         }
 
         public int getHealPower() { return  healPower;}
