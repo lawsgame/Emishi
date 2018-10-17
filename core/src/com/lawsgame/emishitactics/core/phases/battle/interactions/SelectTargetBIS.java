@@ -4,6 +4,8 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
+import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -64,9 +66,8 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         if(currentCommand.isTargetValid()){
 
 
-            if(currentCommand.getActionChoice().isUndoable()){
+            if(currentCommand.isUndoable()){
 
-                // remove blinking and other highlighting target affect
                 currentCommand.attach(this);
                 currentCommand.apply();
                 historic.push(currentCommand);
@@ -78,34 +79,20 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
             }
         }else{
 
-            /*
-             * this paragraph is required to initialize the SelectActorBIS below, triggerd if the player :
-             * - touch a none valid target tile
-             * - the historic is fully clearable
-             * - yet, the target tile is not occupied by the active player unit
-             * , and those, before clearing the historic obviously
-             * which explains why it is visible here.
-             */
-            int rowInit;
-            int colInit;
-            if(!historic.isEmpty()){
-                rowInit = historic.get(0).getRowActor();
-                colInit = historic.get(0).getColActor();
-            }else{
-                rowInit = currentCommand.getRowActor();
-                colInit = currentCommand.getColActor();
-            }
+            IUnit touchedPCUnit = null;
+            if(bim.bfr.getModel().isTileOccupiedByPlayerControlledUnit(row, col))
+                touchedPCUnit = bim.bfr.getModel().getUnit(row, col);
 
             if (Utils.undoCommands(historic)){
 
-                if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col) && !bim.battlefield.getUnit(row, col).isDone()) {
-                    bim.replace(new SelectActionBIS(bim, row, col));
+                if(touchedPCUnit != null && !touchedPCUnit.isDone()) {
+                    bim.replace(new SelectActionBIS(bim, touchedPCUnit));
                 }else{
-                    bim.replace(new SelectActorBIS(bim, rowInit, colInit, false));
+                    bim.replace(new SelectActionBIS(bim, currentCommand.getInitiator()));
                 }
             } else {
 
-                bim.replace(new SelectActionBIS(bim, historic.peek().getRowActor(), historic.peek().getColActor(), historic));
+                bim.replace(new SelectActionBIS(bim, historic.peek().getInitiator(), historic));
             }
         }
     }

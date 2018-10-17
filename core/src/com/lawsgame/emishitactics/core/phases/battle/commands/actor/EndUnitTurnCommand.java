@@ -19,7 +19,7 @@ public class EndUnitTurnCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean canbePerformedBy(IUnit actor) {
+    public boolean isInitiatorValid(IUnit actor) {
         return true;
     }
 

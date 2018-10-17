@@ -26,13 +26,30 @@ import java.util.Arrays;
  *  command.update(dt);
  *
  *  ActionChoice choice = ...;
- *  if(bcm.canActionBePerformed(...){
- *      ActorCommand command = bcm.get(...); /OR new XCommand(...);
- *      if(command != null && command.setInitiator(...)){
- *          command.setTarget(...);
- *          if(command.isTargetValid()){
- *              command.apply();
- *          }
+ *  if(bcm.canActionBePerformed(actor, ...){
+ *      ActorCommand command = bcm.get(...);
+ *      command.setTarget(...);
+ *      if(command.apply()){
+ *
+ *          // the command has been applied successfully*
+ *      }else{
+ *
+ *          // the command failed to be applied
+ *      }
+ *  }
+ *
+ *  OR
+ *
+ *  ActionChoice choice = ...;
+ *  ActorCommand command = new ActorCommand( choice, ...);
+ *  if(command.setInitiator(...)){
+ *      command.setTarget(...);
+ *      if(command.apply()){
+ *
+ *          // the command has been applied successfully
+ *      }else{
+ *
+ *          // the command failed to be applied
  *      }
  *  }
  *
@@ -56,7 +73,7 @@ public abstract class ActorCommand extends BattleCommand{
 
 
     protected final ActionChoice choice;
-    private boolean free;                           // command that does not count as the player choice i.e. setTiles acted and moved as true while being applied nor it costs any OA point
+    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied nor it costs any OA point
 
     private IUnit initiator;
     private IUnit target;
@@ -64,31 +81,58 @@ public abstract class ActorCommand extends BattleCommand{
     protected int colActor;
     protected int rowTarget;
     protected int colTarget;
+    protected boolean eventTriggered;
 
-    protected EncounterOutcome outcome;
+    protected Outcome outcome;
 
 
     public ActorCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free){
         super(bfr, scheduler);
         this.choice = choice;
+
+        this.outcome = new Outcome(playerInventory);
+        this.free = free;
+    }
+
+    public void init(){
         this.rowActor = -1;
         this.colActor = -1;
         this.rowTarget = -1;
         this.colTarget = -1;
-        this.outcome = new EncounterOutcome(playerInventory);
-        this.free = free;
+        this.eventTriggered = false;
+    }
+
+    public final boolean setInitiator(int rowActor, int colActor) {
+        if(bfr.getModel().isTileOccupied(rowActor, colActor)) {
+            this.rowActor = rowActor;
+            this.colActor = colActor;
+            this.initiator = bfr.getModel().getUnit(rowActor, colActor);
+            if(choice.isActorIsTarget()){
+                setTarget(rowActor, colActor);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public final void setTarget(int rowTarget, int colTarget){
+        if(bfr.getModel().isTileExisted(rowTarget, colTarget)){
+            this.rowTarget = rowTarget;
+            this.colTarget = colTarget;
+            this.target = bfr.getModel().getUnit(rowTarget, colTarget);
+        }
     }
 
 
     @Override
-    public final void apply() {
-        if(isTargetValid()) {
+    public final boolean apply() {
+        // disable the blinking of the target
+        this.highlightTargets(false);
 
-            // disable the blinking of the target
-            this.highlightTargets(false);
+        // Outcome and animation scheduler cleared.
+        this.outcome.reset();
 
-            // Outcome and animation scheduler cleared.
-            this.outcome.reset();
+        if(super.apply()) {
 
             /*
              * 1) set as moved or acted if required
@@ -105,26 +149,18 @@ public abstract class ActorCommand extends BattleCommand{
                 getInitiator().addActionPoints(-choice.getCost());
             }
 
-
-            super.apply();
-
             outcome.clean();
             outcome.resolve();
 
+            return true;
         }
+        return false;
     }
 
     public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){
-        boolean successfullyApplied = false;
-        if(setInitiator(rowActor, colActor)) {
-            setTarget(rowTarget, colTarget);
-            if (isTargetValid()) {
-                successfullyApplied = true;
-                apply();
-
-            }
-        }
-        return successfullyApplied;
+        setInitiator(rowActor, colActor);
+        setTarget(rowTarget, colTarget);
+        return apply();
     }
 
     public final boolean apply(int rowActor, int colActor){
@@ -132,25 +168,43 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     @Override
-    public final void undo(){
-        if(!free){
+    public final boolean undo(){
+        if(super.undo()) {
 
-            if (choice.isActedBased())
-                getInitiator().setActed(false);
-            else
-                getInitiator().setMoved( false);
+            if (!free) {
+                if (choice.isActedBased())
+                    getInitiator().setActed(false);
+                else
+                    getInitiator().setMoved(false);
 
-            getInitiator().addActionPoints(choice.getCost());
+                getInitiator().addActionPoints(choice.getCost());
+            }
+            return true;
         }
-        unexecute();
+        return false;
     }
 
     protected void unexecute(){ }
 
+    @Override
+    public boolean isUndoable() {
+        return choice.isUndoable() && !initiator.isOutOfAction();
+    }
+
+    @Override
+    public boolean isApplicable() {
+        return isInitiatorValid() && isTargetValid();
+    }
+
+    public boolean isInitiatorValid(){
+        return isInitiatorValid(initiator);
+    }
 
     // called to checked initiator requirements
-    public boolean canbePerformedBy(IUnit actor){
-        return choice.getCost() <= actor.getActionPoints()
+    public boolean isInitiatorValid(IUnit actor){
+        return actor != null
+                && !actor.isOutOfAction()
+                && choice.getCost() <= actor.getActionPoints()
                 && (choice.isActedBased() ? !actor.hasActed() : !actor.hasMoved() || free);
     }
 
@@ -162,17 +216,9 @@ public abstract class ActorCommand extends BattleCommand{
      * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
     public final boolean isTargetValid() {
-        if(isTargetValid(rowActor, colActor, rowTarget, colTarget)){
-            init();
-            return true;
-        }
-        return false;
+        return isTargetValid(rowActor, colActor, rowTarget, colTarget);
     }
 
-    /**
-     * especially required to build attributes values required for instanciating the associated ActionInfoPanel
-     */
-    protected void init(){};
 
 
         /*
@@ -199,7 +245,7 @@ public abstract class ActorCommand extends BattleCommand{
     /**
      * AI ORIENTED METHOD
      *
-     * check the third requirements to perform an action
+     * performEvent the third requirements to perform an action
      * - target availability requirements
      *
      * @param row
@@ -212,8 +258,8 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     public final boolean atActionRange(){
-        return battlefield.isTileOccupied(rowActor, colActor)
-                && atActionRange(rowActor, colActor, battlefield.getUnit(rowActor, colActor));
+        return bfr.getModel().isTileOccupied(rowActor, colActor)
+                && atActionRange(rowActor, colActor, bfr.getModel().getUnit(rowActor, colActor));
     }
 
     /**
@@ -224,8 +270,8 @@ public abstract class ActorCommand extends BattleCommand{
     public abstract Array<int[]> getTargetsAtRange(int row, int col, IUnit actor);
 
     public final Array<int[]> getTargetsAtRange(){
-        if(battlefield.isTileOccupied(rowActor, colActor))
-            return getTargetsAtRange(rowActor, colActor, battlefield.getUnit(rowActor, colActor));
+        if(bfr.getModel().isTileOccupied(rowActor, colActor))
+            return getTargetsAtRange(rowActor, colActor, bfr.getModel().getUnit(rowActor, colActor));
         return new Array<int[]>();
     }
 
@@ -237,19 +283,19 @@ public abstract class ActorCommand extends BattleCommand{
      */
     public Array<int[]> getActionArea() {
         Array<int[]> actionArea = new Array<int[]>();
-        if(battlefield.isTileOccupied(rowActor, colActor)) {
+        if(bfr.getModel().isTileOccupied(rowActor, colActor)) {
             switch (choice.getRangedType()) {
                 case MOVE:
-                    actionArea = battlefield.getMoveArea(rowActor, colActor);
+                    actionArea = bfr.getModel().getMoveArea(rowActor, colActor);
                     break;
                 case WEAPON:
-                    IUnit actor = battlefield.getUnit(rowActor, colActor);
-                    int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, battlefield);
-                    int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, battlefield);
-                    actionArea = Utils.getEreaFromRange(battlefield, rowActor, colActor, rangeMin, rangeMax);
+                    IUnit actor = bfr.getModel().getUnit(rowActor, colActor);
+                    int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, bfr.getModel());
+                    int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, bfr.getModel());
+                    actionArea = Utils.getEreaFromRange(bfr.getModel(), rowActor, colActor, rangeMin, rangeMax);
                     break;
                 case SPECIFIC:
-                    actionArea = Utils.getEreaFromRange(battlefield, rowActor, colActor, choice.getRangeMin(), choice.getRangeMax());
+                    actionArea = Utils.getEreaFromRange(bfr.getModel(), rowActor, colActor, choice.getRangeMin(), choice.getRangeMax());
                     break;
             }
         }
@@ -262,11 +308,11 @@ public abstract class ActorCommand extends BattleCommand{
      */
     public final Array<int[]> getImpactArea(){
         Array<int[]> orientedArea = choice.getOrientedImpactArea(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-        if(battlefield.isTileExisted(rowTarget, colTarget)) {
+        if(bfr.getModel().isTileExisted(rowTarget, colTarget)) {
             for (int i = 0; i < orientedArea.size; i++) {
                 orientedArea.get(i)[0] += rowTarget;
                 orientedArea.get(i)[1] += colTarget;
-                if (!battlefield.isTileExisted(orientedArea.get(i)[0], orientedArea.get(i)[1])) {
+                if (!bfr.getModel().isTileExisted(orientedArea.get(i)[0], orientedArea.get(i)[1])) {
                     orientedArea.removeIndex(i);
                     i--;
                 }
@@ -276,25 +322,19 @@ public abstract class ActorCommand extends BattleCommand{
         return orientedArea;
     }
 
-
-    @Override
-    public void redo() { }
-
-
-
     //------------------- HELPER METHODS -----------------------------
 
     protected final boolean isTargetAllyValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired){
         boolean valid = false;
-        if(battlefield.isTileOccupied(rowActor0, colActor0)
+        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)
                 && (choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC)){
-            IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
+            IUnit actor = bfr.getModel().getUnit(rowActor0, colActor0);
+            int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getArmy().getAffiliation())
-                        && (!woundedRequired || battlefield.getUnit(rowTarget0, colTarget0).isWounded())) {
+                if(bfr.getModel().isTileOccupiedByAlly(rowTarget0, colTarget0, actor.getArmy().getAffiliation())
+                        && (!woundedRequired || bfr.getModel().getUnit(rowTarget0, colTarget0).isWounded())) {
 
                     valid = true;
                 }
@@ -305,15 +345,15 @@ public abstract class ActorCommand extends BattleCommand{
 
     protected final boolean isEnemyTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
         boolean valid = false;
-        if(battlefield.isTileOccupied(rowActor0, colActor0)
+        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)
                 && (choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC)){
-            IUnit actor = battlefield.getUnit(rowActor0, colActor0);
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, battlefield) : choice.getRangeMax();
+            IUnit actor = bfr.getModel().getUnit(rowActor0, colActor0);
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
-                if(battlefield.isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getArmy().getAffiliation())
-                        && (!stealableRequired || battlefield.getUnit(rowTarget0, colTarget0).isStealable())) {
+                if(bfr.getModel().isTileOccupiedByFoe(rowTarget0, colTarget0, actor.getArmy().getAffiliation())
+                        && (!stealableRequired || bfr.getModel().getUnit(rowTarget0, colTarget0).isStealable())) {
                     valid = true;
                 }
             }
@@ -324,15 +364,15 @@ public abstract class ActorCommand extends BattleCommand{
     protected final Array<int[]> getAlliesAtRange(int row, int col, IUnit actor, boolean woundedRequired){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
                 for (int c = col - rangeMin; c <= col + rangeMax; c++) {
                     dist = Utils.dist(row, col, r, c);
                     if (rangeMin <= dist && dist <= rangeMax
-                            && battlefield.isTileOccupiedByAlly(r, c, actor.getArmy().getAffiliation())
-                            && (!woundedRequired || battlefield.getUnit(r, c).isWounded())) {
+                            && bfr.getModel().isTileOccupiedByAlly(r, c, actor.getArmy().getAffiliation())
+                            && (!woundedRequired || bfr.getModel().getUnit(r, c).isWounded())) {
 
                         targetsAtRange.add(new int[]{r, c});
                     }
@@ -346,8 +386,8 @@ public abstract class ActorCommand extends BattleCommand{
     protected final Array<int[]> getFoesAtRange(int row, int col, IUnit actor, boolean stealableRequired){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, battlefield) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, battlefield) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
 
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
@@ -355,8 +395,8 @@ public abstract class ActorCommand extends BattleCommand{
                     dist = Utils.dist(row, col, r, c);
                     if (rangeMin <= dist
                             && dist <= rangeMax
-                            && battlefield.isTileOccupiedByFoe(r, c, actor.getArmy().getAffiliation())
-                            && (!stealableRequired || battlefield.getUnit(r, c).isStealable())) {
+                            && bfr.getModel().isTileOccupiedByFoe(r, c, actor.getArmy().getAffiliation())
+                            && (!stealableRequired || bfr.getModel().getUnit(r, c).isStealable())) {
 
                         targetsAtRange.add(new int[]{r, c});
                     }
@@ -382,7 +422,7 @@ public abstract class ActorCommand extends BattleCommand{
             for(int i = 0; i < impactArea.size; i++){
                 row =rowImpactTile - impactArea.get(i)[0];
                 col =colImpactTile - impactArea.get(i)[1];
-                if(battlefield.isTileExisted(row, col) && or == Utils.getOrientationFromCoords(rowActor, colActor, row, col)){
+                if(bfr.getModel().isTileExisted(row, col) && or == Utils.getOrientationFromCoords(rowActor, colActor, row, col)){
                     possibleTargetTiles.add(new int[]{row, col});
                 }
             }
@@ -404,20 +444,6 @@ public abstract class ActorCommand extends BattleCommand{
         return choice;
     }
 
-
-    public final boolean setInitiator(int rowActor, int colActor) {
-        if(battlefield.isTileOccupied(rowActor, colActor)) {
-            this.rowActor = rowActor;
-            this.colActor = colActor;
-            this.initiator = battlefield.getUnit(rowActor, colActor);
-            if(choice.isActorIsTarget()){
-                setTarget(rowActor, colActor);
-            }
-            return true;
-        }
-        return false;
-    }
-
     public final IUnit getInitiator(){
         return initiator;
     }
@@ -430,15 +456,6 @@ public abstract class ActorCommand extends BattleCommand{
         return colActor;
     }
 
-
-    public final void setTarget(int rowTarget, int colTarget){
-        if(battlefield.isTileExisted(rowTarget, colTarget)){
-            this.rowTarget = rowTarget;
-            this.colTarget = colTarget;
-            this.target = battlefield.getUnit(rowTarget, colTarget);
-        }
-    }
-
     public final IUnit getTarget(){
         return target;
     }
@@ -448,15 +465,15 @@ public abstract class ActorCommand extends BattleCommand{
     public final int getColTarget() { return colTarget; }
 
     public final TileType getTargetTile() {
-        return battlefield.getTile(rowTarget, colTarget).getType();
+        return bfr.getModel().getTile(rowTarget, colTarget).getType();
     }
 
-    public final EncounterOutcome getOutcome(){
+    public final Outcome getOutcome(){
         return outcome;
     }
 
     public final Battlefield getBattlefield() {
-        return battlefield;
+        return bfr.getModel();
     }
 
     public final boolean isFree() {
@@ -472,7 +489,7 @@ public abstract class ActorCommand extends BattleCommand{
     public String toString() {
         String str = "\nActorCommand  : " +getActionChoice().name();
         str += "\n    initiator : "+getInitiator().getName();
-        str += "\n    target : "+((battlefield.isTileOccupied(rowTarget, colTarget)) ?  battlefield.getUnit(rowTarget, colTarget).getName(): " ("+rowTarget+" "+colTarget+") ");
+        str += "\n    target : "+((bfr.getModel().isTileOccupied(rowTarget, colTarget)) ?  bfr.getModel().getUnit(rowTarget, colTarget).getName(): " ("+rowTarget+" "+colTarget+") ");
         str += "\n    executable ? "+isTargetValid();
         return str;
     }
@@ -486,13 +503,13 @@ public abstract class ActorCommand extends BattleCommand{
 
 
 
-public static class EncounterOutcome {
+public static class Outcome {
         public Array<ExperiencePointsHolder> expHolders;
         public Array<DroppedItemHolder> droppedItemHolders;
         public Inventory playerInventory;
         boolean resolved;
 
-        public EncounterOutcome(Inventory playerInventory) {
+        public Outcome(Inventory playerInventory) {
             this.playerInventory = playerInventory;
             this.expHolders = new Array<ExperiencePointsHolder>();
             this.droppedItemHolders = new Array<DroppedItemHolder>();

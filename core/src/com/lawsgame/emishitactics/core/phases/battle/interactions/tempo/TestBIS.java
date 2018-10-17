@@ -2,47 +2,30 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.ai.AggressiveAI;
-import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PushCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoAreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoAreaWidget;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
-import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.LinkedList;
-import java.util.Stack;
 
 public class TestBIS extends BattleInteractionState implements Observer{
 
@@ -169,7 +152,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
                     default: command = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
                 }
             } else {
-                command = (index != 9) ? new MoveCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) : new BuildCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), Data.TileType.BRIDGE);
+                command = (index != 9) ? new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) : new BuildCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), Data.TileType.BRIDGE);
 
             }
 
@@ -198,7 +181,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
             ActorCommand command = historic.peek();
-            if(command.getActionChoice().isUndoable()){
+            if(command.isUndoable()){
                 command.undo();
                 historic.pop();
             }

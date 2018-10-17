@@ -151,7 +151,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
         @Override
         public void apply() {
-            bim.replace(new SelectActionBIS(bim, currentCommand.getRowActor(), currentCommand.getColActor(), historic));
+            bim.replace(new SelectActionBIS(bim, currentCommand.getInitiator(), historic));
         }
     }
 

@@ -85,7 +85,7 @@ public class StandardTask extends Task {
 
     /**
      * convient method
-     * usefull to check if adding that task to the queue is relevant.
+     * usefull to performEvent if adding that task to the queue is relevant.
      * @return
      */
     @Override

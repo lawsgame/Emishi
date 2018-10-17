@@ -16,11 +16,11 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 
-public class MoveCommand extends ActorCommand {
+public class WalkCommand extends ActorCommand {
     protected Array<int[]> validPath;
     protected Data.Orientation oldWalkerOrientation;
 
-    public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+    public WalkCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, ActionChoice.MOVE, scheduler, playerInventory, false);
     }
 
@@ -31,14 +31,14 @@ public class MoveCommand extends ActorCommand {
         oldWalkerOrientation = getInitiator().getOrientation();
 
         // update model
-        battlefield.moveUnit(rowActor, colActor, rowTarget, colTarget, false);
+        bfr.getModel().moveUnit(rowActor, colActor, rowTarget, colTarget, false);
         Data.Orientation or = (validPath.size > 1) ?
                 Utils.getOrientationFromCoords(validPath.get(validPath.size - 2)[0], validPath.get(validPath.size - 2)[1], rowTarget, colTarget) :
                 Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         getInitiator().setOrientation(or);
 
         // push render task
-        scheduleRenderTask(new StandardTask(battlefield, bfr.getUnitRenderer(getInitiator()), new Walk(getInitiator(), validPath)));
+        scheduleRenderTask(new StandardTask(bfr.getModel(), bfr.getUnitRenderer(getInitiator()), new Walk(getInitiator(), validPath)));
 
 
     }
@@ -56,9 +56,9 @@ public class MoveCommand extends ActorCommand {
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
-        if(battlefield.isTileOccupied(rowActor0, colActor0)){
+        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)){
 
-            this.validPath = battlefield.getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getInitiator().has(Data.Ability.PATHFINDER), getInitiator().getArmy().getAffiliation());
+            this.validPath = bfr.getModel().getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getInitiator().has(Data.Ability.PATHFINDER), getInitiator().getArmy().getAffiliation());
             if(validPath.size > 0 && validPath.size <= getInitiator().getAppMobility()){
 
                 valid = true;
@@ -69,18 +69,18 @@ public class MoveCommand extends ActorCommand {
 
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
-        return battlefield.getMoveArea(row, col, actor);
+        return bfr.getModel().getMoveArea(row, col, actor);
     }
 
     @Override
     protected void unexecute() {
-        if(battlefield.isTileOccupied(rowTarget, colTarget)){
-            IUnit unit = battlefield.getUnit(rowTarget, colTarget);
+        if(bfr.getModel().isTileOccupied(rowTarget, colTarget)){
+            IUnit unit = bfr.getModel().getUnit(rowTarget, colTarget);
             if(unit == getInitiator()) {
                 BattleUnitRenderer walkerRenderer = bfr.getUnitRenderer(getInitiator());
-                battlefield.moveUnit(rowTarget, colTarget, rowActor, colActor, false);
+                bfr.getModel().moveUnit(rowTarget, colTarget, rowActor, colActor, false);
                 unit.setOrientation(oldWalkerOrientation);
-                scheduleRenderTask(new StandardTask(battlefield, walkerRenderer, new Notification.SetUnit(rowActor, colActor, unit)));
+                scheduleRenderTask(new StandardTask(bfr.getModel(), walkerRenderer, new Notification.SetUnit(rowActor, colActor, unit)));
                 scheduleRenderTask(new StandardTask(walkerRenderer, oldWalkerOrientation));
             }
 

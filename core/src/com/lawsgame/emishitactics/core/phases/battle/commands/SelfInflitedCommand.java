@@ -17,7 +17,7 @@ public abstract class SelfInflitedCommand extends ActorCommand {
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
-        if(battlefield.isTileOccupied(rowActor0, colActor0)
+        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)
                 && rowActor0 == rowTarget0
                 && colActor0 == colTarget0){
             valid = true;

@@ -80,7 +80,18 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         } else if(data instanceof Data.Weather){
 
             this.renderedWeather = (Data.Weather) data;
-        } else if(data instanceof Notification.SetUnit){
+        } else if(data instanceof Notification.SetTile){
+
+            if(data instanceof Notification.Build){
+
+                final Notification.Build notif= (Notification.Build)data;
+                setBuildTask(notif);
+            }else {
+
+                Notification.SetTile notif = (Notification.SetTile)data;
+                addTileRenderer(notif.row, notif.col, notif.tileType);
+            }
+        }else if(data instanceof Notification.SetUnit){
 
             final Notification.SetUnit notif = (Notification.SetUnit)data;
             if (isUnitRendererCreated(notif.unitModel)) {
@@ -96,59 +107,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
             }else{
                 addUnitRenderer(notif.row, notif.col, notif.unitModel);
             }
-        } else if (data instanceof Notification.SwitchPosition) {
-
-            final Notification.SwitchPosition notif = (Notification.SwitchPosition)data;
-            final BattleUnitRenderer bur1 = getUnitRenderer(notif.unit1);
-            final BattleUnitRenderer bur2 = getUnitRenderer(notif.unit2);
-            if (bur1 != null && bur2 != null) {
-                switch (notif.mode) {
-                    case GUARDIAN:
-                    case WALK :
-
-
-                        notif.unit1.notifyAllObservers(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                removeAreaRenderersAssociatedWith(bur1.getModel());
-                                Array<int[]> path = new Array<int[]>();
-                                path.add(new int[]{notif.rowUnit2, notif.colUnit2});
-                                bur1.displayWalk(path, true);
-                            }
-                        });
-                        notif.unit2.notifyAllObservers(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                removeAreaRenderersAssociatedWith(bur2.getModel());
-                                Array<int[]> path = new Array<int[]>();
-                                path.add(new int[]{notif.rowUnit1, notif.colUnit1});
-                                bur2.displayWalk(path, true);
-                            }
-                        });
-                        break;
-                    case INSTANT:
-                        notif.unit1.notifyAllObservers(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                bur1.setPos(notif.rowUnit2, notif.colUnit2);
-                                removeAreaRenderersAssociatedWith(bur1.getModel());
-                            }
-                        });
-                        notif.unit2.notifyAllObservers(new SimpleCommand() {
-
-                            @Override
-                            public void apply() {
-                                bur2.setPos(notif.rowUnit1, notif.colUnit1);
-                                removeAreaRenderersAssociatedWith(bur2.getModel());
-                            }
-                        });
-                        break;
-                }
-            }
-        }else if(data instanceof Notification.Walk){
+        } else if(data instanceof Notification.Walk){
 
             final Notification.Walk notif = (Notification.Walk)data;
             final BattleUnitRenderer bur = getUnitRenderer(notif.unit);
@@ -159,17 +118,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                     removeAreaRenderersAssociatedWith(bur.getModel());
                 }
             });
-        }else if(data instanceof Notification.SetTile){
-
-            if(data instanceof Notification.Build){
-
-                final Notification.Build notif= (Notification.Build)data;
-                setBuildTask(notif);
-            }else {
-
-                Notification.SetTile notif = (Notification.SetTile)data;
-                addTileRenderer(notif.row, notif.col, notif.tileType);
-            }
         }else if(data instanceof Area){
 
             Area area = (Area)data;

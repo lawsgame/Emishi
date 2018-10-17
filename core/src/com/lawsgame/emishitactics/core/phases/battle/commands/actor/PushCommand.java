@@ -20,23 +20,23 @@ public class PushCommand extends ActorCommand {
     }
 
     @Override
-    public boolean canbePerformedBy(IUnit actor) {
-        return super.canbePerformedBy(actor) && !actor.isHorseman();
+    public boolean isInitiatorValid(IUnit actor) {
+        return super.isInitiatorValid(actor) && !actor.isHorseman();
     }
 
     @Override
     protected void execute() {
 
         // update model
-        IUnit actor = battlefield.getUnit(rowActor, colActor);
-        IUnit pushed = battlefield.getUnit(rowTarget, colTarget);
+        IUnit actor = bfr.getModel().getUnit(rowActor, colActor);
+        IUnit pushed = bfr.getModel().getUnit(rowTarget, colTarget);
         Data.Orientation pushOr = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         pushed.setOrientation(pushOr);
         switch(pushOr){
-            case WEST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1, false); break;
-            case NORTH: battlefield.moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget, false);
-            case SOUTH: battlefield.moveUnit(rowTarget, colTarget, rowTarget - 1, colTarget, false); break;
-            case EAST:  battlefield.moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1, false); break;
+            case WEST:  bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1, false); break;
+            case NORTH: bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget, false);
+            case SOUTH: bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget - 1, colTarget, false); break;
+            case EAST:  bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1, false); break;
         }
 
         // push render task
@@ -50,19 +50,19 @@ public class PushCommand extends ActorCommand {
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
-        if(battlefield.isTileOccupied(rowActor0, colActor0)){
+        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)){
 
-            IUnit pusher = battlefield.getUnit(rowActor0, colActor0);
-            if(battlefield.isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getArmy().getAffiliation()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
+            IUnit pusher = bfr.getModel().getUnit(rowActor0, colActor0);
+            if(bfr.getModel().isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getArmy().getAffiliation()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
 
-                IUnit pushed = battlefield.getUnit(rowTarget0, colTarget0);
-                if(rowActor0 < rowTarget0 && battlefield.isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
+                IUnit pushed = bfr.getModel().getUnit(rowTarget0, colTarget0);
+                if(rowActor0 < rowTarget0 && bfr.getModel().isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
-                if(rowActor0 > rowTarget0 && battlefield.isTileAvailable(rowTarget0 - 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
+                if(rowActor0 > rowTarget0 && bfr.getModel().isTileAvailable(rowTarget0 - 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
-                if(colActor0 < colTarget0 && battlefield.isTileAvailable(rowTarget0, colTarget0 + 1, pushed.has(Data.Ability.PATHFINDER)))
+                if(colActor0 < colTarget0 && bfr.getModel().isTileAvailable(rowTarget0, colTarget0 + 1, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
-                if(colActor0 > colTarget0 && battlefield.isTileAvailable(rowTarget0, colTarget0 - 1, pushed.has(Data.Ability.PATHFINDER)))
+                if(colActor0 > colTarget0 && bfr.getModel().isTileAvailable(rowTarget0, colTarget0 - 1, pushed.has(Data.Ability.PATHFINDER)))
                     valid = true;
             }
         }
@@ -73,23 +73,23 @@ public class PushCommand extends ActorCommand {
     public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
         Array<int[]> targetsAtRange = new Array<int[]>();
         if(actor.isMobilized()) {
-            if (battlefield.isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAffiliation())
-                    && battlefield.isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER))) {
+            if (bfr.getModel().isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAffiliation())
+                    && bfr.getModel().isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER))) {
                 targetsAtRange.add(new int[]{row + 1, col});
             }
 
-            if (battlefield.isTileOccupiedByAlly(row - 1, col, actor.getArmy().getAffiliation())
-                    && battlefield.isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))) {
+            if (bfr.getModel().isTileOccupiedByAlly(row - 1, col, actor.getArmy().getAffiliation())
+                    && bfr.getModel().isTileAvailable(row - 2, col, actor.has(Data.Ability.PATHFINDER))) {
                 targetsAtRange.add(new int[]{row - 1, col});
             }
 
-            if (battlefield.isTileOccupiedByAlly(row, col + 1, actor.getArmy().getAffiliation())
-                    && battlefield.isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))) {
+            if (bfr.getModel().isTileOccupiedByAlly(row, col + 1, actor.getArmy().getAffiliation())
+                    && bfr.getModel().isTileAvailable(row, col + 2, actor.has(Data.Ability.PATHFINDER))) {
                 targetsAtRange.add(new int[]{row, col + 1});
             }
 
-            if (battlefield.isTileOccupiedByAlly(row, col - 1, actor.getArmy().getAffiliation())
-                    && battlefield.isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))) {
+            if (bfr.getModel().isTileOccupiedByAlly(row, col - 1, actor.getArmy().getAffiliation())
+                    && bfr.getModel().isTileAvailable(row, col - 2, actor.has(Data.Ability.PATHFINDER))) {
                 targetsAtRange.add(new int[]{row, col - 1});
             }
 

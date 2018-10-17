@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine.FocusOn;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand.EncounterOutcome;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand.Outcome;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -25,23 +25,22 @@ import java.util.Stack;
 
 public class HandleOutcomeBIS extends BattleInteractionState{
     private Stack<ActorCommand> historic;
-    private EncounterOutcome outcome;
+    private Outcome outcome;
 
-    private static EncounterOutcome emptyOutcome;
+    private static Outcome emptyOutcome;
 
     private ExperiencePanel experiencePanel;
     private LevelUpPanel levelUpPanel;
     private LootPanel lootPanel;
 
     private LinkedList<HandleOutcomeTask> tasks;
-    //private LinkedList<Boolean> levelPanelShown;
     private boolean aiTurn;
 
     public HandleOutcomeBIS(BattleInteractionMachine bim, Stack<ActorCommand> historic, boolean aiTurn) {
         super(bim, true, false, false, false, false);
 
         this.historic = historic;
-        if(emptyOutcome == null) emptyOutcome = new EncounterOutcome(bim.player.getInventory());
+        if(emptyOutcome == null) emptyOutcome = new Outcome(bim.player.getInventory());
         this.outcome = (historic.size() > 0) ? historic.peek().getOutcome() : emptyOutcome;
         this.experiencePanel = new TempoExperiencePanel(bim.uiStage.getViewport());
         this.levelUpPanel = new TempoLevelUpPanel(bim.uiStage.getViewport());
@@ -122,8 +121,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                 if(actor.isOutOfAction() || actor.isDone()) {
                         bim.replace(new EndUnitTurnBIS(bim, actor));
                 }else{
-                    int[] actorPos = bim.battlefield.getUnitPos(actor);
-                    bim.replace(new SelectActionBIS(bim, actorPos[0], actorPos[1], historic));
+                    bim.replace(new SelectActionBIS(bim, actor, historic));
                 }
             }else{
                 try {

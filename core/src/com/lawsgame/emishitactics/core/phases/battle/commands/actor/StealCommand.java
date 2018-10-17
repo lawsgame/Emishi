@@ -21,16 +21,16 @@ public class StealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean canbePerformedBy(IUnit actor) {
-        return super.canbePerformedBy(actor) && actor.has(Data.Ability.STEAL);
+    public boolean isInitiatorValid(IUnit actor) {
+        return super.isInitiatorValid(actor) && actor.has(Data.Ability.STEAL);
     }
 
     @Override
     protected void execute() {
 
         // update model
-        IUnit stealer = battlefield.getUnit(rowActor, colActor);
-        IUnit stolen = battlefield.getUnit(rowTarget, colTarget);
+        IUnit stealer = bfr.getModel().getUnit(rowActor, colActor);
+        IUnit stolen = bfr.getModel().getUnit(rowTarget, colTarget);
         Item stoleItem = null;
         int stealRate = getStealRate();
         boolean stealSuccessful = Utils.getMean(1,100) < stealRate;
@@ -72,6 +72,6 @@ public class StealCommand extends ActorCommand {
 
 
     public int getStealRate(){
-        return Formulas.getStealRate(rowActor, colActor, rowTarget, colTarget, battlefield);
+        return Formulas.getStealRate(rowActor, colActor, rowTarget, colTarget, bfr.getModel());
     }
 }

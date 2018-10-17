@@ -12,7 +12,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrient
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PushCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
@@ -32,7 +32,7 @@ public class BattleCommandManager {
     public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
         commandPool = new Array<Array<ActorCommand>>();
 
-        setChoice(new MoveCommand(bfr, scheduler, playerInventory));
+        setChoice(new WalkCommand(bfr, scheduler, playerInventory));
         setChoice(new AttackCommand(bfr, scheduler, playerInventory));
 
         final Array<ActorCommand>  commands = new Array<ActorCommand>();
@@ -89,7 +89,7 @@ public class BattleCommandManager {
                 choice = commandPool.get(i).get(0).getActionChoice();
                 if(!choice.isEndTurnActionOnly()) {
                     for (int j = 0; j < commandPool.get(i).size; j++) {
-                        if (commandPool.get(i).get(j).canbePerformedBy(actor)) {
+                        if (commandPool.get(i).get(j).isInitiatorValid(actor)) {
                             choices.add(choice);
                             break;
                         }
@@ -106,7 +106,8 @@ public class BattleCommandManager {
             if(commandPool.get(i).size > 0 && commandPool.get(i).get(0).getActionChoice() == choice) {
                 Array<ActorCommand> chosenCommands = commandPool.get(i);
                 for (int j = 0; j < chosenCommands.size; j++) {
-                    if (!checkPerformable || chosenCommands.get(j).canbePerformedBy(actor)) {
+                    if (!checkPerformable || chosenCommands.get(j).isInitiatorValid(actor)) {
+                        chosenCommands.get(j).init();
                         availableCommands.add(chosenCommands.get(j));
                     }
                 }

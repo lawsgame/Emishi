@@ -1,11 +1,11 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands.battle;
+package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class BeginArmyTurnCommand extends BattleCommand {
+public class BeginArmyTurnCommand extends EventCommand {
     protected IArmy army;
 
     public BeginArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, IArmy army) {
@@ -13,23 +13,20 @@ public class BeginArmyTurnCommand extends BattleCommand {
         this.army = army;
     }
 
+
+    @Override
+    public boolean isApplicable() {
+        return true;
+    }
+
     @Override
     protected void execute() {
-        if(army != null) {
+        if (army != null) {
             army.replenishMoral(true);
             army.updateActionPoints();
-            if(army.isPlayerControlled())
-                battlefield.incrementTurn();
+            if (army.isPlayerControlled())
+                bfr.getModel().incrementTurn();
         }
     }
 
-    @Override
-    public void undo() {
-
-    }
-
-    @Override
-    public void redo() {
-
-    }
 }

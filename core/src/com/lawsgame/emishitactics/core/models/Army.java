@@ -566,7 +566,7 @@ public class Army extends IArmy{
 
     /**
      * disengagement consist in removing a IUnit form the mobilized army
-     * 1) FIRST we check that the given IUnit is:
+     * 1) FIRST we performEvent that the given IUnit is:
      *  - not null
      *  - mobilized
      *  - not a warlord

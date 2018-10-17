@@ -25,7 +25,7 @@ public class BuildCommand extends ActorCommand {
     protected void execute() {
 
         // update model
-        battlefield.setTile(rowTarget, colTarget, buildingType, false);
+        bfr.getModel().setTile(rowTarget, colTarget, buildingType, false);
 
         // push render task
         scheduleRenderTask(new StandardTask(bfr, new Build(rowTarget, colTarget, buildingType, getInitiator())));
@@ -36,26 +36,26 @@ public class BuildCommand extends ActorCommand {
     }
 
     @Override
-    public boolean canbePerformedBy(IUnit actor) {
-        return actor.has(Ability.BUILD) && super.canbePerformedBy(actor);
+    public boolean isInitiatorValid(IUnit actor) {
+        return actor.has(Ability.BUILD) && super.isInitiatorValid(actor);
     }
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
-        if(battlefield.isTileOccupied(rowActor0, colActor0) && battlefield.isTileExisted(rowTarget0, colTarget0)){
+        if(bfr.getModel().isTileOccupied(rowActor0, colActor0) && bfr.getModel().isTileExisted(rowTarget0, colTarget0)){
 
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (choice.getRangeMin() <= dist && dist <= choice.getRangeMax()) {
 
                 if(buildingType == Data.TileType.WATCH_TOWER
-                        && battlefield.isTileOfType(rowTarget0, colTarget0, Data.TileType.PLAIN) ) {
+                        && bfr.getModel().isTileOfType(rowTarget0, colTarget0, Data.TileType.PLAIN) ) {
 
                     valid = true;
                 } else if (buildingType == Data.TileType.BRIDGE
-                        && battlefield.isTileOfType(rowTarget0, colTarget0, Data.TileType.SHALLOWS)
-                        && ((battlefield.isTileOfType(rowTarget0, colTarget0 + 1,Data.TileType.PLAIN) && battlefield.isTileOfType(rowTarget0, colTarget0 - 1, Data.TileType.PLAIN))
-                            || (battlefield.isTileOfType(rowTarget0 + 1, colTarget0,Data.TileType.PLAIN) && battlefield.isTileOfType(rowTarget0 - 1, colTarget0, Data.TileType.PLAIN)))) {
+                        && bfr.getModel().isTileOfType(rowTarget0, colTarget0, Data.TileType.SHALLOWS)
+                        && ((bfr.getModel().isTileOfType(rowTarget0, colTarget0 + 1,Data.TileType.PLAIN) && bfr.getModel().isTileOfType(rowTarget0, colTarget0 - 1, Data.TileType.PLAIN))
+                            || (bfr.getModel().isTileOfType(rowTarget0 + 1, colTarget0,Data.TileType.PLAIN) && bfr.getModel().isTileOfType(rowTarget0 - 1, colTarget0, Data.TileType.PLAIN)))) {
 
                     valid = true;
                 }
@@ -74,16 +74,16 @@ public class BuildCommand extends ActorCommand {
         for (int r = row - rangeMin; r <= row + rangeMax; r++) {
             for (int c = col - rangeMin; c <= col + rangeMax; c++) {
                 dist = Utils.dist(row, col, r, c);
-                if (rangeMin <= dist && dist <= rangeMax && battlefield.isTileExisted(r, c)) {
+                if (rangeMin <= dist && dist <= rangeMax && bfr.getModel().isTileExisted(r, c)) {
 
                     if (buildingType == Data.TileType.WATCH_TOWER
-                            && battlefield.isTileOfType(r, c, Data.TileType.PLAIN)) {
+                            && bfr.getModel().isTileOfType(r, c, Data.TileType.PLAIN)) {
 
                         targetsAtRange.add(new int[]{r, c});
                     } else if (buildingType == Data.TileType.BRIDGE
-                            && battlefield.isTileOfType(r, c, Data.TileType.SHALLOWS)
-                            && ((battlefield.isTileOfType(r, c + 1, Data.TileType.PLAIN) && battlefield.isTileOfType(r, c - 1, Data.TileType.PLAIN))
-                            || (battlefield.isTileOfType(r + 1, c, Data.TileType.PLAIN) && battlefield.isTileOfType(r - 1, c, Data.TileType.PLAIN)))) {
+                            && bfr.getModel().isTileOfType(r, c, Data.TileType.SHALLOWS)
+                            && ((bfr.getModel().isTileOfType(r, c + 1, Data.TileType.PLAIN) && bfr.getModel().isTileOfType(r, c - 1, Data.TileType.PLAIN))
+                            || (bfr.getModel().isTileOfType(r + 1, c, Data.TileType.PLAIN) && bfr.getModel().isTileOfType(r - 1, c, Data.TileType.PLAIN)))) {
 
                         targetsAtRange.add(new int[]{r, c});
                     }

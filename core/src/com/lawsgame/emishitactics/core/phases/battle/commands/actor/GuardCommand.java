@@ -22,16 +22,16 @@ public class GuardCommand extends SelfInflitedCommand {
 
 
     @Override
-    public boolean canbePerformedBy(IUnit actor) {
-        return super.canbePerformedBy(actor) && actor.has(Data.Ability.GUARD);
+    public boolean isInitiatorValid(IUnit actor) {
+        return super.isInitiatorValid(actor) && actor.has(Data.Ability.GUARD);
     }
 
     @Override
     protected void execute() {
 
         // update model
-        UnitArea area = Area.createGuardedArea(battlefield, rowActor, colActor, getInitiator());
-        battlefield.addUnitArea(area, false);
+        UnitArea area = Area.createGuardedArea(bfr.getModel(), rowActor, colActor, getInitiator());
+        bfr.getModel().addUnitArea(area, false);
 
 
         // push render task
@@ -46,8 +46,8 @@ public class GuardCommand extends SelfInflitedCommand {
         for(int r = rowActor - rangeMax; r <= rowActor + rangeMax; r++){
             for(int c = colActor - rangeMax; c <= colActor + rangeMax; c++){
                 dist = Utils.dist(rowActor, colActor, r, c);
-                if(rangeMin <= dist && dist <= rangeMax && battlefield.isTileOccupiedByAlly(r,c, getInitiator().getArmy().getAffiliation())){
-                    guardedUnit = battlefield.getUnit(r,c);
+                if(rangeMin <= dist && dist <= rangeMax && bfr.getModel().isTileOccupiedByAlly(r,c, getInitiator().getArmy().getAffiliation())){
+                    guardedUnit = bfr.getModel().getUnit(r,c);
                     task.addThread(new RendererThread(bfr.getUnitRenderer(guardedUnit), Data.AnimId.GUARDED));
                 }
             }
@@ -62,7 +62,7 @@ public class GuardCommand extends SelfInflitedCommand {
     @Override
     public void unexecute() {
         if(getInitiator() != null){
-            Array<UnitArea> areas = battlefield.removeUnitAreas(getInitiator(), Data.AreaType.GUARD_AREA, false);
+            Array<UnitArea> areas = bfr.getModel().removeUnitAreas(getInitiator(), Data.AreaType.GUARD_AREA, false);
             for(int i = 0; i < areas.size; i++) {
                 scheduleRenderTask(new StandardTask(bfr, areas.get(i)));
             }

@@ -19,15 +19,15 @@ public class HealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean canbePerformedBy(IUnit actor) {
-        return super.canbePerformedBy(actor) && actor.has(Data.Ability.HEAL);
+    public boolean isInitiatorValid(IUnit actor) {
+        return super.isInitiatorValid(actor) && actor.has(Data.Ability.HEAL);
     }
 
     @Override
     protected void execute() {
 
         // update model
-        int healPower = Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, battlefield);
+        int healPower = Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, bfr.getModel());
         boolean treated = getTarget().treated(healPower);
 
         // push render task
@@ -56,20 +56,20 @@ public class HealCommand extends ActorCommand {
     //-------------------- GETTERS & SETTERS ----------------------
 
     public int getHealPower(){
-        return Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, battlefield);
+        return Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, bfr.getModel());
     }
 
     public int getRecoveredHitPoints(){
         int treatedHP = 0;
-        if(battlefield.isTileOccupied(rowTarget, colTarget))
-            treatedHP = battlefield.getUnit(rowTarget, colTarget).getRecoveredHitPoints(getHealPower());
+        if(bfr.getModel().isTileOccupied(rowTarget, colTarget))
+            treatedHP = bfr.getModel().getUnit(rowTarget, colTarget).getRecoveredHitPoints(getHealPower());
         return treatedHP;
     }
 
     public int getRecoveredMoralPoints(){
         int moralPoints = 0;
-        if(battlefield.isTileOccupied(rowTarget, colTarget))
-            moralPoints = battlefield.getUnit(rowTarget, colTarget).getRecoveredMoralPoints(getHealPower());
+        if(bfr.getModel().isTileOccupied(rowTarget, colTarget))
+            moralPoints = bfr.getModel().getUnit(rowTarget, colTarget).getRecoveredMoralPoints(getHealPower());
         return moralPoints;
     }
 

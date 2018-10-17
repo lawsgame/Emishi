@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.Notification.SwitchPosition;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -32,27 +32,38 @@ public class SwitchPositionCommand extends ActorCommand {
         oldTargetOrientation = getTarget().getOrientation();
 
         //update model
-        battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
+        bfr.getModel().switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
 
         // push render task
-        scheduleRenderTask(new StandardTask(bfr, new SwitchPosition(getInitiator(), getTarget(), SwitchPosition.Mode.WALK, battlefield)));
+
+        StandardTask task = new StandardTask();
+        Array<int[]> path = new Array<int[]>();
+        path.add(new int[]{rowTarget, colTarget});
+        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), bfr.getModel(), new Notification.Walk(getInitiator(), path)));
+        path = new Array<int[]>();
+        path.add(new int[]{rowActor, colActor});
+        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getTarget()), bfr.getModel(), new Notification.Walk(getTarget(), path)));
+        scheduleRenderTask(task);
+
+        //scheduleRenderTask(new StandardTask(bfr.getModel(), bfr, new SwitchPosition(getInitiator(), getTarget(), SwitchPosition.Mode.WALK, bfr.getModel())));
     }
 
     @Override
     public void unexecute() {
-        if(battlefield.isTileOccupied(rowActor, colActor)
-                && targetRenderer.getModel() == battlefield.getUnit(rowActor, colActor)
-                && battlefield.isTileOccupied(rowTarget, colTarget)
-                && actorRenderer.getModel() == battlefield.getUnit(rowTarget, colTarget)
+        if(bfr.getModel().isTileOccupied(rowActor, colActor)
+                && targetRenderer.getModel() == bfr.getModel().getUnit(rowActor, colActor)
+                && bfr.getModel().isTileOccupied(rowTarget, colTarget)
+                && actorRenderer.getModel() == bfr.getModel().getUnit(rowTarget, colTarget)
                 && oldTargetOrientation != null
                 && oldActorOrientation != null){
 
-            IUnit actor = battlefield.getUnit(rowActor, colActor);
-            IUnit target = battlefield.getUnit(rowTarget, colTarget);
+            IUnit actor = bfr.getModel().getUnit(rowActor, colActor);
+            IUnit target = bfr.getModel().getUnit(rowTarget, colTarget);
             actor.setOrientation(oldActorOrientation);
             target.setOrientation(oldTargetOrientation);
-            battlefield.switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
-            scheduleRenderTask(new StandardTask(bfr, new SwitchPosition(actor, target, SwitchPosition.Mode.INSTANT, battlefield)));
+            bfr.getModel().switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
+            scheduleRenderTask(new StandardTask(bfr.getModel(), actorRenderer, new Notification.SetUnit(rowActor, colActor, getInitiator())));
+            scheduleRenderTask(new StandardTask(bfr.getModel(), targetRenderer, new Notification.SetUnit(rowTarget, colTarget, getTarget())));
             scheduleRenderTask(new StandardTask(targetRenderer, oldTargetOrientation));
             scheduleRenderTask(new StandardTask(actorRenderer, oldActorOrientation));
         }

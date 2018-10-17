@@ -200,15 +200,15 @@ public class AiBIS extends BattleInteractionState implements Observer {
                 }
 
                 // push the action render task OR trigger
-                if(command.containPushableRenderTasks()) {
+                command.attach(this);
 
-                    System.out.println("    > executeCommand.pushRenderTasks()");
+                System.out.println("    > executeCommand.pushRenderTasks()");
 
-                    command.attach(this);
-                    command.pushRenderTasks();
-                }else{
+                if(!command.pushRenderTasks()) {
 
                     System.out.println("    > executeCommand.next() : no pushable tasks");
+
+                    command.detach(this);
                     next();
                 }
             }

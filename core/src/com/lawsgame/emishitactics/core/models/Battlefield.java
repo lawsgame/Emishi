@@ -108,7 +108,7 @@ public class Battlefield extends Observable {
      * @param army
      */
     public void addArmyId(IArmy army){
-        //check if the army if already deployed
+        //performEvent if the army if already deployed
         boolean armyAlreadyAdded = false;
         for(int i = 0; i < armyTurnOrder.size(); i++){
             if(armyTurnOrder.get(i) == army) {
@@ -149,7 +149,7 @@ public class Battlefield extends Observable {
      ADD A TILE:
      1) addExpGained a TileType
      2) addExpGained the texture in the tiles atlas
-     30) (checking) check the correspondance between its texture name and its TileType name
+     30) (checking) performEvent the correspondance between its texture name and its TileType name
      31) (optional) addExpGained specific rules...
 
     TILE METHODS HIERARCHY
@@ -731,7 +731,7 @@ public class Battlefield extends Observable {
                 this.affiliation = actor.getArmy().getAffiliation();
                 this.battlefield = bf;
 
-                // add the check map dimensions and origin point
+                // add the performEvent map dimensions and origin point
 
                 int range = moveRange + 6;
                 this.rowOrigin = rowActor - range;

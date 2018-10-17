@@ -1,21 +1,27 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands.battle;
+package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class EndArmyTurnCommand extends BattleCommand {
+public class EndArmyTurnCommand extends EventCommand {
     protected IArmy army;
 
     public EndArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, IArmy army) {
         super(bfr, scheduler);
         this.army = army;
+    }
+
+
+    @Override
+    public boolean isApplicable() {
+        return true;
     }
 
     @Override
@@ -40,15 +46,5 @@ public class EndArmyTurnCommand extends BattleCommand {
             }
         }
         scheduleRenderTask(resetDoneTask);
-    }
-
-    @Override
-    public void undo() {
-
-    }
-
-    @Override
-    public void redo() {
-
     }
 }

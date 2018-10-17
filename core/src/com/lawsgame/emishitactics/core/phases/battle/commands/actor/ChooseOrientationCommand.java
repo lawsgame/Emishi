@@ -34,8 +34,8 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
 
     @Override
     public void unexecute() {
-        if(oldOrientation != null && battlefield.isTileOccupied(rowActor, colActor)) {
-            IUnit unit = battlefield.getUnit(rowActor, colActor);
+        if(oldOrientation != null && bfr.getModel().isTileOccupied(rowActor, colActor)) {
+            IUnit unit = bfr.getModel().getUnit(rowActor, colActor);
             if(getInitiator() == unit) {
                 unit.setOrientation(oldOrientation);
                 scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(unit), oldOrientation));

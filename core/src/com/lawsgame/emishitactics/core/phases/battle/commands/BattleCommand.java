@@ -1,49 +1,52 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.engine.patterns.command.Command;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 
-public abstract class BattleCommand extends Observable implements Command, Observer {
-    protected final Battlefield battlefield;
+public abstract class BattleCommand extends Observable implements Observer {
     protected final BattlefieldRenderer bfr;
 
     protected final AnimationScheduler scheduler;
     private boolean decoupled;
-    private boolean launched;
     private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed AND usefull for decoupling view and model updates
     private boolean tasksScheduled;
 
 
     public BattleCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler){
         this.bfr = bfr;
-        this.battlefield = bfr.getModel();
         this.scheduler = scheduler;
         this.renderTasks = new Array<Task>();
-
-        this.launched = false;
         this.tasksScheduled = false;
         this.decoupled = false;
     }
 
-    @Override
-    public void apply() {
-        this.launched = true;
-        this.tasksScheduled = false;
-        this.renderTasks.clear();
+    public boolean apply() {
+        if(isApplicable()) {
+            execute();
+            return true;
+        }
+        return false;
+    }
 
-        execute();
+    public boolean undo(){
+        if(isUndoable()){
+            unexecute();
+            return true;
+        }
+        return false;
     }
 
     protected abstract void execute();
+    protected abstract void unexecute();
+    public abstract boolean isApplicable();
+    public abstract boolean isUndoable();
 
     public final boolean isExecuting(){
-        return launched && renderTasks.size > 0;
+        return tasksScheduled && renderTasks.size > 0;
     }
 
     protected final void scheduleRenderTask(Task task){
@@ -57,22 +60,29 @@ public abstract class BattleCommand extends Observable implements Command, Obser
         }
     }
 
-    public final void pushRenderTasks(){
+    protected final void scheduleMultipleRenderTasks(Array<Task> tasks){
+        for(int i = 0; i < tasks.size; i++)
+            scheduleRenderTask(tasks.get(i));
+    }
 
-        if(containPushableRenderTasks()) {
+    public final boolean pushRenderTasks(){
+
+        if(decoupled && !tasksScheduled && renderTasks.size > 0) {
 
             this.tasksScheduled = true;
             for (int i = 0; i < renderTasks.size; i++) {
                 renderTasks.get(i).attach(this);
                 scheduler.addTask(renderTasks.get(i));
-
             }
-            System.out.println("");
+            return true;
         }
+        return false;
     }
 
-    public boolean containPushableRenderTasks() {
-        return decoupled && !tasksScheduled && renderTasks.size > 0;
+    public final Array<Task> confiscateTasks(){
+        Array<Task> tasks = renderTasks;
+        renderTasks = new Array<Task>();
+        return tasks;
     }
 
     @Override
@@ -88,8 +98,8 @@ public abstract class BattleCommand extends Observable implements Command, Obser
 
             // notify that the command is done : the model is updated AND the render tasks are completed
             if (renderTasks.size == 0) {
-                launched = false;
                 notifyAllObservers(this);
+                tasksScheduled = false;
             }
         }
     }

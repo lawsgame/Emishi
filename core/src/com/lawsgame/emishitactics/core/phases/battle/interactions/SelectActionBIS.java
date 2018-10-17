@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
@@ -24,22 +25,29 @@ public class SelectActionBIS extends BattleInteractionState {
     private ChoicePanel choicePanel;
     private ChoicePanel commandPanel;
 
-    public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit, Stack<ActorCommand> historic) {
+    public SelectActionBIS(BattleInteractionMachine bim, IUnit actor, Stack<ActorCommand> historic) {
         super(bim, true, true, true, false, true);
-        this.rowSltdUnit = rowSltdUnit;
-        this.colSltdUnit = colSltdUnit;
+        int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
+        this.rowSltdUnit = actorPos[0];
+        this.colSltdUnit = actorPos[1];
         this.historic = historic;
         this.choicePanel = new TempoChoicePanel(bim.asm);
         this.commandPanel = new TempoCommandChoicePanel(bim.asm, 0);
 
     }
 
-    public SelectActionBIS(BattleInteractionMachine bim, int rowSltdUnit, int colSltdUnit) {
-        this(bim, rowSltdUnit, colSltdUnit, new Stack<ActorCommand>());
+    public SelectActionBIS(BattleInteractionMachine bim, IUnit actor) {
+        this(bim, actor, new Stack<ActorCommand>());
     }
 
     @Override
     public void init() {
+        Array<IUnit> playerArmy = bim.player.getArmy().getMobilizedUnits(true);
+        for(int i = 0; i < playerArmy.size; i++) {
+            int[] unitpos = bim.bfr.getModel().getUnitPos(playerArmy.get(i));
+            System.out.println(playerArmy.get(i).getName() + " coords = " + unitpos[0] + " " + unitpos[1]);
+        }
+        System.out.println("sltd coords = "+rowSltdUnit+" "+colSltdUnit);
         System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
         super.init();
@@ -76,7 +84,7 @@ public class SelectActionBIS extends BattleInteractionState {
             }else{
 
                 if (Utils.undoCommands(historic) && !touchedUnit.isDone()) {
-                    bim.replace(new SelectActionBIS(bim, row, col));
+                    bim.replace(new SelectActionBIS(bim, touchedUnit));
                     return true;
                 } else {
                     // if not all commands are undoable, all the undoable ones are visible, the unit is updated and a new choice panel is provided

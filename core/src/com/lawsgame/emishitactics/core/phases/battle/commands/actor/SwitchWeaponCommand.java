@@ -38,8 +38,8 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean canbePerformedBy(IUnit actor) {
-        return super.canbePerformedBy(actor) && weaponIndex < actor.getWeapons().size;
+    public boolean isInitiatorValid(IUnit actor) {
+        return super.isInitiatorValid(actor) && weaponIndex < actor.getWeapons().size;
     }
 
     //------------ GETTERS -------------------------------------
@@ -52,8 +52,8 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
     public String getName(I18NBundle bundle) {
 
         String str = "";
-        if(battlefield.isTileOccupied(rowActor, colActor)){
-            Weapon weapon = battlefield.getUnit(rowActor, colActor).getWeapon(weaponIndex);
+        if(bfr.getModel().isTileOccupied(rowActor, colActor)){
+            Weapon weapon = bfr.getModel().getUnit(rowActor, colActor).getWeapon(weaponIndex);
             if(weapon != null){
                 str = weapon.getName(bundle);
             }
