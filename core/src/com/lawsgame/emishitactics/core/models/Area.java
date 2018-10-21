@@ -4,10 +4,10 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 
-public  class Area extends Observable {
+public  class Area extends Model {
     private int rowInit;
     private int colInit;
     private boolean[][] checkmap;

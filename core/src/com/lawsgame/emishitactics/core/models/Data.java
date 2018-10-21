@@ -192,7 +192,8 @@ public class Data {
     }
 
     public enum ActionChoice{
-        MOVE                (1, 0, true, false, RangedBasedType.MOVE, false, new int[0][0]),
+        MOVE                (0, 0, true, false, 0, 0, false, new int[0][0]),
+        WALK                (1, 0, true, false, RangedBasedType.MOVE, false, new int[0][0]),
         ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[0][0]),
         SWITCH_POSITION     (1, 0, true, false, 1, 1, false, new int[0][0]),
         PUSH                (1, 0, false, true, 1, 1, false, new int[0][0]),
@@ -576,10 +577,15 @@ public class Data {
      */
     public enum WeaponTemplate{
         FIST(           1, 1, 100, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
+
         SHORTSWORD(     3, 3, 90, 1, 1, 20, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
+
         LANCE(          3, 3, 95, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
+
         BROAD_AXE(      4, 5, 80, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
+
         CLUB(           4, 4, 85, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
+
         HUNTING_BOW(    3, 4, 75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
 
         private int damageMin;
@@ -679,6 +685,8 @@ public class Data {
     }
 
     public enum Ability{
+        //Offensive
+
         //Passive
         PATHFINDER,
         UNBREAKABLE,
@@ -690,6 +698,7 @@ public class Data {
         HEAL,
         STEAL,
         BUILD,
+        COVER,
 
         NONE
     }

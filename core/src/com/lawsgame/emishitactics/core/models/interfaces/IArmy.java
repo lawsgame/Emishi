@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-public abstract class IArmy extends Observable{
+public abstract class IArmy extends Model{
 
 
     public abstract int getId();

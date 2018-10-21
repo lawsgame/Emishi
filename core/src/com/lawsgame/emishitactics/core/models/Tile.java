@@ -3,26 +3,17 @@ package com.lawsgame.emishitactics.core.models;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
-
-import java.util.HashMap;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 /**
  * Immutable class
  */
-public class Tile {
-
-    private static HashMap<TileType, Tile> tileTemplates = new HashMap<TileType, Tile>();
+public class Tile extends Model{
 
     protected TileType type;
 
-    Tile(TileType type){
+    public Tile(TileType type){
         this.type = type;
-    }
-
-    public static Tile get(TileType type){
-        if(!tileTemplates.containsKey(type))
-            tileTemplates.put(type, new Tile(type));
-        return tileTemplates.get(type);
     }
 
     public TileType getType() {

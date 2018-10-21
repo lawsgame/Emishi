@@ -6,9 +6,11 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -32,11 +34,24 @@ public class PushCommand extends ActorCommand {
         IUnit pushed = bfr.getModel().getUnit(rowTarget, colTarget);
         Data.Orientation pushOr = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         pushed.setOrientation(pushOr);
+        Tile tile;
         switch(pushOr){
-            case WEST:  bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1, false); break;
-            case NORTH: bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget, false);
-            case SOUTH: bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget - 1, colTarget, false); break;
-            case EAST:  bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1, false); break;
+            case WEST:
+                bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1, false);
+                tile = bfr.getModel().getTile(rowTarget, colTarget - 1);
+                break;
+            case NORTH:
+                bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget, false);
+                tile = bfr.getModel().getTile(rowTarget + 1, colTarget );
+                break;
+            case SOUTH:
+                bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget - 1, colTarget, false);
+                tile = bfr.getModel().getTile(rowTarget - 1, colTarget);
+                break;
+            default:
+                bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1, false);
+                tile = bfr.getModel().getTile(rowTarget, colTarget + 1);
+                break;
         }
 
         // push render task
@@ -44,6 +59,13 @@ public class PushCommand extends ActorCommand {
         task.addThread(new RendererThread(bfr.getUnitRenderer(actor), Data.AnimId.PUSH));
         task.addThread(new RendererThread(bfr.getUnitRenderer(pushed), Notification.Pushed.get(pushOr)));
         scheduleRenderTask(task);
+
+
+        if(tile.isAnyEventTriggerable()){
+            this.eventTriggered = true;
+            Array<Task> eventTasks = tile.performEvents();
+            scheduleMultipleRenderTasks(eventTasks);
+        }
 
     }
 

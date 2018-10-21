@@ -213,8 +213,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
                 this.remainingPath.add(new float[]{bfr.getCenterX(row, col), bfr.getCenterY(row, col)});
             }
             this.remainingPath.add(new float[]{getCenterX(), getCenterY()});
-
-            //updateMoveTempoStep(0);
             this.state = AnimId.WALK;
 
         }

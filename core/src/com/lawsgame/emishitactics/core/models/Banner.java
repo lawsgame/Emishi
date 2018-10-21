@@ -7,6 +7,8 @@ import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Banner extends Observable  {
+
+
     private final Array<Sign> bannerSigns;
 
     public Banner() {

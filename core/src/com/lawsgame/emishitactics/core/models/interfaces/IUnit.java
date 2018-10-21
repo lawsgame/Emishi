@@ -15,7 +15,7 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
-public abstract class IUnit extends Observable {
+public abstract class IUnit extends Model {
 
     public abstract String getName(I18NBundle bundle);
 

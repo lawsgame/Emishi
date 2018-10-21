@@ -10,11 +10,9 @@ import com.lawsgame.emishitactics.core.models.Data.Environment;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.interfaces.Item;
-import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
 
@@ -31,7 +29,7 @@ import java.util.LinkedList;
  *
  */
 
-public class Battlefield extends Observable {
+public class Battlefield extends Model {
     private Tile[][] tiles;
     private IUnit[][] units;
     private Array<Area> deploymentAreas;
@@ -171,7 +169,7 @@ public class Battlefield extends Observable {
     }
 
     public boolean setTile(int r, int c, TileType type, boolean notifyObservers){
-        return setTile(r, c, Tile.get(type), notifyObservers);
+        return setTile(r, c, new Tile(type), notifyObservers);
     }
 
     public Tile getTile(int r, int c) {

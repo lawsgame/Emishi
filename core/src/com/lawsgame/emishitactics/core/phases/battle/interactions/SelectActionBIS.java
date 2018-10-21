@@ -42,12 +42,6 @@ public class SelectActionBIS extends BattleInteractionState {
 
     @Override
     public void init() {
-        Array<IUnit> playerArmy = bim.player.getArmy().getMobilizedUnits(true);
-        for(int i = 0; i < playerArmy.size; i++) {
-            int[] unitpos = bim.bfr.getModel().getUnitPos(playerArmy.get(i));
-            System.out.println(playerArmy.get(i).getName() + " coords = " + unitpos[0] + " " + unitpos[1]);
-        }
-        System.out.println("sltd coords = "+rowSltdUnit+" "+colSltdUnit);
         System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
         super.init();

@@ -124,7 +124,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         System.out.println("input : "+row+" "+col);
         //bim.moveCamera(row, col, true);
 
-        //MOVE UNIT
+        //WALK UNIT
 
         //int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
         //bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);

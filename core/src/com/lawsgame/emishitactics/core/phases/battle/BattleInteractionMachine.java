@@ -15,11 +15,14 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.MessageEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.trigger.SimpleTrigger;
+import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
@@ -30,8 +33,6 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.ShortUnitPane
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
-
-import java.util.Arrays;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
     public final Player player;
@@ -105,6 +106,20 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         showSUP = new ShowPanel(shortUnitPanel);
         hideSTP = new HidePanel(shortTilePanel);
         hideSUP = new HidePanel(shortUnitPanel);
+
+
+        //TEST
+        /*
+        Trigger trigger;
+        for(int r = 0; r < battlefield.getNbRows(); r++){
+            for(int c = 0; c < battlefield.getNbColumns(); c++){
+                trigger = new SimpleTrigger(true);
+                battlefield.getTile(r, c).add(trigger);
+                trigger.addEvent(new MessageEvent(bfr, scheduler, "     event triggerd at "+r+" "+c));
+            }
+        }
+        */
+
 
     }
 

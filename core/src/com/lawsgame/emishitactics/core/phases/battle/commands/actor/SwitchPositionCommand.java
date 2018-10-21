@@ -5,6 +5,7 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -45,7 +46,19 @@ public class SwitchPositionCommand extends ActorCommand {
         task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getTarget()), bfr.getModel(), new Notification.Walk(getTarget(), path)));
         scheduleRenderTask(task);
 
-        //scheduleRenderTask(new StandardTask(bfr.getModel(), bfr, new SwitchPosition(getInitiator(), getTarget(), SwitchPosition.Mode.WALK, bfr.getModel())));
+
+        Tile tile = bfr.getModel().getTile(rowActor, colActor);
+        if(tile.isAnyEventTriggerable()){
+            this.eventTriggered = true;
+            Array<AnimationScheduler.Task> eventTasks = tile.performEvents();
+            scheduleMultipleRenderTasks(eventTasks);
+        }
+        tile = bfr.getModel().getTile(rowTarget, colTarget);
+        if(tile.isAnyEventTriggerable()){
+            this.eventTriggered = true;
+            Array<AnimationScheduler.Task> eventTasks = tile.performEvents();
+            scheduleMultipleRenderTasks(eventTasks);
+        }
     }
 
     @Override

@@ -190,7 +190,7 @@ public abstract class ActorCommand extends BattleCommand{
 
     @Override
     public boolean isUndoable() {
-        return choice.isUndoable() && !initiator.isOutOfAction();
+        return choice.isUndoable() && !initiator.isOutOfAction() && !eventTriggered;
     }
 
     @Override

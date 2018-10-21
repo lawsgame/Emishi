@@ -1,6 +1,7 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands;
+package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 
 public abstract class Trigger {
@@ -14,12 +15,12 @@ public abstract class Trigger {
 
     public abstract boolean isTriggered();
 
-    public Array<Task> performEvent(boolean decoupled){
+    public Array<Task> performEvent(){
         Array<Task> tasks = new Array<Task>();
         if(isTriggered()){
             for(int i = 0; i < eventCommands.size; i++){
                 if(eventCommands.get(i).isApplicable()){
-                    eventCommands.get(i).setDecoupled(decoupled);
+                    eventCommands.get(i).setDecoupled(true);
                     eventCommands.get(i).apply();
                     tasks.addAll(eventCommands.get(i).confiscateTasks());
                 }
