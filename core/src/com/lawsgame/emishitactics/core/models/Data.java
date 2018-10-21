@@ -721,6 +721,10 @@ public class Data {
         public String getName(I18NBundle bundle) {
             return bundle.get(name());
         }
+
+        public static Orientation random() {
+            return values()[MathUtils.random(values().length)];
+        }
     }
 
     /**

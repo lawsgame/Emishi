@@ -11,9 +11,18 @@ import com.lawsgame.emishitactics.engine.timers.CountDown;
 import java.util.LinkedList;
 
 public class StandardTask extends Task {
-    protected String tag = "";
     protected Array<Thread> parallelThreads;
     protected boolean initiazed = false;
+    protected String tag = "";
+
+
+    public StandardTask(){
+
+        this.parallelThreads = new Array<Thread>();
+        this.initiazed = false;
+        this.tag = "";
+    }
+
 
     public StandardTask(Renderer renderer, Object dataBundle){
         this();
@@ -29,14 +38,14 @@ public class StandardTask extends Task {
         parallelThreads.add(rendererThread);
     }
 
-    public StandardTask(){
-        parallelThreads = new Array<Thread>();
-    }
-
     public StandardTask(SimpleCommand command, float delay){
         this();
         addThread(new  CommandThread(command, delay));
     }
+
+
+
+    // -------------- METHODS ----------------------
 
     public void update(float dt){
         for(int i = 0; i < parallelThreads.size; i++){
@@ -84,8 +93,8 @@ public class StandardTask extends Task {
     }
 
     /**
-     * convient method
-     * usefull to performEvent if adding that task to the queue is relevant.
+     * convenient method
+     * usefull to perform if adding that task to the queue is relevant.
      * @return
      */
     @Override
@@ -190,12 +199,14 @@ public class StandardTask extends Task {
 
     public static class RendererThread extends Thread {
         protected Renderer executer;
+        protected boolean bundlesSent;
         protected LinkedList<Observable> senders;
         protected LinkedList<Object> bundles;
         protected CountDown countDown;
 
 
         public RendererThread(Renderer executer, float delay){
+            this.bundlesSent = false;
             this.executer = executer;
             this.countDown = new CountDown(delay);
             this.bundles = new LinkedList<Object>();
@@ -223,7 +234,7 @@ public class StandardTask extends Task {
         }
 
         boolean isCompleted() {
-            return bundles.size() == 0 && !executer.isExecuting();
+            return bundlesSent && !executer.isExecuting();
         }
 
         @Override
@@ -243,8 +254,12 @@ public class StandardTask extends Task {
 
         void update(float dt) {
             countDown.update(dt);
-            if(countDown.isFinished() && !isEmpty() && !executer.isExecuting()){
-                senders.pop().notifyAllObservers(bundles.pop());
+            if(countDown.isFinished()){
+                countDown.reset();
+                bundlesSent = true;
+                while(senders.size() > 0) {
+                    senders.pop().notifyAllObservers(bundles.pop());
+                }
             }
         }
 

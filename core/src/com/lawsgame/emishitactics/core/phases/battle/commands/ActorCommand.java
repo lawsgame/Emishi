@@ -158,9 +158,11 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){
-        setInitiator(rowActor, colActor);
-        setTarget(rowTarget, colTarget);
-        return apply();
+        if(setInitiator(rowActor, colActor)) {
+            setTarget(rowTarget, colTarget);
+            return apply();
+        }
+        return false;
     }
 
     public final boolean apply(int rowActor, int colActor){
@@ -202,10 +204,16 @@ public abstract class ActorCommand extends BattleCommand{
 
     // called to checked initiator requirements
     public boolean isInitiatorValid(IUnit actor){
-        return actor != null
-                && !actor.isOutOfAction()
-                && choice.getCost() <= actor.getActionPoints()
-                && (choice.isActedBased() ? !actor.hasActed() : !actor.hasMoved() || free);
+        boolean valid = false;
+        if(actor != null && !actor.isOutOfAction()){
+            if(free){
+                valid = true;
+            }else if (choice.getCost() <= actor.getActionPoints() && (choice.isActedBased() ? !actor.hasActed() : !actor.hasMoved())){
+                valid = true;
+            }
+
+        }
+        return valid;
     }
 
     /**

@@ -526,7 +526,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getAppMoral() {
+    public int getAppMoral() {;
         return getAppBravery() + getChiefCharismaBonus();
     }
 
@@ -1099,7 +1099,13 @@ public class Unit extends IUnit{
 
     @Override
     public int getChiefCharismaBonus() {
-        return isMobilized() ? army.getWarchief(this).getAppCharisma() - Data.SQUAD_SIZE_EXCEEDANCE_CHA_MALUS * getArmy().getSquadExceedingCapacity(this) : 0;
+        int chiefCharisma = 0;
+        if(isMobilized()){
+            chiefCharisma = army.getWarchief(this).getAppCharisma() - Data.SQUAD_SIZE_EXCEEDANCE_CHA_MALUS * getArmy().getSquadExceedingCapacity(this);
+            if(chiefCharisma < 0 )
+                chiefCharisma = 0;
+        }
+        return chiefCharisma;
     }
 
     @Override

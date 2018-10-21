@@ -655,7 +655,7 @@ public class Army extends IArmy{
         int exceedance = 0;
         IUnit warchief = getWarchief(unit);
         if(warchief != null){
-            exceedance = warchief.getMaxSoldiersAs(warchief.isWarlord()) - getSquadSize(unit, false);
+            exceedance = getSquadSize(unit, false) - warchief.getMaxSoldiersAs(warchief.isWarlord());
         }
         return (exceedance > 0 ) ? exceedance : 0;
     }

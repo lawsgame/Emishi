@@ -12,7 +12,7 @@ public abstract class BattleCommand extends Observable implements Observer {
 
     protected final AnimationScheduler scheduler;
     private boolean decoupled;
-    private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is executing / completed AND usefull for decoupling view and model updates
+    private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is bundlesSent / completed AND usefull for decoupling view and model updates
     private boolean tasksScheduled;
 
 
