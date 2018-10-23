@@ -7,8 +7,6 @@ import com.badlogic.gdx.utils.I18NBundle;
 
 import java.util.Random;
 
-import static com.lawsgame.emishitactics.core.models.Data.BonusType.ATTACKMIGHT;
-
 public class Data {
 
 
@@ -36,6 +34,10 @@ public class Data {
     public static final float DEALT_DAMAGE_LN_RANDOM = 1.5f;
     public static final int WC_CHARISMA_BONUS_ATT_ACC = 3;
     public static final int SQUAD_SIZE_EXCEEDANCE_CHA_MALUS = 3;
+    public static final float[] BANNER_STRENGTH_BONUS_COST    = new float[]{1,     2, 3, 4};
+    public static final float[] BANNER_RANGE_BONUS_COST       = new float[]{1,     6};
+    public static final float[] BANNER_LOOTRATE_BONUS_COST    = new float[]{0.1f,  1, 2, 3, 4, 5};
+    public static final float[] BANNER_AP_REGEN_BONUS_COST    = new float[]{1,     2, 6};
 
     // RENDER parameters
         public static final float SPEED_TEMPO_WALK = 3f;  //buildingType/s
@@ -101,20 +103,30 @@ public class Data {
     }
 
     public enum SpriteSetId{
-        WALK_FLEE_SWITCHPOSITION,
-        LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED,
-        PUSHED_BACKSTABBED,
-        ATTACK,
-        SPECIAL_MOVE,
-        WOUNDED,
-        REST,
-        BANNER,
-        DODGE,
-        STEAL,
-        BUILD,
-        PUSH,
-        HEAL,
-        DIE
+        WALK_FLEE_SWITCHPOSITION(false),
+        LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED(false),
+        PUSHED_BACKSTABBED(false),
+        ATTACK(false),
+        SPECIAL_MOVE(false),
+        WOUNDED(false),
+        REST(false),
+        BANNER(false),
+        DODGE(false),
+        STEAL(false),
+        BUILD(false),
+        PUSH(false),
+        HEAL(true),
+        DIE(false);
+
+        private boolean rest0;
+
+        SpriteSetId(boolean rest0) {
+            this.rest0 = rest0;
+        }
+
+        public boolean isRest0() {
+            return rest0;
+        }
     }
 
     public enum AnimId {
@@ -577,15 +589,10 @@ public class Data {
      */
     public enum WeaponTemplate{
         FIST(           1, 1, 100, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
-
         SHORTSWORD(     3, 3, 90, 1, 1, 20, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
-
         LANCE(          3, 3, 95, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
-
         BROAD_AXE(      4, 5, 80, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
-
         CLUB(           4, 4, 85, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
-
         HUNTING_BOW(    3, 4, 75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
 
         private int damageMin;
@@ -755,53 +762,6 @@ public class Data {
         ALLY,
         ENEMY_0,
         ENEMY_1
-    }
-
-    public enum BonusType{
-        ATTACKACCURACY,
-        ATTACKMIGHT,
-        AVOIDANCE,
-        PIERCINGDEFENSE,
-        BLUNTDEFENSE,
-        EDGEDDEFENSE,
-        CHARGINGOARATE,
-        RANGE
-    }
-
-    public enum BannerSignTemplate {
-        WARRIOR(ATTACKMIGHT, 1 ,2, 20);
-
-        private BonusType bonusType;
-        private int amount;
-        private int maxSignByBanner;
-        private int dropFactor;
-
-        BannerSignTemplate(BonusType bonusType, int amount, int maxSignByBanner, int dropFactor) {
-            this.bonusType = bonusType;
-            this.amount = amount;
-            this.maxSignByBanner = maxSignByBanner;
-            this.dropFactor = dropFactor;
-        }
-
-        public BonusType getBonusType() {
-            return bonusType;
-        }
-
-        public int getAmount() {
-            return amount;
-        }
-
-        public int getMaxSignByBanner() {
-            return maxSignByBanner;
-        }
-
-        public int getDropFactor() {
-            return dropFactor;
-        }
-
-        public String getName(I18NBundle bundle){
-            return bundle.get(name());
-        }
     }
 
     public enum UnitTemplate {

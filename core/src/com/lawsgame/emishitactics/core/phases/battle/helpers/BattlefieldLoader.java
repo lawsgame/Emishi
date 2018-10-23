@@ -7,12 +7,20 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.models.Banner.Sign;
-import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.*;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.Affiliation;
+import com.lawsgame.emishitactics.core.models.Data.Behaviour;
+import com.lawsgame.emishitactics.core.models.Data.Environment;
+import com.lawsgame.emishitactics.core.models.Data.EquipmentTemplate;
+import com.lawsgame.emishitactics.core.models.Data.Orientation;
+import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
+import com.lawsgame.emishitactics.core.models.Data.WeaponTemplate;
+import com.lawsgame.emishitactics.core.models.Data.WeaponType;
+import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
@@ -279,13 +287,21 @@ public class BattlefieldLoader {
                 }
             }
 
-            if(attributeElt.get("id").equals("banner sign")) {
-                for (BannerSignTemplate value : BannerSignTemplate.values()) {
-                    if (value.name().equals(attributeElt.get("value"))) {
-                        unit.getBanner().addSign(new Sign(value, true, attributeElt.getBoolean("stealable")), false);
-                        break;
-                    }
-                }
+            if(attributeElt.get("id").equals("banner")) {
+                unit.getBanner().setMaxPoints(unit.getAppLeadership());
+                int bonusBanner = attributeElt.getInt("strength");
+                for(int i = 0; i < bonusBanner; i++)
+                    unit.getBanner().incrementStrength();
+                bonusBanner = attributeElt.getInt("range");
+                for(int i = 0; i < bonusBanner; i++)
+                    unit.getBanner().incrementRange();
+                bonusBanner = attributeElt.getInt("lootrate");
+                for(int i = 0; i < bonusBanner; i++)
+                    unit.getBanner().incrementLootRate();
+                bonusBanner = attributeElt.getInt("apregen");
+                for(int i = 0; i < bonusBanner; i++)
+                    unit.getBanner().incrementAPRegen();
+
             }
 
             if(attributeElt.get("id").equals("Orientation")) {

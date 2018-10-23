@@ -6,8 +6,8 @@
                 <Unit row = "14" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
                     <Attribute id= "right handed" value="true"/>
+                    <Attribute id= "banner" strength ="1" range="0" lootrate="0" apregen="0"/>
                     <Attribute id= "equipement" value ="WARRIOR" stealable="false"/>
-                    <Attribute id= "banner sign" value ="NONE"/>
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>

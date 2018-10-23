@@ -31,7 +31,7 @@ public class BuildCommand extends ActorCommand {
         scheduleRenderTask(new StandardTask(bfr, new Build(rowTarget, colTarget, buildingType, getInitiator())));
 
         // set outcome
-        outcome.expHolders.add(new ExperiencePointsHolder(getInitiator(), choice.getExperience()));
+        outcome.add(getInitiator(), choice.getExperience());
 
     }
 

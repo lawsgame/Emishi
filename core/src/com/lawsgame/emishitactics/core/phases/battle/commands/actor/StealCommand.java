@@ -52,8 +52,8 @@ public class StealCommand extends ActorCommand {
 
         // setTiles outoome
         if(stealSuccessful){
-            outcome.expHolders.add(new ExperiencePointsHolder(stealer, choice.getExperience()));
-            outcome.droppedItemHolders.add(new DroppedItemHolder(stoleItem, stealer.isMobilized() && stealer.getArmy().isPlayerControlled()));
+            outcome.add(stealer, choice.getExperience());
+            outcome.add(stoleItem, stealer.isMobilized() && stealer.getArmy().isPlayerControlled());
         }
 
     }

@@ -2,7 +2,9 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -24,6 +26,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeapon
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
+import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.LinkedList;
 
@@ -34,6 +37,9 @@ public class TestBIS extends BattleInteractionState implements Observer{
     IUnit sltdUnit;
     int index;
     boolean switchmode;
+
+    Array<Sprite> sprites;
+    Animation animation;
 
     LinkedList<ActorCommand> historic = new LinkedList<ActorCommand>();
     ActorCommand command = null;
@@ -46,7 +52,13 @@ public class TestBIS extends BattleInteractionState implements Observer{
         index = 1;
         switchmode = false;
 
-
+        sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.SpriteSetId.HEAL);
+        for(int i =0; i < sprites.size; i++){
+            sprites.get(i).setPosition(1, 1);
+            sprites.get(i).setSize(1, 2);
+        }
+        animation = new Animation(sprites.size, 0.3f, true, false, false);
+        animation.play();
 
     }
 
@@ -114,7 +126,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-
+        sprites.get(animation.getCurrentFrame()).draw(batch);
     }
 
     @Override
@@ -177,7 +189,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     @Override
     public void update60(float dt) {
-
+        animation.update(dt);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
             ActorCommand command = historic.peek();

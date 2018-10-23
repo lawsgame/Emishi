@@ -183,12 +183,12 @@ public class AttackCommand extends ActorCommand {
 
                 IUnit target = notifs.get(0).wounded;
                 experience = Formulas.getGainedExperience(receiver.getLevel(), target.getLevel(), !target.isOutOfAction());
-                outcome.expHolders.add(new ExperiencePointsHolder(receiver, experience));
+                outcome.add(receiver, experience);
                 lootRate = Formulas.getLootRate(rowReceiver, colReceiver, bfr.getModel());
                 dicesResult = Utils.getMean(1, 100);
                 if(dicesResult < lootRate){
                     droppedItem = target.getRandomlyDroppableItem();
-                    outcome.droppedItemHolders.add(new DroppedItemHolder(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled()));
+                    outcome.add(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled());
                 }
             } else if (notifs.size > 1){
 
@@ -209,7 +209,7 @@ public class AttackCommand extends ActorCommand {
                         lootRate = Formulas.getLootRate(rowReceiver, colReceiver, bfr.getModel());
                         if (Utils.getMean(1, 100) < lootRate) {
                             droppedItem = squad.get(i).getRandomlyDroppableItem();
-                            outcome.droppedItemHolders.add(new DroppedItemHolder(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled()));
+                            outcome.add(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled());
                         }
                     }
                 }
@@ -217,7 +217,7 @@ public class AttackCommand extends ActorCommand {
                 // add experience points
                 squad = receiver.getSquad(true);
                 for(int i = 0; i < squad.size; i++) {
-                    outcome.expHolders.add(new ExperiencePointsHolder(squad.get(i), experience));
+                    outcome.add(squad.get(i), experience);
                 }
 
             }

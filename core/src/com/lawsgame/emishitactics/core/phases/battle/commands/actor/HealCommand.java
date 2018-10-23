@@ -37,7 +37,7 @@ public class HealCommand extends ActorCommand {
         scheduleRenderTask(task);
 
         // setTiles outcome
-        outcome.expHolders.add(new ExperiencePointsHolder(getInitiator(), choice.getExperience()));
+        outcome.add(getInitiator(), choice.getExperience());
 
 
     }

@@ -68,7 +68,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         }else {
             while (!outcome.isHandled()) {
 
-                if(!outcome.isExperienceGainHandled()){
+                if(!outcome.isExpHandled()){
 
                     ActorCommand.ExperiencePointsHolder holder = outcome.expHolders.pop();
                     int[] receiverPos = bim.battlefield.getUnitPos(holder.receiver);
@@ -87,7 +87,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                         }
                         tasks.add(levelUpTask);
                     }
-                }else if(!outcome.isLootedItemsClaimingHandled()){
+                }else if(!outcome.isLootHandled()){
 
                    ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
                     HandleOutcomeTask lootTask = new HandleOutcomeTask(HOTType.LOOT);

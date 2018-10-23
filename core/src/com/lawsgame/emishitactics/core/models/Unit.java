@@ -345,7 +345,7 @@ public class Unit extends IUnit{
             this.level = upto;
             this.mobility += mob;
             this.charisma += cha;
-            this.leadership += ld;
+            this.setLeadership((int) (this.leadership + ld));
             this.hitPoints += hpt;
             this.strength += str;
             this.piercinfArmor += armorP;
@@ -401,7 +401,8 @@ public class Unit extends IUnit{
     @Override
     public void setHorsemanUponPromotion(boolean horseman) {
         this.horsemanUponPromotion = horseman;
-        if(isPromoted()) this.horseman = horseman;
+        if(isPromoted())
+            this.horseman = horseman;
     }
 
     @Override
@@ -737,14 +738,14 @@ public class Unit extends IUnit{
         for(int i = 0; i < equipments.size; i++){
             if(equipments.get(i).getTemplate().getAbility() == ability){
                 hasAbility = true;
-                continue;
+                break;
             }
         }
         if(!hasAbility){
             for(int i = 0; i < weapons.size; i++){
                 if(weapons.get(i).getTemplate().getAbility() == ability){
                     hasAbility = true;
-                    continue;
+                    break;
                 }
             }
         }
@@ -752,7 +753,7 @@ public class Unit extends IUnit{
             for(int i = 0; i < template.getNativeAbilities().length; i++){
                 if(template.getNativeAbilities()[i] == ability){
                     hasAbility = true;
-                    continue;
+                    break;
                 }
             }
         }
@@ -867,17 +868,10 @@ public class Unit extends IUnit{
     public Item getRandomlyDroppableItem() {
         Item droppedItem = null;
 
-        if(!weapons.contains(Weapon.FIST, true)|| equipments.size > 0 || (isStandardBearer() && banner.isDroppable())) {
+        if(!weapons.contains(Weapon.FIST, true)|| equipments.size > 0) {
             int dropRange = 0;
-            for (int i = 0; i < weapons.size; i++) {
-                dropRange += weapons.get(i).getDropRate();
-            }
-            for (int i = 0; i < equipments.size; i++) {
-                dropRange += equipments.get(i).getDropRate();
-            }
-            for(int i = 0; i < banner.getBannerSigns().size; i++){
-                dropRange += banner.getBannerSigns().get(i).getDropRate();
-            }
+            for (int i = 0; i < weapons.size; i++) { dropRange += weapons.get(i).getDropRate(); }
+            for (int i = 0; i < equipments.size; i++) { dropRange += equipments.get(i).getDropRate(); }
 
             int pick = 1 + Data.rand(dropRange);
             dropRange = 0;
@@ -885,7 +879,7 @@ public class Unit extends IUnit{
                 dropRange += weapons.get(i).getDropRate();
                 if(pick <= dropRange) {
                     droppedItem = removeWeapon(i);
-                    continue;
+                    break;
                 }
             }
             if(droppedItem == null) {
@@ -893,16 +887,7 @@ public class Unit extends IUnit{
                     dropRange += equipments.get(i).getDropRate();
                     if(pick <= dropRange) {
                         droppedItem = removeEquipment(i);
-                        continue;
-                    }
-                }
-            }
-            if(droppedItem == null) {
-                for (int i = 0; i < banner.getBannerSigns().size; i++) {
-                    dropRange += banner.getBannerSigns().get(i).getDropRate();
-                    if(pick <= dropRange) {
-                        droppedItem = banner.removeSign(i, false);
-                        continue;
+                        break;
                     }
                 }
             }
@@ -921,11 +906,6 @@ public class Unit extends IUnit{
         for(int i =0; i < equipments.size; i++){
             if(equipments.get(i).isStealable()){
                 stealableItems.add(equipments.get(i));
-            }
-        }
-        for(int i =0; i < banner.getBannerSigns().size; i++){
-            if(banner.getBannerSigns().get(i).isStealable()){
-                stealableItems.add(banner.getBannerSigns().get(i));
             }
         }
         return stealableItems;
@@ -1022,7 +1002,7 @@ public class Unit extends IUnit{
 
     @Override
     public int getMaxSoldiersAs(boolean warlord) {
-        int maxSoldiers = 0;
+        int maxSoldiers;
         if(warlord){
             maxSoldiers = 2 + (this.leadership + 2) / 5;
             if(maxSoldiers > Data.MAX_UNITS_UNDER_WARLORD){
@@ -1082,7 +1062,7 @@ public class Unit extends IUnit{
 
     @Override
     public boolean sameArmyAs(IUnit unit) {
-        return (army != null) ? this.army == unit.getArmy() : false;
+        return army != null && unit.getArmy() != null && this.army == unit.getArmy();
     }
 
     @Override

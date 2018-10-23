@@ -133,6 +133,7 @@ public class GenUnitST {
         }else {
 
             spriteset = new Array<Sprite>();
+            if(id.isRest0()) spriteset.add(getSpriteSet(playerControlled, shield, horseman, template, type, or, done, SpriteSetId.REST).get(0));
             Sprite sprite;
             float spriteWidth;
             for (int i = 0; i < tra.length; i++) {

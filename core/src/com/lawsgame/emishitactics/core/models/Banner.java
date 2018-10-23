@@ -1,139 +1,148 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.I18NBundle;
-import com.lawsgame.emishitactics.core.models.Data.BannerSignTemplate;
-import com.lawsgame.emishitactics.core.models.interfaces.Item;
-import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
-public class Banner extends Observable  {
+public class Banner extends Model  {
 
 
-    private final Array<Sign> bannerSigns;
+    private int maxpoints;
+    private int usedpoints;
+    private int strength;
+    private int range;
+    private int lootrate;
+    private int apregen;
 
-    public Banner() {
-        this.bannerSigns = new Array<Sign>();
+    public Banner(){
+        this.maxpoints = 0;
+        this.usedpoints = 0;
+        this.strength = 0;
+        this.range = 0;
+        this.lootrate = 0;
+        this.apregen = 0;
     }
 
-    public  void addSign(Sign sign, boolean notifyObservers){
-        if(hasSign(sign.getTemplate()) < sign.getTemplate().getMaxSignByBanner()) {
-            if(notifyObservers)
-                notifyAllObservers(null);
-        }
+    public void incrementMaxPoints(){
+        this.maxpoints++;
     }
 
-    public Sign removeSign(int index, boolean notifyObservers){
-        Sign sign = null;
-        if(0 <= index && index < bannerSigns.size) {
-            sign = bannerSigns.removeIndex(index);
-            if (notifyObservers)
-                notifyAllObservers(null);
-        }
-        return sign;
+    public void setMaxPoints(int leadership){
+        this.maxpoints = leadership;
+        this.usedpoints = 0;
+        this.strength = 0;
+        this.range = 0;
+        this.lootrate = 0;
+        this.apregen = 0;
     }
 
-    public void switchSignPosition(int index1, int index2, boolean notifyObservers){
-        if(0 <= index1 && index1 < bannerSigns.size && 0 <= index2 && index2 < bannerSigns.size) {
-            bannerSigns.swap(index1, index2);
-            if (notifyObservers)
-                notifyAllObservers(null);
-        }
+    public int getMaxPoints(){
+        return maxpoints;
     }
 
-    private int hasSign(BannerSignTemplate sign){
-        int numberSigns = 0;
-        for(int i = 0; i < bannerSigns.size; i++){
-            if(bannerSigns.get(i).getTemplate() == sign)
-                numberSigns++;
-        }
-        return numberSigns;
+    public int getUsedPoints(){
+        return usedpoints;
     }
 
-    public Array<Sign> getBannerSigns() {
-        return bannerSigns;
-    }
-
-    public int getBonus(Data.BonusType type){
-        int bonus = 0;
-        for(int i = 0; i < bannerSigns.size; i++){
-            if (bannerSigns.get(i).getTemplate().getBonusType() == type){
-                bonus += bannerSigns.get(i).getTemplate().getAmount();
-            }
-        }
-        return bonus;
-    }
-
-    // --------------------- GETTERS & SETTERS -------------------------------
-
-
-    public boolean isEmpty() {
-        return bannerSigns.size == 0;
-    }
-
-    public boolean isDroppable() {
-        boolean droppable = false;
-        for(int i = 0; i <bannerSigns.size; i++){
-            if(bannerSigns.get(i).isDroppable()){
-                droppable = true;
-            }
-        }
-        return droppable;
-    }
-
-    public boolean isStealable(){
-        boolean stealable = false;
-        for(int i = 0; i <bannerSigns.size; i++){
-            if(bannerSigns.get(i).isStealable()){
-                stealable = true;
-            }
-        }
-        return stealable;
+    public int getRemainingPoints(){
+        return getMaxPoints() - getUsedPoints();
     }
 
 
 
-    public static class Sign implements Item {
-        private Data.BannerSignTemplate template;
-        private boolean droppable;
-        private boolean stealable;
+    // ------------- SETTERS && GETTERS --------------------
 
-        public Sign(Data.BannerSignTemplate template, boolean droppable, boolean stealable) {
-            this.template = template;
-            this.droppable = droppable;
-            this.stealable = stealable;
+    public boolean decrementStrength(){
+        if(0 < strength){
+            this.usedpoints -= Data.BANNER_STRENGTH_BONUS_COST[strength];
+            this.strength--;
+            return true;
         }
+        return false;
+    }
 
-        @Override
-        public String getName(I18NBundle bundle) {
-            return template.getName(bundle);
+    public boolean decrementRange(){
+        if(0 < range){
+            this.usedpoints -= Data.BANNER_RANGE_BONUS_COST[range];
+            this.range--;
+            return true;
         }
+        return false;
+    }
 
-        @Override
-        public boolean isStealable() {
-            return stealable;
+    public boolean decrementLootrate(){
+        if(0 < lootrate){
+            this.usedpoints -= Data.BANNER_LOOTRATE_BONUS_COST[lootrate];
+            this.lootrate--;
+            return true;
         }
+        return false;
+    }
 
-        @Override
-        public boolean isDroppable() {
-            return droppable;
+    public boolean decrementAPRegen(){
+        if(0 < apregen){
+            this.usedpoints -= Data.BANNER_AP_REGEN_BONUS_COST[apregen];
+            this.apregen--;
+            return true;
         }
+        return false;
+    }
 
-        public void setDroppable(boolean droppable) {
-            this.droppable = droppable;
+    public boolean incrementStrength(){
+        boolean notmaxed = strength <  Data.BANNER_STRENGTH_BONUS_COST.length - 1;
+        boolean enoughPoints =  Data.BANNER_STRENGTH_BONUS_COST[strength + 1] <= getRemainingPoints();
+        if(notmaxed && enoughPoints){
+            this.usedpoints +=  Data.BANNER_STRENGTH_BONUS_COST[strength + 1];
+            this.strength++;
+            return true;
         }
+        return false;
+    }
+    public boolean incrementRange(){
+        boolean notmaxed = range <  Data.BANNER_RANGE_BONUS_COST.length - 1;
+        boolean enoughPoints =  Data.BANNER_RANGE_BONUS_COST[range + 1] <= getRemainingPoints();
+        if(notmaxed && enoughPoints){
+            this.usedpoints +=  Data.BANNER_RANGE_BONUS_COST[range + 1];
+            this.range++;
+            return true;
+        }
+        return false;
+    }
+    public boolean incrementLootRate(){
+        boolean notmaxed = lootrate <  Data.BANNER_LOOTRATE_BONUS_COST.length - 1;
+        boolean enoughPoints =  Data.BANNER_LOOTRATE_BONUS_COST[lootrate + 1] <= getRemainingPoints();
+        if(notmaxed && enoughPoints){
+            this.usedpoints +=  Data.BANNER_LOOTRATE_BONUS_COST[lootrate + 1];
+            this.lootrate++;
+            return true;
+        }
+        return false;
+    }
+    public boolean incrementAPRegen(){
+        boolean notmaxed = apregen <  Data.BANNER_AP_REGEN_BONUS_COST.length - 1;
+        boolean enoughPoints =  Data.BANNER_AP_REGEN_BONUS_COST[apregen + 1] <= getRemainingPoints();
+        if(notmaxed && enoughPoints){
+            this.usedpoints +=  Data.BANNER_AP_REGEN_BONUS_COST[apregen + 1];
+            this.apregen++;
+            return true;
+        }
+        return false;
+    }
 
-        public void setStealable(boolean stealable) {
-            this.stealable = stealable;
-        }
 
-        @Override
-        public int getDropRate() {
-            return template.getDropFactor();
-        }
 
-        public Data.BannerSignTemplate getTemplate() {
-            return template;
-        }
+    public float getStrength() {
+        return strength * Data.BANNER_STRENGTH_BONUS_COST[0];
+    }
+
+    public float getRange() {
+        return range * Data.BANNER_RANGE_BONUS_COST[0];
+    }
+
+    public float getLootrate() {
+        return lootrate * Data.BANNER_LOOTRATE_BONUS_COST[0];
+    }
+
+    public float getAPRegeneration() {
+        return apregen * Data.BANNER_AP_REGEN_BONUS_COST[1];
     }
 
 }

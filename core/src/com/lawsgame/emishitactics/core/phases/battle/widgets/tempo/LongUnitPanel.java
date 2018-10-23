@@ -67,12 +67,17 @@ public class LongUnitPanel extends UnitPanel {
             IArmy army = unit.getArmy();
             builder.append("\n\n    ARMY\n");
             builder.append("\nWarlord : " + army.getWarlord().getName());
+            builder.append("\n  > war chiefs: "+army.getNbOfSquads()+"/"+army.getWarlord().getMaxWarChiefs());
             builder.append("\nWar chief : " + army.getWarchief(unit).getName());
+            builder.append("\n  > squad members: "+army.getSquad(unit, true).size+"/"+unit.getWarchief().getMaxSoldiersAs(unit.getWarchief().isWarlord()));
             Banner banner = army.getSquadBanner(unit, false);
             builder.append("\nBanner");
-            for(int i = 0; i < banner.getBannerSigns().size; i++){
-                builder.append("\n  sign :"+banner.getBannerSigns().get(i).getName(bundle));
-            }
+            builder.append("\n  | points   :"+banner.getRemainingPoints()+"/"+banner.getMaxPoints());
+            builder.append("\n  | strength :"+banner.getStrength());
+            builder.append("\n  | range    :"+banner.getRange());
+            builder.append("\n  | loot     :"+banner.getLootrate());
+            builder.append("\n  | AP regen :"+banner.getAPRegeneration());
+
 
         }
         mainDescription = builder.toString();

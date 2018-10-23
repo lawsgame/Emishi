@@ -86,7 +86,6 @@ public class CharaST {
         populate(promoted, template, type, east, id, false, spriteSet);
     }
 
-    boolean once = true;
     public Array<Sprite> getSpriteSet(boolean promoted, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.SpriteSetId id){
 
         Array<Sprite> spriteset;
@@ -101,6 +100,7 @@ public class CharaST {
             spriteset = getSpriteSet(promoted, or, done, id);
         }else {
             spriteset = new Array<Sprite>();
+            if(id.isRest0()) spriteset.add(getSpriteSet(promoted, template, type, or, done, Data.SpriteSetId.REST).get(0));
             Sprite sprite;
             float spriteWidth;
             for (int i = 0; i < tra.length; i++) {

@@ -531,11 +531,26 @@ public static class Outcome {
 
         }
 
-        public boolean isExperienceGainHandled(){
+        public void add(IUnit receiver, int experience){
+            if(experience <= 100){
+                expHolders.add(new ExperiencePointsHolder(receiver, experience));
+            }
+        }
+
+        public void add(Item droppedItem, boolean playerOwned){
+            droppedItemHolders.add(new DroppedItemHolder(droppedItem, playerOwned));
+        }
+
+        public void merge(Outcome outcome){
+            expHolders.addAll(outcome.expHolders);
+            droppedItemHolders.addAll(outcome.droppedItemHolders);
+        }
+
+        public boolean isExpHandled(){
             return expHolders.size == 0;
         }
 
-        public boolean isLootedItemsClaimingHandled(){ return droppedItemHolders.size == 0; }
+        public boolean isLootHandled(){ return droppedItemHolders.size == 0; }
 
         public boolean isHandled(){
             return expHolders.size == 0 && droppedItemHolders.size == 0;
@@ -554,7 +569,8 @@ public static class Outcome {
             for (int i = 0; i < expHolders.size; i++) {
                 for (int j = i + 1; j < expHolders.size; j++) {
                     if (expHolders.get(i).receiver == expHolders.get(j).receiver) {
-                        expHolders.get(i).experience += expHolders.get(j).experience;
+                        if(expHolders.get(i).experience < expHolders.get(j).experience)
+                            expHolders.get(i).experience = expHolders.get(j).experience;
                         expHolders.removeIndex(j);
                         j--;
                     }

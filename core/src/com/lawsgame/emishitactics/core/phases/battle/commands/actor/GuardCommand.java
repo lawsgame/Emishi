@@ -56,7 +56,7 @@ public class GuardCommand extends SelfInflitedCommand {
 
 
         //outcome
-        outcome.expHolders.add(new ExperiencePointsHolder(getInitiator(), choice.getExperience()));
+        outcome.add(getInitiator(), choice.getExperience());
     }
 
     @Override
