@@ -25,7 +25,8 @@ public class PassiveAI extends AI {
         CommandBundle bundle = new CommandBundle();
         if(actorPos != null) {
             EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory);
-            if(endUnitTurnCommand.setInitiator(actorPos[0], actorPos[1])){
+            endUnitTurnCommand.setInitiator(actorPos[0], actorPos[1]);
+            if(endUnitTurnCommand.isInitiatorValid()){
                 if(endUnitTurnCommand.isTargetValid()){
                     endUnitTurnCommand.setDecoupled(true);
                     endUnitTurnCommand.apply();

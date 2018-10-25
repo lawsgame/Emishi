@@ -11,9 +11,12 @@ import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
+import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 
 
 import java.util.LinkedList;
+import java.util.Observable;
 
 
 /*
@@ -83,6 +86,66 @@ public class Battlefield extends Model {
         }
         return 0;
     }
+
+    // --------------- EVENT HANDLING --------------------------------------
+
+    public boolean isAnyEventTriggerable(int row, int col, Object data){
+        boolean any = false;
+        if(isTileExisted(row, col)) {
+            any = tiles[row][col].isAnyEventTriggerable(data) || isAnyEventTriggerable(data);
+            if (!any) {
+                for (int i = 0; i < unitAreas.size; i++) {
+                    if (unitAreas.get(i).contains(row, col) && unitAreas.get(i).isAnyEventTriggerable(data)) {
+                        any = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return any;
+    }
+
+    /**
+     * event ordering:
+     * - tile
+     * - area
+     * - bf
+     *
+     * @param row
+     * @param col
+     * @param data
+     * @return
+     */
+    public Array<Task> performEvents(int row, int col, Object data){
+        Array<Task> tasks = new Array<Task>();
+        if(isTileExisted(row, col)){
+            tasks.addAll(tiles[row][col].performEvents(data));
+            for(int i = 0; i < unitAreas.size; i++){
+                tasks.addAll(unitAreas.get(i).performEvents(data));
+            }
+            tasks.addAll(performEvents(data));
+        }
+        return tasks;
+    }
+
+    public void removeEventTrigger(Trigger trigger){
+        this.remove(trigger);
+        for(int r = 0; r < tiles.length; r++){
+            for(int c = 0; c < tiles[0].length; c++){
+                if(isTileExisted(r, c)) {
+                    tiles[r][c].remove(trigger);
+                    if(isTileOccupied(r, c)){
+                        units[r][c].remove(trigger);
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < unitAreas.size; i++){
+            unitAreas.get(i).remove(trigger);
+        }
+
+    }
+
 
     //----------------- ARMY TURN MANAGEMENT --------------------------------
 
@@ -273,7 +336,7 @@ public class Battlefield extends Model {
         return false;
     }
 
-    public Array<IUnit> getAvailableGuardians(int row, int col, Affiliation alleageance){
+    public Array<IUnit> getAvailableGuardian(int row, int col, Affiliation alleageance){
         Array<IUnit> guardians =  new Array<IUnit>();
         for (int k = 0; k < unitAreas.size; k++) {
             if (unitAreas.get(k).getType() == AreaType.GUARD_AREA
@@ -524,7 +587,9 @@ public class Battlefield extends Model {
 
 
     public IUnit getUnit(int row, int col){
-        return this.units[row][col];
+        if(checkIndexes(row, col))
+            return this.units[row][col];
+        return null;
     }
 
     public Array<IUnit> getStillActiveUnits(int armyId) {
@@ -621,6 +686,22 @@ public class Battlefield extends Model {
         }
         return null;
     }
+
+    public Array<IUnit> findUnit(Affiliation a) {
+        Array<IUnit> units = new Array<IUnit>();
+        for(int r = getNbRows()-1; r > -1 ; r--){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileOccupied(r, c)) {
+                    IUnit unit = getUnit(r, c);
+                    if(unit.isMobilized() && unit.getArmy().getAffiliation() == a) {
+                        units.add(unit);
+                    }
+                }
+            }
+        }
+        return units;
+    }
+
 
     /**
      *

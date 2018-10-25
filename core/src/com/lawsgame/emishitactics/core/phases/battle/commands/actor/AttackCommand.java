@@ -166,10 +166,12 @@ public class AttackCommand extends ActorCommand {
     protected IUnit setDefender(int rowTarget, int colTarget){
         IUnit defender = bfr.getModel().getUnit(rowTarget, colTarget);
         if(bfr.getModel().isTileGuarded(rowTarget, colTarget, defender.getArmy().getAffiliation())){
-            defender = bfr.getModel().getAvailableGuardians(rowTarget, colTarget, defender.getArmy().getAffiliation()).random();
+            defender = bfr.getModel().getAvailableGuardian(rowTarget, colTarget, defender.getArmy().getAffiliation()).random();
         }
         return defender;
     }
+
+
 
     protected void addOutcomeData(int rowReceiver, int colReceiver, Array<ApplyDamage> notifs){
         IUnit receiver =  bfr.getModel().getUnit(rowReceiver, colReceiver);
@@ -178,13 +180,14 @@ public class AttackCommand extends ActorCommand {
         int lootRate;
         int dicesResult;
         Item droppedItem;
-        if(!receiver.isOutOfAction()) {
+        if(receiver != null) {
+
             if (notifs.size == 1 && notifs.get(0).isRelevant()) {
 
                 IUnit target = notifs.get(0).wounded;
                 experience = Formulas.getGainedExperience(receiver.getLevel(), target.getLevel(), !target.isOutOfAction());
                 outcome.add(receiver, experience);
-                lootRate = Formulas.getLootRate(rowReceiver, colReceiver, bfr.getModel());
+                lootRate = Formulas.getLootRate(receiver);
                 dicesResult = Utils.getMean(1, 100);
                 if(dicesResult < lootRate){
                     droppedItem = target.getRandomlyDroppableItem();
@@ -192,47 +195,10 @@ public class AttackCommand extends ActorCommand {
                 }
             } else if (notifs.size > 1){
 
-                //get all wounded opponents
-                Array<IUnit> squad = new Array<IUnit>();
-                for(int i = 0; i < notifs.size; i++){
-                    if(notifs.get(i).isRelevant())
-                        squad.add(notifs.get(i).wounded);
-                }
-
-                // calculate the experience points obtained
-                experience = Formulas.getGainedExperienceFoeEachSquadMember(receiver, squad);
-
-                // fetch dropped items
-                for(int i = 0; i < squad.size; i++) {
-                    if(squad.get(i).isOutOfAction()) {
-
-                        lootRate = Formulas.getLootRate(rowReceiver, colReceiver, bfr.getModel());
-                        if (Utils.getMean(1, 100) < lootRate) {
-                            droppedItem = squad.get(i).getRandomlyDroppableItem();
-                            outcome.add(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled());
-                        }
-                    }
-                }
-
-                // add experience points
-                squad = receiver.getSquad(true);
-                for(int i = 0; i < squad.size; i++) {
-                    outcome.add(squad.get(i), experience);
-                }
+                // to be removed
 
             }
         }
-
-
-    }
-
-    protected void removeOutOfActionUnits(){
-        Array<IUnit> OOAUnits = bfr.getModel().getOOAUnits();
-        bfr.getModel().removeOOAUnits(false);
-        StandardTask removeOOAUnitTask = new StandardTask();
-        for(int i = 0; i < OOAUnits.size; i++)
-            removeOOAUnitTask.addThread(new RendererThread(bfr, OOAUnits.get(i)));
-        scheduleRenderTask(removeOOAUnitTask);
     }
 
     @Override
@@ -248,6 +214,11 @@ public class AttackCommand extends ActorCommand {
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
         return getFoesAtRange(row, col, actor, false);
+    }
+
+    @Override
+    public Array<int[]> getTargetsFromImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0, IUnit actor) {
+        return getTargetedFoes(rowActor0, colActor0, rowTarget0,colTarget0, actor, false);
     }
 
     // -------------------- COMODITY BATTLE PANEL METHODS ------------------
@@ -280,9 +251,9 @@ public class AttackCommand extends ActorCommand {
     public int getLootRate(boolean retaliation){
         int lootRate = 0;
         if(!retaliation){
-            lootRate = Formulas.getLootRate(rowActor, colActor, bfr.getModel());
+            lootRate = Formulas.getLootRate(getInitiator());
         }else if(retaliation && isTargetValid(rowTarget, colTarget, rowActor, colActor)){
-            lootRate = Formulas.getLootRate(rowTarget, colTarget, bfr.getModel());
+            lootRate = Formulas.getLootRate(getTargetDefender());
         }
         return lootRate;
     }

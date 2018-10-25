@@ -66,33 +66,43 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                 proceed();
             }
         }else {
+            int[] expLvls;
+            int[] receiverPos;
+            int experience;
             while (!outcome.isHandled()) {
 
                 if(!outcome.isExpHandled()){
 
-                    ActorCommand.ExperiencePointsHolder holder = outcome.expHolders.pop();
-                    int[] receiverPos = bim.battlefield.getUnitPos(holder.receiver);
 
-                    HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
-                    experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
-                    experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, holder.experience), 0f));
-                    tasks.add(experienceTask);
+                    ActorCommand.ExperiencePointsHolder holder = outcome.expHolders.peek();
+                    if(holder.hasNext()){
+                        expLvls = holder.next();
+                        receiverPos = bim.battlefield.getUnitPos(holder.receiver);
+                        experience = expLvls[expLvls.length - 1];
 
-                    if(holder.isReceiverLevelup()){
-                        // of the unit has leveled up
-                        HandleOutcomeTask levelUpTask = new HandleOutcomeTask(HOTType.LEVELUP);
-                        levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
-                        if (holder.receiver.isMobilized() || holder.receiver.getArmy().isPlayerControlled()) {
-                            levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(holder.receiver, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel, holder.getStatGained()), 0f));
+                        HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
+                        experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
+                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, experience), 0f));
+                        tasks.add(experienceTask);
+
+                        if(expLvls.length > 1){
+                            // of the unit has leveled up
+                            HandleOutcomeTask levelUpTask = new HandleOutcomeTask(HOTType.LEVELUP);
+                            levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
+                            if (holder.receiver.isMobilized() || holder.receiver.getArmy().isPlayerControlled()) {
+                                levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(holder.receiver, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel, expLvls), 0f));
+                            }
+                            tasks.add(levelUpTask);
                         }
-                        tasks.add(levelUpTask);
+                    }else{
+                        outcome.expHolders.pop();
                     }
-                }else if(!outcome.isLootHandled()){
 
-                   ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
+                }else {
+                    ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
                     HandleOutcomeTask lootTask = new HandleOutcomeTask(HOTType.LOOT);
                     lootTask.addThread(new StandardTask.CommandThread(new DisplayLootPanel(holder.droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f));
-                   tasks.offer(lootTask);
+                    tasks.offer(lootTask);
                 }
             }
         }

@@ -119,8 +119,8 @@ public class SelectActionBIS extends BattleInteractionState {
                             Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(sltdUnit, choice, true);
 
                             if(flavors.size == 1){
-
-                                if(flavors.get(0).setInitiator(bis.rowSltdUnit, bis.colSltdUnit)) {
+                                flavors.get(0).setInitiator(bis.rowSltdUnit, bis.colSltdUnit);
+                                if(flavors.get(0).isInitiatorValid()) {
                                     bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, flavors.get(0)));
                                 }
                             }else if(flavors.size > 1){
@@ -171,7 +171,8 @@ public class SelectActionBIS extends BattleInteractionState {
                 for (int i = 0; i < flavors.size; i++) {
 
                     final ActorCommand actorCommand = flavors.get(i);
-                    if(actorCommand.setInitiator(bis.rowSltdUnit, bis.colSltdUnit)) {
+                    actorCommand.setInitiator(bis.rowSltdUnit, bis.colSltdUnit);
+                    if(actorCommand.isInitiatorValid()) {
                         TextButton button = new TextButton(actorCommand.getName(bis.bim.mainI18nBundle), style);
                         button.addListener(new ChangeListener() {
                             @Override

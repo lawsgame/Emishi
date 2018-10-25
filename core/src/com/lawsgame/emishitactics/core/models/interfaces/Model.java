@@ -16,20 +16,20 @@ public abstract class Model extends Observable{
     }
     public void remove(Trigger trigger) { triggers.removeValue(trigger, true);}
 
-    public boolean isAnyEventTriggerable(){
+    public boolean isAnyEventTriggerable(Object data){
         for(int i =0; i < triggers.size; i++){
-            if(triggers.get(i).isTriggered()){
+            if(triggers.get(i).isTriggered(data)){
                 return true;
             }
         }
         return false;
     }
 
-    public Array<Task> performEvents(){
+    public Array<Task> performEvents(Object data){
         Array<Task> tasks = new Array<Task>();
         for(int i = 0; i < triggers.size; i++){
-            if(triggers.get(i).isTriggered()) {
-                tasks.addAll(triggers.get(i).performEvent());
+            if(triggers.get(i).isTriggered(data)) {
+                tasks.addAll(triggers.get(i).performEvent(data));
                 if (triggers.get(i).isEmpty()) {
                     triggers.removeIndex(i);
                     i--;

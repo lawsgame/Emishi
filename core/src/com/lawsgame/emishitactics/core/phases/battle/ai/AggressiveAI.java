@@ -29,7 +29,8 @@ public class AggressiveAI extends PassiveAI {
 
             int[] attackTarget;
             Array<int[]> attackTargetsAtRange;
-            if(attackCommand.setInitiator(actorPos[0], actorPos[1])) {
+            attackCommand.setInitiator(actorPos[0], actorPos[1]);
+            if(attackCommand.isInitiatorValid()) {
                 attackTargetsAtRange = attackCommand.getTargetsAtRange();
                 if (attackTargetsAtRange.size > 0) {
                     attackTarget = attackTargetsAtRange.random();
@@ -40,7 +41,8 @@ public class AggressiveAI extends PassiveAI {
             if(!attackPerformed){
                 int[] moveTarget;
                 Array<int[]> moveTargetsAtRange;
-                if(walkCommand.setInitiator(actorPos[0], actorPos[1])){
+                walkCommand.setInitiator(actorPos[0], actorPos[1]);
+                if(walkCommand.isInitiatorValid()){
 
                     moveTargetsAtRange = walkCommand.getTargetsAtRange();
                     for(int i = 0; i < moveTargetsAtRange.size ; i++){
@@ -64,7 +66,8 @@ public class AggressiveAI extends PassiveAI {
                 }
             }
 
-            if(endUnitTurnCommand.setInitiator(rowEndTile, colEndTile)){
+            endUnitTurnCommand.setInitiator(rowEndTile, colEndTile);
+            if(endUnitTurnCommand.isInitiatorValid()){
                 applyAndStore(endUnitTurnCommand, bundle);
             }
 

@@ -1,8 +1,10 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -27,6 +29,7 @@ public abstract class BattleCommand extends Observable implements Observer {
     public boolean apply() {
         if(isApplicable()) {
             execute();
+            removeOutOfActionUnits();
             return true;
         }
         return false;
@@ -102,6 +105,15 @@ public abstract class BattleCommand extends Observable implements Observer {
                 tasksScheduled = false;
             }
         }
+    }
+
+    protected void removeOutOfActionUnits(){
+        Array<IUnit> OOAUnits = bfr.getModel().getOOAUnits();
+        bfr.getModel().removeOOAUnits(false);
+        StandardTask removeOOAUnitTask = new StandardTask();
+        for(int i = 0; i < OOAUnits.size; i++)
+            removeOOAUnitTask.addThread(new StandardTask.RendererThread(bfr, OOAUnits.get(i)));
+        scheduleRenderTask(removeOOAUnitTask);
     }
 
     public boolean isDecoupled() {

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -12,17 +13,9 @@ import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PushCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -35,22 +28,23 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     private Army army;
     IUnit sltdUnit;
-    int index;
-    boolean switchmode;
 
     Array<Sprite> sprites;
     Animation animation;
 
     LinkedList<ActorCommand> historic = new LinkedList<ActorCommand>();
-    ActorCommand command = null;
+
+    ActorCommand customedCommand = null;
+    Area ccActionArea;
+    Area ccImpactArea;
+    Area ccTargets;
+
 
     public TestBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true, true, false);
         setArmy();
 
         sltdUnit = army.getWarlord();
-        index = 1;
-        switchmode = false;
 
         sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.SpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
@@ -60,6 +54,25 @@ public class TestBIS extends BattleInteractionState implements Observer{
         animation = new Animation(sprites.size, 0.3f, true, false, false);
         animation.play();
 
+
+        // TEST CUSTOMED COMMAND
+
+        //customedCommand = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand = new HitCommand(bim.bfr, Data.ActionChoice.ATTACK, bim.scheduler, bim.player.getInventory(), 1, 50);
+        customedCommand.setFree(true);
+        ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
+        ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
+        ccTargets = new Area(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA);
+        bim.bfr.addAreaRenderer(ccImpactArea);
+        bim.bfr.addAreaRenderer(ccActionArea);
+        bim.bfr.addAreaRenderer(ccTargets);
+
+        IUnit randomFoe = bim.battlefield.getUnit(13,8);//bim.bfr.getModel().findUnit(Data.Affiliation.ENEMY_0).random();
+        randomFoe.addNativeAbility(Data.Ability.GUARD);
+        int[] randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
+        GuardCommand guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        guardCommand.setFree(true);
+        guardCommand.apply(randomFoePos[0], randomFoePos[1]);
     }
 
     private void setArmy(){
@@ -126,25 +139,50 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        sprites.get(animation.getCurrentFrame()).draw(batch);
+        //sprites.get(animation.getCurrentFrame()).draw(batch);
     }
 
     @Override
     public boolean handleTouchInput(int row, int col) {
-        // command test
 
         System.out.println("input : "+row+" "+col);
+        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
         //bim.moveCamera(row, col, true);
 
         //WALK UNIT
 
-        //int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
         //bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
 
 
+        // TEST CUSTOMED COMMAND
+
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
+            if(bim.battlefield.isTileOccupied(row, col)){
+                sltdUnit = bim.battlefield.getUnit(row, col);
+            }else{
+                bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
+            }
+        }else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
+            if(!customedCommand.apply(actorPos[0], actorPos[1], row, col)){
+                System.out.println("command failed to be applied");
+                System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
+                System.out.println("    target ?    : "+customedCommand.isTargetValid());
+            }
+        }else{
+            customedCommand.setInitiator(actorPos[0], actorPos[1]);
+            if(customedCommand.isInitiatorValid()) {
+
+                Array<int[]> impact = customedCommand.getImpactArea(actorPos[0], actorPos[1], row, col);
+                ccImpactArea.setTiles(impact, true);
+                ccActionArea.setTiles(customedCommand.getActionArea(), true);
+                ccTargets.setTiles(customedCommand.getTargetsAtRange(), true);
+
+            }
+        }
+
         // TEST FINAL
 
-
+        /*
         if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Affiliation.ALLY)) {
             sltdUnit = bim.battlefield.getUnit(row, col);
         }else{
@@ -180,8 +218,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
                 }
             }
         }
-
-
+        */
 
 
         return false;
@@ -198,61 +235,6 @@ public class TestBIS extends BattleInteractionState implements Observer{
                 historic.pop();
             }
         }
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)){
-            switchmode = !switchmode;
-            System.out.println("switch between units : "+switchmode);
-        }
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
-            System.out.println("action command : attack");
-            index = 1;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)){
-            System.out.println("action command : heal");
-            index = 2;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
-            System.out.println("action command : push");
-            index = 3;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)){
-            System.out.println("action command : switch");
-            index = 4;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)){
-            System.out.println("action command : guard");
-            index = 5;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)){
-            System.out.println("action command : steal");
-            index = 6;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)){
-            System.out.println("action command : switch weapon");
-            index = 7;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)){
-            System.out.println("action command : choose orientation => NORTH");
-            index = 8;
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)){
-            System.out.println("action command : endTurn turn / build");
-            index = 9;
-        }
-
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.A)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.SPECIAL_MOVE);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.Z)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.ATTACK);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.E)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.HEAL);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.R)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.BUILD);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.T)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.WALK);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.Y)) bim.bfr.getUnitRenderer(sltdUnit).display(Data.AnimId.DODGE);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.C)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.WEST);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.V)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.NORTH);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.N)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.SOUTH);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.B)) bim.bfr.getUnitRenderer(sltdUnit).setOrientation(Data.Orientation.EAST);
-
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             if(!historic.isEmpty())

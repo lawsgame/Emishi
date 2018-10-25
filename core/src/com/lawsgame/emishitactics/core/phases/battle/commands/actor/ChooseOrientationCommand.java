@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -11,11 +12,15 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class ChooseOrientationCommand extends SelfInflitedCommand {
-    protected Data.Orientation oldOrientation;
-    protected Data.Orientation newOrientation;
+    protected Orientation oldOrientation;
+    protected Orientation newOrientation;
 
-    public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Data.Orientation newOrientation) {
+    public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Orientation newOrientation) {
         super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, playerInventory, true);
+       setOrientation(newOrientation);
+    }
+
+    public void setOrientation(Orientation newOrientation){
         this.newOrientation = newOrientation;
     }
 
@@ -30,6 +35,11 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
 
         // push render state
         scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), newOrientation));
+    }
+
+    @Override
+    public boolean isInitiatorValid(int rowActor, int colActor) {
+        return super.isInitiatorValid(rowActor, colActor);
     }
 
     @Override

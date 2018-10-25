@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 public class Utils {
@@ -39,22 +40,6 @@ public class Utils {
         return area;
     }
 
-    public static boolean arrayContains(Array<int[]> intArray, int[] value){
-        boolean contained;
-        if(value != null) {
-            for (int i = 0; i < intArray.size; i++) {
-                if (intArray.get(i).length == value.length) {
-                    contained = true;
-                    for (int j = 0; j < value.length; j++) {
-                        contained = contained && value[j] == intArray.get(i)[j];
-                    }
-                    if (contained) return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public static<T> boolean stackContainsAtLeastOneElementOf(Stack<T> checkedStack, Array<T> initialContainer){
         for (int j = 0; j < initialContainer.size; j++) {
             for(int i = 0; i < checkedStack.size(); i++){
@@ -66,31 +51,6 @@ public class Utils {
         return false;
     }
 
-    public static boolean arrayContains(Array<int[]> intArray, int r, int c){
-        if(intArray != null) {
-            for (int i = 0; i < intArray.size; i++) {
-                if(intArray.get(i).length >= 2) {
-                    if (r == intArray.get(i)[0] && c == intArray.get(i)[1]) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public static void arrayRemove(Array<int[]> intArray, int r, int c) {
-        if(intArray != null) {
-            for (int i = 0; i < intArray.size; i++) {
-                if(intArray.get(i).length >= 2) {
-                    if (r == intArray.get(i)[0] && c == intArray.get(i)[1]) {
-                        intArray.removeIndex(i);
-                        i--;
-                    }
-                }
-            }
-        }
-    }
 
     /**
      *
@@ -225,5 +185,67 @@ public class Utils {
         return madeupTexture;
     }
 
+    public static boolean arrayContains(Array<int[]> intArray, int[] value){
+        if(value != null) {
+            for (int i = 0; i < intArray.size; i++) {
+                if (Arrays.equals(intArray.get(i), value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+    public static boolean arrayContains(Array<int[]> intArray, int r, int c){
+        if(intArray != null) {
+            for (int i = 0; i < intArray.size; i++) {
+                if(intArray.get(i).length >= 2) {
+                    if (r == intArray.get(i)[0] && c == intArray.get(i)[1]) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void arrayRemove(Array<int[]> intArray, int r, int c) {
+        if(intArray != null) {
+            for (int i = 0; i < intArray.size; i++) {
+                if(intArray.get(i).length >= 2) {
+                    if (r == intArray.get(i)[0] && c == intArray.get(i)[1]) {
+                        intArray.removeIndex(i);
+                        i--;
+                    }
+                }
+            }
+        }
+    }
+
+    public static Array<int[]> arrayRemoveClones(Array<int[]> array) {
+        if(array != null) {
+            for (int i = 0; i < array.size; i++) {
+                for (int j = i + 1; j < array.size; j++) {
+                    if (Arrays.equals(array.get(i), array.get(j))) {
+                        array.removeIndex(j);
+                        j--;
+                    }
+                }
+            }
+        }
+        return array;
+    }
+
+    public static Array<int[]> arrayGetElementsInBothOnly(Array<int[]> array1, Array<int[]> array2) {
+        Array<int[]> both =new Array<int[]>();
+        for(int i = 0; i < array1.size; i++){
+            for(int j = 0; j < array2.size; j++){
+                if(Arrays.equals(array1.get(i), array2.get(j))
+                        && !Utils.arrayContains(both, array1.get(i))){
+                    both.add(array1.get(i));
+                }
+            }
+        }
+        return both;
+    }
 }

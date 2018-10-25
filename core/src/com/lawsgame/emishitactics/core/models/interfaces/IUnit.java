@@ -15,12 +15,13 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
+import java.util.Stack;
+
 public abstract class IUnit extends Model {
 
     public abstract String getName(I18NBundle bundle);
-
     public abstract String getName();
-    public abstract void setName(String name);
+    public abstract void setName(String namekey);
     public abstract Data.UnitTemplate getTemplate();
     public abstract WeaponType getWeaponType();
     public abstract int getLevel();
@@ -64,8 +65,8 @@ public abstract class IUnit extends Model {
     public abstract int getCurrentMoral();
     public abstract void setCurrentMoral(int moral);
     public abstract int getExperience();
-    public abstract void setExperience(int experience);
-    public abstract int[] addExpPoints(int exp);
+    public abstract int[] setExperience(int experience);
+    public abstract Stack<int[]> addExpPoints(int exp);
     public abstract int getLeadershipExperience();
     public abstract void setLeadershipExperience(int experience);
     public abstract boolean addLdExpPoints(int exp);
@@ -98,6 +99,7 @@ public abstract class IUnit extends Model {
 
 
     //ITEMS & ABILITIES
+    public abstract void addNativeAbility(Data.Ability guard);
     public abstract boolean has(Data.Ability ability);
     public abstract Array<Data.Ability> getAbilities();
     public abstract boolean has(Equipment item);
@@ -123,7 +125,7 @@ public abstract class IUnit extends Model {
     public abstract int getAppAvoidance();
     public abstract int getAppAPRecoveryRate();
     public abstract int getCurrentAPRecoveryRate(int rowUnit, int colUnit, Battlefield battlefield);
-    public abstract void setActionPoints(int barProgression);
+    public abstract void setActionPoints(int ap);
     public abstract void addActionPoints(int points);
     public abstract int getActionPoints();
 
@@ -166,6 +168,11 @@ public abstract class IUnit extends Model {
     public abstract boolean hasMoved();
     public abstract void setActed(boolean acted);
     public abstract void setMoved(boolean moved);
+    public abstract boolean isDisabled();
+    public abstract void setDisabled(boolean disabled);
+    public abstract boolean isCrippled();
+    public abstract void setCrippled(boolean crippled);
+
     public abstract boolean isDone();
     public abstract boolean isWounded();
     public abstract boolean isOutOfAction();
@@ -174,4 +181,6 @@ public abstract class IUnit extends Model {
     public abstract int getRecoveredMoralPoints(int healPower);
     public abstract boolean treated(int healPower);
     public abstract Array<Notification.ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly);
+
+
 }

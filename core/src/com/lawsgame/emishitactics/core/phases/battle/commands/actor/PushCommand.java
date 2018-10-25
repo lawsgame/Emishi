@@ -15,6 +15,8 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
+import static com.lawsgame.emishitactics.core.models.Notification.STEP_ON;
+
 public class PushCommand extends ActorCommand {
 
     public PushCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
@@ -22,8 +24,8 @@ public class PushCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(IUnit actor) {
-        return super.isInitiatorValid(actor) && !actor.isHorseman();
+    public boolean isInitiatorValid(int rowActor, int colActor) {
+        return super.isInitiatorValid(rowActor, colActor) && !bfr.getModel().getUnit(rowActor, colActor).isHorseman();
     }
 
     @Override
@@ -61,9 +63,9 @@ public class PushCommand extends ActorCommand {
         scheduleRenderTask(task);
 
 
-        if(tile.isAnyEventTriggerable()){
+        if(tile.isAnyEventTriggerable(STEP_ON)){
             this.eventTriggered = true;
-            Array<Task> eventTasks = tile.performEvents();
+            Array<Task> eventTasks = tile.performEvents(STEP_ON);
             scheduleMultipleRenderTasks(eventTasks);
         }
 

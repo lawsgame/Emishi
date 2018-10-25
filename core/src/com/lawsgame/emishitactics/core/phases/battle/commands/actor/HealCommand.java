@@ -19,8 +19,8 @@ public class HealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(IUnit actor) {
-        return super.isInitiatorValid(actor) && actor.has(Data.Ability.HEAL);
+    public boolean isInitiatorValid(int rowActor, int colActor) {
+        return super.isInitiatorValid(rowActor, colActor) && bfr.getModel().getUnit(rowActor, colActor).has(Data.Ability.HEAL);
     }
 
     @Override
@@ -44,12 +44,12 @@ public class HealCommand extends ActorCommand {
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return isTargetAllyValid(rowActor0, colActor0, rowTarget0, colTarget0, true);
+        return isTargetAllyValid(rowActor0, colActor0, rowTarget0, colTarget0, true, false);
     }
 
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
-        return getAlliesAtRange(row, col, actor, true);
+        return getAlliesAtRange(row, col, actor, true, false);
     }
 
 

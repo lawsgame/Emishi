@@ -13,11 +13,11 @@ public abstract class Trigger {
         this.eventCommands = new Array<EventCommand>();
     }
 
-    public abstract boolean isTriggered();
+    public abstract boolean isTriggered(Object data);
 
-    public Array<Task> performEvent(){
+    public Array<Task> performEvent(Object data){
         Array<Task> tasks = new Array<Task>();
-        if(isTriggered()){
+        if(isTriggered(data)){
             for(int i = 0; i < eventCommands.size; i++){
                 if(eventCommands.get(i).isApplicable()){
                     eventCommands.get(i).setDecoupled(true);

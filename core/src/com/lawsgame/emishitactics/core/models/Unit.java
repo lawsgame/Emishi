@@ -13,6 +13,9 @@ import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Stack;
 
 public class Unit extends IUnit{
 
@@ -47,7 +50,10 @@ public class Unit extends IUnit{
     protected int currentMoral;
     protected int currentHitPoints;
     protected int actionPoints = 0;
+    protected boolean disabled;
+    protected boolean crippled;
 
+    protected Array<Data.Ability> nativeAbilities;
     protected Array<Equipment> equipments;
     protected Banner banner;
 
@@ -117,6 +123,8 @@ public class Unit extends IUnit{
         this.weapons.add(Weapon.FIST);
         this.equipments = new Array<Equipment>();
         this.banner = new Banner();
+        this.nativeAbilities = new Array<Data.Ability>();
+        this.nativeAbilities.addAll(template.getNativeAbilities());
 
         if(homogeneousLevelsup) {
             growup(level);
@@ -169,8 +177,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String namekey) {
+        this.name = namekey;
     }
 
     @Override
@@ -548,29 +556,40 @@ public class Unit extends IUnit{
         return experience;
     }
 
+    /**
+     *
+     * @param experience
+     * @return an array of exp gained between each level up
+     */
     @Override
-    public void setExperience(int experience) {
-        this.experience = experience % Data.EXP_REQUIRED_LEVEL_UP;
+    public int[] setExperience(int experience) {
+        // get the number of lvl gained and the resulting exp array
+        int levelsGained = experience / Data.EXP_REQUIRED_LD_LEVEL_UP;
+        int[] exps = new int[ 1 + levelsGained];
+
+        // fill the exps array
+        for(int i = 0; i < exps.length; i++)
+            exps[i] = Data.EXP_REQUIRED_LD_LEVEL_UP;
+        exps[exps.length - 1] = experience % Data.EXP_REQUIRED_LEVEL_UP;
+
+        // set the new experience value
+        this.experience = exps[exps.length - 1];
+
+        return exps;
     }
 
     @Override
-    public int[] addExpPoints(int exp) {
-        int[] gainLvl = new int[13];
-        int tempoExp = exp;
-        int[] tempoGainLvl;
-        while(level < Data.MAX_LEVEL && tempoExp > 0) {
-            if (this.experience + tempoExp < Data.EXP_REQUIRED_LEVEL_UP) {
-                this.experience += tempoExp;
-                tempoExp = 0;
-            } else {
-                tempoExp -= Data.EXP_REQUIRED_LD_LEVEL_UP - this.experience;
-                this.experience = 0;
-                tempoGainLvl = levelup();
-                gainLvl[12] = 1;
-                for(int i = 0; i < tempoGainLvl.length; i++)
-                    gainLvl[i] += tempoGainLvl[i];
-            }
+    public Stack<int[]> addExpPoints(int exp) {
+        Stack<int[]> gainLvl = new Stack<int[]>();
+
+        int previousExperience = getExperience();
+        int[] exps = setExperience(this.experience + exp);
+        exps[0] -= previousExperience;
+
+        for(int i = 0; i < exps.length - 1; i++){
+            gainLvl.push(ArrayUtils.add(levelup(), exps[i]));
         }
+        gainLvl.push(new int[]{exps[exps.length - 1]});
         return gainLvl;
     }
 
@@ -733,6 +752,11 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public void addNativeAbility(Data.Ability guard) {
+
+    }
+
+    @Override
     public boolean has(Data.Ability ability) {
         boolean hasAbility = false;
         for(int i = 0; i < equipments.size; i++){
@@ -750,8 +774,8 @@ public class Unit extends IUnit{
             }
         }
         if(!hasAbility){
-            for(int i = 0; i < template.getNativeAbilities().length; i++){
-                if(template.getNativeAbilities()[i] == ability){
+            for(int i = 0; i < nativeAbilities.size; i++){
+                if(nativeAbilities.get(i) == ability){
                     hasAbility = true;
                     break;
                 }
@@ -778,8 +802,8 @@ public class Unit extends IUnit{
                     abilities.add(ability);
             }
         }
-        for(int i = 0; i < template.getNativeAbilities().length; i++){
-            ability = template.getNativeAbilities()[i];
+        for(int i = 0; i < nativeAbilities.size; i++){
+            ability = nativeAbilities.get(i);
             if(!abilities.contains(ability, true))
                 abilities.add(ability);
         }
@@ -959,8 +983,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setActionPoints(int barProgression) {
-        this.actionPoints = barProgression % Data.MAX_ACTION_POINTS;
+    public void setActionPoints(int ap) {
+        this.actionPoints = ap % Data.MAX_ACTION_POINTS;
     }
 
     @Override
@@ -1161,6 +1185,26 @@ public class Unit extends IUnit{
     @Override
     public void setMoved(boolean moved) {
         this.moved = moved;
+    }
+
+    @Override
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    @Override
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    @Override
+    public boolean isCrippled() {
+        return crippled;
+    }
+
+    @Override
+    public void setCrippled(boolean crippled) {
+        this.crippled = crippled;
     }
 
     @Override

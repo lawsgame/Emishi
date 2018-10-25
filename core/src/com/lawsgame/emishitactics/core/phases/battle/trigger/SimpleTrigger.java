@@ -9,7 +9,7 @@ public class SimpleTrigger extends Trigger{
     }
 
     @Override
-    public boolean isTriggered() {
+    public boolean isTriggered(Object data) {
         return true;
     }
 }

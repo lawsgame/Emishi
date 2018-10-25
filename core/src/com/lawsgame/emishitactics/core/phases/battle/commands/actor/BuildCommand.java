@@ -36,8 +36,8 @@ public class BuildCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(IUnit actor) {
-        return actor.has(Ability.BUILD) && super.isInitiatorValid(actor);
+    public boolean isInitiatorValid(int rowActor, int colActor) {
+        return super.isInitiatorValid(rowActor, colActor) && bfr.getModel().getUnit(rowActor, colActor).has(Ability.BUILD);
     }
 
     @Override

@@ -5,9 +5,13 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
 
+    public static Notification STEP_ON = new Notification();
+
+
+    private Notification(){}
 
     public static class ApplyDamage {
-        public Unit wounded;
+        public IUnit wounded;
         public boolean moralOnly;
         public int damageTaken;
         public State state;
@@ -22,7 +26,7 @@ public class Notification {
             DIED
         }
 
-        public ApplyDamage(Unit wounded, boolean moralOnly, int damageTaken){
+        public ApplyDamage(IUnit wounded, boolean moralOnly, int damageTaken){
             this.wounded = wounded;
             this.moralOnly = moralOnly;
             this.damageTaken = damageTaken;

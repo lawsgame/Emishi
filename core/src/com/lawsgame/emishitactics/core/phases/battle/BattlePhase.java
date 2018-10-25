@@ -11,6 +11,7 @@ import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -65,7 +66,9 @@ public class BattlePhase extends GamePhase {
         }
         testFont.getData().setLineHeight(testFont.getData().lineHeight * lineSpacingFactor);
         testFont.getData().setScale(requiredSize/testFont.getData().lineHeight);
+
     }
+
 
     private static float getPixelPerfectGamePortWidth(int spritePixelWidth){
         return Gdx.app.getGraphics().getWidth() * IsoBFR.SPRITE_STD_SIZE/ spritePixelWidth;

@@ -19,8 +19,8 @@ public class EndUnitTurnCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(IUnit actor) {
-        return true;
+    public boolean isInitiatorValid(int rowActor, int colActor) {
+        return bfr.getModel().isTileOccupied(rowActor, colActor);
     }
 
     @Override

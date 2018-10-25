@@ -40,7 +40,7 @@ public class Data {
     public static final float[] BANNER_AP_REGEN_BONUS_COST    = new float[]{1,     2, 6};
 
     // RENDER parameters
-        public static final float SPEED_TEMPO_WALK = 3f;  //buildingType/s
+        public static final float SPEED_TEMPO_WALK = 3f;  //tile/s
         public static final float SPEED_TEMPO_PUSHED = 8f;
     public static final float SPEED_WALK = 0.8f;
     public static final float SPEED_PUSHED = 1.9f;
@@ -104,7 +104,7 @@ public class Data {
 
     public enum SpriteSetId{
         WALK_FLEE_SWITCHPOSITION(false),
-        LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED(false),
+        LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED(true),
         PUSHED_BACKSTABBED(false),
         ATTACK(false),
         SPECIAL_MOVE(false),
@@ -130,25 +130,25 @@ public class Data {
     }
 
     public enum AnimId {
-        WALK(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_WALK_SPEED, false, false),
-        BACKSTAB(   SpriteSetId.PUSHED_BACKSTABBED),
-        TREATED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        PUSHED(     SpriteSetId.PUSHED_BACKSTABBED),
-        FLEE(       SpriteSetId.WALK_FLEE_SWITCHPOSITION, SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_FLEE_SPEED, true, false),
-        PUSH(       SpriteSetId.PUSH),
-        HEAL(       SpriteSetId.HEAL),
-        STEAL(      SpriteSetId.STEAL),
-        BUILD(      SpriteSetId.BUILD),
-        GUARD(      SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        REST(       SpriteSetId.REST, SpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
-        ATTACK(     SpriteSetId.ATTACK),
-        DODGE(      SpriteSetId.DODGE),
-        DIE(        SpriteSetId.DIE),
-        GUARDED(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        WOUNDED(    SpriteSetId.WOUNDED),
-        LEVELUP(    SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        SWITCH_WEAPON(SpriteSetId.WALK_FLEE_SWITCHPOSITION),
-        SPECIAL_MOVE(SpriteSetId.SPECIAL_MOVE);
+        WALK(           SpriteSetId.WALK_FLEE_SWITCHPOSITION, SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_WALK_SPEED, false, false),
+        BACKSTAB(       SpriteSetId.PUSHED_BACKSTABBED),
+        TREATED(        SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        PUSHED(         SpriteSetId.PUSHED_BACKSTABBED),
+        FLEE(           SpriteSetId.WALK_FLEE_SWITCHPOSITION, SpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_FLEE_SPEED, true, false),
+        PUSH(           SpriteSetId.PUSH),
+        HEAL(           SpriteSetId.HEAL),
+        STEAL(          SpriteSetId.STEAL),
+        BUILD(          SpriteSetId.BUILD),
+        GUARD(          SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        REST(           SpriteSetId.REST, SpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
+        ATTACK(         SpriteSetId.ATTACK),
+        DODGE(          SpriteSetId.DODGE),
+        DIE(            SpriteSetId.DIE),
+        GUARDED(        SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        WOUNDED(        SpriteSetId.WOUNDED),
+        LEVELUP(        SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        SWITCH_WEAPON(  SpriteSetId.WALK_FLEE_SWITCHPOSITION),
+        SPECIAL_MOVE(   SpriteSetId.SPECIAL_MOVE);
 
         SpriteSetId soldierId;
         SpriteSetId warchiefId;
@@ -204,18 +204,20 @@ public class Data {
     }
 
     public enum ActionChoice{
-        MOVE                (0, 0, true, false, 0, 0, false, new int[0][0]),
-        WALK                (1, 0, true, false, RangedBasedType.MOVE, false, new int[0][0]),
-        ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[0][0]),
-        SWITCH_POSITION     (1, 0, true, false, 1, 1, false, new int[0][0]),
-        PUSH                (1, 0, false, true, 1, 1, false, new int[0][0]),
-        SWITCH_WEAPON       (1, 0, false, true, 0, 0, false, new int[0][0]),
-        CHOOSE_ORIENTATION  (0, 0, false, true, 0, 0, true, new int[0][0]),
-        HEAL                (1, 10, false, true, 1, 1, false, new int[0][0]),
-        GUARD               (1, 10, false, true, 0, 0, false, new int[0][0]),
-        STEAL               (1, 10, false, true, 1, 1, false, new int[0][0]),
-        BUILD               (1, 10, false, true, 1, 1, false, new int[0][0]),
-        END_TURN            (0, 0, false, true, 0, 0, false, new int[0][0]);
+        TEST_CHOICE         (0, 0, false, true, 1, 1, false, new int[][]{{0, 0}, {1, 1}, {1, -1}, {1, 0}}),
+
+        MOVE                (0, 0, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        WALK                (1, 0, true, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
+        ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
+        SWITCH_POSITION     (1, 0, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        PUSH                (1, 0, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        SWITCH_WEAPON       (1, 0, false, true, 0, 0, false, new int[][]{{0, 0}}),
+        CHOOSE_ORIENTATION  (0, 0, false, true, 0, 0, true, new int[][]{{0, 0}}),
+        HEAL                (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        GUARD               (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
+        STEAL               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        BUILD               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        END_TURN            (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
         private int experience;
@@ -225,13 +227,14 @@ public class Data {
         private int rangeMax;                  // if true, command that turn actedBased to true is executed, moved otherwise.
         private RangedBasedType rangedBasedType;
         private boolean endTurnActionOnly;
+
         /**
          * TempoAreaWidget of impact :
-         * ( 0, 0) = targeted buildingType
-         * ( 1, 0) = in front of targeted buildingType
-         * ( 0, 1) = right of targeted buildingType
-         * ( 0,-1) = left of targeted buildingType
-         * (-1, 0) = in the back of targeted buildingType
+         * ( 0, 0) = targeted tile
+         * ( 1, 0) = in front of targeted tile
+         * ( 0, 1) = right of targeted tile
+         * ( 0,-1) = left of targeted tile
+         * (-1, 0) = in the back of targeted tile
          */
         protected Array<int[]> impactArea;
 
@@ -363,11 +366,12 @@ public class Data {
         SELECTED_UNIT           (0, true, AreaColor.LIGHT_BLUE),
         BANNER_AREA             (0, true, AreaColor.LIGHT_BROWN),
         MOVE_AREA               (1, false, AreaColor.TURQUOISE),
-        ACTION_AREA             (1, false, AreaColor.RED_ORANGE),
+        ACTION_AREA             (1, false, AreaColor.TURQUOISE),
         GUARD_AREA              (0, true, AreaColor.DEEP_BLUE),
         DEPLOYMENT_AREA         (2, true, AreaColor.ORANGE),
         VANGUARD_DEPLOYMENT_AREA(2, true, AreaColor.YELLOW),
-        FOE_ACTION_AREA         (0, true, AreaColor.RED_PURPLE);
+        FOE_ACTION_AREA         (0, true, AreaColor.RED_PURPLE),
+        COVER                   (0, true, AreaColor.RED_ORANGE);
 
 
         private int layerIndex;
@@ -677,7 +681,7 @@ public class Data {
         private Ability ability;
         private int dropRate;
 
-        EquipmentTemplate(int dropRate, Ability passiveAbility) {
+        EquipmentTemplate(int dropRate, Ability ability) {
             this.dropRate = dropRate;
             this.ability = ability;
         }
@@ -693,6 +697,23 @@ public class Data {
 
     public enum Ability{
         //Offensive
+        DOUBLE_ATTACK,
+        MULTIPLE_ATTACK,
+        IMPALEMENT,
+        CRUSHING_BLOW,
+        BATTERING_RAM,
+        CHARGED_BLOW,
+        BACKSTAB,
+        CRIPPLING_BLOW,
+        FOCUSED_BLOW,
+        BLOOD_RAIN,
+        SWIRLING_ATTACK,
+        GREAT_IMPACT,
+        CHARGE,
+        HARASS,
+        WARCRY,
+        WARCALL,
+        EXECUTION,
 
         //Passive
         PATHFINDER,

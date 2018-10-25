@@ -89,8 +89,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
         handleDeplacement(dt);
 
-        if(targeted)
-            blinkTime += dt;
+        if(targeted) blinkTime += dt;
 
         if(animationCountDown.isFinished()){
             animationCountDown.reset();
@@ -138,7 +137,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     @Override
     public void setDone(boolean done) {
         this.done = done;
-        this.updateAnimation(state);
+        this.display(state);
     }
 
     @Override
@@ -155,19 +154,19 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     @Override
     public void setOrientation(Orientation or) {
         this.orientation = or;
-        this.updateAnimation(state);
+        this.display(state);
     }
 
     @Override
     public void setWeaponType(WeaponType type) {
         this.weaponType = type;
-        this.updateAnimation(state);
+        this.display(state);
     }
 
     @Override
     public void setHorseman(boolean horseman) {
         this.horseman = horseman;
-        this.updateAnimation(state);
+        this.display(state);
     }
 
     /**
@@ -255,7 +254,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
                 setCenterY(vpreviousGoal[1] , false);
 
                 if(!pushed) this.orientation = Utils.getOrientationFromCoords(previousGoal[0], previousGoal[1],goal[0], goal[1]);
-                updateAnimation(state);
+                display(state);
             }
             bfr.updateBURRenderCall(goal[0], goal[1], this);
 
@@ -285,12 +284,12 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
-        updateAnimation((backstab) ? AnimId.BACKSTAB : AnimId.WOUNDED);
+        display((backstab) ? AnimId.BACKSTAB : AnimId.WOUNDED);
     }
 
     @Override
     public void displayTreated(int healedHP) {
-        updateAnimation(AnimId.TREATED);
+        display(AnimId.TREATED);
     }
 
     @Override
@@ -325,12 +324,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     @Override
     public void displayFlee(Orientation fleeingDirection) {
         this.orientation = fleeingDirection;
-        updateAnimation(AnimId.FLEE);
-    }
-
-    @Override
-    public void display(AnimId id) {
-        updateAnimation(id);
+        display(AnimId.FLEE);
     }
 
     /**
@@ -338,10 +332,9 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
      *
      * @param animId
      */
-    private void updateAnimation(AnimId animId){
-
-        // fetch the required sprite build
-       Array<Sprite> updatedSet = (getModel().isCharacter()) ?
+    @Override
+    public void display(AnimId animId) {
+        Array<Sprite> updatedSet = (getModel().isCharacter()) ?
                 bfr.assetProvider.charaSpriteTree.getSpriteSet(
                         promoted,
                         getModel().getTemplate(),

@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
@@ -12,6 +13,8 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+
+import static com.lawsgame.emishitactics.core.models.Notification.STEP_ON;
 
 public class SwitchPositionCommand extends ActorCommand {
     private BattleUnitRenderer actorRenderer;
@@ -34,6 +37,8 @@ public class SwitchPositionCommand extends ActorCommand {
 
         //update model
         bfr.getModel().switchUnitPositions(rowActor, colActor, rowTarget, colTarget);
+        actorRenderer.getModel().setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
+        targetRenderer.getModel().setOrientation(Utils.getOrientationFromCoords(rowTarget, colTarget, rowActor, colActor));
 
         // push render task
 
@@ -48,17 +53,22 @@ public class SwitchPositionCommand extends ActorCommand {
 
 
         Tile tile = bfr.getModel().getTile(rowActor, colActor);
-        if(tile.isAnyEventTriggerable()){
+        if(tile.isAnyEventTriggerable(STEP_ON)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = tile.performEvents();
+            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(STEP_ON);
             scheduleMultipleRenderTasks(eventTasks);
         }
         tile = bfr.getModel().getTile(rowTarget, colTarget);
-        if(tile.isAnyEventTriggerable()){
+        if(tile.isAnyEventTriggerable(STEP_ON)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = tile.performEvents();
+            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(STEP_ON);
             scheduleMultipleRenderTasks(eventTasks);
         }
+    }
+
+    @Override
+    public boolean isInitiatorValid() {
+        return super.isInitiatorValid() && !getInitiator().isCrippled();
     }
 
     @Override
@@ -84,11 +94,14 @@ public class SwitchPositionCommand extends ActorCommand {
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return isTargetAllyValid(rowActor0, colActor0, rowTarget0, colTarget0, false);
+        return isTargetAllyValid(rowActor0, colActor0, rowTarget0, colTarget0, false, true);
     }
 
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
-        return getAlliesAtRange(row, col, actor, false);
+        return getAlliesAtRange(row, col, actor, false, true);
     }
+
+
+
 }

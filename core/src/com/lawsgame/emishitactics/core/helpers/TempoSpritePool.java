@@ -149,6 +149,7 @@ public class TempoSpritePool {
                 Sprite sprite;
                 for(Data.AreaType id: Data.AreaType.values()){
                     region = atlas.findRegion(Assets.getTileHighlighted(id));
+                    if(region == null) region = atlas.findRegion(Assets.getTileHighlighted(Data.AreaType.SELECTED_UNIT));
                     TextureRegion[][] assets = region.split(region.getRegionWidth()/2, region.getRegionHeight()/2);
 
                     sprite = new Sprite(assets[0][0]);

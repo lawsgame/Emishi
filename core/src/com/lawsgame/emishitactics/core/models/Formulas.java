@@ -81,13 +81,11 @@ public class Formulas {
         return attackAccuracy;
     }
 
-    public static boolean isBackstabAttack(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
+    private static boolean isBackstabAttack(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Battlefield battlefield){
         if( battlefield.isTileOccupied(rowDefender0, colDefender0)){
             Data.Orientation attackOr = Utils.getOrientationFromCoords(rowAttacker0, colAttacker0, rowDefender0, colDefender0);
             Data.Orientation defenderOr = battlefield.getUnit(rowDefender0, colDefender0).getOrientation();
-            if(attackOr == defenderOr){
-                return true;
-            }
+            return attackOr == defenderOr;
         }
         return false;
     }
@@ -121,12 +119,7 @@ public class Formulas {
     }
 
 
-    /**
-     *
-     * @param attacker
-     * @param targetedSquad, still fighting members of the opponent squad before the attack
-     * @return
-     */
+    /*
     public static int getGainedExperienceFoeEachSquadMember(IUnit attacker, Array<IUnit> targetedSquad){
         int expPerSquadMember = 0;
         if(attacker.isMobilized()) {
@@ -150,16 +143,16 @@ public class Formulas {
         }
         return expPerSquadMember;
     }
+    */
 
-    public static int getLootRate(int rowAttacker0, int colAttacker0, Battlefield battlefield){
+    public static int getLootRate(IUnit attacker){
         int lootRate = 0;
-        if(battlefield.isTileOccupied(rowAttacker0, colAttacker0)){
-            IUnit attacker = battlefield.getUnit(rowAttacker0, colAttacker0);
-            if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled())
-                lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharismaBonus()/2;
-        }
+        if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled())
+            lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharismaBonus()/2;
         return lootRate;
     }
+
+
 
     public static int getStealRate(int rowRobber, int colRobber, int rowStolen, int colStolen, Battlefield battlefield){
         int stealRate = 0;
