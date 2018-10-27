@@ -11,12 +11,18 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.trigger.UponDisappearingTrigger;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
@@ -25,9 +31,8 @@ import java.util.LinkedList;
 
 public class TestBIS extends BattleInteractionState implements Observer{
 
-
-    private Army army;
     IUnit sltdUnit;
+    IUnit foeWL;
 
     Array<Sprite> sprites;
     Animation animation;
@@ -42,9 +47,8 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     public TestBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true, true, false);
-        setArmy();
 
-        sltdUnit = army.getWarlord();
+        sltdUnit = bim.player.getArmy().getWarlord();
 
         sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.SpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
@@ -58,7 +62,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         // TEST CUSTOMED COMMAND
 
         //customedCommand = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        customedCommand = new HitCommand(bim.bfr, Data.ActionChoice.ATTACK, bim.scheduler, bim.player.getInventory(), 1, 50);
+        customedCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory(), 300, 90);
         customedCommand.setFree(true);
         ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
         ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
@@ -73,64 +77,35 @@ public class TestBIS extends BattleInteractionState implements Observer{
         GuardCommand guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         guardCommand.setFree(true);
         guardCommand.apply(randomFoePos[0], randomFoePos[1]);
+
+
+        Trigger trigger;
+        for(int r = 0; r < bim.battlefield.getNbRows(); r++){
+            for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
+                if(bim.battlefield.isTileOccupied(r, c)){
+                    final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.battlefield.getUnit(r, c));
+                    trigger = new UponDisappearingTrigger(false, woundedRenderer.getModel());
+                    trigger.addEvent(new EventCommand(bim.bfr, bim.scheduler) {
+
+                        @Override
+                        protected void execute() {
+                            System.out.println("Remember the name of the one you killed that day : "+woundedRenderer.getModel().getName());
+                        }
+
+                        @Override
+                        public boolean isApplicable() {
+                            return true;
+                        }
+                    });
+                    woundedRenderer.getModel().add(trigger);
+
+                    if(woundedRenderer.getModel().isWarlord() && woundedRenderer.getModel().getArmy().getAffiliation() == Data.Affiliation.ENEMY_0){
+                        foeWL = woundedRenderer.getModel();
+                    }
+                }
+            }
+        }
     }
-
-    private void setArmy(){
-        army = Army.createPlayerArmyTemplate();
-
-        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 1, Data.WeaponType.BOW, true, false, false, false, false);
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
-        warlord.setLeadership(19);
-        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
-        soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-
-        Unit soldier2 = new Unit("Maro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
-        soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier3 = new Unit("Ken", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
-        soldier3.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-
-        Unit soldier4 = new Unit("Loth", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
-        soldier4.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        Unit soldier5 = new Unit("Caro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
-        soldier5.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-
-
-        Unit warchief1 = new Unit("Azamaru", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
-        warchief1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warchief1.setLeadership(15);
-        warchief1.setExperience(98);
-        warchief1.setCurrentHitPoints(3);
-
-
-        army.add(warlord);
-        army.add(soldier1);
-        army.add(soldier4);
-        army.add(soldier5);
-        army.add(warchief1);
-        army.add(soldier2);
-        army.add(soldier3);
-
-        army.appointWarLord(warlord);
-        army.appointSoldier(soldier1, 0);
-        army.appointSoldier(soldier4, 0);
-        army.appointSoldier(soldier5, 0);
-        army.appointWarChief(warchief1);
-        army.appointSoldier(soldier2, 1);
-        army.appointSoldier(soldier3, 1);
-
-        bim.battlefield.deploy(11,11, soldier1, true);
-        bim.battlefield.deploy(10,11, soldier2, true);
-        bim.battlefield.deploy(9,11, soldier3, true);
-        bim.battlefield.deploy(10,12, warchief1, true);
-
-        bim.battlefield.deploy(14,4, soldier4, true);
-        bim.battlefield.deploy(15,4, soldier5, true);
-
-        bim.battlefield.deploy(11, 4, warlord, true);
-    }
-
 
     @Override
     public void end() {
@@ -239,8 +214,44 @@ public class TestBIS extends BattleInteractionState implements Observer{
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             if(!historic.isEmpty())
                 historic.pop().pushRenderTasks();
+            customedCommand.pushRenderTasks();
         }
 
+        if(Gdx.input.isKeyJustPressed(Input.Keys.B)){
+            System.out.println(bim.bfr.toLongShort());
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
+            /*
+            sltdUnit.notifyAllObservers(Data.AnimId.ATTACK);
+            sltdUnit.setOrientation(Data.Orientation.WEST, true);
+            sltdUnit.notifyAllObservers(Data.AnimId.BACKSTAB);
+            */
+
+            /*
+            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.ATTACK));
+            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.Orientation.WEST));
+            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.BACKSTAB));
+            */
+
+
+            StandardTask task = new StandardTask();
+
+            StandardTask.RendererThread thread0 = new StandardTask.RendererThread(bim.bfr.getUnitRenderer(sltdUnit));
+            thread0.addQuery(Data.AnimId.ATTACK);
+            thread0.addQuery(Data.Orientation.WEST);
+            thread0.addQuery(Data.AnimId.BACKSTAB);
+
+            //StandardTask.RendererThread thread1 = new StandardTask.RendererThread(bim.bfr.getUnitRenderer(foeWL));
+            //thread1.addQuery(Data.Orientation.WEST);
+
+            task.addThread(thread0);
+            //task.addThread(thread1);
+            bim.scheduler.addTask(task);
+
+
+            //bim.bfr.removeUnitRenderer(sltdUnit);
+        }
     }
 
 

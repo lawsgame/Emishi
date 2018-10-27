@@ -9,10 +9,10 @@ public abstract class EventCommand extends BattleCommand{
     }
 
     @Override
-    protected void unexecute() { }
+    protected final void unexecute() { }
 
     @Override
-    public boolean isUndoable() {
+    public final boolean isUndoable() {
         return false;
     }
 

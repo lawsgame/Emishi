@@ -55,11 +55,11 @@ public class StandardTask extends Task {
 
     public boolean isCompleted() {
         for(int i = 0; i < parallelThreads.size; i++){
-            if(parallelThreads.get(i).isCompleted()){
-                return true;
+            if(!parallelThreads.get(i).isCompleted()){
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public void init() {
@@ -133,6 +133,11 @@ public class StandardTask extends Task {
     }
 
 
+
+
+
+    //------------------- THREAD IMP --------------------------------
+
     public static class CommandThread extends Thread {
         LinkedList<SimpleCommand> commands;
         LinkedList<Float> delays;
@@ -193,7 +198,7 @@ public class StandardTask extends Task {
 
         @Override
         public String toString(){
-            return "Command thread ["+getTag()+"]";
+            return "   Command thread ["+getTag()+"]";
         }
     }
 
@@ -265,9 +270,9 @@ public class StandardTask extends Task {
 
         @Override
         public String toString() {
-            String str = "RendererThread : executer = "+((executer != null) ? executer.toString(): "null");
+            String str = "   RendererThread : executer = "+((executer != null) ? executer.toString(): "null");
             for (int j = 0; j < bundles.size(); j++) {
-                str += " : " + bundles.get(j) + " => " + senders.get(j);
+                str += "\n        Notif => sender : " + bundles.get(j) + " => " + senders.get(j);
             }
             return str;
         }

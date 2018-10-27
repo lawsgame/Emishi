@@ -1137,6 +1137,14 @@ public class Unit extends IUnit{
     }
 
     @Override
+    public void setOrientation(Orientation orientation, boolean notifyObservers) {
+        setOrientation(orientation);
+        if(notifyObservers)
+            notifyAllObservers(orientation);
+
+    }
+
+    @Override
     public Data.Orientation getOrientation() {
         return orientation;
     }

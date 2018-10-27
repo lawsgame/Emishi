@@ -129,6 +129,10 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }
     }
 
+    public String toLongShort(){
+        return toString();
+    }
+
 
     public static class BFRendererException extends Exception{
         public BFRendererException(String msg){

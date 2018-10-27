@@ -230,22 +230,65 @@ public class IsoBFR extends BattlefieldRenderer {
         return null;
     }
 
-    protected int getRenderCall(IsoUnitRenderer unitRenderer) {
-        for(int i = 0; i < unitRenderers.size; i++){
-            for(int j = 0; j < unitRenderers.get(i).size; j++){
-                if(unitRenderers.get(i).get(j) == unitRenderer){
-                    return i;
-                }
-            }
+    protected void updateBURRenderCall(IsoUnitRenderer unitRenderer){
+        removeUnitRenderer(unitRenderer.getModel());
+        int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        if(getModel().checkIndexes(row, col)) {
+            addUnitRenderer(row, col, unitRenderer);
         }
-        return -1;
+    }
+
+    protected void updateBURRenderCall(int rowTarget, int colTarget, IsoUnitRenderer unitRenderer){
+        removeUnitRenderer(unitRenderer.getModel());
+        int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
+        if(getModel().checkIndexes(row, col) && getModel().checkIndexes(rowTarget, colTarget)) {
+            addUnitRenderer(row, col, rowTarget, colTarget, unitRenderer);
+        }
+    }
+
+    private void addUnitRenderer(int row, int col, int rowTarget, int colTarget, BattleUnitRenderer bur){
+        if(!isUnitRendererCreated(bur.getModel())){
+            unitRenderers.get(row + col + rowTarget + colTarget).add(bur);
+        }
+    }
+
+
+    private void addUnitRenderer(int row, int col, BattleUnitRenderer bur){
+        addUnitRenderer(row, col, row, col, bur);
     }
 
     @Override
     public void addUnitRenderer(int row, int col, IUnit model) {
-        if(!isUnitRendererCreated(model)){
-            unitRenderers.get(2*row + 2*col).add( new IsoUnitRenderer(row, col, model, this) );
+        addUnitRenderer(row, col, new IsoUnitRenderer(row, col, model, this));
+    }
+
+    @Override
+    public void removeUnitRenderer(IUnit model) {
+        BattleUnitRenderer bur;
+        for (int i = 0; i < unitRenderers.size; i++) {
+            for (int j = 0; j < unitRenderers.get(i).size; j++) {
+                if (unitRenderers.get(i).get(j).getModel() == model) {
+                    bur = unitRenderers.get(i).removeIndex(j);
+                    removeAreaRenderersAssociatedWith(bur.getModel());
+                    j--;
+                }
+            }
         }
+
+    }
+
+    @Override
+    protected boolean isUnitRendererCreated(IUnit model) {
+        for(int i = 0; i < unitRenderers.size; i++){
+            for(int j = 0; j < unitRenderers.get(i).size; j++){
+                if(unitRenderers.get(i).get(j).getModel() == model){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -253,37 +296,6 @@ public class IsoBFR extends BattlefieldRenderer {
         if(!isAreaRendererCreated(area)){
             areaRenderers.get(area.getType().getLayerIndex()).add(new IsoAreaRenderer(area, this, this.assetProvider));
         }
-    }
-
-    @Override
-    public void removeUnitRenderer(IUnit model) {
-        loop:
-        {
-            for (int i = 0; i < unitRenderers.size; i++) {
-                for (int j = 0; j < unitRenderers.get(i).size; j++) {
-                    if (unitRenderers.get(i).get(j).getModel() == model) {
-                        unitRenderers.get(i).removeIndex(j);
-                        break loop;
-                    }
-                }
-            }
-        }
-    }
-
-    protected void updateBURRenderCall(IsoUnitRenderer unitRenderer){
-        removeUnitRenderer(unitRenderer.getModel());
-        int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
-        int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
-        if(getModel().checkIndexes(row, col))
-            unitRenderers.get(2*row + 2*col).add(unitRenderer);
-    }
-
-    protected void updateBURRenderCall(int rowTarget, int colTarget, IsoUnitRenderer unitRenderer){
-        removeUnitRenderer(unitRenderer.getModel());
-        int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
-        int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
-        if(getModel().checkIndexes(row, col) && getModel().checkIndexes(rowTarget, colTarget))
-            unitRenderers.get(row + col + rowTarget + colTarget).add(unitRenderer);
     }
 
     @Override
@@ -299,17 +311,7 @@ public class IsoBFR extends BattlefieldRenderer {
         }
     }
 
-    @Override
-    protected boolean isUnitRendererCreated(IUnit model) {
-        for(int i = 0; i < unitRenderers.size; i++){
-            for(int j = 0; j < unitRenderers.get(i).size; j++){
-                if(unitRenderers.get(i).get(j).getModel() == model){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+
 
     @Override
     public boolean isAreaRendererCreated(Area model){
@@ -372,6 +374,22 @@ public class IsoBFR extends BattlefieldRenderer {
     @Override
     public void dispose() {
         super.dispose();
+    }
+
+    @Override
+    public String toLongShort(){
+        String str = "\nBFR\n";
+        str+= "UNITS\n";
+        for(int i = 0; i < unitRenderers.size; i++){
+            if(unitRenderers.get(i).size > 0) {
+                str += i+") ";
+                for (int j = 0; j < unitRenderers.get(i).size; j++) {
+                    str += unitRenderers.get(i).get(j).getModel().getName()+" | ";
+                }
+                str +="\n";
+            }
+        }
+        return str;
     }
 
 

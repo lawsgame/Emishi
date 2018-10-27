@@ -29,7 +29,6 @@ public abstract class BattleCommand extends Observable implements Observer {
     public boolean apply() {
         if(isApplicable()) {
             execute();
-            removeOutOfActionUnits();
             return true;
         }
         return false;
@@ -113,11 +112,8 @@ public abstract class BattleCommand extends Observable implements Observer {
         StandardTask removeOOAUnitTask = new StandardTask();
         for(int i = 0; i < OOAUnits.size; i++)
             removeOOAUnitTask.addThread(new StandardTask.RendererThread(bfr, OOAUnits.get(i)));
+        removeOOAUnitTask.tag("remove OOA units");
         scheduleRenderTask(removeOOAUnitTask);
-    }
-
-    public boolean isDecoupled() {
-        return decoupled;
     }
 
     public void setDecoupled(boolean decoupled) {

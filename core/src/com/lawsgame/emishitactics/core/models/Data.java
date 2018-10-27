@@ -204,7 +204,7 @@ public class Data {
     }
 
     public enum ActionChoice{
-        TEST_CHOICE         (0, 0, false, true, 1, 1, false, new int[][]{{0, 0}, {1, 1}, {1, -1}, {1, 0}}),
+        TEST_CHOICE         (0, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}, {0, 1}, {0, -1}}),
 
         MOVE                (0, 0, true, false, 0, 0, false, new int[][]{{0, 0}}),
         WALK                (1, 0, true, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),

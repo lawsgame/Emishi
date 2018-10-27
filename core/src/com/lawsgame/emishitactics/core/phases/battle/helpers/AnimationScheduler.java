@@ -8,16 +8,17 @@ import java.util.LinkedList;
 
 /**
  * helper which allows
- * - to posepone  animations triggering
+ * - to postpone  animations triggering
  * - to synchronize animations triggering
  */
 public class AnimationScheduler implements GameUpdatableEntity{
 
     private LinkedList<Task> tasks;
-    private boolean paused;
+    private long time;
 
     public AnimationScheduler(){
         tasks = new LinkedList<Task>();
+        this.time = System.currentTimeMillis();
     }
 
     @Override
@@ -26,6 +27,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
         if(!tasks.isEmpty()){
             if(!tasks.peek().isInitiazed()){
                 tasks.peek().init();
+                System.out.println(this);
             }
 
             //update the threads of the current task
@@ -51,10 +53,14 @@ public class AnimationScheduler implements GameUpdatableEntity{
         }
     }
 
+
     public String toString(){
-        String str = "\nScheduler\n";
+        long currentTime = System.currentTimeMillis();
+        float elapse = (currentTime - time) / 1000f;
+        this.time = currentTime;
+        String str = "\nScheduler @ "+elapse+"\n";
         for(int i = 0; i < tasks.size(); i++){
-            str += "\n"+i+" = ";
+            str += "\n "+i+" = ";
             str += tasks.get(i).toString();
         }
         return str+"\n";

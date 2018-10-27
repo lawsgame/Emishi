@@ -161,6 +161,7 @@ public abstract class IUnit extends Model {
 
     //BATTLE PROCEEDING
     public abstract void setOrientation(Data.Orientation orientation);
+    public abstract void setOrientation(Data.Orientation orientation, boolean notifyObservers);
     public abstract Orientation getOrientation();
     public abstract void setBehaviour(Data.Behaviour behaviour);
     public abstract Behaviour getBehaviour();

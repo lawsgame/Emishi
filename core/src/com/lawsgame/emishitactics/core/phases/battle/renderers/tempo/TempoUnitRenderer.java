@@ -75,6 +75,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void update(float dt) {
+        launchNextAnimation();
 
         countDown.update(dt);
         if (countDown.isFinished()) {
@@ -89,7 +90,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
         handleWalkAnimation(dt);
 
-        super.update(dt);
     }
 
 

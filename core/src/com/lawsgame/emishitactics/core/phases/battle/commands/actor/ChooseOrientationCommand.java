@@ -39,7 +39,7 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
 
     @Override
     public boolean isInitiatorValid(int rowActor, int colActor) {
-        return super.isInitiatorValid(rowActor, colActor);
+        return super.isInitiatorValid(rowActor, colActor) && bfr.getModel().getUnit(rowActor, colActor).getOrientation() != newOrientation;
     }
 
     @Override

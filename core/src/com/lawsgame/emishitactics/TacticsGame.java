@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -42,9 +43,21 @@ public class TacticsGame extends ApplicationAdapter {
 	public void render () {
 		//Anti aliasing enabled
 		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
+
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		//SLOW MOTION
+		/*
+		if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
+			gpm.update(Gdx.graphics.getDeltaTime() * 0.2f);
+		}else{
+			gpm.update(Gdx.graphics.getDeltaTime());
+		}
+		*/
+
 		gpm.update(Gdx.graphics.getDeltaTime());
 		gpm.render(batch);
+
 		//FPS.log();
 	}
 

@@ -209,6 +209,10 @@ public  class Area extends Model {
     }
 
     public String toString(){
+        return "area of type : "+type.name().toLowerCase();
+    }
+
+    public String toLongString(){
         String str ="";
         if(checkmap != null) {
             str += "\nrowInit : "+ rowInit +"\ncolInit : "+colInit+"\n\n";

@@ -190,6 +190,7 @@ public abstract class ActorCommand extends BattleCommand{
         return isInitiatorValid() && isTargetValid();
     }
 
+
     public boolean isInitiatorValid(){
         return isInitiatorValid(rowActor, colActor);
     }
@@ -200,7 +201,7 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     // called to checked initiator requirements
-    public boolean isInitiatorValid(int rowActor, int colActor){
+    protected  boolean isInitiatorValid(int rowActor, int colActor){
         boolean valid = false;
         if(bfr.getModel().isTileOccupied(rowActor, colActor)){
             IUnit actor = bfr.getModel().getUnit(rowActor, colActor);

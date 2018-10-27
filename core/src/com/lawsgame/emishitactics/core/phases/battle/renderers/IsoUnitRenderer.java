@@ -81,25 +81,32 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         }
     }
 
+
     @Override
     public void update(float dt) {
-        super.update(dt);
-        animation.update(dt);
-        animationCountDown.update(dt);
+        // allow to blend animation without displaying the rest animation in-between
+
+
 
         handleDeplacement(dt);
 
         if(targeted) blinkTime += dt;
 
         if(animationCountDown.isFinished()){
-            animationCountDown.reset();
-            if(!outofaction) {
-                this.display(AnimId.REST);
-            }else{
-                this.state = AnimId.REST;
-            }
 
+            if(getModel().isWarlord() && getModel().getArmy().getAffiliation() == Data.Affiliation.ENEMY_0)
+                System.out.println("                "+getModel().getName()+" PREVIOUS STATE :"+state.name() + " RESTING ? "+isResting());
+
+            animationCountDown.reset();
+            display(AnimId.REST);
+            launchNextAnimation();
         }
+
+        if(getModel().isWarlord() && getModel().getArmy().getAffiliation() == Data.Affiliation.ENEMY_0)
+            System.out.println("                "+getModel().getName()+" STATE :"+state.name() + " RESTING ?"+isResting());
+
+        animation.update(dt);
+        animationCountDown.update(dt);
 
     }
 
@@ -218,16 +225,15 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     }
 
     private Vector dl = new Vector();
-    Vector checkingdl = new Vector();
+    private Vector checkingdl = new Vector();
     private boolean pushed = false;
     private float[] vgoal = new float[2];
-    float[] vpreviousGoal; //x, y
-    int[] previousGoal = new int[2]; //x, y
-    int[] goal = new int[2]; // row, col
+    private int[] previousGoal = new int[2]; //x, y
+    private  int[] goal = new int[2]; // row, col
 
     private void updateMoveTempoStep(float dt){
 
-        vpreviousGoal = remainingPath.pop();
+        float[] vpreviousGoal = remainingPath.pop();
         if(remainingPath.size > 0) {
 
             vgoal[0] = remainingPath.peek()[0];
@@ -262,7 +268,13 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             dl.x = 0;
             dl.y = 0;
 
-            if(!pushed) display(AnimId.REST);
+            if(!pushed){
+                this.state = AnimId.REST;
+                /*
+                display(AnimId.REST);
+                launchNextAnimation();
+                */
+            }
             pushed = false;
         }
     }
@@ -334,6 +346,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
      */
     @Override
     public void display(AnimId animId) {
+
         Array<Sprite> updatedSet = (getModel().isCharacter()) ?
                 bfr.assetProvider.charaSpriteTree.getSpriteSet(
                         promoted,
@@ -355,18 +368,18 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         if(updatedSet != null) {
 
             // build animation , sprites, ids and rendering coords fitting
-            this.state = animId;
-            this.spriteSet = updatedSet;
+            state = animId;
+            spriteSet = updatedSet;
             updateSpritePos();
-            this.animation.set(updatedSet.size, animId.getSpeed(), animId.isLoop(), animId.isBacknforth(), animId.isRandomlyStarted());
-            this.animation.stop();
-            this.animation.play();
+            animation.set(updatedSet.size, animId.getSpeed(), animId.isLoop(), animId.isBacknforth(), animId.isRandomlyStarted());
+            animation.stop();
+            animation.play();
+            animationCountDown.reset();
             if(state.isTimeLimited()) {
                 animationCountDown.run();
             }
-            if(state == AnimId.DIE || state == AnimId.FLEE) {
-                outofaction = true;
-            }
+            outofaction = state == AnimId.DIE || state == AnimId.FLEE;
+
         }
     }
 

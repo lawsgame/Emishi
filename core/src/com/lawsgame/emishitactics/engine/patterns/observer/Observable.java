@@ -15,4 +15,12 @@ public abstract class Observable {
 			observers.get(i).getNotification(this, dataBundle);
 		}
 	}
+
+	public String displayObservers(){
+		String str = "OBSERVERS";
+		for(int i = 0; i < observers.size; i++){
+			str += "\n  "+observers.get(i).toString();
+		}
+		return str;
+	}
 }

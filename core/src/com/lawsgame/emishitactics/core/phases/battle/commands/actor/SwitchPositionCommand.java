@@ -64,6 +64,7 @@ public class SwitchPositionCommand extends ActorCommand {
             Array<AnimationScheduler.Task> eventTasks = tile.performEvents(STEP_ON);
             scheduleMultipleRenderTasks(eventTasks);
         }
+
     }
 
     @Override

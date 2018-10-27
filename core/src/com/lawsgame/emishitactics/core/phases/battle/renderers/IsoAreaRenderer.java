@@ -25,9 +25,7 @@ public class IsoAreaRenderer extends AreaRenderer {
 
     @Override
     protected void renderArea(SpriteBatch batch) {
-        //System.out.println("\nAREA RENDER");
         for(int i = 0; i < sprites.size; i++){
-            //System.out.println(sprites.get(i).getX() + " "+sprites.get(i).getY());
             sprites.get(i).draw(batch);
         }
     }
@@ -145,16 +143,20 @@ public class IsoAreaRenderer extends AreaRenderer {
                                     if(getModel().getType().isRectangular()){
                                         sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_ACUTE));
                                     }else {
+
                                         sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
-                                        sprite.setPosition(xCenter - 0.25f, yCenter - 0.5f);
+                                        sprite.setPosition(xCenter - 0.75f, yCenter - 0.25f);
                                         sprite.setFlip(false, true);
                                         sprites.add(sprite);
+
                                         sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                         sprite.setFlip(false, true);
                                         sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f);
                                         sprites.add(sprite);
                                         sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+
                                     }
+
                                 }
                                 sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f );
                                 sprites.add(sprite);

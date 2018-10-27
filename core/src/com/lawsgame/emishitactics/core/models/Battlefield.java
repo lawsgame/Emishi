@@ -349,6 +349,20 @@ public class Battlefield extends Model {
         return guardians;
     }
 
+    public IUnit getStrongestGuardian(int row, int col, Affiliation alleageance){
+        Array<IUnit> guardians = getAvailableGuardian(row, col , alleageance);
+        IUnit electedGuardian = null;
+        if(guardians.size > 0) {
+            electedGuardian = guardians.get(0);
+            for (int i = 1; i < guardians.size; i++) {
+                if (guardians.get(i).getLevel() > electedGuardian.getLevel()) {
+                    electedGuardian = guardians.get(i);
+                }
+            }
+        }
+        return electedGuardian;
+    }
+
     public void addDeploymentTile(int row, int col, int areaIndex, boolean notifyObservers){
 
         if(isTileReachable(row, col, false) && 0 <= areaIndex){
@@ -559,8 +573,9 @@ public class Battlefield extends Model {
                 removeAllAttachedArea(unit,true,  notifyObservers);
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
-                if(notifyObservers)
+                if(notifyObservers) {
                     notifyAllObservers(new Notification.SetUnit(rowf, colf, unit));
+                }
             }
         }
     }
