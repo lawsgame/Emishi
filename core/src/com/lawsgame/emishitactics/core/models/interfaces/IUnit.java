@@ -2,18 +2,17 @@ package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.core.models.Banner;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
-import com.lawsgame.emishitactics.core.models.Banner;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Equipment;
-import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
 import com.lawsgame.emishitactics.core.models.Weapon;
-import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.Stack;
 
@@ -181,7 +180,7 @@ public abstract class IUnit extends Model {
     public abstract int getRecoveredHitPoints(int healPower);
     public abstract int getRecoveredMoralPoints(int healPower);
     public abstract boolean treated(int healPower);
-    public abstract Array<Notification.ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly);
+    public abstract ApplyDamage applyDamage(int damageTaken, boolean moralDamageOnly);
 
 
 }

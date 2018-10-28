@@ -164,54 +164,47 @@ public class HitCommand extends ActorCommand{
 
     protected void performAttack(){
         StandardTask task = new StandardTask();
-        RendererThread attackerThread = new RendererThread(bfr.getUnitRenderer(getInitiator()));
-        Array<StandardTask.RendererThread> targetsThreads = new Array<StandardTask.RendererThread>();
-        targetsThreads.add(new RendererThread(bfr.getUnitRenderer(defenderRenderer.getModel())));
+        RendererThread initiatorThread = new RendererThread(bfr.getUnitRenderer(getInitiator()));
+        Array<StandardTask.RendererThread> defendersThreads = new Array<StandardTask.RendererThread>();
+        defendersThreads.add(new RendererThread(bfr.getUnitRenderer(defenderRenderer.getModel())));
+
+        Array<ApplyDamage> notifs = new Array<ApplyDamage>();
 
         Orientation reOrientation = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         getInitiator().setOrientation(reOrientation);
-        attackerThread.addQuery(reOrientation);
-        attackerThread.addQuery(Data.AnimId.ATTACK);
-
-        boolean backstabbed = getInitiator().getOrientation() == defenderRenderer.getModel().getOrientation();
-        if(!backstabbed){
-            reOrientation = getInitiator().getOrientation().getOpposite();
-            getTarget().setOrientation(reOrientation);
-            targetsThreads.get(0).addQuery(reOrientation);
-        }
+        initiatorThread.addQuery(reOrientation);
+        initiatorThread.addQuery(Data.AnimId.ATTACK);
 
         int dicesroll = Utils.getMean(2,100);
         if(dicesroll < hitrate){
 
-            Array<ApplyDamage> notifs = defenderRenderer.getModel().applyDamage(damageDealt, false);
+            ApplyDamage notif = defenderRenderer.getModel().applyDamage(damageDealt, false);
+            notif.critical = false;
+            notif.backstab = getInitiator().getOrientation() == defenderRenderer.getModel().getOrientation();
+            notif.fleeingOrientation = getInitiator().getOrientation();
 
-            if(!backstabbed){
-                defenderRenderer.getModel().setOrientation(getInitiator().getOrientation().getOpposite());
-                targetsThreads.get(0).addQuery(getInitiator().getOrientation().getOpposite());
-            }
-            for(int i = 0; i < notifs.size; i++){
-                notifs.get(i).critical = false;
-                notifs.get(i).backstab = backstabbed && i == 0;
-                notifs.get(i).fleeingOrientation = getInitiator().getOrientation();
-                if(i != 0){
-                    targetsThreads.add(new StandardTask.RendererThread(bfr.getUnitRenderer(notifs.get(i).wounded), notifs.get(i)));
-                }else{
-                    targetsThreads.get(0).addQuery(notifs.get(0));
-                }
+            if(!notif.backstab){
+                reOrientation = getInitiator().getOrientation().getOpposite();
+                defenderRenderer.getModel().setOrientation(reOrientation);
+                defendersThreads.get(0).addQuery(reOrientation);
             }
 
-            updateOutcome(getInitiator(), notifs);
+            defendersThreads.get(0).addQuery(notif);
+
+            notifs.add(notif);
 
         }else{
-            defenderRenderer.getModel().setOrientation(getInitiator().getOrientation().getOpposite());
-            targetsThreads.get(0).addQuery(getInitiator().getOrientation().getOpposite());
-            targetsThreads.get(0).addQuery(Data.AnimId.DODGE);
+            reOrientation = getInitiator().getOrientation().getOpposite();
+            defenderRenderer.getModel().setOrientation(reOrientation);
+            defendersThreads.get(0).addQuery(reOrientation);
+
+            defendersThreads.get(0).addQuery(Data.AnimId.DODGE);
         }
 
-        System.out.println(outcome);
+        updateOutcome(getInitiator(), notifs);
 
-        task.addThread(attackerThread);
-        task.addllThreads(targetsThreads);
+        task.addThread(initiatorThread);
+        task.addllThreads(defendersThreads);
         scheduleRenderTask(task);
 
     }

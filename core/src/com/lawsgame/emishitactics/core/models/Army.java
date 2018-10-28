@@ -665,6 +665,15 @@ public class Army extends IArmy{
         return getSquadExceedingCapacity(unit) > 0;
     }
 
+    @Override
+    public Array<Notification.ApplyDamage> dealDamageUponUnitRemoval(IUnit removed) {
+        //TODO:
+
+
+
+        return null;
+    }
+
 
     @Override
     public String toString(){

@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public abstract class IArmy extends Model{
@@ -62,6 +63,7 @@ public abstract class IArmy extends Model{
     public abstract void updateActionPoints();
     public abstract int getSquadExceedingCapacity(IUnit unit);
     public abstract boolean isSquadOversized(IUnit unit);
+    public abstract Array<Notification.ApplyDamage> dealDamageUponUnitRemoval(IUnit removed);
 
     public abstract String toShortString();
 }

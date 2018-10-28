@@ -1261,10 +1261,9 @@ public class Unit extends IUnit{
         return false;
     }
 
-    public Array<ApplyDamage> applyDamage(int damageTaken, boolean moralDamageOnly){
-        Array<ApplyDamage> notifications = new Array<ApplyDamage>();
+    @Override
+    public ApplyDamage applyDamage(int damageTaken, boolean moralDamageOnly){
         ApplyDamage notification = new ApplyDamage(this, moralDamageOnly, damageTaken);
-        notifications.add(notification);
 
         // moral damaga
         if (!has(Data.Ability.UNBREAKABLE)) {
@@ -1289,6 +1288,7 @@ public class Unit extends IUnit{
             }
         }
 
+        /*
         if(isOutOfAction() && isWarChief()){
             int moralDamage = getWarchief().getAppCharisma();
             Array<IUnit> squad = getArmy().getSquad(this, true);
@@ -1296,7 +1296,8 @@ public class Unit extends IUnit{
                 notifications.addAll(squad.get(i).applyDamage(moralDamage, true));
             }
         }
-        return notifications;
+        */
+        return notification;
     }
 
     @Override
