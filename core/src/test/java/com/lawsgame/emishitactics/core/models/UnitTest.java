@@ -41,7 +41,6 @@ public class UnitTest {
 
         res = unit.setExperience(238);
 
-        System.out.println(unit.getExperience());
         assertTrue(unit.getExperience() == 38);
         assertTrue(res.length == 3);
         assertTrue(res[0] == 100);

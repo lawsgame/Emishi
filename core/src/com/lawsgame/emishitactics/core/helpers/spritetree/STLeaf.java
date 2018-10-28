@@ -36,7 +36,7 @@ public class STLeaf {
 
 
 
-    // ----------- STLeaf for REST animation -----------------
+    // ----------- STLeaf for IDLE animation -----------------
 
     static class RestSpriteSetLeaf extends STLeaf {
         protected boolean done;

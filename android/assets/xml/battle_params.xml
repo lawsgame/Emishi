@@ -17,10 +17,16 @@
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
+                <Unit row = "9" col = "7" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="SWORD" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                    <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
+                    <Attribute id= "right handed" value="true"/>
+                    <Attribute id= "orientation" value="SOUTH"/>
+                    <Attribute id= "behaviour" value="PASSIVE"/>
+                </Unit>
             </Squad>
 
             <!---Squad>
-                <Unit row = "9" col = "7" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="SWORD" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "9" col = "8" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="SWORD" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
                     <Attribute id= "right handed" value="true"/>
                     <Attribute id= "orientation" value="SOUTH"/>

@@ -25,18 +25,19 @@ public class AnimationScheduler implements GameUpdatableEntity{
     public void update(float dt) {
 
         if(!tasks.isEmpty()){
-            if(!tasks.peek().isInitiazed()){
-                tasks.peek().init();
-                System.out.println(this);
-            }
-
-            //update the threads of the current task
-            tasks.peek().update(dt);
-
             // launch the next task
             if(tasks.peek().isCompleted()){
                 tasks.peek().notifyAllObservers(tasks.peek());
                 tasks.pop();
+            }
+
+            if(!tasks.isEmpty()) {
+                if (!tasks.peek().isInitiazed()) {
+                    tasks.peek().init();
+                }
+
+                //update the threads of the current task
+                tasks.peek().update(dt);
             }
         }
     }

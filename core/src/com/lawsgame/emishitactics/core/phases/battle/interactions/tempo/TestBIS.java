@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -62,7 +63,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         // TEST CUSTOMED COMMAND
 
         //customedCommand = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        customedCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory(), 300, 90);
+        customedCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory(), 20, 90);
         customedCommand.setFree(true);
         ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
         ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
@@ -216,23 +217,30 @@ public class TestBIS extends BattleInteractionState implements Observer{
                 historic.pop().pushRenderTasks();
             customedCommand.pushRenderTasks();
         }
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.B)){
-            System.out.println(bim.bfr.toLongShort());
-        }
-
         if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
+
+            int[] sltdUnitPos = bim.battlefield.getUnitPos(sltdUnit);
+            Array<int[]> path = new Array<int[]>();
+            path.add(new int[]{sltdUnitPos[0], sltdUnitPos[1] + 1});
             /*
-            sltdUnit.notifyAllObservers(Data.AnimId.ATTACK);
-            sltdUnit.setOrientation(Data.Orientation.WEST, true);
-            sltdUnit.notifyAllObservers(Data.AnimId.BACKSTAB);
+            bim.bfr.getUnitRenderer(sltdUnit).displayWalk(path, false);
+            bim.scheduler.addTask(new StandardTask(bim.battlefield, bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path)));
+            */
+
+            /*
+            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.AnimId.ATTACK);
+            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.Orientation.WEST);
+            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.AnimId.BACKSTAB);
+            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, new Notification.Walk(sltdUnit, path));
             */
 
             /*
             bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.ATTACK));
             bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.Orientation.WEST));
             bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.BACKSTAB));
+            bim.scheduler.addTask(new StandardTask(bim.battlefield, bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path)));
             */
+
 
 
             StandardTask task = new StandardTask();
@@ -242,13 +250,22 @@ public class TestBIS extends BattleInteractionState implements Observer{
             thread0.addQuery(Data.Orientation.WEST);
             thread0.addQuery(Data.AnimId.BACKSTAB);
 
-            //StandardTask.RendererThread thread1 = new StandardTask.RendererThread(bim.bfr.getUnitRenderer(foeWL));
-            //thread1.addQuery(Data.Orientation.WEST);
+            StandardTask.RendererThread thread1 = new StandardTask.RendererThread(bim.bfr.getUnitRenderer(foeWL));
+            thread1.addQuery(Data.AnimId.SPECIAL_MOVE);
 
             task.addThread(thread0);
-            //task.addThread(thread1);
+            task.addThread(thread1);
             bim.scheduler.addTask(task);
 
+            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path)));
+
+
+            /*
+            int[] foePos = bim.battlefield.getUnitPos(foeWL);
+            path.get(0)[0] = foePos[0];
+            path.get(0)[1] = foePos[1] + 1;
+            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(foeWL), new Notification.Walk(foeWL, path)));
+            */
 
             //bim.bfr.removeUnitRenderer(sltdUnit);
         }
@@ -269,7 +286,6 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     @Override
     public void getNotification(Observable sender, Object data) {
-        System.out.println(sender+"\n");
         if(sender == data)
             sender.detach(this);
     }

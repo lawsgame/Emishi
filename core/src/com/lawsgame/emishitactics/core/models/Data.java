@@ -42,11 +42,11 @@ public class Data {
     // RENDER parameters
         public static final float SPEED_TEMPO_WALK = 3f;  //tile/s
         public static final float SPEED_TEMPO_PUSHED = 8f;
-    public static final float SPEED_WALK = 0.8f;
+    public static final float SPEED_WALK = 1.5f;
     public static final float SPEED_PUSHED = 1.9f;
     public static final float ANIMATION_NORMAL_SPEED = 0.55f;
     public static final float ANIMATION_FLEE_SPEED = 0.09f;
-    public static final float ANIMATION_WALK_SPEED = 0.33f;
+    public static final float ANIMATION_WALK_SPEED = 0.25f;
     public static final float TARGET_BLINK_PERIOD = 1.0f * MathUtils.PI;
     public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
 
@@ -140,7 +140,7 @@ public class Data {
         STEAL(          SpriteSetId.STEAL),
         BUILD(          SpriteSetId.BUILD),
         GUARD(          SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        REST(           SpriteSetId.REST, SpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
+        IDLE(           SpriteSetId.REST, SpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
         ATTACK(         SpriteSetId.ATTACK),
         DODGE(          SpriteSetId.DODGE),
         DIE(            SpriteSetId.DIE),

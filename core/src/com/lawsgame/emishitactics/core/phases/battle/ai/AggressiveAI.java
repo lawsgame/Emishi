@@ -71,7 +71,6 @@ public class AggressiveAI extends PassiveAI {
                 applyAndStore(endUnitTurnCommand, bundle);
             }
 
-            //System.out.println(bundle);
 
         }
         return bundle;

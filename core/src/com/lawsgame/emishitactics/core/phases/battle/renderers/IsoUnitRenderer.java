@@ -15,6 +15,8 @@ import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
+import static com.lawsgame.emishitactics.core.models.Data.AnimId.IDLE;
+
 public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     private static final float VECTPROD_ERROR_MARGIN = 0.01f;
@@ -41,6 +43,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     private boolean visible;
     private float blinkTime = 0;
+    private boolean poolNextTask = false;
     private CountDown animationCountDown = new CountDown(Data.ANIMATION_DURATION);
 
     //walk (& switch position / pushed) attributes
@@ -67,7 +70,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         this.done = model.isDone();
         this.promoted = model.isPromoted();
 
-        display(AnimId.REST);
+        display(IDLE);
         setPos(row, col);
     }
 
@@ -84,7 +87,22 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     @Override
     public void update(float dt) {
-        // allow to blend animation without displaying the rest animation in-between
+        /*
+         POOLING SCHEDULER TASK
+
+         By setting poolNextTask to true, the renderer allow itself to wait one fool frame
+         for the scheduler to push the next set of tasks to be rendered
+         before updating the current animation by calling BUR.display().
+
+         Allowing in fine to blend animation without displaying the ugly blinking rest animation in-between
+          */
+        if(poolNextTask){
+            poolNextTask = false;
+            launchNextAnimation();
+            if(state == IDLE){
+                display(IDLE);
+            }
+        }
 
 
 
@@ -93,18 +111,24 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         if(targeted) blinkTime += dt;
 
         if(animationCountDown.isFinished()){
-
-            if(getModel().isWarlord() && getModel().getArmy().getAffiliation() == Data.Affiliation.ENEMY_0)
-                System.out.println("                "+getModel().getName()+" PREVIOUS STATE :"+state.name() + " RESTING ? "+isResting());
-
             animationCountDown.reset();
-            display(AnimId.REST);
+            this.state = IDLE;
+
+            /*
+            launchNextAnimation is called twice :
+
+            One time, right after the end of any animation to pool the next
+            render task from the notification queue of the BUR super class
+
+            A second time, through the use of poolNextTask if the BUR is still in
+            idle mode to allow the scheduler to update the content of the notification queue
+            of the renderer.
+             */
             launchNextAnimation();
+            if(state == IDLE) {
+                this.poolNextTask = true;
+            }
         }
-
-        if(getModel().isWarlord() && getModel().getArmy().getAffiliation() == Data.Affiliation.ENEMY_0)
-            System.out.println("                "+getModel().getName()+" STATE :"+state.name() + " RESTING ?"+isResting());
-
         animation.update(dt);
         animationCountDown.update(dt);
 
@@ -181,10 +205,15 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
      * @return true if the unit is not at rest.
      */
     @Override
-    public boolean isResting() {
-        return state == AnimId.REST;
+    public boolean isIdling() {
+        return state == IDLE;
     }
 
+    /**
+     *
+     * @param path : path to a given tile, must not include the current tile occupied by this unit
+     * @param switchpos
+     */
     @Override
     public void displayWalk(Array<int[]> path, boolean switchpos) {
 
@@ -265,15 +294,17 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             bfr.updateBURRenderCall(goal[0], goal[1], this);
 
         }else{
+            // walk animation finished !
             dl.x = 0;
             dl.y = 0;
 
             if(!pushed){
-                this.state = AnimId.REST;
-                /*
-                display(AnimId.REST);
+
+                //display(AnimId.IDLE);
+                this.state = IDLE;
                 launchNextAnimation();
-                */
+                this.poolNextTask = true;
+
             }
             pushed = false;
         }

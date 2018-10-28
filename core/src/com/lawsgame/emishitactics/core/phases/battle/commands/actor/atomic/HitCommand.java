@@ -107,7 +107,7 @@ public class HitCommand extends ActorCommand{
         performAttack();
 
         // HANDLE EVENTS
-        //handleEvents();
+        handleEvents();
 
         // remove OOA units
         removeOutOfActionUnits();
@@ -163,24 +163,22 @@ public class HitCommand extends ActorCommand{
     }
 
     protected void performAttack(){
-
-        orientationCommand.setOrientation(Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget));
-        if(orientationCommand.apply(rowActor, colActor))
-            scheduleMultipleRenderTasks(orientationCommand.confiscateTasks());
-
-        boolean backstabbed = getInitiator().getOrientation() == defenderRenderer.getModel().getOrientation();
-
-        if(!backstabbed) {
-            orientationCommand.setOrientation(getInitiator().getOrientation().getOpposite());
-            if (orientationCommand.apply(rowTarget, colTarget))
-                scheduleMultipleRenderTasks(orientationCommand.confiscateTasks());
-        }
-
         StandardTask task = new StandardTask();
         RendererThread attackerThread = new RendererThread(bfr.getUnitRenderer(getInitiator()));
         Array<StandardTask.RendererThread> targetsThreads = new Array<StandardTask.RendererThread>();
         targetsThreads.add(new RendererThread(bfr.getUnitRenderer(defenderRenderer.getModel())));
+
+        Orientation reOrientation = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
+        getInitiator().setOrientation(reOrientation);
+        attackerThread.addQuery(reOrientation);
         attackerThread.addQuery(Data.AnimId.ATTACK);
+
+        boolean backstabbed = getInitiator().getOrientation() == defenderRenderer.getModel().getOrientation();
+        if(!backstabbed){
+            reOrientation = getInitiator().getOrientation().getOpposite();
+            getTarget().setOrientation(reOrientation);
+            targetsThreads.get(0).addQuery(reOrientation);
+        }
 
         int dicesroll = Utils.getMean(2,100);
         if(dicesroll < hitrate){
@@ -202,13 +200,15 @@ public class HitCommand extends ActorCommand{
                 }
             }
 
-            updateOutcome(getInitiator(), notifs);;
+            updateOutcome(getInitiator(), notifs);
 
         }else{
             defenderRenderer.getModel().setOrientation(getInitiator().getOrientation().getOpposite());
             targetsThreads.get(0).addQuery(getInitiator().getOrientation().getOpposite());
             targetsThreads.get(0).addQuery(Data.AnimId.DODGE);
         }
+
+        System.out.println(outcome);
 
         task.addThread(attackerThread);
         task.addllThreads(targetsThreads);

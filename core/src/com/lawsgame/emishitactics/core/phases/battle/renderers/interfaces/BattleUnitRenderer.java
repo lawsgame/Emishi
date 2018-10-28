@@ -6,7 +6,6 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.GameElement;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
@@ -22,14 +21,13 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     }
 
     /**
-     *
-     * @return true if a animation has effectively be launched
+     *  recurvise method which keep calling itself to iterate through the notificationQueue
+     *  until the renderer is not idle any more or the notification queue gets empty.
      */
     protected void launchNextAnimation(){
-        if(isResting() && notificationQueue.size() > 0) {
+        if(isIdling() && notificationQueue.size() > 0) {
 
             Object query = notificationQueue.pop();
-            System.out.println("BUR model : "+getModel().getName()+" & query :"+query);
 
             if (query instanceof Notification.ApplyDamage) {
                 Notification.ApplyDamage notification = (Notification.ApplyDamage) query;
@@ -45,6 +43,9 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
             } else if (query instanceof Notification.Pushed) {
                 Notification.Pushed notif = (Notification.Pushed) query;
                 displayPushed(notif.orientation);
+            } else if (query instanceof Notification.Walk) {
+                Notification.Walk notif = (Notification.Walk) query;
+                displayWalk(notif.path, false);
             } else if (query instanceof Notification.Fled) {
                 Notification.Fled notif = (Notification.Fled) query;
                 displayFlee(notif.orientation);
@@ -73,7 +74,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
 
     @Override
     public boolean isExecuting() {
-        return !isResting() || notificationQueue.size() > 0;
+        return !isIdling() || notificationQueue.size() > 0;
     }
 
     public abstract void setPos(int row, int col);
@@ -84,7 +85,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     public abstract void setOrientation(Data.Orientation or);
     public abstract void setWeaponType(Data.WeaponType type);
     public abstract void setHorseman(boolean horseman);
-    public abstract boolean isResting();
+    public abstract boolean isIdling();
 
     public abstract void displayWalk(Array<int[]> path, boolean swithpos);
     public abstract void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab);

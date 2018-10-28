@@ -13,7 +13,7 @@ public class Player {
     public static Player create(){
         Army playerArmy = Army.createPlayerArmyTemplate();
 
-        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 18, Data.WeaponType.BOW, true, false, false, false, false);
+        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 6, Data.WeaponType.BOW, true, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));

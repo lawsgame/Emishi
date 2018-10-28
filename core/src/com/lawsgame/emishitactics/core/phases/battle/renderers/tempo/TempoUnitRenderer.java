@@ -67,7 +67,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         this.visible = true;
         weapontTexture = TempoSpritePool.get().getWeaponSprite(model.getCurrentWeapon().getTemplate().getWeaponType());
         orientationTexture = TempoSpritePool.get().getOrientationSprite(model.getOrientation());
-        display(Data.AnimId.REST);
+        display(Data.AnimId.IDLE);
     }
 
 
@@ -82,7 +82,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
             offabbTexture = null;
             countDown.reset();
             if(!isExecuting())
-                display(Data.AnimId.REST);
+                display(Data.AnimId.IDLE);
 
         }
 
@@ -130,7 +130,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 if (remainingPath.size == 0) {
                     pushed = false;
                     executing = false;
-                    display(Data.AnimId.REST);
+                    display(Data.AnimId.IDLE);
                 } else {
                     Data.Orientation orientation = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(), remainingPath.get(0)[0], remainingPath.get(0)[1]);
                     orientationTexture = TempoSpritePool.get().getOrientationSprite(orientation);
@@ -314,7 +314,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
                 unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
-            case REST:
+            case IDLE:
                 if(done){
                     unitSprite.setRegion(TempoSpritePool.get().getDoneUnitSprite());
                 }else {
@@ -362,14 +362,14 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public boolean isResting() {
+    public boolean isIdling() {
         return !executing;
     }
 
     @Override
     public void setDone(boolean done) {
         this.done = done;
-        display(Data.AnimId.REST);
+        display(Data.AnimId.IDLE);
     }
 
     @Override
