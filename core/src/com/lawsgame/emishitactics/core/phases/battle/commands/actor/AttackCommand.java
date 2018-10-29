@@ -63,28 +63,11 @@ public class AttackCommand extends ActorCommand {
 
 
     public int getHitRate(boolean retaliation){
-        int hitRate = 0;
-        if(!retaliation){
-            int[] defenderPos = bfr.getModel().getUnitPos(initialBlow.getDefenderRenderer().getModel());
-            hitRate = Formulas.getHitRate(rowActor, colActor, defenderPos[0], defenderPos[1], bfr.getModel());
-        }else if(relationBlow.isApplicable()){
-            int[] defenderPos = bfr.getModel().getUnitPos(relationBlow.getDefenderRenderer().getModel());
-            hitRate = Formulas.getHitRate(rowTarget, colTarget, defenderPos[0], defenderPos[1], bfr.getModel());
-        }
-        return hitRate;
+        return 0;
     }
 
     public int getDealtDamage(boolean retaliation){
-        int dealtDamage = 0;
-        if(!retaliation){
-            int[] defenderPos = bfr.getModel().getUnitPos(initialBlow.getDefenderRenderer().getModel());
-            dealtDamage = Formulas.getDealtDamage(rowActor, colActor, defenderPos[0], defenderPos[1], bfr.getModel());
-        }else if(relationBlow.isApplicable()){
-            int[] defenderPos = bfr.getModel().getUnitPos(relationBlow.getDefenderRenderer().getModel());
-            dealtDamage = Formulas.getDealtDamage(rowTarget, colTarget, defenderPos[0], defenderPos[1], bfr.getModel());
-        }
-
-        return dealtDamage;
+        return 0;
     }
 
     public int getLootRate(boolean retaliation){
@@ -98,11 +81,11 @@ public class AttackCommand extends ActorCommand {
     }
 
     public IUnit getTargetDefender(){
-        return initialBlow.getDefenderRenderer().getModel();
+        return initialBlow.getTarget();
     }
 
 
     public IUnit getInitiatorDefender() {
-        return relationBlow.getDefenderRenderer().getModel();
+        return relationBlow.getInitiator();
     }
 }

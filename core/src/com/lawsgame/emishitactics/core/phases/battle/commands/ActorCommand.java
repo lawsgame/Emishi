@@ -73,7 +73,9 @@ public abstract class ActorCommand extends BattleCommand{
 
 
     protected final ActionChoice choice;
-    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as true while being applied nor it costs any OA point
+    protected boolean registerAction;
+    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as "registerAction" while being applied nor it costs any OA point
+
 
     private IUnit initiator;
     private IUnit target;
@@ -89,7 +91,6 @@ public abstract class ActorCommand extends BattleCommand{
     public ActorCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free){
         super(bfr, scheduler);
         this.choice = choice;
-
         this.outcome = new Outcome(playerInventory);
         this.free = free;
     }
@@ -103,6 +104,7 @@ public abstract class ActorCommand extends BattleCommand{
         this.rowTarget = -1;
         this.colTarget = -1;
         this.eventTriggered = false;
+        this.registerAction = true;
     }
 
     public final void setInitiator(int rowActor, int colActor) {
@@ -135,9 +137,9 @@ public abstract class ActorCommand extends BattleCommand{
             if(!free){
 
                 if(choice.isActedBased()) {
-                    getInitiator().setActed(true);
+                    getInitiator().setActed(registerAction);
                 }else {
-                    getInitiator().setMoved( true);
+                    getInitiator().setMoved(registerAction);
                 }
 
                 getInitiator().addActionPoints(-choice.getCost());
@@ -152,6 +154,7 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){
+        init();
         setInitiator(rowActor, colActor);
         setTarget(rowTarget, colTarget);
         return apply();
@@ -191,28 +194,17 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
 
-    public boolean isInitiatorValid(){
-        return isInitiatorValid(rowActor, colActor);
-    }
-
-    public boolean isInitiatorValid(IUnit actor){
-        int[] actorPos = bfr.getModel().getUnitPos(actor);
-        return actorPos != null && isInitiatorValid(actorPos[0], actorPos[1]);
-    }
-
     // called to checked initiator requirements
-    protected  boolean isInitiatorValid(int rowActor, int colActor){
+    public  boolean isInitiatorValid(){
         boolean valid = false;
         if(bfr.getModel().isTileOccupied(rowActor, colActor)){
             IUnit actor = bfr.getModel().getUnit(rowActor, colActor);
             if(!actor.isOutOfAction()) {
-                if (free) {
-                    valid = true;
-                } else if (choice.getCost() <= actor.getActionPoints()) {
+                if (free || choice.getCost() <= actor.getActionPoints()) {
                     if (choice.isActedBased()) {
-                        valid = !actor.hasActed() && !actor.isDisabled();
+                        valid = (free || !actor.hasActed()) && !actor.isDisabled();
                     } else {
-                        valid = !actor.hasMoved() && !actor.isCrippled();
+                        valid = (free || !actor.hasMoved()) && !actor.isCrippled();
                     }
                 }
             }
@@ -227,7 +219,7 @@ public abstract class ActorCommand extends BattleCommand{
      * @return whether or not THIS SPECIFIC TARGET is at range by the initiator performing the given action if one's is standing the buildingType (rowActor, colActor)
      * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public final boolean isTargetValid() {
+    public boolean isTargetValid() {
         return isTargetValid(rowActor, colActor, rowTarget, colTarget);
     }
 

@@ -47,7 +47,9 @@ public class Data {
     public static final float ANIMATION_NORMAL_SPEED = 0.55f;
     public static final float ANIMATION_FLEE_SPEED = 0.09f;
     public static final float ANIMATION_WALK_SPEED = 0.25f;
-    public static final float TARGET_BLINK_PERIOD = 1.0f * MathUtils.PI;
+    public static final float BLINK_PERIOD_TARGET = 1.0f * MathUtils.PI;
+    public static final float BLINK_PERIOD_WOUNDED_BASE = 7.0f;
+    public static final float BLINK_PERIOD_WOUNDED_AMPLITUDE = 2.0f;
     public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
 
 
@@ -141,7 +143,7 @@ public class Data {
         BUILD(          SpriteSetId.BUILD),
         GUARD(          SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         IDLE(           SpriteSetId.REST, SpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
-        ATTACK(         SpriteSetId.ATTACK),
+        REGULAR_ATTACK(         SpriteSetId.ATTACK),
         DODGE(          SpriteSetId.DODGE),
         DIE(            SpriteSetId.DIE),
         GUARDED(        SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
@@ -217,7 +219,8 @@ public class Data {
         GUARD               (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
         STEAL               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
         BUILD               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        END_TURN            (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}});
+        END_TURN            (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}}),
+        SELF_HEAL           (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
         private int experience;
@@ -592,12 +595,12 @@ public class Data {
      *  - Great bow
      */
     public enum WeaponTemplate{
-        FIST(           1, 1, 100, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
-        SHORTSWORD(     3, 3, 90, 1, 1, 20, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
-        LANCE(          3, 3, 95, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
-        BROAD_AXE(      4, 5, 80, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
-        CLUB(           4, 4, 85, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
-        HUNTING_BOW(    3, 4, 75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
+        FIST(           1, 1, 110, 1, 1, 0, WeaponType.FIST, DamageType.BLUNT, Ability.NONE),
+        SHORTSWORD(     4, 4, 85, 1, 1, 20, 50, WeaponType.SWORD, DamageType.EDGED, Ability.NONE),
+        SPEAR(          3, 3, 100, 1, 1, 20, 50, WeaponType.POLEARM, DamageType.PIERCING, Ability.NONE),
+        BROAD_AXE(      3, 5, 95, 1, 1, 20, 50, WeaponType.AXE, DamageType.EDGED, Ability.NONE),
+        CLUB(           4, 6, 80, 1, 1, 20, 50, WeaponType.MACE, DamageType.BLUNT, Ability.NONE),
+        HUNTING_BOW(    4, 5, 75, 2, 2, 20, 50, WeaponType.BOW, DamageType.PIERCING, Ability.NONE);
 
         private int damageMin;
         private int damageMax;

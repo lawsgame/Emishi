@@ -31,7 +31,9 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
 
             if (query instanceof Notification.ApplyDamage) {
                 Notification.ApplyDamage notification = (Notification.ApplyDamage) query;
-                displayTakeHit(notification.moralOnly, notification.damageTaken, notification.critical, notification.backstab);
+                displayTakeHit(notification.moralOnly, notification.damageDealt, notification.critical, notification.backstab);
+            } else if (query instanceof Notification.Attack) {
+                displayAttack((Notification.Attack) query);
             } else if (query instanceof Notification.Done) {
                 setDone(((Notification.Done) query).done);
             } else if (query instanceof Notification.Blink) {
@@ -62,7 +64,11 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
                 setHorseman(((Notification.Horseman) query).horseman);
             } else if (query instanceof Notification.Visible) {
                 setVisible(((Notification.Visible) query).visible);
-            }else if (query instanceof Command) {
+            } else if (query instanceof Notification.Disabled) {
+                setDisabled(((Notification.Disabled) query).disabled);
+            } else if (query instanceof Notification.Crippled) {
+                setCrippled(((Notification.Crippled) query).crippled);
+            } else if (query instanceof Command) {
                 Command customQuery = (Command) query;
                 customQuery.apply();
             }
@@ -71,6 +77,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
             launchNextAnimation();
         }
     }
+
 
     @Override
     public boolean isExecuting() {
@@ -82,12 +89,15 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     public abstract float getCenterY();
     public abstract void setDone(boolean done);
     public abstract void setTargeted(boolean targeted);
+    public abstract void setDisabled(boolean disabled);
+    public abstract void setCrippled(boolean crippled);
     public abstract void setOrientation(Data.Orientation or);
     public abstract void setWeaponType(Data.WeaponType type);
     public abstract void setHorseman(boolean horseman);
     public abstract boolean isIdling();
 
     public abstract void displayWalk(Array<int[]> path, boolean swithpos);
+    public abstract void displayAttack(Notification.Attack query);
     public abstract void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab);
     public abstract void displayTreated(int healedHP);
     public abstract void displayPushed(Data.Orientation pushedTowards);

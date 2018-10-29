@@ -126,8 +126,8 @@ public class LongUnitPanel extends UnitPanel {
         builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getBaseLeadership()+")");
         builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getBaseMobility()+")");
 
-        builder.append("\n\nATTACK might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
-        builder.append("\nATTACK accuracy : "+unit.getAppAttackAccuracy());
+        builder.append("\n\nREGULAR_ATTACK might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
+        builder.append("\nREGULAR_ATTACK accuracy : "+unit.getAppAttackAccuracy());
         builder.append("\nAvoidance : "+unit.getAppAvoidance());
         builder.append("\nRange : ("+unit.getAppWeaponRangeMin()+", "+unit.getAppWeaponRangeMax()+")");
 

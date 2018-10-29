@@ -1,20 +1,46 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
 
-    public static Notification STEP_ON = new Notification();
+    public static class StepOn {
+        public final IUnit walker;
 
+        public StepOn(IUnit walker){
+            this.walker = walker;
+        }
+    }
 
-    private Notification(){}
+    public static class BeginArmyTurn{
+        public final IArmy army;
+
+        public BeginArmyTurn(IArmy army) {
+            this.army = army;
+        }
+    }
+
+    public static class Attack{
+        public final boolean specialmove;
+        public int lifeDrained;
+
+        public Attack(boolean specialmove) {
+            this.specialmove = specialmove;
+            this.lifeDrained = 0;
+        }
+    }
 
     public static class ApplyDamage {
-        public IUnit wounded;
-        public boolean moralOnly;
-        public int damageTaken;
-        public State state;
+        public final IUnit wounded;
+        public final boolean moralOnly;
+        public final int damageDealt;
+        public final int lifeDamageTaken;
+        public boolean crippled;
+        public boolean disabled;
+        public int healFromDamage;
+        public final State state;
 
         public boolean critical;
         public boolean backstab;
@@ -23,17 +49,22 @@ public class Notification {
         public enum State{
             WOUNDED,
             FLED,
-            DIED
+            UNDAMAGED, DIED
         }
 
-        public ApplyDamage(IUnit wounded, boolean moralOnly, int damageTaken){
+        public ApplyDamage(IUnit wounded, boolean moralOnly, int damageDealt, int lifeDamageTaken, State state){
             this.wounded = wounded;
             this.moralOnly = moralOnly;
-            this.damageTaken = damageTaken;
+            this.damageDealt = damageDealt;
+            this.lifeDamageTaken = lifeDamageTaken;
+            this.state = state;
+            this.disabled = false;
+            this.crippled =false;
+            this.healFromDamage = 0;
         }
 
         public boolean isRelevant(){
-            return damageTaken > 0;
+            return damageDealt > 0;
         }
     }
 
@@ -193,6 +224,40 @@ public class Notification {
         }
 
         public static Visible get(boolean visible){
+            return (visible) ? TRUE : FALSE;
+        }
+
+
+    }
+
+    public static class Crippled {
+        public final boolean crippled;
+
+        private static final Crippled FALSE = new Crippled(false);
+        private static final Crippled TRUE = new Crippled(true);
+
+        private Crippled(boolean crippled) {
+            this.crippled = crippled;
+        }
+
+        public static Crippled get(boolean crippled){
+            return (crippled) ? TRUE : FALSE;
+        }
+
+
+    }
+
+    public static class Disabled {
+        public final boolean disabled;
+
+        private static final Disabled FALSE = new Disabled(false);
+        private static final Disabled TRUE = new Disabled(true);
+
+        private Disabled(boolean disabled) {
+            this.disabled = disabled;
+        }
+
+        public static Disabled get(boolean visible){
             return (visible) ? TRUE : FALSE;
         }
 

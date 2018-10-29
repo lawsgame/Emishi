@@ -38,8 +38,8 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor) {
-        return super.isInitiatorValid(rowActor, colActor) && weaponIndex < bfr.getModel().getUnit(rowActor,colActor).getWeapons().size;
+    public boolean isInitiatorValid() {
+        return super.isInitiatorValid() && weaponIndex < bfr.getModel().getUnit(rowActor,colActor).getWeapons().size;
     }
 
     //------------ GETTERS -------------------------------------

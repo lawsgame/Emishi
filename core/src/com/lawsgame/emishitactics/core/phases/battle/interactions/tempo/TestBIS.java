@@ -6,19 +6,14 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
-import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -50,6 +45,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         super(bim, true, true, true, true, false);
 
         sltdUnit = bim.player.getArmy().getWarlord();
+        sltdUnit.applyDamage(4, false);
 
         sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.SpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
@@ -63,8 +59,18 @@ public class TestBIS extends BattleInteractionState implements Observer{
         // TEST CUSTOMED COMMAND
 
         //customedCommand = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        customedCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory(), 20, 90);
-        customedCommand.setFree(true);
+        HitCommand hitCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory());
+        sltdUnit.setActionPoints(100);
+        hitCommand.setFree(true);
+        //hitCommand.setRepeatableOnKill(true);
+        hitCommand.setResetOrientation(true);
+        hitCommand.setSpecialmove(true);
+        //hitCommand.setMoralDamage(true);
+        hitCommand.setHealingFromDamage(true);
+        //hitCommand.setRetaliation(true);
+
+
+        customedCommand = hitCommand;
         ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
         ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
         ccTargets = new Area(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA);
@@ -72,12 +78,21 @@ public class TestBIS extends BattleInteractionState implements Observer{
         bim.bfr.addAreaRenderer(ccActionArea);
         bim.bfr.addAreaRenderer(ccTargets);
 
-        IUnit randomFoe = bim.battlefield.getUnit(13,8);//bim.bfr.getModel().findUnit(Data.Affiliation.ENEMY_0).random();
+        IUnit randomFoe = bim.battlefield.getUnit(13,8);
         randomFoe.addNativeAbility(Data.Ability.GUARD);
         int[] randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
         GuardCommand guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         guardCommand.setFree(true);
+        if(!guardCommand.apply(randomFoePos[0], randomFoePos[1])){ }
+
+        /*
+        randomFoe = bim.battlefield.getUnit(12,9);
+        randomFoe.addNativeAbility(Data.Ability.GUARD);
+        randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
+        guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        guardCommand.setFree(true);
         guardCommand.apply(randomFoePos[0], randomFoePos[1]);
+        */
 
 
         Trigger trigger;
@@ -85,7 +100,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
             for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
                 if(bim.battlefield.isTileOccupied(r, c)){
                     final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.battlefield.getUnit(r, c));
-                    trigger = new UponDisappearingTrigger(false, woundedRenderer.getModel());
+                    trigger = new UponDisappearingTrigger(true, woundedRenderer.getModel());
                     trigger.addEvent(new EventCommand(bim.bfr, bim.scheduler) {
 
                         @Override
@@ -132,6 +147,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         // TEST CUSTOMED COMMAND
 
+        customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
             if(bim.battlefield.isTileOccupied(row, col)){
                 sltdUnit = bim.battlefield.getUnit(row, col);
@@ -146,8 +162,9 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
         }else{
             customedCommand.setInitiator(actorPos[0], actorPos[1]);
+            customedCommand.setFree(true);
             if(customedCommand.isInitiatorValid()) {
-
+                customedCommand.setFree(false);
                 Array<int[]> impact = customedCommand.getImpactArea(actorPos[0], actorPos[1], row, col);
                 ccImpactArea.setTiles(impact, true);
                 ccActionArea.setTiles(customedCommand.getActionArea(), true);
@@ -228,14 +245,14 @@ public class TestBIS extends BattleInteractionState implements Observer{
             */
 
             /*
-            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.AnimId.ATTACK);
+            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.AnimId.REGULAR_ATTACK);
             bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.Orientation.WEST);
             bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.AnimId.BACKSTAB);
             bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, new Notification.Walk(sltdUnit, path));
             */
 
             /*
-            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.ATTACK));
+            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.REGULAR_ATTACK));
             bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.Orientation.WEST));
             bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.BACKSTAB));
             bim.scheduler.addTask(new StandardTask(bim.battlefield, bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path)));
@@ -246,7 +263,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
             StandardTask task = new StandardTask();
 
             StandardTask.RendererThread thread0 = new StandardTask.RendererThread(bim.bfr.getUnitRenderer(sltdUnit));
-            thread0.addQuery(Data.AnimId.ATTACK);
+            thread0.addQuery(Data.AnimId.REGULAR_ATTACK);
             thread0.addQuery(Data.Orientation.WEST);
             thread0.addQuery(Data.AnimId.BACKSTAB);
 

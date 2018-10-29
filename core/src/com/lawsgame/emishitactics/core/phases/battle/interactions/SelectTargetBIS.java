@@ -40,6 +40,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, true, true, false);
 
         if(currentCommand.getActionChoice().isActorIsTarget()){
+            currentCommand.setTarget(currentCommand.getRowActor(), currentCommand.getColActor());
             triggerCurrentCommand();
         }
     }
@@ -64,10 +65,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         int row = currentCommand.getRowTarget();
         int col = currentCommand.getColTarget();
         if(currentCommand.isTargetValid()){
-
-
             if(currentCommand.isUndoable()){
-
                 currentCommand.attach(this);
                 currentCommand.apply();
                 historic.push(currentCommand);
@@ -100,6 +98,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     @Override
     public void getNotification(Observable sender, Object data) {
         if(data instanceof ActorCommand && data == currentCommand){
+            System.out.println("command retrieved");
             bim.replace(new HandleOutcomeBIS(bim, historic, false));
         }
     }

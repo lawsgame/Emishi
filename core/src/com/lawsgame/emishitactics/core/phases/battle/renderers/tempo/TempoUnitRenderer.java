@@ -9,6 +9,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
@@ -219,6 +220,11 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
+    public void displayAttack(Notification.Attack query) {
+        display(query.specialmove ? Data.AnimId.SPECIAL_MOVE : Data.AnimId.REGULAR_ATTACK);
+    }
+
+    @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
         if(backstab){
             unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
@@ -262,7 +268,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void display(Data.AnimId id) {
         switch (id){
-            case ATTACK:
+            case REGULAR_ATTACK:
                 unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.ATTACK, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
@@ -359,6 +365,16 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         }else{
             blinkTime = 0;
         }
+    }
+
+    @Override
+    public void setDisabled(boolean disabled) {
+
+    }
+
+    @Override
+    public void setCrippled(boolean crippled) {
+
     }
 
     @Override

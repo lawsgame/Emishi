@@ -169,9 +169,9 @@ public abstract class IUnit extends Model {
     public abstract void setActed(boolean acted);
     public abstract void setMoved(boolean moved);
     public abstract boolean isDisabled();
-    public abstract void setDisabled(boolean disabled);
+    public abstract void setDisabled(boolean disabled, boolean notifyObservers);
     public abstract boolean isCrippled();
-    public abstract void setCrippled(boolean crippled);
+    public abstract void setCrippled(boolean crippled, boolean notifyObservers);
 
     public abstract boolean isDone();
     public abstract boolean isWounded();

@@ -2,8 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.models.Area;
-import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.engine.GameRenderableEntity;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -43,8 +41,8 @@ public abstract class AreaRenderer extends Renderer<Area> implements GameRendera
     public void getNotification(Observable sender, Object data) {
         if(data == null) {
             change();
-        }else if(data instanceof Notification.Visible){
-            setVisible(((Notification.Visible) data).visible);
+        }else if(data instanceof Notification.Disabled){
+            setVisible(((Notification.Disabled) data).disabled);
         }
     }
 }

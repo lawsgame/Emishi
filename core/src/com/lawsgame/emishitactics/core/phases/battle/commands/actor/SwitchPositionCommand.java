@@ -14,8 +14,6 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-import static com.lawsgame.emishitactics.core.models.Notification.STEP_ON;
-
 public class SwitchPositionCommand extends ActorCommand {
     private BattleUnitRenderer actorRenderer;
     private BattleUnitRenderer targetRenderer;
@@ -52,16 +50,17 @@ public class SwitchPositionCommand extends ActorCommand {
         scheduleRenderTask(task);
 
 
+        Notification.StepOn stepOn = new Notification.StepOn(getInitiator());
         Tile tile = bfr.getModel().getTile(rowActor, colActor);
-        if(tile.isAnyEventTriggerable(STEP_ON)){
+        if(tile.isAnyEventTriggerable(stepOn)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(STEP_ON);
+            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(stepOn);
             scheduleMultipleRenderTasks(eventTasks);
         }
         tile = bfr.getModel().getTile(rowTarget, colTarget);
-        if(tile.isAnyEventTriggerable(STEP_ON)){
+        if(tile.isAnyEventTriggerable(stepOn)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(STEP_ON);
+            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(stepOn);
             scheduleMultipleRenderTasks(eventTasks);
         }
 

@@ -81,7 +81,7 @@ public class SelectActionBIS extends BattleInteractionState {
                     bim.replace(new SelectActionBIS(bim, touchedUnit));
                     return true;
                 } else {
-                    // if not all commands are undoable, all the undoable ones are visible, the unit is updated and a new choice panel is provided
+                    // if not all commands are undoable, all the undoable ones are disabled, the unit is updated and a new choice panel is provided
                     bim.focusOn(row, col, true, true, true, false, false);
                     resetChoicePanel();
                     choicePanel.setVisible(false);
@@ -105,8 +105,7 @@ public class SelectActionBIS extends BattleInteractionState {
 
             if (bis.bim.battlefield.isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
 
-                final IUnit sltdUnit = bis.bim.battlefield.getUnit(bis.rowSltdUnit, bis.colSltdUnit);
-                final Array<ActionChoice> choices = bis.bim.bcm.getAvailableChoices(sltdUnit, bis.historic);
+                final Array<ActionChoice> choices = bis.bim.bcm.getAvailableChoices(bis.rowSltdUnit, bis.colSltdUnit, bis.historic);
                 for (int i = 0; i < choices.size; i++) {
 
                     final ActionChoice choice = choices.get(i);
@@ -116,7 +115,7 @@ public class SelectActionBIS extends BattleInteractionState {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
 
-                            Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(sltdUnit, choice, true);
+                            Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(bis.rowSltdUnit, bis.colSltdUnit, choice, true);
 
                             if(flavors.size == 1){
                                 flavors.get(0).setInitiator(bis.rowSltdUnit, bis.colSltdUnit);
@@ -166,8 +165,7 @@ public class SelectActionBIS extends BattleInteractionState {
             Array<TextButton> buttons = new Array<TextButton>();
             if (bis.bim.battlefield.isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
 
-                IUnit sltdUnit = bis.bim.battlefield.getUnit(bis.rowSltdUnit, bis.colSltdUnit);
-                Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(sltdUnit, actionChoice, true);
+                Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(bis.rowSltdUnit, bis.colSltdUnit, actionChoice, true);
                 for (int i = 0; i < flavors.size; i++) {
 
                     final ActorCommand actorCommand = flavors.get(i);

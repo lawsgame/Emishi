@@ -19,7 +19,7 @@ public class EndUnitTurnCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor) {
+    public boolean isInitiatorValid() {
         return bfr.getModel().isTileOccupied(rowActor, colActor);
     }
 

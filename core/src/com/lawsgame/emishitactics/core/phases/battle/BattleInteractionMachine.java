@@ -216,13 +216,15 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
             bfr.getAreaRenderer(selectedTile).setVisible(true);
         }
 
-        // show warchief posiiton and his banner covered area
+        // show warchief positon and his banner covered area
         if(bannerShown && battlefield.isTileOccupied(row, col)) {
             IUnit warchief = battlefield.getUnit(row, col).getWarchief();
             if (warchief != battlefield.getUnit(row, col)) {
                 int[] warchiefPos = battlefield.getUnitPos(warchief);
-                warchiefBannerCoveredArea.setTiles(warchiefPos[0], warchiefPos[1], 0, warchief.getArmy().getBannerRange(warchief), true);
-                bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(true);
+                if(warchiefPos != null) {
+                    warchiefBannerCoveredArea.setTiles(warchiefPos[0], warchiefPos[1], 0, warchief.getArmy().getBannerRange(warchief), true);
+                    bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(true);
+                }
             }
         }
 

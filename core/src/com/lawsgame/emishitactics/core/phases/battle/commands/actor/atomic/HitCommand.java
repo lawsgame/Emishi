@@ -2,11 +2,13 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
+import com.lawsgame.emishitactics.core.models.Notification.Attack;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
@@ -15,40 +17,30 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class HitCommand extends ActorCommand{
-    protected int damageDealt;
-    protected int hitrate;
     private SwitchPositionCommand switchcommand;
     private ChooseOrientationCommand orientationCommand;
     private WalkCommand walkcommand;
     private GuardCommand guardCommand;
 
-    private int rowInitDefender = -1;
-    private int colInitDefender = -1;
-    private BattleUnitRenderer defenderRenderer = null;
+    private Array<DefenderData> defendersData;
 
     protected boolean retaliation;
     protected boolean resetOrientation;
     protected boolean specialmove;
+    protected boolean moralDamage;
     protected boolean cripplingTarget;
     protected boolean disablingTarget;
-    protected boolean healingFromDamage;
-    protected boolean moralDamage;
     protected boolean repeatableOnKill;
-    protected boolean stealing;
+    protected boolean healingFromDamage;
 
-
-
-    public HitCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, int damageDealt, int hitrate) {
+    public HitCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, choice, scheduler, playerInventory, true);
-        this.damageDealt = damageDealt;
-        this.hitrate = hitrate;
         this.retaliation = false;
         this.resetOrientation = false;
         this.specialmove = false;
@@ -57,7 +49,8 @@ public class HitCommand extends ActorCommand{
         this.healingFromDamage = false;
         this.moralDamage = false;
         this.repeatableOnKill = false;
-        this.stealing = false;
+
+        this.defendersData = new Array<DefenderData>();
 
         this.switchcommand = new SwitchPositionCommand(bfr, scheduler, playerInventory);
         this.switchcommand.setDecoupled(true);
@@ -76,16 +69,10 @@ public class HitCommand extends ActorCommand{
         this.guardCommand.setFree(true);
     }
 
-    public HitCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory) {
-        this(bfr, choice, scheduler, playerInventory, 1, 50);
-    }
-
     @Override
     public void init() {
         super.init();
-        rowInitDefender = -1;
-        colInitDefender = -1;
-        defenderRenderer = null;
+        defendersData.clear();
     }
 
     //--------------- EXECUTE -----------------------------------------------
@@ -93,124 +80,160 @@ public class HitCommand extends ActorCommand{
     @Override
     protected void execute() {
 
-        // set orientation
-        Orientation initiatorOr = getInitiator().getOrientation();
-        Orientation defenderInitOr = defenderRenderer.getModel().getOrientation();
-        Orientation targetInitOr = getTarget().getOrientation();
+        Orientation initiatorInitOr = getInitiator().getOrientation();
 
-        // switch guardian / target
-        if(switchcommand.apply(rowTarget, colTarget, rowInitDefender, colInitDefender)) {
-            scheduleMultipleRenderTasks(switchcommand.confiscateTasks());
+        // SWITCH GUARDIAN - TARGET
+        for(int i = 0; i < defendersData.size; i++) {
+            if (switchcommand.apply(
+                    defendersData.get(i).rowInitTarget,
+                    defendersData.get(i).colInitTarget,
+                    defendersData.get(i).rowInitDefender,
+                    defendersData.get(i).colInitDefender)) {
+                scheduleMultipleRenderTasks(switchcommand.confiscateTasks());
+            }
         }
 
-        // PERFORM ATTACK
+        // PERFORM REGULAR_ATTACK
         performAttack();
 
         // HANDLE EVENTS
         handleEvents();
 
-        // remove OOA units
+        // REMOVE OOA UNITS
         removeOutOfActionUnits();
 
-        // switch back guardian / target
-        if(switchcommand.apply(rowTarget, colTarget, rowInitDefender, colInitDefender)){
-            scheduleMultipleRenderTasks(switchcommand.confiscateTasks());
-        }else if(walkcommand.apply(rowInitDefender, colInitDefender, rowTarget, colTarget)){
-            scheduleMultipleRenderTasks(walkcommand.confiscateTasks());
-        }
-        if(isDefenderGuardian() && guardCommand.apply(rowInitDefender, colInitDefender)){
-            scheduleMultipleRenderTasks(guardCommand.confiscateTasks());
+        // SWITCH BACK GUARDIAN - TARGET
+        for(int i = 0; i < defendersData.size; i++) {
+            if (switchcommand.apply(
+                    defendersData.get(i).rowInitTarget,
+                    defendersData.get(i).colInitTarget,
+                    defendersData.get(i).rowInitDefender,
+                    defendersData.get(i).colInitDefender)) {
+                scheduleMultipleRenderTasks(switchcommand.confiscateTasks());
+            }else if (walkcommand.apply(
+                    defendersData.get(i).rowInitDefender,
+                    defendersData.get(i).colInitDefender,
+                    defendersData.get(i).rowInitTarget,
+                    defendersData.get(i).colInitTarget)){
+                scheduleMultipleRenderTasks(walkcommand.confiscateTasks());
+            }
+            if(isDefenderGuardian(i) && guardCommand.apply(defendersData.get(i).rowInitDefender, defendersData.get(i).colInitTarget)){
+                scheduleMultipleRenderTasks(guardCommand.confiscateTasks());
+            }
         }
 
-
-        // reset orientation
+        // RESET ORIENTATION
         if(resetOrientation) {
+            StandardTask resetOrTask = new StandardTask();
             if (retaliation) {
-                orientationCommand.setOrientation(initiatorOr);
-                if (orientationCommand.apply(rowActor, colActor))
-                    scheduleMultipleRenderTasks(orientationCommand.confiscateTasks());
+                getInitiator().setOrientation(initiatorInitOr);
+                resetOrTask.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), initiatorInitOr));
             }
-
-            orientationCommand.setOrientation(targetInitOr);
-            if (orientationCommand.apply(rowTarget, colTarget)) {
-                scheduleMultipleRenderTasks(orientationCommand.confiscateTasks());
+            DefenderData data;
+            for(int i = 0; i < defendersData.size; i++){
+                data = defendersData.get(i);
+                data.targetRenderer.getModel().setOrientation(data.targetInitOrientation);
+                resetOrTask.addThread(new RendererThread(data.targetRenderer, data.targetInitOrientation));
+                data.defenderRenderer.getModel().setOrientation(data.defenderInitOrientation);
+                resetOrTask.addThread(new RendererThread(data.defenderRenderer, data.defenderInitOrientation));
             }
-            orientationCommand.setOrientation(defenderInitOr);
-            if (orientationCommand.apply(rowInitDefender, colInitDefender)) {
-                scheduleMultipleRenderTasks(orientationCommand.confiscateTasks());
-            }
+            scheduleRenderTask(resetOrTask);
         }
     }
 
     protected void handleEvents(){
-
-        Array<Task> tasks;
-        if(getInitiator().isAnyEventTriggerable(null)){
-            eventTriggered = true;
-            tasks = getInitiator().performEvents(null);
-            scheduleMultipleRenderTasks(tasks);
-        }
-        if(getTarget().isAnyEventTriggerable(null)){
-            eventTriggered = true;
-            tasks = getTarget().performEvents(null);
-            scheduleMultipleRenderTasks(tasks);
-        }
-        if(isDefenderGuardian() && defenderRenderer.getModel().isAnyEventTriggerable(null)){
-            eventTriggered = true;
-            tasks = defenderRenderer.getModel().performEvents(null);
-            scheduleMultipleRenderTasks(tasks);
+        checkEventFor(getInitiator());
+        for(int i = 0; i < defendersData.size; i++){
+            checkEventFor(defendersData.get(i).targetRenderer.getModel());
+            checkEventFor(defendersData.get(i).defenderRenderer.getModel());
         }
     }
+
+    private void checkEventFor(IUnit unit){
+        if(unit.isAnyEventTriggerable(null)){
+            eventTriggered = true;
+            scheduleMultipleRenderTasks(unit.performEvents(null));
+        }
+    }
+
 
     protected void performAttack(){
         StandardTask task = new StandardTask();
         RendererThread initiatorThread = new RendererThread(bfr.getUnitRenderer(getInitiator()));
-        Array<StandardTask.RendererThread> defendersThreads = new Array<StandardTask.RendererThread>();
-        defendersThreads.add(new RendererThread(bfr.getUnitRenderer(defenderRenderer.getModel())));
+        Array<RendererThread> defenderThreads = new Array<RendererThread>();
+        for(int i = 0; i < defendersData.size; i++)
+            defenderThreads.add(new StandardTask.RendererThread(defendersData.get(i).defenderRenderer));
 
         Array<ApplyDamage> notifs = new Array<ApplyDamage>();
+        Attack attackNotif = new Attack(specialmove);
 
         Orientation reOrientation = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         getInitiator().setOrientation(reOrientation);
         initiatorThread.addQuery(reOrientation);
-        initiatorThread.addQuery(Data.AnimId.ATTACK);
+        initiatorThread.addQuery(attackNotif);
 
-        int dicesroll = Utils.getMean(2,100);
-        if(dicesroll < hitrate){
+        DefenderData data;
+        for(int i = 0; i < defendersData.size; i++) {
 
-            ApplyDamage notif = defenderRenderer.getModel().applyDamage(damageDealt, false);
-            notif.critical = false;
-            notif.backstab = getInitiator().getOrientation() == defenderRenderer.getModel().getOrientation();
-            notif.fleeingOrientation = getInitiator().getOrientation();
+            data = defendersData.get(i);
+            int dicesroll = Utils.getMean(2, 100);
+            if (dicesroll < defendersData.get(i).hitrate) {
 
-            if(!notif.backstab){
+                ApplyDamage notif = data.defenderRenderer.getModel().applyDamage(data.damageDealt, moralDamage);
+                notif.critical = false;
+                notif.crippled = cripplingTarget;
+                notif.disabled = disablingTarget;
+                notif.backstab = getInitiator().getOrientation() == data.defenderRenderer.getModel().getOrientation();
+                notif.fleeingOrientation = getInitiator().getOrientation();
+                data.defenderRenderer.getModel().setCrippled(cripplingTarget, false);
+                data.defenderRenderer.getModel().setDisabled(disablingTarget, false);
+                registerAction = !repeatableOnKill || !data.defenderRenderer.getModel().isOutOfAction();
+
+
+                if (!notif.backstab) {
+                    reOrientation = getInitiator().getOrientation().getOpposite();
+                    data.defenderRenderer.getModel().setOrientation(reOrientation);
+                    defenderThreads.get(i).addQuery(reOrientation);
+                }
+
+                defenderThreads.get(i).addQuery(notif);
+
+                notifs.add(notif);
+
+            } else {
+
                 reOrientation = getInitiator().getOrientation().getOpposite();
-                defenderRenderer.getModel().setOrientation(reOrientation);
-                defendersThreads.get(0).addQuery(reOrientation);
+                data.defenderRenderer.getModel().setOrientation(reOrientation);
+                defenderThreads.get(i).addQuery(reOrientation);
+                defenderThreads.get(i).addQuery(Data.AnimId.DODGE);
             }
 
-            defendersThreads.get(0).addQuery(notif);
+            updateOutcome(getInitiator(), notifs);
 
-            notifs.add(notif);
-
-        }else{
-            reOrientation = getInitiator().getOrientation().getOpposite();
-            defenderRenderer.getModel().setOrientation(reOrientation);
-            defendersThreads.get(0).addQuery(reOrientation);
-
-            defendersThreads.get(0).addQuery(Data.AnimId.DODGE);
+            System.out.println(outcome);
         }
 
-        updateOutcome(getInitiator(), notifs);
+
+        if(healingFromDamage){
+            int healValue = 0;
+            for(int i = 0; i < notifs.size; i++){
+                healValue += notifs.get(i).lifeDamageTaken;
+            }
+            boolean treated = getInitiator().treated(healValue);
+            if(treated)
+                attackNotif.lifeDrained = healValue;
+        }
+
 
         task.addThread(initiatorThread);
-        task.addllThreads(defendersThreads);
+        for(int i = 0; i < defenderThreads.size; i++)
+            task.addThread(defenderThreads.get(i));
         scheduleRenderTask(task);
 
     }
 
-    protected final boolean isDefenderGuardian(){
-        return rowInitDefender != rowTarget || colInitDefender != colTarget;
+    protected final boolean isDefenderGuardian(int index){
+        return defendersData.get(index).isTargetGuarded();
     }
 
 
@@ -222,7 +245,6 @@ public class HitCommand extends ActorCommand{
         if(receiver != null) {
             for(int i = 0; i < notifs.size; i++){
                 experience += Formulas.getGainedExperience(receiver.getLevel(), notifs.get(i).wounded.getLevel(), !notifs.get(i).wounded.isOutOfAction());
-
                 if(notifs.get(i).wounded.isOutOfAction()) {
                     dicesResult = Utils.getMean(1, 100);
                     if (dicesResult < lootRate) {
@@ -240,35 +262,65 @@ public class HitCommand extends ActorCommand{
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        if(isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0, false)) {
-            setDefender(rowTarget0, colTarget0, rowTarget0, colTarget0);
+        return isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0, false);
+    }
+
+    @Override
+    public boolean isTargetValid() {
+        if(super.isTargetValid()){
+            setDefenders();
             return true;
         }
         return false;
     }
 
-    /**
-     *
-     * @param rowTarget0 : where the target would be when attacked
-     * @param colTarget0 : where the target would be when attacked
-     * @param currentTargetRow : current position of the target
-     * @param currentTargetCol : current position of the target
-     */
-    public void setDefender(int currentTargetRow, int currentTargetCol, int rowTarget0, int colTarget0){
-        IUnit defender = bfr.getModel().getUnit(currentTargetRow, currentTargetCol);
-        if(bfr.getModel().isTileGuarded(rowTarget0, colTarget0, defender.getArmy().getAffiliation())){
+    public void setDefenders(){
 
-            defender = bfr.getModel().getStrongestGuardian(rowTarget0, colTarget0, defender.getArmy().getAffiliation());
-            int[] defenderPos = bfr.getModel().getUnitPos(defender);
-            this.rowInitDefender = defenderPos[0];
-            this.colInitDefender = defenderPos[1];
-            this.defenderRenderer = bfr.getUnitRenderer(defender);
-        }else{
+        IUnit target;
+        Array<int[]> targetsPos = getTargetsFromImpactArea();
+        IUnit defender;
+        int[] defenderPos;
+        IUnit guardian;
+        Array<IUnit> unavailableGuardians = new Array<IUnit>();
 
-            this.rowInitDefender = rowTarget0;
-            this.colInitDefender = colTarget0;
-            this.defenderRenderer = bfr.getUnitRenderer(bfr.getModel().getUnit(currentTargetRow, currentTargetCol));
+        //remove units already targeted by the attack to become guardians of other targeted units
+        for(int i = 0; i < targetsPos.size; i++){
+            if(bfr.getModel().isTileOccupied(targetsPos.get(i)[0], targetsPos.get(i)[1])){
+                unavailableGuardians.add(bfr.getModel().getUnit(targetsPos.get(i)[0], targetsPos.get(i)[1]));
+            }
         }
+
+        // set the defenders data
+        for(int i = 0; i < targetsPos.size; i++){
+            if(bfr.getModel().isTileOccupied(targetsPos.get(i)[0], targetsPos.get(i)[1])){
+
+                target = bfr.getModel().getUnit(targetsPos.get(i)[0], targetsPos.get(i)[1]);
+                defender = target;
+                defenderPos = targetsPos.get(i);
+                guardian = bfr.getModel().getStrongestAvailableGuardian(rowTarget, colTarget, defender.getArmy().getAffiliation(), unavailableGuardians);
+                if(guardian != null){
+                    defender = guardian;
+                    defenderPos = bfr.getModel().getUnitPos(guardian);
+                    unavailableGuardians.add(guardian);
+                }
+
+                defendersData.add(new DefenderData(
+                        getInitiator(),
+                        bfr.getUnitRenderer(target),
+                        bfr.getUnitRenderer(defender),
+                        target.getOrientation(),
+                        defender.getOrientation(),
+                        rowActor,
+                        colActor,
+                        targetsPos.get(i)[0],
+                        targetsPos.get(i)[1],
+                        defenderPos[0],
+                        defenderPos[1],
+                        bfr.getModel()));
+            }
+        }
+
+
     }
 
     @Override
@@ -285,24 +337,8 @@ public class HitCommand extends ActorCommand{
     //-------------- GETTERS & SETTERS ---------------------------------
 
 
-    public BattleUnitRenderer getDefenderRenderer() {
-        return defenderRenderer;
-    }
-
-    public int getRowInitDefender() {
-        return rowInitDefender;
-    }
-
-    public int getColInitDefender() {
-        return colInitDefender;
-    }
-
-    public void setDamageDealt(int damageDealt) {
-        this.damageDealt = damageDealt;
-    }
-
-    public void setHitrate(int hitrate) {
-        this.hitrate = hitrate;
+    public Array<DefenderData> getDefenderData() {
+        return defendersData;
     }
 
     public void setRetaliation(boolean retaliation) {
@@ -312,6 +348,7 @@ public class HitCommand extends ActorCommand{
     public void setSpecialmove(boolean specialmove) {
         this.specialmove = specialmove;
     }
+
     public void setCripplingTarget(boolean cripplingTarget) {
         this.cripplingTarget = cripplingTarget;
     }
@@ -332,11 +369,55 @@ public class HitCommand extends ActorCommand{
         this.repeatableOnKill = repeatableOnKill;
     }
 
-    public void setStealing(boolean stealing) {
-        this.stealing = stealing;
-    }
-
     public void setResetOrientation(boolean resetOrientation) {
         this.resetOrientation = resetOrientation;
+    }
+
+
+
+    //------------------------- DEFENDER DATA --------------------------------
+
+    public static class DefenderData {
+        public final BattleUnitRenderer targetRenderer;
+        public final BattleUnitRenderer defenderRenderer;
+        public final Orientation targetInitOrientation;
+        public final Orientation defenderInitOrientation;
+        public final int rowInitTarget;
+        public final int colInitTarget;
+        public final int rowInitDefender;
+        public final int colInitDefender;
+        public final int hitrate;
+        public final int damageDealt;
+
+
+        public DefenderData(
+                IUnit attacker,
+                BattleUnitRenderer targetRenderer,
+                BattleUnitRenderer defenderRenderer,
+                Orientation targetInitOrientation,
+                Orientation defenderInitOrientation,
+                int rowAttacker,
+                int colAttacker,
+                int rowInitTarget,
+                int colInitTarget,
+                int rowInitDefender,
+                int colInitDefender,
+                Battlefield bf) {
+
+            this.targetRenderer = targetRenderer;
+            this.defenderRenderer = defenderRenderer;
+            this.targetInitOrientation = targetInitOrientation;
+            this.defenderInitOrientation = defenderInitOrientation;
+            this.rowInitTarget = rowInitTarget;
+            this.colInitTarget = colInitTarget;
+            this.rowInitDefender = rowInitDefender;
+            this.colInitDefender = colInitDefender;
+            this.hitrate = 90; //Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
+            this.damageDealt = 300; //Formulas.getDealtDamage(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
+        }
+
+        public boolean isTargetGuarded(){
+            return rowInitTarget != rowInitDefender ||  colInitTarget != colInitDefender ;
+        }
     }
 }

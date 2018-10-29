@@ -44,7 +44,7 @@ public class LongTilePanel extends TilePanel {
         builder.append("\nStrength bonus : "+tileType.getAttackMightBonus());
         builder.append("\nDefense bonus : "+ tileType.getDefenseBonus());
         builder.append("\nAvoidance bonus : "+tileType.getAvoidBonus());
-        builder.append("\nATTACK accuracy bonus : "+tileType.getAttackAccBonus());
+        builder.append("\nREGULAR_ATTACK accuracy bonus : "+tileType.getAttackAccBonus());
         builder.append("\nRange enhanced : "+tileType.enhanceRange());
 
         description = builder.toString();

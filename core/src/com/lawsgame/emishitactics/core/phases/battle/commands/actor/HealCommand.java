@@ -19,15 +19,15 @@ public class HealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor) {
-        return super.isInitiatorValid(rowActor, colActor) && bfr.getModel().getUnit(rowActor, colActor).has(Data.Ability.HEAL);
+    public boolean isInitiatorValid() {
+        return super.isInitiatorValid() && bfr.getModel().getUnit(rowActor, colActor).has(Data.Ability.HEAL);
     }
 
     @Override
     protected void execute() {
 
         // update model
-        int healPower = Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, bfr.getModel());
+        int healPower = Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, getInitiator(), getTarget(), bfr.getModel());
         boolean treated = getTarget().treated(healPower);
 
         // push render task
@@ -36,7 +36,7 @@ public class HealCommand extends ActorCommand {
         task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
         scheduleRenderTask(task);
 
-        // setTiles outcome
+        // set outcome
         outcome.add(getInitiator(), choice.getExperience());
 
 
@@ -53,10 +53,11 @@ public class HealCommand extends ActorCommand {
     }
 
 
+
     //-------------------- GETTERS & SETTERS ----------------------
 
     public int getHealPower(){
-        return Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, bfr.getModel());
+        return Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, getInitiator(), getTarget(), bfr.getModel());
     }
 
     public int getRecoveredHitPoints(){
@@ -72,5 +73,7 @@ public class HealCommand extends ActorCommand {
             moralPoints = bfr.getModel().getUnit(rowTarget, colTarget).getRecoveredMoralPoints(getHealPower());
         return moralPoints;
     }
+
+
 
 }

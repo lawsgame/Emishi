@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
@@ -12,7 +13,6 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-import static com.lawsgame.emishitactics.core.models.Notification.STEP_ON;
 
 
 public class WalkCommand extends ActorCommand {
@@ -26,10 +26,11 @@ public class WalkCommand extends ActorCommand {
     @Override
     protected void execute() {
 
+        Notification.StepOn stepOn = new Notification.StepOn(getInitiator());
         Array<int[]> subpath = new Array<int[]>();
         for(int i = 0; i < validPath.size; i++){
             subpath.add(validPath.get(i));
-            if(bfr.getModel().isAnyEventTriggerable(subpath.peek()[0], subpath.peek()[1], STEP_ON)){
+            if(bfr.getModel().isAnyEventTriggerable(subpath.peek()[0], subpath.peek()[1], stepOn)){
 
                 moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath);
                 moveCommand.setDecoupled(true);
@@ -39,7 +40,7 @@ public class WalkCommand extends ActorCommand {
                     scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
 
                     // handle event
-                    Array<Task> subTasks = bfr.getModel().performEvents(subpath.peek()[0], subpath.peek()[1], STEP_ON);
+                    Array<Task> subTasks = bfr.getModel().performEvents(subpath.peek()[0], subpath.peek()[1], stepOn);
                     scheduleMultipleRenderTasks(subTasks);
 
                     // keep walking if possible

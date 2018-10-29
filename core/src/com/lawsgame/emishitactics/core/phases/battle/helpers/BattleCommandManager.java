@@ -80,7 +80,7 @@ public class BattleCommandManager {
 
 
 
-    public Array<ActionChoice> getAvailableChoices(IUnit actor, Stack<ActorCommand> history){
+    public Array<ActionChoice> getAvailableChoices(int rowActor, int colActor, Stack<ActorCommand> history){
         Array<ActionChoice> choices = new Array<ActionChoice>();
         ActionChoice choice;
         for (int  i = 0; i < commandPool.size; i++) {
@@ -89,7 +89,8 @@ public class BattleCommandManager {
                 choice = commandPool.get(i).get(0).getActionChoice();
                 if(!choice.isEndTurnActionOnly()) {
                     for (int j = 0; j < commandPool.get(i).size; j++) {
-                        if (commandPool.get(i).get(j).isInitiatorValid(actor)) {
+                        commandPool.get(i).get(j).setInitiator(rowActor, colActor);
+                        if (commandPool.get(i).get(j).isInitiatorValid()) {
                             choices.add(choice);
                             break;
                         }
@@ -100,13 +101,14 @@ public class BattleCommandManager {
         return choices;
     }
 
-    public Array<ActorCommand> getAvailableCommands(IUnit actor, ActionChoice choice, boolean checkPerformable){
+    public Array<ActorCommand> getAvailableCommands(int rowActor, int colActor, ActionChoice choice, boolean checkPerformable){
         Array<ActorCommand> availableCommands = new Array<ActorCommand>();
         for(int i = 0; i < commandPool.size ;i++) {
             if(commandPool.get(i).size > 0 && commandPool.get(i).get(0).getActionChoice() == choice) {
                 Array<ActorCommand> chosenCommands = commandPool.get(i);
                 for (int j = 0; j < chosenCommands.size; j++) {
-                    if (!checkPerformable || chosenCommands.get(j).isInitiatorValid(actor)) {
+                    chosenCommands.get(j).setInitiator(rowActor, colActor);
+                    if (!checkPerformable || chosenCommands.get(j).isInitiatorValid()) {
                         chosenCommands.get(j).init();
                         availableCommands.add(chosenCommands.get(j));
                     }
@@ -116,12 +118,12 @@ public class BattleCommandManager {
         return availableCommands;
     }
 
-    public HashMap<ActionChoice, Array<ActorCommand>> getAllCommands(IUnit actor, Stack<ActorCommand> history, boolean checkFlavorPerformable) {
+    public HashMap<ActionChoice, Array<ActorCommand>> getAllCommands(int rowActor, int colActor, Stack<ActorCommand> history, boolean checkFlavorPerformable) {
         HashMap<ActionChoice, Array<ActorCommand>> commands = new HashMap<ActionChoice, Array<ActorCommand>>();
-        if(actor != null && history != null) {
-            Array<ActionChoice> availableChoices = getAvailableChoices(actor, history);
+        if(history != null) {
+            Array<ActionChoice> availableChoices = getAvailableChoices(rowActor, colActor, history);
             for (int i = 0; i < availableChoices.size; i++) {
-                commands.put(availableChoices.get(i), getAvailableCommands(actor, availableChoices.get(i), checkFlavorPerformable));
+                commands.put(availableChoices.get(i), getAvailableCommands(rowActor, colActor, availableChoices.get(i), checkFlavorPerformable));
             }
         }
         return commands;
@@ -130,8 +132,8 @@ public class BattleCommandManager {
     //-------------------------  GETTERS & SETTERS ---------------------------
 
 
-    public String toString(IUnit actor, Stack<ActorCommand> history, boolean checkFlavorPerformable){
-        HashMap<ActionChoice, Array<ActorCommand>> allcommands = getAllCommands(actor, history, checkFlavorPerformable);
+    public String toString(int rowActor, int colActor, Stack<ActorCommand> history, boolean checkFlavorPerformable){
+        HashMap<ActionChoice, Array<ActorCommand>> allcommands = getAllCommands(rowActor, colActor, history, checkFlavorPerformable);
         String str = "Availables commands : \n";
         Array<ActorCommand> commands;
         for (ActionChoice choice : allcommands.keySet()) {

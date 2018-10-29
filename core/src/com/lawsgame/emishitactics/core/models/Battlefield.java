@@ -12,6 +12,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 
 
@@ -89,10 +90,18 @@ public class Battlefield extends Model {
 
     // --------------- EVENT HANDLING --------------------------------------
 
+
+    /**
+     *
+     * @param row
+     * @param col
+     * @param data
+     * @return true if an event is triggered on a specific tile, holds wether by the tile itself or the unit on it.
+     */
     public boolean isAnyEventTriggerable(int row, int col, Object data){
         boolean any = false;
         if(isTileExisted(row, col)) {
-            any = tiles[row][col].isAnyEventTriggerable(data) || isAnyEventTriggerable(data);
+            any = tiles[row][col].isAnyEventTriggerable(data);
             if (!any) {
                 for (int i = 0; i < unitAreas.size; i++) {
                     if (unitAreas.get(i).contains(row, col) && unitAreas.get(i).isAnyEventTriggerable(data)) {
@@ -128,6 +137,49 @@ public class Battlefield extends Model {
         return tasks;
     }
 
+    @Override
+    public boolean isAnyEventTriggerable(Object data) {
+        for(int r = 0; r < tiles.length; r++){
+            for(int c = 0; c < tiles[0].length; c++){
+                if(isAnyEventTriggerable(r, c, data))
+                    return true;
+            }
+        }
+        for(int i = 0; i < unitAreas.size; i++){
+            if(unitAreas.get(i).isAnyEventTriggerable(data))
+                return true;
+        }
+        for(int i = 0; i < armyTurnOrder.size(); i++){
+            if(armyTurnOrder.get(i).isAnyEventTriggerable(data))
+                return true;
+        }
+        return super.isAnyEventTriggerable(data);
+    }
+
+    /**
+     *
+     * @param data
+     * @return all render tasks associated with the handled events
+     */
+    @Override
+    public Array<Task> performEvents(Object data) {
+        Array<Task> tasks = super.performEvents(data);
+
+        for(int i = 0; i < armyTurnOrder.size(); i++){
+            tasks.addAll(armyTurnOrder.get(i).performEvents(data));
+        }
+        for(int i = 0; i < unitAreas.size; i++){
+            tasks.addAll(unitAreas.get(i).performEvents(data));
+        }
+        for(int r = 0; r < tiles.length; r++){
+            for(int c = 0; c < tiles[0].length; c++){
+                tasks.addAll(tiles[r][c].performEvents(data));
+            }
+        }
+
+        return tasks;
+    }
+
     public void removeEventTrigger(Trigger trigger){
         this.remove(trigger);
         for(int r = 0; r < tiles.length; r++){
@@ -142,6 +194,9 @@ public class Battlefield extends Model {
         }
         for(int i = 0; i < unitAreas.size; i++){
             unitAreas.get(i).remove(trigger);
+        }
+        for(int i = 0; i < armyTurnOrder.size(); i++){
+            armyTurnOrder.get(i).remove(trigger);
         }
 
     }
@@ -349,8 +404,29 @@ public class Battlefield extends Model {
         return guardians;
     }
 
-    public IUnit getStrongestGuardian(int row, int col, Affiliation alleageance){
+    public IUnit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance){
         Array<IUnit> guardians = getAvailableGuardian(row, col , alleageance);
+        IUnit electedGuardian = null;
+        if(guardians.size > 0) {
+            electedGuardian = guardians.get(0);
+            for (int i = 1; i < guardians.size; i++) {
+                if (guardians.get(i).getLevel() > electedGuardian.getLevel()) {
+                    electedGuardian = guardians.get(i);
+                }
+            }
+        }
+        return electedGuardian;
+    }
+
+    public IUnit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance, Array<IUnit> alreadyAffectedGuardian){
+        Array<IUnit> guardians = getAvailableGuardian(row, col , alleageance);
+        for(int i =0; i < guardians.size; i++){
+            if(alreadyAffectedGuardian.contains(guardians.get(i), true)){
+               guardians.removeIndex(i);
+               i--;
+            }
+        }
+
         IUnit electedGuardian = null;
         if(guardians.size > 0) {
             electedGuardian = guardians.get(0);

@@ -9,8 +9,10 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.AnimId;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.engine.math.functions.Function;
 import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
@@ -34,15 +36,20 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     protected boolean horseman;
     protected boolean shieldbearer;
     protected boolean done;
-    protected boolean targeted;
+    protected boolean crippled;
+    protected boolean disabled;
+
     protected boolean promoted;
     protected boolean outofaction = false;
 
 
     // RENDER ATTRIBUTES
 
-    private boolean visible;
+
+    protected boolean blinking;
     private float blinkTime = 0;
+    private Function blinkPeriod;
+    private boolean visible;
     private boolean poolNextTask = false;
     private CountDown animationCountDown = new CountDown(Data.ANIMATION_DURATION);
 
@@ -69,6 +76,9 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         this.shieldbearer = model.isShielbearer();
         this.done = model.isDone();
         this.promoted = model.isPromoted();
+        this.blinkPeriod = new TargetPeriod();
+        setCrippled(model.isCrippled());
+        setDisabled(model.isDisabled());
 
         display(IDLE);
         setPos(row, col);
@@ -77,8 +87,8 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     @Override
     public void render(SpriteBatch batch) {
         if(visible && bfr.isSpriteWithinFrame(spriteSet.get(animation.getCurrentFrame()))){
-            if(targeted){
-                spriteSet.get(animation.getCurrentFrame()).setAlpha(0.7f + 0.3f* MathUtils.cos(Data.TARGET_BLINK_PERIOD * blinkTime));
+            if(blinking){
+                spriteSet.get(animation.getCurrentFrame()).setAlpha(0.7f + 0.3f* MathUtils.cos(blinkPeriod.getValue(blinkTime) * blinkTime));
             }
             spriteSet.get(animation.getCurrentFrame()).draw(batch);
         }
@@ -108,10 +118,11 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
         handleDeplacement(dt);
 
-        if(targeted) blinkTime += dt;
+        if(blinking) blinkTime += dt;
 
         if(animationCountDown.isFinished()){
             animationCountDown.reset();
+            setBlinking(false);
             this.state = IDLE;
 
             /*
@@ -155,6 +166,17 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         bfr.updateBURRenderCall(this);
     }
 
+    private void setBlinking(boolean blinking){
+        this.blinking = blinking;
+        if(!blinking) {
+            for(int i = 0; i < spriteSet.size; i++) {
+                spriteSet.get(i).setAlpha(1);
+            }
+        }else{
+            blinkTime = 0;
+        }
+    }
+
     @Override
     public float getCenterX() {
         return cx;
@@ -173,13 +195,18 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     @Override
     public void setTargeted(boolean targeted) {
-        this.targeted = targeted;
-        if(!targeted) {
-            for(int i = 0; i < spriteSet.size; i++)
-                spriteSet.get(i).setAlpha(1);
-        }else{
-            blinkTime = 0;
-        }
+        this.blinkPeriod = new TargetPeriod();
+        setBlinking(targeted);
+    }
+
+    @Override
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    @Override
+    public void setCrippled(boolean crippled) {
+        this.crippled = crippled;
     }
 
     @Override
@@ -252,6 +279,9 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
         }
     }
+
+
+
 
     private Vector dl = new Vector();
     private Vector checkingdl = new Vector();
@@ -326,8 +356,18 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     }
 
     @Override
+    public void displayAttack(Notification.Attack query) {
+        display(query.specialmove ? Data.AnimId.SPECIAL_MOVE : Data.AnimId.REGULAR_ATTACK);
+        System.out.println("display attack life dranied : "+query.lifeDrained);
+    }
+
+
+    @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
+        this.blinkPeriod = new WoundedPeriod();
+        setBlinking(true);
         display((backstab) ? AnimId.BACKSTAB : AnimId.WOUNDED);
+
     }
 
     @Override
@@ -427,5 +467,32 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+
+
+    //------------------ HELPER CLASS--------------------------------
+
+    public static class TargetPeriod implements Function{
+
+        @Override
+        public float getValue(float t) {
+            return Data.BLINK_PERIOD_TARGET;
+        }
+    }
+
+    public static class WoundedPeriod implements Function{
+
+
+        /**
+         *
+         * @param t
+         * @return Q(t) = (B + A*sin( 2*PI*t / animation_duration) * PI
+         */
+        @Override
+        public float getValue(float t) {
+            return (Data.BLINK_PERIOD_WOUNDED_BASE + Data.BLINK_PERIOD_WOUNDED_AMPLITUDE*MathUtils.sin( MathUtils.PI *(0.25f + 0.75f * t/ Data.ANIMATION_DURATION))) * MathUtils.PI;
+        }
+    }
+
+
 
 }

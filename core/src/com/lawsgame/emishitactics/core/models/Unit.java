@@ -1201,8 +1201,10 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setDisabled(boolean disabled) {
+    public void setDisabled(boolean disabled, boolean notifyObservers)  {
         this.disabled = disabled;
+        if(notifyObservers)
+            notifyAllObservers(Notification.Disabled.get(disabled));
     }
 
     @Override
@@ -1211,8 +1213,10 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public void setCrippled(boolean crippled) {
+    public void setCrippled(boolean crippled, boolean notifyObservers) {
         this.crippled = crippled;
+        if(notifyObservers)
+            notifyAllObservers(Notification.Crippled.get(crippled));
     }
 
     @Override
@@ -1262,16 +1266,17 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public ApplyDamage applyDamage(int damageTaken, boolean moralDamageOnly){
-        ApplyDamage notification = new ApplyDamage(this, moralDamageOnly, damageTaken);
+    public ApplyDamage applyDamage(int damageDealt, boolean moralDamageOnly){
+        ApplyDamage.State state = ApplyDamage.State.UNDAMAGED;
+        int lifeDamageTaken = 0;
 
         // moral damaga
         if (!has(Data.Ability.UNBREAKABLE)) {
-            if(this.currentMoral > damageTaken) {
-                notification.state = ApplyDamage.State.WOUNDED;
-                this.currentMoral -= damageTaken;
+            if(this.currentMoral > damageDealt) {
+                state = ApplyDamage.State.WOUNDED;
+                this.currentMoral -= damageDealt;
             }else{
-                notification.state = ApplyDamage.State.FLED;
+                state = ApplyDamage.State.FLED;
                 this.currentMoral = 0;
 
             }
@@ -1279,11 +1284,14 @@ public class Unit extends IUnit{
 
         // physical damage
         if(!moralDamageOnly){
-            if(this.currentHitPoints > damageTaken) {
-                this.currentHitPoints -= damageTaken;
+            if(this.currentHitPoints > damageDealt) {
+                lifeDamageTaken = damageDealt;
+                this.currentHitPoints -= damageDealt;
             }else{
-                notification.state = ApplyDamage.State.DIED;
+                state = ApplyDamage.State.DIED;
+                lifeDamageTaken = this.currentHitPoints;
                 this.currentHitPoints = 0;
+
 
             }
         }
@@ -1297,7 +1305,7 @@ public class Unit extends IUnit{
             }
         }
         */
-        return notification;
+        return new ApplyDamage(this, moralDamageOnly, damageDealt, lifeDamageTaken, state);
     }
 
     @Override

@@ -273,12 +273,12 @@ public class Army extends IArmy{
     @Override
     public int getBannerRange(int squadIndex){
         boolean validIndex = 0 <= squadIndex && squadIndex < getNbOfSquads();
-        return (validIndex) ? (int) Math.sqrt(mobilizedTroups.get(squadIndex).get(0).getAppLeadership()) : 0;
+    return (validIndex) ? (int) Math.sqrt(mobilizedTroups.get(squadIndex).get(0).getAppCharisma()) : 0;
     }
 
     @Override
     public int getBannerRange(IUnit unit){
-        return (unit.isMobilized()) ? (int) Math.sqrt(getWarchief(unit).getAppLeadership()) : 0;
+        return (unit.isMobilized()) ? (int) Math.sqrt(getWarchief(unit).getAppCharisma()) : 0;
     }
 
     @Override
