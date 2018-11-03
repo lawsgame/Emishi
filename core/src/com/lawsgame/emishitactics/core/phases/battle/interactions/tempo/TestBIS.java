@@ -15,7 +15,6 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -48,7 +47,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         sltdUnit = bim.player.getArmy().getWarlord();
         sltdUnit.applyDamage(4, false);
 
-        sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.SpriteSetId.HEAL);
+        sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
             sprites.get(i).setPosition(1, 1);
             sprites.get(i).setSize(1, 2);
@@ -60,16 +59,19 @@ public class TestBIS extends BattleInteractionState implements Observer{
         // TEST CUSTOMED COMMAND
 
         //customedCommand = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        /*HitCommand hitCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory());
+
+        /*
+        HitCommand hitCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory());
         sltdUnit.setActionPoints(100);
         hitCommand.setFree(true);
         //hitCommand.setRepeatableOnKill(true);
         hitCommand.setResetOrientation(true);
         hitCommand.setSpecialmove(true);
         //hitCommand.setMoralDamage(true);
-        hitCommand.setHealingFromDamage(true);
+        //hitCommand.setHealingFromDamage(true);
         //hitCommand.setRetaliation(true);
-        customedCommand = hitCommand;*/
+        customedCommand = hitCommand;
+        */
 
         customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);

@@ -92,7 +92,7 @@ public class BattlefieldLoader {
                 colorKey = layoutPixmap.getPixel(c, r);
                 if(r % 2 == 0){
                     if(c % 2 == 0){
-                        // addExpGained the buildingType type
+                        // add the buildingType type
                         fieldType = colorToFieldTypeMap.get(colorKey);
                         if(fieldType == null){
                             fieldType = TileType.PLAIN;

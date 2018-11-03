@@ -79,7 +79,7 @@ public class ShortTilePanel extends TilePanel {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if(getX() == stageViewport.getWorldWidth()){
+        if(getX() == -getWidth()){
             description = builder.toString();
         }
 

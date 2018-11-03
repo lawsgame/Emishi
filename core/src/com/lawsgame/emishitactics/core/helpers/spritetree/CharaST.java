@@ -68,7 +68,7 @@ public class CharaST {
             Data.UnitTemplate template,
             Data.WeaponType type,
             boolean east,
-            Data.SpriteSetId id,
+            Data.AnimSpriteSetId id,
             boolean done,
             TextureRegion[] spriteSet){
         for(int i = 0; i < children.size; i++){
@@ -82,11 +82,11 @@ public class CharaST {
         children.add(node);
     }
 
-    public void populate(boolean promoted, Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.SpriteSetId id, TextureRegion[] spriteSet){
+    public void populate(boolean promoted, Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.AnimSpriteSetId id, TextureRegion[] spriteSet){
         populate(promoted, template, type, east, id, false, spriteSet);
     }
 
-    public Array<Sprite> getSpriteSet(boolean promoted, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.SpriteSetId id){
+    public Array<Sprite> getSpriteSet(boolean promoted, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimSpriteSetId id){
 
         Array<Sprite> spriteset;
         TextureRegion[] tra = null;
@@ -100,7 +100,7 @@ public class CharaST {
             spriteset = getSpriteSet(promoted, or, done, id);
         }else {
             spriteset = new Array<Sprite>();
-            if(id.isRest0()) spriteset.add(getSpriteSet(promoted, template, type, or, done, Data.SpriteSetId.REST).get(0));
+            if(id.isRest0()) spriteset.add(getSpriteSet(promoted, template, type, or, done, Data.AnimSpriteSetId.REST).get(0));
             Sprite sprite;
             float spriteWidth;
             for (int i = 0; i < tra.length; i++) {
@@ -116,7 +116,7 @@ public class CharaST {
         return spriteset;
     }
 
-    private Array<Sprite> getSpriteSet(boolean promoted, Data.Orientation or, boolean done, Data.SpriteSetId id) {
+    private Array<Sprite> getSpriteSet(boolean promoted, Data.Orientation or, boolean done, Data.AnimSpriteSetId id) {
         return getSpriteSet(promoted, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, or, done, id);
     }
 

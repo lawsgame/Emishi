@@ -9,6 +9,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class AttackCommand extends ActorCommand {
@@ -28,6 +29,8 @@ public class AttackCommand extends ActorCommand {
 
     @Override
     protected void execute() {
+
+
         if(initialBlow.apply())
             scheduleMultipleRenderTasks(initialBlow.confiscateTasks());
 
@@ -37,7 +40,11 @@ public class AttackCommand extends ActorCommand {
             }
         }
 
+        scheduleRenderTask(initialBlow.resetOrientation());
+
         System.out.println(scheduler);
+
+
     }
 
 
@@ -48,6 +55,7 @@ public class AttackCommand extends ActorCommand {
         if(initialBlow.isInitiatorValid()) {
             initialBlow.setTarget(rowTarget0, colTarget0);
 
+            retalationBlows.clear();
             HitCommand blow;
             Array<int[]> targets = getTargetsFromImpactArea();
             for(int i = 0; i < targets.size; i++){
@@ -57,9 +65,8 @@ public class AttackCommand extends ActorCommand {
                 blow.init();
                 blow.setInitiator(targets.get(i)[0], targets.get(i)[1]);
                 blow.setTarget(rowActor0, colActor0);
-                if(blow.isApplicable()){
+                if(blow.isApplicable())
                     retalationBlows.add(blow);
-                }
             }
             return initialBlow.isTargetValid(rowActor0, colActor0, rowTarget0, colTarget0);
         }
@@ -79,31 +86,13 @@ public class AttackCommand extends ActorCommand {
     // -------------------- COMODITY BATTLE PANEL METHODS ------------------
 
 
-
-    public int getHitRate(boolean retaliation){
-        return 0;
+    public HitCommand getInitialBlow(){
+        return initialBlow;
     }
 
-    public int getDealtDamage(boolean retaliation){
-        return 0;
-    }
-
-    public int getLootRate(boolean retaliation){
-        int lootRate = 0;
-        if(!retaliation){
-            lootRate = Formulas.getLootRate(getInitiator());
-        }else if(retalationBlows.get(0).isApplicable()){
-            lootRate = Formulas.getLootRate(getTarget());
-        }
-        return lootRate;
-    }
-
-    public IUnit getTargetDefender(){
-        return initialBlow.getTarget();
+    public Array<HitCommand> getRetalationBlows(){
+        return retalationBlows;
     }
 
 
-    public IUnit getInitiatorDefender() {
-        return retalationBlows.get(0).getInitiator();
-    }
 }

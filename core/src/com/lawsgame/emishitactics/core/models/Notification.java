@@ -8,9 +8,17 @@ public class Notification {
 
     public static class StepOn {
         public final IUnit walker;
+        public int rowTile;
+        public int colTile;
 
         public StepOn(IUnit walker){
             this.walker = walker;
+        }
+
+        public StepOn(int rowTile, int colTile, IUnit walker){
+            this.walker = walker;
+            this.rowTile = rowTile;
+            this.colTile = colTile;
         }
     }
 
@@ -124,19 +132,19 @@ public class Notification {
     public static class SetTile {
         public int row;
         public int col;
-        public Data.TileType tileType;
+        public Tile tile;
 
-        public SetTile(int row, int col, Data.TileType tileType){
+        public SetTile(int row, int col, Tile tile){
             this.row = row;
             this.col = col;
-            this.tileType = tileType;
+            this.tile = tile;
         }
     }
 
     public static class Build extends  SetTile{
         public IUnit builder;
 
-        public Build(int row, int col, Data.TileType tile, IUnit builder){
+        public Build(int row, int col, Tile tile, IUnit builder){
             super(row, col, tile);
             this.builder = builder;
         }

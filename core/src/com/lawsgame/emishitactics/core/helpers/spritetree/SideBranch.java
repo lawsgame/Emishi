@@ -37,25 +37,25 @@ public class SideBranch {
                   Data.UnitTemplate template,
                   Data.WeaponType type,
                   boolean east,
-                  Data.SpriteSetId spriteSetId,
+                  Data.AnimSpriteSetId animSpriteSetId,
                   boolean done,
                   TextureRegion[] spriteSet){
         for(int i = 0; i < children.size; i++){
             if(children.get(i).shieldbearer == shield){
-                children.get(i).populate(horseman, template, type, east, spriteSetId, spriteSet, done);
+                children.get(i).populate(horseman, template, type, east, animSpriteSetId, spriteSet, done);
                 return;
             }
         }
         ShieldedBranch node = new ShieldedBranch(shield);
-        node.populate(horseman, template, type, east, spriteSetId, spriteSet, done);
+        node.populate(horseman, template, type, east, animSpriteSetId, spriteSet, done);
         children.add(node);
     }
 
-    void populate(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.SpriteSetId spriteSetId, TextureRegion[] spriteSet){
-        populate(shield, horseman, template, type, east, spriteSetId, true, spriteSet);
+    void populate(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.AnimSpriteSetId animSpriteSetId, TextureRegion[] spriteSet){
+        populate(shield, horseman, template, type, east, animSpriteSetId, true, spriteSet);
     }
 
-    public TextureRegion[] getSpriteSet(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.SpriteSetId id){
+    public TextureRegion[] getSpriteSet(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimSpriteSetId id){
         TextureRegion[] res = null;
         for(int i = 0; i < children.size; i++){
             if(children.get(i).shieldbearer == shield){

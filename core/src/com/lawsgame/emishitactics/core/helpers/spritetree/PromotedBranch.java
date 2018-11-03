@@ -32,7 +32,7 @@ public class PromotedBranch {
         return null;
     }
 
-    public void populate(Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.SpriteSetId id, TextureRegion[] spriteSet, boolean done){
+    public void populate(Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.AnimSpriteSetId id, TextureRegion[] spriteSet, boolean done){
         for(int i = 0; i < children.size; i++){
             if(children.get(i).template == template){
                 children.get(i).populate(type, east, id, spriteSet, done);
@@ -44,7 +44,7 @@ public class PromotedBranch {
         children.add(node);
     }
 
-    public TextureRegion[] getSpriteSet(Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.SpriteSetId id){
+    public TextureRegion[] getSpriteSet(Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimSpriteSetId id){
         TextureRegion[] res = null;
         for(int i = 0; i < children.size; i++){
             if(children.get(i).template == template){

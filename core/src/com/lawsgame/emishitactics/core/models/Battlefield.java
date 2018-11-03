@@ -280,7 +280,7 @@ public class Battlefield extends Model {
         if(checkIndexes(r,c) && tile != null){
             tiles[r][c] = tile;
             if(notifyObservers)
-                notifyAllObservers( new Notification.SetTile(r, c, tile.getType()));
+                notifyAllObservers( new Notification.SetTile(r, c, tile));
             return true;
         }
         return false;

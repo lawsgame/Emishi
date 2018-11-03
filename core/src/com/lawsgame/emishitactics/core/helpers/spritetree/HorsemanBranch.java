@@ -36,7 +36,7 @@ public class HorsemanBranch {
     public void populate(Data.UnitTemplate template,
                          Data.WeaponType type,
                          boolean east,
-                         Data.SpriteSetId id,
+                         Data.AnimSpriteSetId id,
                          TextureRegion[] spriteSet,
                          boolean done){
         for(int i = 0; i < children.size; i++){
@@ -50,7 +50,7 @@ public class HorsemanBranch {
         children.add(node);
     }
 
-    public TextureRegion[] getSpriteSet(Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.SpriteSetId id){
+    public TextureRegion[] getSpriteSet(Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimSpriteSetId id){
         TextureRegion[] res = null;
         for(int i = 0; i < children.size; i++){
             if(children.get(i).template == template){

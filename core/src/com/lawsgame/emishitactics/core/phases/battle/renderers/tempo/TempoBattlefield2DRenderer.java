@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
+import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -43,7 +44,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         this.tileRenderers = new TextureRegion[battlefield.getNbRows()][battlefield.getNbColumns()];
         for (int r = 0; r < battlefield.getNbRows(); r++) {
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
-                addTileRenderer(r, c, getModel().getTile(r, c).getType());
+                addTileRenderer(r, c, getModel().getTile(r, c));
                 if(battlefield.isTileOccupied(r, c)) {
                     addUnitRenderer(r, c, getModel().getUnit(r, c));
                 }
@@ -59,12 +60,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
-    @Override
-    public void updateAreaRenderers(float dt) {
-        for(int i = 0; i < areaRenderers.size; i++) {
-            areaRenderers.get(i).update(dt);
-        }
-    }
 
     @Override
     public void prerender() {
@@ -98,6 +93,9 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             countDown.reset();
         }
 
+        for(int i = 0; i < areaRenderers.size; i++) {
+            areaRenderers.get(i).update(dt);
+        }
         for(int i =0; i < unitRenderers.size; i++){
             unitRenderers.get(i).update(dt);
         }
@@ -114,7 +112,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             @Override
             public void apply() {
                 countDown.run();
-                TextureRegion tr = sprite2DPool.getBuildInConstructionSprite(notif.tileType);
+                TextureRegion tr = sprite2DPool.getBuildInConstructionSprite(notif.tile.getType());
                 if(tr != null)
                     tileRenderers [notif.row][notif.col] = tr;
                 notif.builder.notifyAllObservers(Data.AnimId.BUILD);
@@ -123,15 +121,15 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         offerTask(new SimpleCommand() {
             @Override
             public void apply() {
-                addTileRenderer(notif.row, notif.col, notif.tileType);
+                addTileRenderer(notif.row, notif.col, notif.tile);
             }
         });
     }
 
-    public void addTileRenderer(int r, int c, Data.TileType tileType){
+    public void addTileRenderer(int r, int c, Tile tile){
         try{
             if (getModel().isTileExisted(r, c)) {
-                TextureRegion tileTR = sprite2DPool.getTileSprite(tileType);
+                TextureRegion tileTR = sprite2DPool.getTileSprite(tile.getType());
                 if (tileTR != null) {
                     tileRenderers[r][c] = tileTR;
                 } else {

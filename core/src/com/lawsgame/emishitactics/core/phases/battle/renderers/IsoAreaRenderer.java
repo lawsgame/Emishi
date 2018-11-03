@@ -60,28 +60,28 @@ public class IsoAreaRenderer extends AreaRenderer {
                         if(otc){
                             if(wtc){
                                 if(!stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                     sprite.setFlip(true, false);
                                     sprite.setPosition(xCenter - 0.25f, yCenter - 0.25f );
                                     sprites.add(sprite);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_OBTUSE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_OBTUSE));
                                     }else{
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
                                         sprite.setPosition(xCenter - 0.5f, yCenter - 0.375f );
                                         sprite.setFlip(false, false);
                                         sprites.add(sprite);
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                         sprite.setFlip(true, false);
                                         sprite.setPosition(xCenter - 0.25f, yCenter - 0.25f );
                                         sprites.add(sprite);
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                     }
                                 }
                                 sprite.setPosition(xCenter - 0.25f, yCenter - 0.25f );
@@ -91,23 +91,23 @@ public class IsoAreaRenderer extends AreaRenderer {
                             if(wtc){
                                 if(stc){
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
                                         sprite.setPosition(xCenter - 0.25f, yCenter - 0.5f);
                                         sprite.setFlip(false, true);
                                         sprites.add(sprite);
                                     }
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_OBTUSE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_INSIDE_OBTUSE));
                                     sprite.setFlip(false, true);
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                     sprite.setFlip(true, true);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                     sprite.setFlip(false, true);
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_OBTUSE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_OBTUSE));
 
                                 }
                             }
@@ -127,7 +127,7 @@ public class IsoAreaRenderer extends AreaRenderer {
                             if(wtc){
 
                                 if(!ntc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                     sprite.setFlip(false, true);
                                     sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f );
                                     sprites.add(sprite);
@@ -136,24 +136,24 @@ public class IsoAreaRenderer extends AreaRenderer {
 
                                 if(ntc){
 
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                     sprite.setFlip(false, false);
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_ACUTE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_ACUTE));
                                     }else {
 
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
                                         sprite.setPosition(xCenter - 0.75f, yCenter - 0.25f);
                                         sprite.setFlip(false, true);
                                         sprites.add(sprite);
 
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                         sprite.setFlip(false, true);
                                         sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f);
                                         sprites.add(sprite);
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
 
                                     }
 
@@ -166,20 +166,20 @@ public class IsoAreaRenderer extends AreaRenderer {
                             if(wtc){
                                 if(ntc){
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
                                         sprite.setPosition(xCenter - 1f, yCenter - 0.125f);
                                         sprites.add(sprite);
                                     }
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_ACUTE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_INSIDE_ACUTE));
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                 }
                             }else{
                                 if(ntc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                     sprite.setFlip(false, true);
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_ACUTE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_ACUTE));
                                 }
                             }
                             sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f );
@@ -197,29 +197,29 @@ public class IsoAreaRenderer extends AreaRenderer {
                         if(otc){
                             if(etc){
                                 if(!stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                     sprite.setFlip(true, false);
                                     sprite.setPosition(xCenter, yCenter - 0.125f );
                                     sprites.add(sprite);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                     sprite.setFlip(true, true);
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_ACUTE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_ACUTE));
                                         sprite.setFlip(true, false);
                                     }else {
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
                                         sprite.setPosition(xCenter + 0.25f, yCenter);
                                         sprites.add(sprite);
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                         sprite.setFlip(true, true);
                                         sprite.setPosition(xCenter, yCenter - 0.125f);
                                         sprites.add(sprite);
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN));
                                         sprite.setFlip(true, false);
                                     }
                                 }
@@ -230,24 +230,24 @@ public class IsoAreaRenderer extends AreaRenderer {
                             if(etc){
                                 if(stc){
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
                                         sprite.setPosition(xCenter + 0.5f, yCenter - 0.125f);
                                         sprite.setFlip(true, false);
                                         sprites.add(sprite);
                                     }
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_ACUTE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_INSIDE_ACUTE));
                                     sprite.setFlip(true, false);
 
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                     sprite.setFlip(true, true);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                     sprite.setFlip(true, false);
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_ACUTE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_ACUTE));
                                     sprite.setFlip(true, false);
                                 }
                             }
@@ -264,30 +264,30 @@ public class IsoAreaRenderer extends AreaRenderer {
                         if(otc){
                             if(etc){
                                 if(!ntc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                     sprite.setFlip(false, true);
                                     sprite.setPosition(xCenter - 0.25f, yCenter );
                                     sprites.add(sprite);
                                 }
                             }else{
                                 if(ntc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                     sprite.setFlip(true, true);
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_OBTUSE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_OBTUSE));
                                         sprite.setFlip(false, true);
                                     }else {
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE));
                                         sprite.setPosition(xCenter, yCenter + 0.125f);
                                         sprite.setFlip(true, false);
                                         sprites.add(sprite);
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                         sprite.setFlip(false, true);
                                         sprite.setPosition(xCenter - 0.25f, yCenter);
                                         sprites.add(sprite);
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_SIDE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_SIDE));
                                         sprite.setFlip(true, true);
                                     }
                                 }
@@ -299,23 +299,23 @@ public class IsoAreaRenderer extends AreaRenderer {
                                 if(ntc){
 
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
+                                        sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE));
                                         sprite.setPosition(xCenter - 0.25f, yCenter + 0.25f);
                                         sprites.add(sprite);
                                     }
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.ANTI_INSIDE_OBTUSE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.ANTI_INSIDE_OBTUSE));
                                     sprite.setFlip(false,false);
 
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                     sprite.setFlip(false, false);
                                 }
                             }else{
                                 if(ntc){
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.BORDER));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.BORDER));
                                     sprite.setFlip(true, false);
                                 }else{
-                                    sprite = new Sprite(assetProvider.getAreaTR(color, AreaSpriteType.CORNER_OBTUSE));
+                                    sprite = new Sprite(assetProvider.getAreaSprite(color, AreaSpriteType.CORNER_OBTUSE));
                                     sprite.setFlip(false, true);
                                 }
                             }

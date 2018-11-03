@@ -6,6 +6,7 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -25,7 +26,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         this.notificationQueue = new LinkedList<SimpleCommand>();
     }
 
-    public abstract void updateAreaRenderers(float dt);
     public abstract void prerender();
     public abstract void render(SpriteBatch batch);
 
@@ -37,7 +37,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
     public abstract AreaRenderer getAreaRenderer(Area area);
-    public abstract void addTileRenderer(int row, int col, Data.TileType type);
+    public abstract void addTileRenderer(int row, int col, Tile model);
     public abstract void addUnitRenderer(int row, int col, IUnit model);
     public abstract void addAreaRenderer(Area area);
     public abstract void removeUnitRenderer(IUnit model);
@@ -68,7 +68,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         if(!isCurrentTaskCompleted() && ! notificationQueue.isEmpty()){
             notificationQueue.pop().apply();
         }
-        updateAreaRenderers(dt);
     }
 
 
@@ -89,7 +88,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
             }else {
 
                 Notification.SetTile notif = (Notification.SetTile)data;
-                addTileRenderer(notif.row, notif.col, notif.tileType);
+                addTileRenderer(notif.row, notif.col, notif.tile);
             }
         }else if(data instanceof Notification.SetUnit){
 

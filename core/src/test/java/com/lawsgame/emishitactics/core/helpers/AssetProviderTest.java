@@ -15,11 +15,11 @@ public class AssetProviderTest {
     public void before(){
         tree = new CharaST();
 
-        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, true, Data.SpriteSetId.REST, false, new TextureRegion[]{});
-        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, true, Data.SpriteSetId.REST, false, new TextureRegion[]{});
-        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, false, Data.SpriteSetId.REST, false, new TextureRegion[]{});
-        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, false, Data.SpriteSetId.ATTACK, false, new TextureRegion[]{});
-        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.MACE, false, Data.SpriteSetId.ATTACK, false, new TextureRegion[]{});
+        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, true, Data.AnimSpriteSetId.REST, false, new TextureRegion[]{});
+        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, true, Data.AnimSpriteSetId.REST, false, new TextureRegion[]{});
+        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, false, Data.AnimSpriteSetId.REST, false, new TextureRegion[]{});
+        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD, false, Data.AnimSpriteSetId.ATTACK, false, new TextureRegion[]{});
+        tree.populate(true, Data.UnitTemplate.SOLAIRE, Data.WeaponType.MACE, false, Data.AnimSpriteSetId.ATTACK, false, new TextureRegion[]{});
 
 
     }

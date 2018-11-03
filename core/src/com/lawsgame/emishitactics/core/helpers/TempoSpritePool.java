@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
+import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 
 import java.util.HashMap;
 
@@ -26,8 +26,8 @@ public class TempoSpritePool {
     private TempoSpritePool(){
         this.tileSprites = new HashMap<Data.TileType, TextureRegion>();
         this.areaSprites = new HashMap<Data.AreaType, TextureRegion>();
-        this.unitSprites = new HashMap<Data.SpriteSetId, TextureRegion>();
-        this.foeSprites = new HashMap<Data.SpriteSetId, TextureRegion>();
+        this.unitSprites = new HashMap<AnimSpriteSetId, TextureRegion>();
+        this.foeSprites = new HashMap<AnimSpriteSetId, TextureRegion>();
         this.weaponSprites = new HashMap<Data.WeaponType, TextureRegion>();
         this.orientationSprites = new HashMap<Data.Orientation, TextureRegion>();
     }
@@ -39,8 +39,8 @@ public class TempoSpritePool {
     private TextureRegion blackBGSprite = null;
     public TextureRegion buttonUp = null;
     public TextureRegion buttonDown = null;
-    private HashMap<Data.SpriteSetId, TextureRegion> unitSprites;
-    private HashMap<Data.SpriteSetId, TextureRegion> foeSprites;
+    private HashMap<AnimSpriteSetId, TextureRegion> unitSprites;
+    private HashMap<AnimSpriteSetId, TextureRegion> foeSprites;
     private TextureRegion unitDoneSprite = null;
     private HashMap<Data.WeaponType, TextureRegion> weaponSprites;
     private HashMap<Data.Orientation, TextureRegion> orientationSprites;
@@ -72,7 +72,7 @@ public class TempoSpritePool {
             if(asm.isLoaded(Assets.ATLAS_TEMPO_TILES)) {
                 atlas = asm.get(Assets.ATLAS_TEMPO_TILES);
                 for (Data.TileType tileType : Data.TileType.values()) {
-                    regionName = Assets.getRegionTile(tileType);
+                    regionName = tileType.name().toLowerCase();
                     region = atlas.findRegion(regionName);
                     if (region != null) {
                         this.tileSprites.put(tileType, region);
@@ -89,31 +89,31 @@ public class TempoSpritePool {
                 TextureRegion[][] unitRegions = region.split(32,32);
                 TextureRegion[][] iconRegions = region.split(8,8);
 
-                unitSprites.put(SpriteSetId.ATTACK, unitRegions[3][0]);
-                unitSprites.put(SpriteSetId.PUSH, unitRegions[4][0]);
-                unitSprites.put(SpriteSetId.HEAL, unitRegions[5][0]);
-                unitSprites.put(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, unitRegions[5][0]);
-                unitSprites.put(SpriteSetId.STEAL, unitRegions[6][0]);
-                unitSprites.put(SpriteSetId.BUILD, unitRegions[7][0]);
-                unitSprites.put(SpriteSetId.WALK_FLEE_SWITCHPOSITION, unitRegions[8][0]);
-                unitSprites.put(SpriteSetId.DODGE, unitRegions[9][0]);
-                unitSprites.put(SpriteSetId.PUSHED_BACKSTABBED, unitRegions[12][0]);
-                unitSprites.put(SpriteSetId.WOUNDED, unitRegions[13][0]);
-                unitSprites.put(SpriteSetId.DIE, unitRegions[14][0]);
-                unitSprites.put(SpriteSetId.REST, unitRegions[0][0]);
+                unitSprites.put(AnimSpriteSetId.ATTACK, unitRegions[3][0]);
+                unitSprites.put(AnimSpriteSetId.PUSH, unitRegions[4][0]);
+                unitSprites.put(AnimSpriteSetId.HEAL, unitRegions[5][0]);
+                unitSprites.put(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, unitRegions[5][0]);
+                unitSprites.put(AnimSpriteSetId.STEAL, unitRegions[6][0]);
+                unitSprites.put(AnimSpriteSetId.BUILD, unitRegions[7][0]);
+                unitSprites.put(AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, unitRegions[8][0]);
+                unitSprites.put(AnimSpriteSetId.DODGE, unitRegions[9][0]);
+                unitSprites.put(AnimSpriteSetId.PUSHED_BACKSTABBED, unitRegions[12][0]);
+                unitSprites.put(AnimSpriteSetId.WOUNDED, unitRegions[13][0]);
+                unitSprites.put(AnimSpriteSetId.DIE, unitRegions[14][0]);
+                unitSprites.put(AnimSpriteSetId.REST, unitRegions[0][0]);
 
-                foeSprites.put(SpriteSetId.ATTACK, unitRegions[3][4]);
-                foeSprites.put(SpriteSetId.PUSH, unitRegions[4][4]);
-                foeSprites.put(SpriteSetId.HEAL, unitRegions[5][4]);
-                foeSprites.put(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, unitRegions[5][4]);
-                foeSprites.put(SpriteSetId.STEAL, unitRegions[6][4]);
-                foeSprites.put(SpriteSetId.BUILD, unitRegions[7][4]);
-                foeSprites.put(SpriteSetId.WALK_FLEE_SWITCHPOSITION, unitRegions[8][4]);
-                foeSprites.put(SpriteSetId.DODGE, unitRegions[9][4]);
-                foeSprites.put(SpriteSetId.PUSHED_BACKSTABBED, unitRegions[12][4]);
-                foeSprites.put(SpriteSetId.WOUNDED, unitRegions[13][4]);
-                foeSprites.put(SpriteSetId.DIE, unitRegions[14][4]);
-                foeSprites.put(SpriteSetId.REST, unitRegions[0][4]);
+                foeSprites.put(AnimSpriteSetId.ATTACK, unitRegions[3][4]);
+                foeSprites.put(AnimSpriteSetId.PUSH, unitRegions[4][4]);
+                foeSprites.put(AnimSpriteSetId.HEAL, unitRegions[5][4]);
+                foeSprites.put(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, unitRegions[5][4]);
+                foeSprites.put(AnimSpriteSetId.STEAL, unitRegions[6][4]);
+                foeSprites.put(AnimSpriteSetId.BUILD, unitRegions[7][4]);
+                foeSprites.put(AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, unitRegions[8][4]);
+                foeSprites.put(AnimSpriteSetId.DODGE, unitRegions[9][4]);
+                foeSprites.put(AnimSpriteSetId.PUSHED_BACKSTABBED, unitRegions[12][4]);
+                foeSprites.put(AnimSpriteSetId.WOUNDED, unitRegions[13][4]);
+                foeSprites.put(AnimSpriteSetId.DIE, unitRegions[14][4]);
+                foeSprites.put(AnimSpriteSetId.REST, unitRegions[0][4]);
 
                 unitDoneSprite = unitRegions[0][6];
 
@@ -231,7 +231,7 @@ public class TempoSpritePool {
         return shieldSprite;
     }
 
-    public TextureRegion getUnitSprite(Data.SpriteSetId id, Data.Affiliation affiliation){
+    public TextureRegion getUnitSprite(AnimSpriteSetId id, Data.Affiliation affiliation){
         TextureRegion res;
         if(affiliation == Data.Affiliation.ALLY){
             res = unitSprites.get(id);

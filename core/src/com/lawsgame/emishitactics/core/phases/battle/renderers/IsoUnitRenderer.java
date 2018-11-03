@@ -86,7 +86,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     @Override
     public void render(SpriteBatch batch) {
-        if(visible && bfr.isSpriteWithinFrame(spriteSet.get(animation.getCurrentFrame()))){
+        if(visible && bfr.isInFrame(spriteSet.get(animation.getCurrentFrame()))){
             if(blinking){
                 spriteSet.get(animation.getCurrentFrame()).setAlpha(0.7f + 0.3f* MathUtils.cos(blinkPeriod.getValue(blinkTime) * blinkTime));
             }

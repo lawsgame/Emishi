@@ -1,8 +1,11 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
+import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Notification.BeginArmyTurn;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class BeginArmyTurnCommand extends EventCommand {
@@ -26,6 +29,13 @@ public class BeginArmyTurnCommand extends EventCommand {
             army.updateActionPoints();
             if (army.isPlayerControlled())
                 bfr.getModel().incrementTurn();
+
+            Array<Task> tasks;
+            BeginArmyTurn beginArmyTurn = new BeginArmyTurn(army);
+            if(bfr.getModel().isAnyEventTriggerable(beginArmyTurn)){
+                tasks = bfr.getModel().performEvents(beginArmyTurn);
+                scheduleMultipleRenderTasks(tasks);
+            }
         }
     }
 

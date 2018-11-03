@@ -28,7 +28,7 @@ public class BuildCommand extends ActorCommand {
         bfr.getModel().setTile(rowTarget, colTarget, buildingType, false);
 
         // push render task
-        scheduleRenderTask(new StandardTask(bfr, new Build(rowTarget, colTarget, buildingType, getInitiator())));
+        scheduleRenderTask(new StandardTask(bfr, new Build(rowTarget, colTarget, bfr.getModel().getTile(rowTarget, colTarget), getInitiator())));
 
         // set outcome
         outcome.add(getInitiator(), choice.getExperience());

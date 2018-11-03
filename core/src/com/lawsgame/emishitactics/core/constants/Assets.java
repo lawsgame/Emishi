@@ -1,8 +1,9 @@
 package com.lawsgame.emishitactics.core.constants;
 
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
-import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
+import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 
 public class Assets {
 
@@ -39,12 +40,12 @@ public class Assets {
     public static String getRegionMap(int id) {
         return "map"+id;
     }
-    public static String getRegionTile(TileType tileType) { return tileType.name().toLowerCase(); }
+    public static String getRegionTile(Data.TileSpriteSetId tileType) { return tileType.name().toLowerCase(); }
     public static String getTileHighlighted(AreaType id){
         return id.name().toLowerCase();
     }
 
-    public static String getRegionUnitAction(SpriteSetId id, boolean east){
+    public static String getRegionUnitAction(AnimSpriteSetId id, boolean east){
         return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south");
     }
 

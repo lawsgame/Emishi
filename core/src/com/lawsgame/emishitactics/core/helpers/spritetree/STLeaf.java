@@ -1,25 +1,25 @@
 package com.lawsgame.emishitactics.core.helpers.spritetree;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
+import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 
 public class STLeaf {
 
-    protected final SpriteSetId id;
+    protected final AnimSpriteSetId id;
     protected TextureRegion[] spriteset;
 
-    public STLeaf(SpriteSetId id, TextureRegion[] spriteset) {
+    public STLeaf(AnimSpriteSetId id, TextureRegion[] spriteset) {
         this.id = id;
         this.spriteset = spriteset;
     }
 
-    public static STLeaf create(SpriteSetId id, TextureRegion[] spriteset, boolean done){
-        return (id == SpriteSetId.REST || id == SpriteSetId.BANNER) ?
+    public static STLeaf create(AnimSpriteSetId id, TextureRegion[] spriteset, boolean done){
+        return (id == AnimSpriteSetId.REST || id == AnimSpriteSetId.BANNER) ?
                 new RestSpriteSetLeaf( id, spriteset, done) :
                 new STLeaf(id, spriteset);
     }
 
-    public boolean isCorrect(SpriteSetId id, boolean done){
+    public boolean isCorrect(AnimSpriteSetId id, boolean done){
         return this.id == id;
     }
 
@@ -41,12 +41,12 @@ public class STLeaf {
     static class RestSpriteSetLeaf extends STLeaf {
         protected boolean done;
 
-        public RestSpriteSetLeaf(SpriteSetId id, TextureRegion[] spriteset,  boolean done) {
+        public RestSpriteSetLeaf(AnimSpriteSetId id, TextureRegion[] spriteset, boolean done) {
             super(id, spriteset);
             this.done = done;
         }
 
-        public boolean isCorrect(SpriteSetId id, boolean done){
+        public boolean isCorrect(AnimSpriteSetId id, boolean done){
             return this.id == id && this.done == done;
         }
 

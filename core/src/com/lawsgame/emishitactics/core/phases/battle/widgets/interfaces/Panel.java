@@ -72,7 +72,7 @@ public abstract class Panel extends Actor {
         setY(y, fromdown);
     }
 
-    public void setBounds(float x, float y , float width, float height, boolean fromLeft, boolean fromdown){
+    public void setPositionAndDimension(float x, float y , float width, float height, boolean fromLeft, boolean fromdown){
         setX(x, fromLeft);
         setY(y, fromdown);
         setWidth(width);

@@ -15,9 +15,9 @@ import com.lawsgame.emishitactics.core.helpers.spritetree.GenUnitST;
 import com.lawsgame.emishitactics.core.helpers.spritetree.WeaponBranch;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.AreaColor;
-import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
-import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.TileSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -41,9 +41,8 @@ public class AssetProvider implements Disposable{
     }
 
     private float spriteStdSize;
-    private TextureRegion undefinedTileSprite = null;
-    private HashMap<TileType, TextureRegion> tileSprites = new HashMap<Data.TileType, TextureRegion>();
-
+    private Array<TextureRegion> undefinedTileSprites = new Array<TextureRegion>();
+    private HashMap<TileSpriteSetId, Array<TextureRegion>> tileSprites = new HashMap<Data.TileSpriteSetId, Array<TextureRegion>> ();
     public HashMap<String, TextureRegion> portraits = new HashMap<String, TextureRegion>();
     public GenUnitST genSpriteTree = new GenUnitST();
     public CharaST charaSpriteTree = new CharaST();
@@ -56,27 +55,63 @@ public class AssetProvider implements Disposable{
         this.spriteStdSize = spriteStdSize;
     }
 
-    public Array<Sprite> getTileSprite(TileType type) {
+    public Array<Sprite> getTileSpriteSet(TileSpriteSetId id) {
         Array<Sprite> sprites = new Array<Sprite>();
-        Sprite sprite = (tileSprites.containsKey(type) && tileSprites.get(type) != null) ?
-            new Sprite(tileSprites.get(type)) :
-            new Sprite(undefinedTileSprite);
-        sprite.setSize(spriteStdSize, spriteStdSize);
-        sprites.add(sprite);
+        if(id != null) {
+            Array<TextureRegion> regions;
+            if (id.isUpper()) {
+                regions = tileSprites.get(id);
+            } else {
+                if(tileSprites.containsKey(id) && tileSprites.get(id) != null) {
+                    regions = tileSprites.get(id);
+                }else{
+                    regions = undefinedTileSprites;
+                }
+            }
+            if (regions != null) {
+                Sprite sprite;
+                boolean shortSprite;
+                for (int i = 0; i < regions.size; i++) {
+                    shortSprite = regions.get(i).getRegionHeight() == regions.get(i).getRegionWidth();
+                    sprite = new Sprite(regions.get(i));
+                    sprite.setSize(spriteStdSize, ((shortSprite) ?  1f : 1.5f) * spriteStdSize);
+                    sprites.add(sprite);
+                }
+            }
+        }
         return sprites;
     }
+
+
+    public Sprite getAreaSprite(AreaColor color, AreaSpriteType type){
+        Sprite sprite;
+        TextureRegion region = areaTextureRegions.get(color, type);
+        if(region == null) {
+            sprite = new Sprite(areaTextureRegions.get(AreaColor.LIGHT_BLUE, type));
+        }else{
+            sprite = new Sprite(region);
+        }
+        sprite.setSize(0.5f, 0.25f);
+        return sprite;
+    }
+
+
+    // --------------- LOAR ASSETS --------------------------------
 
     public void set(Battlefield battlefield, AssetManager asm){
 
         if(asm != null) {
             FileHandle dirHandle;
             FileHandle fileHandle;
-            String filepath = "";
+            String filepath;
             TextureRegion region;
             String regionName;
             TextureAtlas atlas;
+            Array<TextureAtlas.AtlasRegion> atlasRegions;
+            Array<TextureRegion> regions;
 
             // LOAD TILE SET
+
             dirHandle = Gdx.files.internal(Assets.TILE_SPRITES_DIR);
             if(dirHandle.child(battlefield.getEnvironment().name().toLowerCase()+EXT_PACK).exists()) {
                 filepath = String.format("%s/%s%s", Assets.TILE_SPRITES_DIR, battlefield.getEnvironment().name().toLowerCase(), EXT_PACK);
@@ -88,14 +123,22 @@ public class AssetProvider implements Disposable{
             asm.finishLoading();
             if (asm.isLoaded(filepath)) {
                 atlas = asm.get(filepath);
-                this.undefinedTileSprite = atlas.findRegion(Assets.REGION_TERRAINS_UNDEFINED);
-                for (Data.TileType tileType : Data.TileType.values()) {
-                    regionName = Assets.getRegionTile(tileType);
-                    region = atlas.findRegion(regionName);
-                    if (region != null) {
-                        region.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-                        this.tileSprites.put(tileType, region);
+                atlasRegions = atlas.findRegions(Assets.REGION_TERRAINS_UNDEFINED);
+                for(int i = 0; i < atlasRegions.size; i++)
+                    this.undefinedTileSprites.add(atlasRegions.get(i));
+
+                for (TileSpriteSetId tileId : TileSpriteSetId.values()) {
+                    regions = new Array<TextureRegion>();
+                    regionName = Assets.getRegionTile(tileId);
+                    atlasRegions = atlas.findRegions(regionName);
+                    if(atlasRegions.size > 0) {
+                        for (int i = 0; i < atlasRegions.size; i++) {
+                            atlasRegions.get(i).getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                            regions.add(atlasRegions.get(i));
+                        }
+                        this.tileSprites.put(tileId, regions);
                     }
+
                 }
             }
 
@@ -205,13 +248,12 @@ public class AssetProvider implements Disposable{
         }
     }
 
-
     private void loadSpriteSet(WeaponBranch node, TextureAtlas unitAtlas, boolean done) {
 
         Array<TextureAtlas.AtlasRegion> animationSet;
         TextureRegion[] animationArray;
         String spriteSetName;
-        for(SpriteSetId id : SpriteSetId.values()){
+        for(AnimSpriteSetId id : AnimSpriteSetId.values()){
 
             spriteSetName = Assets.getRegionUnitAction(id, false);
             animationSet = unitAtlas.findRegions(spriteSetName);
@@ -326,17 +368,5 @@ public class AssetProvider implements Disposable{
     @Override
     public void dispose() { }
 
-
-    public Sprite getAreaTR(AreaColor color, AreaSpriteType type){
-        Sprite sprite;
-        TextureRegion region = areaTextureRegions.get(color, type);
-        if(region == null) {
-            sprite = new Sprite(areaTextureRegions.get(AreaColor.LIGHT_BLUE, type));
-        }else{
-            sprite = new Sprite(region);
-        }
-        sprite.setSize(0.5f, 0.25f);
-        return sprite;
-    }
 
 }

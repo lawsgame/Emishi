@@ -50,17 +50,18 @@ public class SwitchPositionCommand extends ActorCommand {
         scheduleRenderTask(task);
 
 
-        Notification.StepOn stepOn = new Notification.StepOn(getInitiator());
-        Tile tile = bfr.getModel().getTile(rowActor, colActor);
-        if(tile.isAnyEventTriggerable(stepOn)){
+        // handle event
+
+        Notification.StepOn stepOn = new Notification.StepOn(rowTarget, colTarget, getInitiator());
+        if(bfr.getModel().isAnyEventTriggerable(rowTarget, colTarget, stepOn)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(stepOn);
+            Array<AnimationScheduler.Task> eventTasks = bfr.getModel().performEvents(rowTarget, colTarget, stepOn);
             scheduleMultipleRenderTasks(eventTasks);
         }
-        tile = bfr.getModel().getTile(rowTarget, colTarget);
-        if(tile.isAnyEventTriggerable(stepOn)){
+        stepOn = new Notification.StepOn(rowActor, colActor, getTarget());
+        if(bfr.getModel().isAnyEventTriggerable(rowActor, colActor, stepOn)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = tile.performEvents(stepOn);
+            Array<AnimationScheduler.Task> eventTasks = bfr.getModel().performEvents(rowActor, colActor, stepOn);
             scheduleMultipleRenderTasks(eventTasks);
         }
 

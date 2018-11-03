@@ -13,7 +13,7 @@ public class OrientationBranch {
         this.spriteSetLeaves = new Array<STLeaf>();
     }
 
-    public boolean isChildExist(Data.SpriteSetId id, boolean done){
+    public boolean isChildExist(Data.AnimSpriteSetId id, boolean done){
         for(int i = 0; i < spriteSetLeaves.size; i++){
             if(spriteSetLeaves.get(i).isCorrect(id, done)){
                 return true;
@@ -26,7 +26,7 @@ public class OrientationBranch {
         return ((or == Data.Orientation.NORTH || or == Data.Orientation.EAST) && east) || ((or == Data.Orientation.SOUTH || or == Data.Orientation.WEST) && !east);
     }
 
-    public void populate(Data.SpriteSetId id, TextureRegion[] spriteSet, boolean done){
+    public void populate(Data.AnimSpriteSetId id, TextureRegion[] spriteSet, boolean done){
         for(int i = 0; i < spriteSetLeaves.size; i++){
             if(spriteSetLeaves.get(i).isCorrect(id, done)){
                 spriteSetLeaves.get(i).spriteset = spriteSet;
@@ -36,7 +36,7 @@ public class OrientationBranch {
         spriteSetLeaves.add(STLeaf.create(id, spriteSet, done));
     }
 
-    public TextureRegion[] getSpriteSet(Data.SpriteSetId id, boolean done) {
+    public TextureRegion[] getSpriteSet(Data.AnimSpriteSetId id, boolean done) {
         TextureRegion[] res = null;
         for(int i = 0; i < spriteSetLeaves.size; i++){
             if(spriteSetLeaves.get(i).isCorrect(id, done)){

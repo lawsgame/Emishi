@@ -17,6 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -29,6 +30,7 @@ public class HitCommand extends ActorCommand{
     private GuardCommand guardCommand;
 
     private Array<DefenderData> defendersData;
+    private Orientation initiatorInitOr;
 
     protected boolean retaliation;
     protected boolean resetOrientation;
@@ -80,7 +82,7 @@ public class HitCommand extends ActorCommand{
     @Override
     protected void execute() {
 
-        Orientation initiatorInitOr = getInitiator().getOrientation();
+        initiatorInitOr = getInitiator().getOrientation();
 
         // SWITCH GUARDIAN - TARGET
         for(int i = 0; i < defendersData.size; i++) {
@@ -124,21 +126,27 @@ public class HitCommand extends ActorCommand{
 
         // RESET ORIENTATION
         if(resetOrientation) {
-            StandardTask resetOrTask = new StandardTask();
-            if (retaliation) {
-                getInitiator().setOrientation(initiatorInitOr);
-                resetOrTask.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), initiatorInitOr));
-            }
-            DefenderData data;
-            for(int i = 0; i < defendersData.size; i++){
-                data = defendersData.get(i);
-                data.targetRenderer.getModel().setOrientation(data.targetInitOrientation);
-                resetOrTask.addThread(new RendererThread(data.targetRenderer, data.targetInitOrientation));
+            scheduleRenderTask(resetOrientation());
+        }
+    }
+
+    public Task resetOrientation(){
+        StandardTask resetOrTask = new StandardTask();
+        if (retaliation) {
+            getInitiator().setOrientation(initiatorInitOr);
+            resetOrTask.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), initiatorInitOr));
+        }
+        DefenderData data;
+        for(int i = 0; i < defendersData.size; i++){
+            data = defendersData.get(i);
+            data.targetRenderer.getModel().setOrientation(data.targetInitOrientation);
+            resetOrTask.addThread(new RendererThread(data.targetRenderer, data.targetInitOrientation));
+            if(isDefenderGuardian(i)) {
                 data.defenderRenderer.getModel().setOrientation(data.defenderInitOrientation);
                 resetOrTask.addThread(new RendererThread(data.defenderRenderer, data.defenderInitOrientation));
             }
-            scheduleRenderTask(resetOrTask);
         }
+        return resetOrTask;
     }
 
     protected void handleEvents(){
@@ -238,7 +246,7 @@ public class HitCommand extends ActorCommand{
 
     protected void updateOutcome(IUnit receiver, Array<ApplyDamage> notifs){
         int experience = 0;
-        int lootRate = Formulas.getLootRate(receiver);
+        int lootRate = getLootRate();
         int dicesResult;
         Item droppedItem;
         if(receiver != null) {
@@ -261,44 +269,39 @@ public class HitCommand extends ActorCommand{
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0, false);
-    }
-
-    @Override
-    public boolean isTargetValid() {
-        if(super.isTargetValid()){
-            setDefenders();
+        if(isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0, false)){
+            setDefenders(rowActor0, colActor0, rowTarget0, colTarget0);
             return true;
         }
         return false;
     }
 
-    public void setDefenders(){
+    private void setDefenders(int rowActor, int colActor, int rowTarget, int colTarget){
         defendersData.clear();
 
         IUnit target;
-        Array<int[]> targetsPos = getTargetsFromImpactArea();
+        Array<int[]> targetsPos = getTargetsFromImpactArea(rowActor, colActor, rowTarget, colTarget, getInitiator());
         IUnit defender;
         int[] defenderPos;
         IUnit guardian;
         Array<IUnit> unavailableGuardians = new Array<IUnit>();
 
         //remove units already targeted by the attack to become guardians of other targeted units
-        for(int i = 0; i < targetsPos.size; i++){
-            if(bfr.getModel().isTileOccupied(targetsPos.get(i)[0], targetsPos.get(i)[1])){
+        for (int i = 0; i < targetsPos.size; i++) {
+            if (bfr.getModel().isTileOccupied(targetsPos.get(i)[0], targetsPos.get(i)[1])) {
                 unavailableGuardians.add(bfr.getModel().getUnit(targetsPos.get(i)[0], targetsPos.get(i)[1]));
             }
         }
 
         // set the defenders data
-        for(int i = 0; i < targetsPos.size; i++){
-            if(bfr.getModel().isTileOccupied(targetsPos.get(i)[0], targetsPos.get(i)[1])){
+        for (int i = 0; i < targetsPos.size; i++) {
+            if (bfr.getModel().isTileOccupied(targetsPos.get(i)[0], targetsPos.get(i)[1])) {
 
                 target = bfr.getModel().getUnit(targetsPos.get(i)[0], targetsPos.get(i)[1]);
                 defender = target;
                 defenderPos = targetsPos.get(i);
                 guardian = bfr.getModel().getStrongestAvailableGuardian(rowTarget, colTarget, defender.getArmy().getAffiliation(), unavailableGuardians);
-                if(guardian != null){
+                if (guardian != null) {
                     defender = guardian;
                     defenderPos = bfr.getModel().getUnitPos(guardian);
                     unavailableGuardians.add(guardian);
@@ -319,6 +322,7 @@ public class HitCommand extends ActorCommand{
                         bfr.getModel()));
             }
         }
+        System.out.println("data size :"+getDefenderData().size);
 
 
     }
@@ -336,9 +340,12 @@ public class HitCommand extends ActorCommand{
 
     //-------------- GETTERS & SETTERS ---------------------------------
 
-
     public Array<DefenderData> getDefenderData() {
         return defendersData;
+    }
+
+    public int getLootRate(){
+        return Formulas.getLootRate(getInitiator());
     }
 
     public void setRetaliation(boolean retaliation) {
@@ -374,10 +381,10 @@ public class HitCommand extends ActorCommand{
     }
 
 
-
     //------------------------- DEFENDER DATA --------------------------------
 
     public static class DefenderData {
+        public final IUnit attacker;
         public final BattleUnitRenderer targetRenderer;
         public final BattleUnitRenderer defenderRenderer;
         public final Orientation targetInitOrientation;
@@ -388,6 +395,7 @@ public class HitCommand extends ActorCommand{
         public final int colInitDefender;
         public final int hitrate;
         public final int damageDealt;
+        public final int lootRate;
 
 
         public DefenderData(
@@ -404,6 +412,7 @@ public class HitCommand extends ActorCommand{
                 int colInitDefender,
                 Battlefield bf) {
 
+            this.attacker = attacker;
             this.targetRenderer = targetRenderer;
             this.defenderRenderer = defenderRenderer;
             this.targetInitOrientation = targetInitOrientation;
@@ -414,10 +423,22 @@ public class HitCommand extends ActorCommand{
             this.colInitDefender = colInitDefender;
             this.hitrate = 90; //Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
             this.damageDealt = 1; //Formulas.getDealtDamage(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
+            this.lootRate = Formulas.getLootRate(attacker);
         }
 
         public boolean isTargetGuarded(){
             return rowInitTarget != rowInitDefender ||  colInitTarget != colInitDefender ;
         }
+
+        public String toString(){
+            String str = "\nATTACKER : "+attacker.getName();
+            str +="\nTARGET : "+targetRenderer.getModel().getName();
+            str +="\nDEFENDER : "+defenderRenderer.getModel().getName();
+            str +="\n\nDamage dealt : "+damageDealt;
+            str +="\nHit rate : "+hitrate;
+            str +="\nLoot rate : "+lootRate;
+            return str;
+        }
     }
+
 }

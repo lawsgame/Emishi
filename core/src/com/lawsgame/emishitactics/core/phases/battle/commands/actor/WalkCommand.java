@@ -27,9 +27,12 @@ public class WalkCommand extends ActorCommand {
     protected void execute() {
 
         Notification.StepOn stepOn = new Notification.StepOn(getInitiator());
+
         Array<int[]> subpath = new Array<int[]>();
         for(int i = 0; i < validPath.size; i++){
             subpath.add(validPath.get(i));
+            stepOn.rowTile = subpath.peek()[0];
+            stepOn.colTile = subpath.peek()[1];
             if(bfr.getModel().isAnyEventTriggerable(subpath.peek()[0], subpath.peek()[1], stepOn)){
 
                 moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath);
@@ -69,20 +72,6 @@ public class WalkCommand extends ActorCommand {
                 scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
             }
         }
-
-        /*
-        oldWalkerOrientation = getInitiator().getOrientation();
-
-        // update model
-        bfr.getModel().moveUnit(rowActor, colActor, rowTarget, colTarget, false);
-        Data.Orientation or = (validPath.size > 1) ?
-                Utils.getOrientationFromCoords(validPath.get(validPath.size - 2)[0], validPath.get(validPath.size - 2)[1], rowTarget, colTarget) :
-                Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
-        getInitiator().setOrientation(or);
-
-        // push render task
-        scheduleRenderTask(new StandardTask(bfr.getModel(), bfr.getUnitRenderer(getInitiator()), new Walk(getInitiator(), validPath)));
-        */
 
     }
 

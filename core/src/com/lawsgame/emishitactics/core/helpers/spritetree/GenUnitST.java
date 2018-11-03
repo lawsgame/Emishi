@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
+import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
@@ -42,26 +42,26 @@ public class GenUnitST {
                   Data.UnitTemplate template,
                   Data.WeaponType type,
                   boolean east,
-                  Data.SpriteSetId spriteSetId,
+                  AnimSpriteSetId animSpriteSetId,
                   boolean done,
                   TextureRegion[] spriteSet){
         for(int i = 0; i < children.size; i++){
             if(children.get(i).pc == playerControlled){
-                children.get(i).populate(shield, horseman, template, type, east, spriteSetId, done, spriteSet);
+                children.get(i).populate(shield, horseman, template, type, east, animSpriteSetId, done, spriteSet);
                 return;
             }
         }
         SideBranch node = new SideBranch(shield);
-        node.populate(shield, horseman, template, type, east, spriteSetId, done, spriteSet);
+        node.populate(shield, horseman, template, type, east, animSpriteSetId, done, spriteSet);
         children.add(node);
     }
 
     public void populate(boolean playerControlled, boolean shield, boolean horseman,
                          UnitTemplate template,
                          WeaponType type, boolean east,
-                         SpriteSetId spriteSetId,
+                         AnimSpriteSetId animSpriteSetId,
                          TextureRegion[] spriteSet){
-        populate(playerControlled, shield, horseman, template, type, east, spriteSetId, true, spriteSet);
+        populate(playerControlled, shield, horseman, template, type, east, animSpriteSetId, true, spriteSet);
     }
 
 
@@ -119,7 +119,7 @@ public class GenUnitST {
                                       WeaponType type,
                                       Orientation or,
                                       boolean done,
-                                      SpriteSetId id){
+                                      AnimSpriteSetId id){
         Array<Sprite> spriteset;
         TextureRegion[] tra = null;
         for(int i = 0; i < children.size; i++){
@@ -133,7 +133,7 @@ public class GenUnitST {
         }else {
 
             spriteset = new Array<Sprite>();
-            if(id.isRest0()) spriteset.add(getSpriteSet(playerControlled, shield, horseman, template, type, or, done, SpriteSetId.REST).get(0));
+            if(id.isRest0()) spriteset.add(getSpriteSet(playerControlled, shield, horseman, template, type, or, done, AnimSpriteSetId.REST).get(0));
             Sprite sprite;
             float spriteWidth;
             for (int i = 0; i < tra.length; i++) {
@@ -149,7 +149,7 @@ public class GenUnitST {
         return spriteset;
     }
 
-    private Array<Sprite> getSpriteSet(boolean playerControlled, Data.Orientation or, boolean done, Data.SpriteSetId id) {
+    private Array<Sprite> getSpriteSet(boolean playerControlled, Data.Orientation or, boolean done, AnimSpriteSetId id) {
         return getSpriteSet(playerControlled,false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, or, done, id);
     }
 

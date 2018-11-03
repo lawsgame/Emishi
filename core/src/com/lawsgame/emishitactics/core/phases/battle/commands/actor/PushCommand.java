@@ -34,23 +34,28 @@ public class PushCommand extends ActorCommand {
         IUnit pushed = bfr.getModel().getUnit(rowTarget, colTarget);
         Data.Orientation pushOr = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         pushed.setOrientation(pushOr);
-        Tile tile;
+        int rowEndTile;
+        int colEndTile;
         switch(pushOr){
             case WEST:
                 bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget - 1, false);
-                tile = bfr.getModel().getTile(rowTarget, colTarget - 1);
+                rowEndTile = rowTarget;
+                colEndTile = colTarget - 1;
                 break;
             case NORTH:
                 bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget + 1, colTarget, false);
-                tile = bfr.getModel().getTile(rowTarget + 1, colTarget );
+                rowEndTile = rowTarget + 1;
+                colEndTile = colTarget;
                 break;
             case SOUTH:
                 bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget - 1, colTarget, false);
-                tile = bfr.getModel().getTile(rowTarget - 1, colTarget);
+                rowEndTile = rowTarget - 1;
+                colEndTile = colTarget;
                 break;
             default:
                 bfr.getModel().moveUnit(rowTarget, colTarget, rowTarget, colTarget + 1, false);
-                tile = bfr.getModel().getTile(rowTarget, colTarget + 1);
+                rowEndTile = rowTarget;
+                colEndTile = colTarget + 1;
                 break;
         }
 
@@ -60,10 +65,11 @@ public class PushCommand extends ActorCommand {
         task.addThread(new RendererThread(bfr.getUnitRenderer(pushed), Notification.Pushed.get(pushOr)));
         scheduleRenderTask(task);
 
-
-        if(tile.isAnyEventTriggerable(new Notification.StepOn(getInitiator()))){
+        // handle event
+        Notification.StepOn stepOn = new Notification.StepOn(rowEndTile, colEndTile, getTarget());
+        if(bfr.getModel().isAnyEventTriggerable(rowEndTile, colEndTile, stepOn)){
             this.eventTriggered = true;
-            Array<Task> eventTasks = tile.performEvents(new Notification.StepOn(getInitiator()));
+            Array<Task> eventTasks = bfr.getModel().performEvents(rowEndTile, colEndTile, stepOn);
             scheduleMultipleRenderTasks(eventTasks);
         }
 

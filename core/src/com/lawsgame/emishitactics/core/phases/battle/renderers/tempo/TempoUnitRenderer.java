@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.SpriteSetId;
+import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -208,7 +208,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
             Data.Orientation or = Utils.getOrientationFromCoords(unitSprite.getY(), unitSprite.getX(),path.get(0)[0], path.get(0)[1]);
             orientationTexture = TempoSpritePool.get().getOrientationSprite(or);
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
             executing = true;
 
 
@@ -227,9 +227,9 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
         if(backstab){
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
         }else{
-            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WOUNDED, getModel().getArmy().getAffiliation()));
+            unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.WOUNDED, getModel().getArmy().getAffiliation()));
         }
         countDown.run();
     }
@@ -238,14 +238,14 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     @Override
     public void displayTreated(int healedHP) {
 
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
         countDown.run();
     }
 
     @Override
     public void displayPushed(Data.Orientation pushedTowards){
         orientationTexture = TempoSpritePool.get().getOrientationSprite(pushedTowards);
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
         pushed = true;
         int x = (int) getCenterX();
         int y = (int) getCenterY();
@@ -260,7 +260,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
     @Override
     public void displayFlee(Data.Orientation fleeingDirection) {
-        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
+        unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, getModel().getArmy().getAffiliation()));
         orientationTexture = TempoSpritePool.get().getOrientationSprite(fleeingDirection);
         countDown.run();
     }
@@ -269,62 +269,62 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     public void display(Data.AnimId id) {
         switch (id){
             case REGULAR_ATTACK:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.ATTACK, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.ATTACK, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case PUSH:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.PUSH, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.PUSH, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case HEAL:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.HEAL, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.HEAL, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case STEAL:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.STEAL, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.STEAL, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case BUILD:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.BUILD, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.BUILD, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case GUARD:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case GUARDED:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case DIE:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.DIE, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.DIE, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case DODGE:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.DODGE, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.DODGE, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case WOUNDED:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.WOUNDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.WOUNDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case SPECIAL_MOVE:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.SPECIAL_MOVE, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.SPECIAL_MOVE, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case LEVELUP:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case SWITCH_WEAPON:
-                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(SpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
+                unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED, getModel().getArmy().getAffiliation()));
                 countDown.run();
                 break;
             case IDLE:
                 if(done){
                     unitSprite.setRegion(TempoSpritePool.get().getDoneUnitSprite());
                 }else {
-                    unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(Data.SpriteSetId.REST, getModel().getArmy().getAffiliation()));
+                    unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.REST, getModel().getArmy().getAffiliation()));
                 }
                 break;
                 default:

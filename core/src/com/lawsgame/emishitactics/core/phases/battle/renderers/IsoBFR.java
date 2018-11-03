@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -17,7 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.engine.CameraManager;
 
 public class IsoBFR extends BattlefieldRenderer {
-    public static final float RATIO = 0.5f; // <1 : ratio between the the great and little dialogue
+    public static float RATIO = 0.5f; // <1 : ratio between the the great and little dialogue
     public static final float SPRITE_STD_SIZE = 1.25f;
     private static final float CAM_VELOCITY = 45.0f;
     private static float X_CAM_BOUNDS_OFFSET = 1f;
@@ -26,7 +26,7 @@ public class IsoBFR extends BattlefieldRenderer {
     private CameraManager gcm;
     private boolean visible;
     protected AssetProvider assetProvider;
-    private Array<Array<Sprite>> lowerTileSprites;
+    private Array<Array<IsoTileRenderer>> tileRenderers;
     private Array<Array<BattleUnitRenderer>> unitRenderers;
     private Array<Array<AreaRenderer>> areaRenderers;
 
@@ -40,10 +40,10 @@ public class IsoBFR extends BattlefieldRenderer {
     public IsoBFR(Battlefield battlefield, AssetProvider assetProvider, boolean test) {
         super(battlefield);
         int depth = 2*(battlefield.getNbRows() + battlefield.getNbColumns()) - 3;
-        this.lowerTileSprites = new Array<Array<Sprite>>();
+        this.tileRenderers = new Array<Array<IsoTileRenderer>> ();
         this.unitRenderers = new Array<Array<BattleUnitRenderer>>();
         for(int i = 0; i < depth; i++) {
-            lowerTileSprites.add(new Array<Sprite>());
+            tileRenderers.add(new Array<IsoTileRenderer>());
             unitRenderers.add(new Array<BattleUnitRenderer>());
         }
 
@@ -68,7 +68,7 @@ public class IsoBFR extends BattlefieldRenderer {
             // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
             for (int r = 0; r < battlefield.getNbRows(); r++) {
                 for (int c = 0; c < battlefield.getNbColumns(); c++) {
-                    addTileRenderer(r, c, getModel().getTile(r, c).getType());
+                    addTileRenderer(r, c, getModel().getTile(r, c));
                     if (battlefield.isTileOccupied(r, c)) {
                         addUnitRenderer(r, c, getModel().getUnit(r, c));
                     }
@@ -88,7 +88,6 @@ public class IsoBFR extends BattlefieldRenderer {
         }
     }
 
-
     @Override
     public void setGameCamParameters(CameraManager cameraManager) {
         float width = 2*X_CAM_BOUNDS_OFFSET + (getModel().getNbRows() + getModel().getNbColumns()) / 2.0f;
@@ -96,15 +95,6 @@ public class IsoBFR extends BattlefieldRenderer {
         cameraManager.setCameraBoundaries(width, height);
         cameraManager.setCameraVelocity(CAM_VELOCITY);
         this.gcm = cameraManager;
-    }
-
-    @Override
-    public void updateAreaRenderers(float dt) {
-        for(int i = 0; i < areaRenderers.size; i++) {
-            for(int j = 0; j < areaRenderers.get(i).size; j++) {
-                areaRenderers.get(i).get(j).update(dt);
-            }
-        }
     }
 
     @Override
@@ -126,13 +116,12 @@ public class IsoBFR extends BattlefieldRenderer {
     @Override
     public void render(SpriteBatch batch) {
         if(visible) {
-            for(int i = lowerTileSprites.size - 1; i >= 0 ; i--){
-                for(int j = 0; j < lowerTileSprites.get(i).size; j++){
-                    if(isSpriteWithinFrame(lowerTileSprites.get(i).get(j))) {
-                        lowerTileSprites.get(i).get(j).draw(batch);
+            for(int i = tileRenderers.size - 1; i >= 0 ; i--){
+                for(int j = 0; j < tileRenderers.get(i).size; j++){
+                    if(tileRenderers.get(i).get(j).isInFrame(this)) {
+                        tileRenderers.get(i).get(j).renderLowerPart(batch);
                     }
                 }
-
             }
             for(int i =0 ; i < areaRenderers.size ; i++){
                 for(int j =0 ; j < areaRenderers.get(i).size ; j++){
@@ -140,6 +129,11 @@ public class IsoBFR extends BattlefieldRenderer {
                 }
             }
             for(int i = unitRenderers.size - 1; i >= 0 ; i--){
+                for(int j = 0; j < tileRenderers.get(i).size; j++){
+                    if(tileRenderers.get(i).get(j).isInFrame(this)) {
+                        tileRenderers.get(i).get(j).renderUpperPart(batch);
+                    }
+                }
                 for(int j = 0; j < unitRenderers.get(i).size; j++){
                     unitRenderers.get(i).get(j).render(batch);
                 }
@@ -148,19 +142,28 @@ public class IsoBFR extends BattlefieldRenderer {
         }
     }
 
-    protected boolean isSpriteWithinFrame(Sprite sprite) {
-        return gcm.getClipBounds().contains(sprite.getX(), sprite.getY())
+    public boolean isInFrame(Sprite sprite){
+        return sprite != null
+                && (gcm.getClipBounds().contains(sprite.getX(), sprite.getY())
                 || gcm.getClipBounds().contains(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight())
                 || gcm.getClipBounds().contains(sprite.getX(), sprite.getY() + sprite.getHeight())
-                || gcm.getClipBounds().contains(sprite.getX() + sprite.getWidth(), sprite.getY()) ;
+                || gcm.getClipBounds().contains(sprite.getX() + sprite.getWidth(), sprite.getY())) ;
     }
 
     @Override
     public void update(float dt) {
         super.update(dt);
         for(int i = 0; i < unitRenderers.size; i++){
+            for(int j = 0; j < tileRenderers.get(i).size; j++){
+                tileRenderers.get(i).get(j).update(dt);
+            }
             for(int j = 0; j < unitRenderers.get(i).size; j++){
                 unitRenderers.get(i).get(j).update(dt);
+            }
+        }
+        for(int i = 0; i < areaRenderers.size; i++) {
+            for(int j = 0; j < areaRenderers.get(i).size; j++) {
+                areaRenderers.get(i).get(j).update(dt);
             }
         }
     }
@@ -193,16 +196,14 @@ public class IsoBFR extends BattlefieldRenderer {
         return getCenterX(row, col) - SPRITE_STD_SIZE * 0.5f;
     }
 
-    public float getRenderYFrom(int row, int col) {
-        return getCenterY(row, col)- RATIO*SPRITE_STD_SIZE * 1.5f;
+    public float getRenderYFrom(int row, int col, boolean upper) {
+        return getCenterY(row, col)- RATIO* (SPRITE_STD_SIZE * ((upper) ? 0.5f : 1.5f ));
     }
 
     @Override
-    public void addTileRenderer(int row, int col, Data.TileType type) {
+    public void addTileRenderer(int row, int col, Tile model) {
         if(assetProvider != null && getModel().checkIndexes(row, col)){
-            Sprite tileSprite = assetProvider.getTileSprite(type).get(0);
-            tileSprite.setPosition(getRenderXFrom(row, col), getRenderYFrom(row, col));
-            lowerTileSprites.get(2*row + 2*col).add(tileSprite);
+            tileRenderers.get(2*row + 2*col).add(IsoTileRenderer.create(row, col, model, assetProvider, this));
         }
     }
 

@@ -1,26 +1,131 @@
 
 principality.png
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Linear,Linear
 repeat: none
-dirt
+hills
+  rotate: false
+  xy: 0, 320
+  size: 128, 192
+  orig: 128, 192
+  offset: 0, 0
+  index: 0
+mountains
+  rotate: false
+  xy: 0, 128
+  size: 128, 192
+  orig: 128, 192
+  offset: 0, 0
+  index: 0
+ancient_site
   rotate: false
   xy: 0, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: -1
-plain
+  index: 0
+trap
   rotate: false
-  xy: 128, 0
+  xy: 128, 320
+  size: 128, 192
+  orig: 128, 192
+  offset: 0, 0
+  index: 0
+bridge
+  rotate: false
+  xy: 128, 192
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: -1
-undefined
+  index: 0
+broken_bridge
+  rotate: false
+  xy: 256, 384
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+castle
+  rotate: false
+  xy: 128, 64
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+dirt
+  rotate: false
+  xy: 256, 256
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+forest
+  rotate: false
+  xy: 384, 384
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+plain
+  rotate: false
+  xy: 256, 128
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+sanctuary
   rotate: false
   xy: 256, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: -1
+  index: 0
+stockade
+  rotate: false
+  xy: 384, 256
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+swamp
+  rotate: false
+  xy: 512, 384
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+undefined
+  rotate: false
+  xy: 384, 128
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+village
+  rotate: false
+  xy: 384, 0
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+watch_tower
+  rotate: false
+  xy: 512, 256
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+water
+  rotate: false
+  xy: 640, 384
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+woods
+  rotate: false
+  xy: 512, 128
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0

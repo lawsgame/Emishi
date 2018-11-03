@@ -77,7 +77,7 @@ public class BattlePhase extends GamePhase {
     public BattlePhase(GPM gsm, Player player, int chapterId ){
         super(gsm, getPixelPerfectGamePortWidth(128));
 
-        System.out.println(getPixelPerfectGamePortWidth(128));
+        System.out.println("game port width : " +getPixelPerfectGamePortWidth(128));
 
         // load assets
         loadRequiredAssets();
@@ -100,8 +100,8 @@ public class BattlePhase extends GamePhase {
 
         //lauch initial BIS
         this.bim = new BattleInteractionMachine(bfr, gameCM, asm, stageUI, player, assetProvider);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }
