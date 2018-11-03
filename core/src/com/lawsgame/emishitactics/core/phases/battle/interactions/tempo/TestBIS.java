@@ -13,6 +13,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -59,7 +60,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         // TEST CUSTOMED COMMAND
 
         //customedCommand = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        HitCommand hitCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory());
+        /*HitCommand hitCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory());
         sltdUnit.setActionPoints(100);
         hitCommand.setFree(true);
         //hitCommand.setRepeatableOnKill(true);
@@ -68,9 +69,11 @@ public class TestBIS extends BattleInteractionState implements Observer{
         //hitCommand.setMoralDamage(true);
         hitCommand.setHealingFromDamage(true);
         //hitCommand.setRetaliation(true);
+        customedCommand = hitCommand;*/
 
+        customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand.setFree(true);
 
-        customedCommand = hitCommand;
         ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
         ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
         ccTargets = new Area(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA);

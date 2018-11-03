@@ -123,7 +123,7 @@ public abstract class ActorCommand extends BattleCommand{
     @Override
     public final boolean apply() {
         // disable the blinking of the target
-        this.highlightTargets(false);
+        // this.highlightTargets(false);
 
         // Outcome and animation scheduler cleared.
         this.outcome.reset();

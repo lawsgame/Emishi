@@ -210,7 +210,6 @@ public class HitCommand extends ActorCommand{
 
             updateOutcome(getInitiator(), notifs);
 
-            System.out.println(outcome);
         }
 
 
@@ -275,6 +274,7 @@ public class HitCommand extends ActorCommand{
     }
 
     public void setDefenders(){
+        defendersData.clear();
 
         IUnit target;
         Array<int[]> targetsPos = getTargetsFromImpactArea();
@@ -413,7 +413,7 @@ public class HitCommand extends ActorCommand{
             this.rowInitDefender = rowInitDefender;
             this.colInitDefender = colInitDefender;
             this.hitrate = 90; //Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
-            this.damageDealt = 300; //Formulas.getDealtDamage(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
+            this.damageDealt = 1; //Formulas.getDealtDamage(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
         }
 
         public boolean isTargetGuarded(){

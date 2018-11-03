@@ -14,7 +14,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class AttackCommand extends ActorCommand {
 
     protected HitCommand initialBlow;
-    protected HitCommand relationBlow;
+    protected Array<HitCommand> retalationBlows;
 
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, Data.ActionChoice.ATTACK, scheduler, playerInventory, false);
@@ -22,16 +22,22 @@ public class AttackCommand extends ActorCommand {
         this.initialBlow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, playerInventory);
         this.initialBlow.setDecoupled(true);
         this.initialBlow.setFree(true);
-        this.relationBlow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, playerInventory);
-        this.relationBlow.setRetaliation(true);
-        this.relationBlow.setDecoupled(true);
-        this.relationBlow.setFree(true);
+        this.retalationBlows = new Array<HitCommand>();
 
     }
 
     @Override
     protected void execute() {
+        if(initialBlow.apply())
+            scheduleMultipleRenderTasks(initialBlow.confiscateTasks());
 
+        for(int i = 0; i < retalationBlows.size; i++){
+            if(retalationBlows.get(i).apply()){
+                scheduleMultipleRenderTasks(retalationBlows.get(i).confiscateTasks());
+            }
+        }
+
+        System.out.println(scheduler);
     }
 
 
@@ -40,9 +46,21 @@ public class AttackCommand extends ActorCommand {
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         initialBlow.setInitiator(rowActor0, colActor0);
         if(initialBlow.isInitiatorValid()) {
-            relationBlow.setInitiator(rowTarget0, colTarget0);
-            relationBlow.setTarget(rowActor0, colActor0);
             initialBlow.setTarget(rowTarget0, colTarget0);
+
+            HitCommand blow;
+            Array<int[]> targets = getTargetsFromImpactArea();
+            for(int i = 0; i < targets.size; i++){
+                blow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, outcome.playerInventory);
+                blow.setFree(true);
+                blow.setDecoupled(true);
+                blow.init();
+                blow.setInitiator(targets.get(i)[0], targets.get(i)[1]);
+                blow.setTarget(rowActor0, colActor0);
+                if(blow.isApplicable()){
+                    retalationBlows.add(blow);
+                }
+            }
             return initialBlow.isTargetValid(rowActor0, colActor0, rowTarget0, colTarget0);
         }
         return false;
@@ -74,7 +92,7 @@ public class AttackCommand extends ActorCommand {
         int lootRate = 0;
         if(!retaliation){
             lootRate = Formulas.getLootRate(getInitiator());
-        }else if(relationBlow.isApplicable()){
+        }else if(retalationBlows.get(0).isApplicable()){
             lootRate = Formulas.getLootRate(getTarget());
         }
         return lootRate;
@@ -86,6 +104,6 @@ public class AttackCommand extends ActorCommand {
 
 
     public IUnit getInitiatorDefender() {
-        return relationBlow.getInitiator();
+        return retalationBlows.get(0).getInitiator();
     }
 }
