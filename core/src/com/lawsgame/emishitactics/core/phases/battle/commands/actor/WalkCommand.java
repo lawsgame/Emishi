@@ -35,7 +35,7 @@ public class WalkCommand extends ActorCommand {
             stepOn.colTile = subpath.peek()[1];
             if(bfr.getModel().isAnyEventTriggerable(subpath.peek()[0], subpath.peek()[1], stepOn)){
 
-                moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath);
+                moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
                 moveCommand.setDecoupled(true);
                 if(moveCommand.apply(rowActor, colActor)) {
 
@@ -66,7 +66,7 @@ public class WalkCommand extends ActorCommand {
         }
 
         if(!eventTriggered){
-            moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath);
+            moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
             moveCommand.setDecoupled(true);
             if(moveCommand.apply(rowActor, colActor)) {
                 scheduleMultipleRenderTasks(moveCommand.confiscateTasks());

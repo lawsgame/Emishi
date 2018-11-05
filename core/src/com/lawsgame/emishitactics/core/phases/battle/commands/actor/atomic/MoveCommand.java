@@ -16,10 +16,16 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class MoveCommand extends SelfInflitedCommand {
     protected Array<int[]> path;
     protected Data.Orientation oldWalkerOrientation;
+    protected boolean reveal;
 
-    public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Array<int[]> path){
+    public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
+        this(bfr, scheduler, playerInventory, new Array<int[]>(), false);
+    }
+
+    public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Array<int[]> path, boolean reveal) {
         super(bfr, Data.ActionChoice.MOVE, scheduler, playerInventory, true);
         this.path = path;
+        this.reveal = reveal;
     }
 
     @Override
@@ -34,7 +40,18 @@ public class MoveCommand extends SelfInflitedCommand {
         getInitiator().setOrientation(or);
 
         // push render task
-        scheduleRenderTask(new StandardTask(bfr.getModel(), bfr.getUnitRenderer(getInitiator()), new Notification.Walk(getInitiator(), path)));
+        StandardTask task = new StandardTask();
+        StandardTask.RendererThread thread = new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()));
+        if(reveal)
+            thread.addQuery(Notification.Visible.get(true));
+        thread.addQuery(bfr.getModel(), new Notification.Walk(getInitiator(), path, reveal));
+        task.addThread(thread);
+        scheduleRenderTask(task);
+    }
+
+    @Override
+    public boolean isUndoable() {
+        return super.isUndoable() && !reveal;
     }
 
     @Override
@@ -54,6 +71,17 @@ public class MoveCommand extends SelfInflitedCommand {
 
     @Override
     public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return super.isTargetValid(rowActor0, colActor0, rowTarget0, colTarget0) && !getBattlefield().isTileOccupied(path.peek()[0], path.peek()[1]);
+        return super.isTargetValid(rowActor0, colActor0, rowTarget0, colTarget0) && path.size > 0 && !getBattlefield().isTileOccupied(path.peek()[0], path.peek()[1]);
+    }
+
+    // -------------- GETTERS & SETTERS -----------------------------------------
+
+
+    public void setPath(Array<int[]> path) {
+        this.path = path;
+    }
+
+    public void setReveal(boolean reveal) {
+        this.reveal = reveal;
     }
 }

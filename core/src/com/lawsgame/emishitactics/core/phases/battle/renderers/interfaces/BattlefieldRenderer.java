@@ -113,7 +113,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
             notif.unit.notifyAllObservers(new SimpleCommand() {
                 @Override
                 public void apply() {
-                    bur.displayWalk(notif.path, false);
+                    bur.displayWalk(notif.path, notif.reveal);
                     removeAreaRenderersAssociatedWith(bur.getModel());
                 }
             });

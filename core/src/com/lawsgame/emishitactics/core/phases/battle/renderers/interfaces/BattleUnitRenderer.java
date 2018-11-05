@@ -24,11 +24,13 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
      *  recurvise method which keep calling itself to iterate through the notificationQueue
      *  until the renderer is not idle any more or the notification queue gets empty.
      */
+
+    int nb = 0;
     protected void launchNextAnimation(){
+
         if(isIdling() && notificationQueue.size() > 0) {
 
             Object query = notificationQueue.pop();
-
             if (query instanceof Notification.ApplyDamage) {
                 Notification.ApplyDamage notification = (Notification.ApplyDamage) query;
                 displayTakeHit(notification.moralOnly, notification.damageDealt, notification.critical, notification.backstab);
@@ -47,7 +49,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
                 displayPushed(notif.orientation);
             } else if (query instanceof Notification.Walk) {
                 Notification.Walk notif = (Notification.Walk) query;
-                displayWalk(notif.path, false);
+                displayWalk(notif.path, notif.reveal);
             } else if (query instanceof Notification.Fled) {
                 Notification.Fled notif = (Notification.Fled) query;
                 displayFlee(notif.orientation);
@@ -76,6 +78,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
 
             launchNextAnimation();
         }
+        nb = 0;
     }
 
 
@@ -96,7 +99,7 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     public abstract void setHorseman(boolean horseman);
     public abstract boolean isIdling();
 
-    public abstract void displayWalk(Array<int[]> path, boolean swithpos);
+    public abstract void displayWalk(Array<int[]> path, boolean reinform);
     public abstract void displayAttack(Notification.Attack query);
     public abstract void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab);
     public abstract void displayTreated(int healedHP);

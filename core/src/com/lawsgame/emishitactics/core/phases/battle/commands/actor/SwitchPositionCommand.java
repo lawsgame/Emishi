@@ -43,10 +43,10 @@ public class SwitchPositionCommand extends ActorCommand {
         StandardTask task = new StandardTask();
         Array<int[]> path = new Array<int[]>();
         path.add(new int[]{rowTarget, colTarget});
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), bfr.getModel(), new Notification.Walk(getInitiator(), path)));
+        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), bfr.getModel(), new Notification.Walk(getInitiator(), path, false)));
         path = new Array<int[]>();
         path.add(new int[]{rowActor, colActor});
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getTarget()), bfr.getModel(), new Notification.Walk(getTarget(), path)));
+        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getTarget()), bfr.getModel(), new Notification.Walk(getTarget(), path, false)));
         scheduleRenderTask(task);
 
 

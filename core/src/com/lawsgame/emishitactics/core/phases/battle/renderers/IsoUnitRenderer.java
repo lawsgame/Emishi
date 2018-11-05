@@ -30,7 +30,9 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     protected Animation animation;
     protected Array<Sprite> spriteSet;
 
-    // model delayed attributes
+
+    // MODEL DELAYED ATTRIBUTES
+
     protected WeaponType weaponType;
     protected Orientation orientation;
     protected boolean horseman;
@@ -38,13 +40,11 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     protected boolean done;
     protected boolean crippled;
     protected boolean disabled;
-
     protected boolean promoted;
     protected boolean outofaction = false;
 
 
     // RENDER ATTRIBUTES
-
 
     protected boolean blinking;
     private float blinkTime = 0;
@@ -59,6 +59,8 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
      * the data struture is a Stack with on top the current step vgoal od the moving unit
      */
     private Array<float[]> remainingPath = new Array<float[]>();
+    private boolean reveal = false;
+    private float alpha = 1f;
 
 
 
@@ -88,12 +90,16 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     public void render(SpriteBatch batch) {
         if(visible && bfr.isInFrame(spriteSet.get(animation.getCurrentFrame()))){
             if(blinking){
-                spriteSet.get(animation.getCurrentFrame()).setAlpha(0.7f + 0.3f* MathUtils.cos(blinkPeriod.getValue(blinkTime) * blinkTime));
+                this.alpha = 0.7f + 0.3f* MathUtils.cos(blinkPeriod.getValue(blinkTime) * blinkTime);
             }
+            updateAlpha();
             spriteSet.get(animation.getCurrentFrame()).draw(batch);
         }
     }
 
+    private void updateAlpha(){
+        spriteSet.get(animation.getCurrentFrame()).setAlpha(alpha);
+    }
 
     @Override
     public void update(float dt) {
@@ -170,7 +176,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         this.blinking = blinking;
         if(!blinking) {
             for(int i = 0; i < spriteSet.size; i++) {
-                spriteSet.get(i).setAlpha(1);
+                this.alpha = 1f;
             }
         }else{
             blinkTime = 0;
@@ -239,10 +245,10 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     /**
      *
      * @param path : path to a given tile, must not include the current tile occupied by this unit
-     * @param switchpos
+     * @param reveal
      */
     @Override
-    public void displayWalk(Array<int[]> path, boolean switchpos) {
+    public void displayWalk(Array<int[]> path, boolean reveal) {
 
         int rowInitUnit = bfr.getRow(getCenterX(), getCenterY());
         int colInitUnit = bfr.getCol(getCenterX(), getCenterY());
@@ -256,12 +262,12 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
          */
         boolean validPath = path.size > 0;
         int[] oldCoords = new int[]{rowInitUnit, colInitUnit};
-        for(int[] coords: path) {
-            if(coords.length < 2 || 1 != Utils.dist(oldCoords[0], oldCoords[1], coords[0], coords[1])) {
+        for(int i = 0; i < path.size; i++) {
+            if(path.get(i).length < 2 || 1 != Utils.dist(oldCoords[0], oldCoords[1], path.get(i)[0], path.get(i)[1])) {
                 validPath = false;
                 break;
             }
-            oldCoords = coords;
+            oldCoords = path.get(i);
         }
 
         if(validPath) {
@@ -277,6 +283,10 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             this.remainingPath.add(new float[]{getCenterX(), getCenterY()});
             this.state = AnimId.WALK;
 
+            if(reveal){
+                this.alpha = 0f;
+                this.reveal = true;
+            }
         }
     }
 
@@ -292,8 +302,15 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     private void updateMoveTempoStep(float dt){
 
+
+
         float[] vpreviousGoal = remainingPath.pop();
         if(remainingPath.size > 0) {
+
+            if(reveal && MathUtils.isZero(1f - alpha, 0.1f)){
+                this.alpha = 1f;
+                this.reveal = false;
+            }
 
             vgoal[0] = remainingPath.peek()[0];
             vgoal[1] = remainingPath.peek()[1];
@@ -323,10 +340,14 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             }
             bfr.updateBURRenderCall(goal[0], goal[1], this);
 
+
+
         }else{
             // walk animation finished !
             dl.x = 0;
             dl.y = 0;
+
+            bfr.updateBURRenderCall( this);
 
             if(!pushed){
 
@@ -334,10 +355,16 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
                 this.state = IDLE;
                 launchNextAnimation();
                 this.poolNextTask = true;
-
             }
+            reveal = false;
+            alpha = 1f;
             pushed = false;
         }
+
+        System.out.println("");
+        System.out.println("    cX : "+getCenterX());
+        System.out.println("    cY : "+getCenterY());
+        System.out.println("    render call : "+bfr.getRenderCall(this));
     }
 
     private void handleDeplacement(float dt){
@@ -351,6 +378,9 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             } else {
                 setCenterX(getCenterX() + dl.x * dt, false);
                 setCenterY(getCenterY() + dl.y * dt, false);
+                if(alpha < 1f){
+                    this.alpha = 1 - Math.abs(getCenterX() - remainingPath.peek()[0]);
+                }
             }
         }
     }
@@ -467,6 +497,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+
 
 
     //------------------ HELPER CLASS--------------------------------

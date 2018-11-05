@@ -15,8 +15,11 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.trigger.UponDisappearingTrigger;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -35,6 +38,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     LinkedList<ActorCommand> historic = new LinkedList<ActorCommand>();
 
+    MoveCommand moveCommand = null;
     ActorCommand customedCommand = null;
     Area ccActionArea;
     Area ccImpactArea;
@@ -75,6 +79,9 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
+
+        moveCommand = new MoveCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        //bim.bfr.getUnitRenderer(sltdUnit).setVisible(false);
 
         ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
         ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
@@ -149,9 +156,22 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         //bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
 
+        if(!bim.battlefield.isTileOccupied(row, col)){
+            moveCommand.setPath(bim.battlefield.getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation()));
+            moveCommand.setReveal(false);
+            if(!moveCommand.apply(actorPos[0], actorPos[1])){
+                System.out.println("command failed to be applied");
+                System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
+                System.out.println("    target ?    : "+customedCommand.isTargetValid());
+            }
+            //System.out.println(bim.scheduler);
+        }
+
+
 
         // TEST CUSTOMED COMMAND
 
+        /*
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
             if(bim.battlefield.isTileOccupied(row, col)){
@@ -177,6 +197,8 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
             }
         }
+        /*
+
 
         // TEST FINAL
 
@@ -279,7 +301,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
             task.addThread(thread1);
             bim.scheduler.addTask(task);
 
-            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path)));
+            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path, false)));
 
 
             /*

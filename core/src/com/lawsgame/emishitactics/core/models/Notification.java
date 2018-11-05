@@ -151,12 +151,14 @@ public class Notification {
     }
 
     public static class Walk {
-        public IUnit unit;
+        public final IUnit unit;
         public Array<int[]> path;
+        public final boolean reveal;
 
-        public Walk(IUnit unit, Array<int[]> path){
+        public Walk(IUnit unit, Array<int[]> path, boolean reveal){
             this.unit = unit;
             this.path = path;
+            this.reveal = reveal;
         }
     }
 

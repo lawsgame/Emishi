@@ -15,6 +15,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRe
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.CameraManager;
+import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
 public class IsoBFR extends BattlefieldRenderer {
     public static float RATIO = 0.5f; // <1 : ratio between the the great and little dialogue
@@ -109,9 +110,6 @@ public class IsoBFR extends BattlefieldRenderer {
                 renderedWeather.getUpperColor());
         backkgroundRenderer.end();
     }
-
-
-
 
     @Override
     public void render(SpriteBatch batch) {
@@ -248,6 +246,30 @@ public class IsoBFR extends BattlefieldRenderer {
             addUnitRenderer(row, col, rowTarget, colTarget, unitRenderer);
         }
     }
+
+    public int getRenderCall(Renderer renderer) {
+        if(renderer instanceof IsoUnitRenderer) {
+            IsoUnitRenderer iur = (IsoUnitRenderer) renderer;
+            for(int i = 0; i < unitRenderers.size; i++){
+                for(int j = 0; j < unitRenderers.get(i).size; j++){
+                    if(unitRenderers.get(i).get(j) == iur){
+                        return i;
+                    }
+                }
+            }
+        }else if(renderer instanceof IsoTileRenderer) {
+            IsoTileRenderer itr = (IsoTileRenderer) renderer;
+            for(int i = 0; i < tileRenderers.size; i++){
+                for(int j = 0; j < tileRenderers.get(i).size; j++){
+                    if(tileRenderers.get(i).get(j) == itr){
+                        return i;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
 
     private void addUnitRenderer(int row, int col, int rowTarget, int colTarget, BattleUnitRenderer bur){
         if(!isUnitRendererCreated(bur.getModel())){
