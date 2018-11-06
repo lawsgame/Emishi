@@ -666,7 +666,7 @@ public class Army extends IArmy{
     }
 
     @Override
-    public Array<Notification.ApplyDamage> dealDamageUponUnitRemoval(IUnit removed) {
+    public Array<Notification.TakeDamage> dealDamageUponUnitRemoval(IUnit removed) {
         //TODO:
 
 
@@ -674,11 +674,12 @@ public class Army extends IArmy{
         return null;
     }
 
-
     @Override
-    public String toString(){
-        String str = "\n|CURRENT ARMY";
-        str += toShortString();
+    public String toLongString(){
+        String str = "CURRENT ARMY";
+        str += "\nLeader : "+getWarlord();
+        str += "\nMobilized troops : "+getMobilizedUnits(true).size;
+        str += "\nReserve : "+getNonMobilizedUnits().size+"\n";
         for(int i = 0 ; i <  mobilizedTroups.size; i++){
             for(int j = 0; j <  mobilizedTroups.get(i).size; j++){
                 if(j == 0){
@@ -701,11 +702,8 @@ public class Army extends IArmy{
     }
 
     @Override
-    public String toShortString(){
-        String str = "\nLeader : "+getWarlord();
-        str += "\nMobilized troops : "+getMobilizedUnits(true).size;
-        str += "\nReserve : "+getNonMobilizedUnits().size+"\n";
-        return str;
+    public String toString(){
+        return "Army of "+((getWarlord() != null) ? getWarlord().getName() : "");
     }
 }
 

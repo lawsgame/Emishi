@@ -31,8 +31,8 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
         if(isIdling() && notificationQueue.size() > 0) {
 
             Object query = notificationQueue.pop();
-            if (query instanceof Notification.ApplyDamage) {
-                Notification.ApplyDamage notification = (Notification.ApplyDamage) query;
+            if (query instanceof Notification.TakeDamage) {
+                Notification.TakeDamage notification = (Notification.TakeDamage) query;
                 displayTakeHit(notification.moralOnly, notification.damageDealt, notification.critical, notification.backstab);
             } else if (query instanceof Notification.Attack) {
                 displayAttack((Notification.Attack) query);
@@ -116,11 +116,11 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     public void getNotification(Observable sender, final Object data){
         if(data != null) {
             notificationQueue.offer(data);
-            if (data instanceof Notification.ApplyDamage) {
-                Notification.ApplyDamage notif = (Notification.ApplyDamage) data;
-                if (notif.state == Notification.ApplyDamage.State.DIED)
+            if (data instanceof Notification.TakeDamage) {
+                Notification.TakeDamage notif = (Notification.TakeDamage) data;
+                if (notif.state == Notification.TakeDamage.State.DIED)
                     notificationQueue.offer(Data.AnimId.DIE);
-                if (notif.state == Notification.ApplyDamage.State.FLED)
+                if (notif.state == Notification.TakeDamage.State.FLED)
                     notificationQueue.offer(Notification.Fled.get(notif.fleeingOrientation));
             }
             launchNextAnimation();

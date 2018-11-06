@@ -4,13 +4,14 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class EndArmyTurnCommand extends EventCommand {
+public class EndArmyTurnCommand extends BattleCommand {
     protected IArmy army;
 
     public EndArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, IArmy army) {
@@ -22,6 +23,11 @@ public class EndArmyTurnCommand extends EventCommand {
     @Override
     public boolean isApplicable() {
         return true;
+    }
+
+    @Override
+    public boolean isUndoable() {
+        return false;
     }
 
     @Override
@@ -46,5 +52,10 @@ public class EndArmyTurnCommand extends EventCommand {
             }
         }
         scheduleRenderTask(resetDoneTask);
+    }
+
+    @Override
+    protected void unexecute() {
+
     }
 }

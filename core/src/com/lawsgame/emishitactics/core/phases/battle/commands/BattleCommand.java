@@ -1,6 +1,8 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
@@ -102,6 +104,105 @@ public abstract class BattleCommand extends Observable implements Observer {
             if (renderTasks.size == 0) {
                 notifyAllObservers(this);
                 tasksScheduled = false;
+            }
+        }
+    }
+
+
+    protected boolean isAnyEventTriggerable(Object data, Array<int[]> area) {
+        Battlefield bf = bfr.getModel();
+        boolean eventTrig = false;
+
+        if(bf.isAnyEventTriggerable(data)){
+            return true;
+        }
+
+        for(int i = 0; i < bf.armyTurnOrder.size(); i++){
+            if(bf.armyTurnOrder.get(i).isAnyEventTriggerable(data)) {
+                return true;
+            }
+        }
+
+        for(int i = 0; i< area.size; i++){
+            eventTrig = isAnyEventTriggerable(data, area.get(i)[0], area.get(i)[1]);
+        }
+
+        return eventTrig;
+    }
+
+
+    protected boolean isAnyEventTriggerable(Object data, int row, int col){
+        Battlefield bf = bfr.getModel();
+
+        if(bf.isTileExisted(row, col)) {
+            // check unit
+            if(bf.isTileOccupied(row, col)){
+                if(bf.getUnit(row, col).isAnyEventTriggerable(data)) {
+                    return true;
+                }
+            }
+
+            // check tile
+            if(bf.getTile(row, col).isAnyEventTriggerable(data)) {
+                return true;
+            }
+
+            // check areas
+            for (int j = 0; j < bf.getUnitAreas().size; j++) {
+                if (Utils.arrayContains(bf.getUnitAreas().get(j).getTiles(), row, col)
+                        && bf.getUnitAreas().get(j).isAnyEventTriggerable(data)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * handle triggered events within the given area in this order:
+     *  1) battlefield related
+     *  2) army related
+     *  THEN
+     *  3.1) unit related
+     *  3.2) tile related
+     *  3.3) area related
+     *
+     *
+     *
+     * @param data : notif to give to the triggers
+     * @param area : tiles to check for event to trigger
+     * @return if a event has been triggered
+     */
+    protected void handleEvents(Object data, Array<int[]> area) {
+
+        scheduleMultipleRenderTasks(bfr.getModel().performEvents(data));
+
+        for(int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++)
+            scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data));
+
+        for(int i = 0; i< area.size; i++)
+            handleEvents(data, area.get(i)[0], area.get(i)[1]);
+    }
+
+
+    protected void handleEvents(Object data, int row, int col){
+
+        if(bfr.getModel().isTileExisted(row, col)) {
+            // check unit
+            if(bfr.getModel().isTileOccupied(row, col)){
+                scheduleMultipleRenderTasks(bfr.getModel().getUnit(row, col).performEvents(data));
+            }
+
+            // check tile
+            scheduleMultipleRenderTasks(bfr.getModel().getTile(row, col).performEvents(data));
+
+
+            // check areas
+            for (int j = 0; j < bfr.getModel().getUnitAreas().size; j++) {
+                if (Utils.arrayContains(bfr.getModel().getUnitAreas().get(j).getTiles(), row, col)) {
+                    scheduleMultipleRenderTasks(bfr.getModel().getUnitAreas().get(j).performEvents(data));
+                }
             }
         }
     }

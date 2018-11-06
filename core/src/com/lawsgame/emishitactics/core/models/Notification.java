@@ -30,6 +30,17 @@ public class Notification {
         }
     }
 
+
+    public static class Fight{
+        private static Fight fight;
+
+        private Fight(){}
+
+        public static Fight get() {
+            return fight;
+        }
+    }
+
     public static class Attack{
         public final boolean specialmove;
         public int lifeDrained;
@@ -40,7 +51,7 @@ public class Notification {
         }
     }
 
-    public static class ApplyDamage {
+    public static class TakeDamage {
         public final IUnit wounded;
         public final boolean moralOnly;
         public final int damageDealt;
@@ -60,7 +71,7 @@ public class Notification {
             UNDAMAGED, DIED
         }
 
-        public ApplyDamage(IUnit wounded, boolean moralOnly, int damageDealt, int lifeDamageTaken, State state){
+        public TakeDamage(IUnit wounded, boolean moralOnly, int damageDealt, int lifeDamageTaken, State state){
             this.wounded = wounded;
             this.moralOnly = moralOnly;
             this.damageDealt = damageDealt;

@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
-import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
+import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -1266,17 +1266,17 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public ApplyDamage applyDamage(int damageDealt, boolean moralDamageOnly){
-        ApplyDamage.State state = ApplyDamage.State.UNDAMAGED;
+    public TakeDamage applyDamage(int damageDealt, boolean moralDamageOnly){
+        TakeDamage.State state = TakeDamage.State.UNDAMAGED;
         int lifeDamageTaken = 0;
 
         // moral damaga
         if (!has(Data.Ability.UNBREAKABLE)) {
             if(this.currentMoral > damageDealt) {
-                state = ApplyDamage.State.WOUNDED;
+                state = TakeDamage.State.WOUNDED;
                 this.currentMoral -= damageDealt;
             }else{
-                state = ApplyDamage.State.FLED;
+                state = TakeDamage.State.FLED;
                 this.currentMoral = 0;
 
             }
@@ -1288,7 +1288,7 @@ public class Unit extends IUnit{
                 lifeDamageTaken = damageDealt;
                 this.currentHitPoints -= damageDealt;
             }else{
-                state = ApplyDamage.State.DIED;
+                state = TakeDamage.State.DIED;
                 lifeDamageTaken = this.currentHitPoints;
                 this.currentHitPoints = 0;
 
@@ -1305,7 +1305,7 @@ public class Unit extends IUnit{
             }
         }
         */
-        return new ApplyDamage(this, moralDamageOnly, damageDealt, lifeDamageTaken, state);
+        return new TakeDamage(this, moralDamageOnly, damageDealt, lifeDamageTaken, state);
     }
 
     @Override

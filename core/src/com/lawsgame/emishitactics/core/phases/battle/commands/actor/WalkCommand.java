@@ -33,18 +33,16 @@ public class WalkCommand extends ActorCommand {
             subpath.add(validPath.get(i));
             stepOn.rowTile = subpath.peek()[0];
             stepOn.colTile = subpath.peek()[1];
-            if(bfr.getModel().isAnyEventTriggerable(subpath.peek()[0], subpath.peek()[1], stepOn)){
+            if(isAnyEventTriggerable(stepOn, subpath.peek()[0], subpath.peek()[1])){
 
                 moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
                 moveCommand.setDecoupled(true);
                 if(moveCommand.apply(rowActor, colActor)) {
-
-                    this.eventTriggered = true;
                     scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
 
-                    // handle event
-                    Array<Task> subTasks = bfr.getModel().performEvents(subpath.peek()[0], subpath.peek()[1], stepOn);
-                    scheduleMultipleRenderTasks(subTasks);
+                    // perform event
+                    this.eventTriggered = true;
+                    handleEvents(stepOn, subpath.peek()[0], subpath.peek()[1]);
 
                     // keep walking if possible
                     WalkCommand walkCommand = new WalkCommand(bfr, scheduler, outcome.playerInventory);
@@ -54,8 +52,7 @@ public class WalkCommand extends ActorCommand {
                         walkCommand.setDecoupled(true);
                         walkCommand.setTarget(validPath.peek()[0], validPath.peek()[1]);
                         if(walkCommand.apply()){
-                            subTasks = walkCommand.confiscateTasks();
-                            scheduleMultipleRenderTasks(subTasks);
+                            scheduleMultipleRenderTasks(walkCommand.confiscateTasks());
                         }
                     }
                     break;

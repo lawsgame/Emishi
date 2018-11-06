@@ -4,14 +4,14 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class TrapEvent extends EventCommand{
+public class TrapEvent extends BattleCommand{
     private int damage;
     private int row;
     private int col;
@@ -54,12 +54,12 @@ public class TrapEvent extends EventCommand{
 
         // update model
         IUnit victim = bfr.getModel().getUnit(row, col);
-        Notification.ApplyDamage applyDamage = victim.applyDamage(damage, false);
-        applyDamage.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
+        Notification.TakeDamage TakeDamage = victim.applyDamage(damage, false);
+        TakeDamage.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
 
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), applyDamage));
+        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), TakeDamage));
 
         if(bfr.getModel().isTileExisted(row, col) && bfr.getModel().getTile(row, col).getType() != Data.TileType.TRAP) {
 
@@ -76,7 +76,17 @@ public class TrapEvent extends EventCommand{
     }
 
     @Override
+    protected void unexecute() {
+
+    }
+
+    @Override
     public boolean isApplicable() {
         return bfr.getModel().isTileOccupied(row, col) && !bfr.getModel().getUnit(row, col).isOutOfAction();
+    }
+
+    @Override
+    public boolean isUndoable() {
+        return false;
     }
 }

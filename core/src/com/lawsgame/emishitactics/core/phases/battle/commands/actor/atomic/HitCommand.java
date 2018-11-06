@@ -7,7 +7,8 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
+import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
 import com.lawsgame.emishitactics.core.models.Notification.Attack;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -99,7 +100,7 @@ public class HitCommand extends ActorCommand{
         performAttack();
 
         // HANDLE EVENTS
-        handleEvents();
+        handleEvents(Notification.Fight.get());
 
         // REMOVE OOA UNITS
         removeOutOfActionUnits();
@@ -149,22 +150,6 @@ public class HitCommand extends ActorCommand{
         return resetOrTask;
     }
 
-    protected void handleEvents(){
-        checkEventFor(getInitiator());
-        for(int i = 0; i < defendersData.size; i++){
-            checkEventFor(defendersData.get(i).targetRenderer.getModel());
-            checkEventFor(defendersData.get(i).defenderRenderer.getModel());
-        }
-    }
-
-    private void checkEventFor(IUnit unit){
-        if(unit.isAnyEventTriggerable(null)){
-            eventTriggered = true;
-            scheduleMultipleRenderTasks(unit.performEvents(null));
-        }
-    }
-
-
     protected void performAttack(){
         StandardTask task = new StandardTask();
         RendererThread initiatorThread = new RendererThread(bfr.getUnitRenderer(getInitiator()));
@@ -172,7 +157,7 @@ public class HitCommand extends ActorCommand{
         for(int i = 0; i < defendersData.size; i++)
             defenderThreads.add(new StandardTask.RendererThread(defendersData.get(i).defenderRenderer));
 
-        Array<ApplyDamage> notifs = new Array<ApplyDamage>();
+        Array<TakeDamage> notifs = new Array<TakeDamage>();
         Attack attackNotif = new Attack(specialmove);
 
         Orientation reOrientation = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
@@ -187,7 +172,7 @@ public class HitCommand extends ActorCommand{
             int dicesroll = Utils.getMean(2, 100);
             if (dicesroll < defendersData.get(i).hitrate) {
 
-                ApplyDamage notif = data.defenderRenderer.getModel().applyDamage(data.damageDealt, moralDamage);
+                TakeDamage notif = data.defenderRenderer.getModel().applyDamage(data.damageDealt, moralDamage);
                 notif.critical = false;
                 notif.crippled = cripplingTarget;
                 notif.disabled = disablingTarget;
@@ -244,7 +229,7 @@ public class HitCommand extends ActorCommand{
     }
 
 
-    protected void updateOutcome(IUnit receiver, Array<ApplyDamage> notifs){
+    protected void updateOutcome(IUnit receiver, Array<TakeDamage> notifs){
         int experience = 0;
         int lootRate = getLootRate();
         int dicesResult;

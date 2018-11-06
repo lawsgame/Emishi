@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Equipment;
-import com.lawsgame.emishitactics.core.models.Notification.ApplyDamage;
+import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
 import com.lawsgame.emishitactics.core.models.Weapon;
 
 import java.util.Stack;
@@ -180,7 +180,7 @@ public abstract class IUnit extends Model {
     public abstract int getRecoveredHitPoints(int healPower);
     public abstract int getRecoveredMoralPoints(int healPower);
     public abstract boolean treated(int healPower);
-    public abstract ApplyDamage applyDamage(int damageTaken, boolean moralDamageOnly);
+    public abstract TakeDamage applyDamage(int damageTaken, boolean moralDamageOnly);
 
 
 }

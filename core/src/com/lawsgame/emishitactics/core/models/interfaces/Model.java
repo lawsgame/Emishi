@@ -42,4 +42,19 @@ public abstract class Model extends Observable{
         return tasks;
     }
 
+    public boolean holdEvent(){
+        return triggers.size > 0;
+    }
+
+    public String triggerToString(){
+        String str = toString();
+        str +=  "\n     registered TRIGGERS : ";
+        for (int i = 0; i < triggers.size; i++) {
+            str += "\n      trigger " + i + " : " + triggers.get(i);
+            for (int j = 0; j < triggers.get(i).eventCommands.size; j++)
+                str += "\n          event "+j+" : " + triggers.get(i).eventCommands.get(j).toString();
+        }
+        return str;
+    }
+
 }

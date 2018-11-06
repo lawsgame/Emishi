@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -15,7 +16,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
-public class ReinforcementEvent extends EventCommand {
+public class ReinforcementEvent extends BattleCommand {
     private Array<IUnit> reinforcements;
     private Array<int[]> entryPoints;
     private Array<int[]> deploymentPositions;
@@ -78,6 +79,11 @@ public class ReinforcementEvent extends EventCommand {
     }
 
     @Override
+    protected void unexecute() {
+
+    }
+
+    @Override
     public boolean isApplicable() {
         paths.clear();
         Array<int[]> path;
@@ -114,6 +120,11 @@ public class ReinforcementEvent extends EventCommand {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean isUndoable() {
+        return false;
     }
 
     public void addStiffeners(IUnit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){

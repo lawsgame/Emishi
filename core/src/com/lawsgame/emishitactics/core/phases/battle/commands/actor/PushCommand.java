@@ -67,10 +67,9 @@ public class PushCommand extends ActorCommand {
 
         // handle event
         Notification.StepOn stepOn = new Notification.StepOn(rowEndTile, colEndTile, getTarget());
-        if(bfr.getModel().isAnyEventTriggerable(rowEndTile, colEndTile, stepOn)){
+        if(isAnyEventTriggerable(stepOn, rowEndTile, colEndTile)){
             this.eventTriggered = true;
-            Array<Task> eventTasks = bfr.getModel().performEvents(rowEndTile, colEndTile, stepOn);
-            scheduleMultipleRenderTasks(eventTasks);
+            handleEvents(stepOn, rowEndTile, colEndTile);
         }
 
     }

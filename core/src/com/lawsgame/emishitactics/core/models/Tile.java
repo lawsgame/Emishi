@@ -28,6 +28,9 @@ public class Tile extends Model{
         return true;
     }
 
+    public String toString(){
+        return type.name();
+    }
 
 
     //------------- SUB CLASS ---------------------

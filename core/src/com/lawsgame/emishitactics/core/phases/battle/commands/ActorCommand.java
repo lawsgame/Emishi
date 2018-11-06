@@ -183,6 +183,21 @@ public abstract class ActorCommand extends BattleCommand{
 
     protected void unexecute(){ }
 
+
+    protected boolean isAnyEventTriggerable(Object data){
+        Array<int[]> area = getImpactArea();
+        area.add(new int[]{rowActor, colActor});
+        Utils.arrayRemoveClones(area);
+        return isAnyEventTriggerable(data, area);
+    }
+
+    protected void handleEvents(Object data){
+        Array<int[]> area = getImpactArea();
+        area.add(new int[]{rowActor, colActor});
+        Utils.arrayRemoveClones(area);
+        handleEvents(data, area);
+    }
+
     @Override
     public boolean isUndoable() {
         return choice.isUndoable() && !initiator.isOutOfAction() && !eventTriggered;
@@ -222,8 +237,6 @@ public abstract class ActorCommand extends BattleCommand{
     public boolean isTargetValid() {
         return isTargetValid(rowActor, colActor, rowTarget, colTarget);
     }
-
-
 
         /*
     required for testing retaliation availability for the attacked target without copy and paste the code of the

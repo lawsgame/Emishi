@@ -12,6 +12,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
@@ -133,7 +134,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
                 if(bim.battlefield.isTileOccupied(r, c)){
                     final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.battlefield.getUnit(r, c));
                     trigger = new UponDisappearingTrigger(true, woundedRenderer.getModel());
-                    trigger.addEvent(new EventCommand(bim.bfr, bim.scheduler) {
+                    trigger.addEvent(new BattleCommand(bim.bfr, bim.scheduler) {
 
                         @Override
                         protected void execute() {
@@ -141,8 +142,18 @@ public class TestBIS extends BattleInteractionState implements Observer{
                         }
 
                         @Override
+                        protected void unexecute() {
+
+                        }
+
+                        @Override
                         public boolean isApplicable() {
                             return true;
+                        }
+
+                        @Override
+                        public boolean isUndoable() {
+                            return false;
                         }
                     });
                     woundedRenderer.getModel().add(trigger);
@@ -158,6 +169,8 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
 
         TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler);
+
+        System.out.println(bim.bfr.getModel().triggerToString());
 
     }
 

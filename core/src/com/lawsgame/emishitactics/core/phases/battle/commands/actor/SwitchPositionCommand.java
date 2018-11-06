@@ -53,16 +53,14 @@ public class SwitchPositionCommand extends ActorCommand {
         // handle event
 
         Notification.StepOn stepOn = new Notification.StepOn(rowTarget, colTarget, getInitiator());
-        if(bfr.getModel().isAnyEventTriggerable(rowTarget, colTarget, stepOn)){
+        if(isAnyEventTriggerable(stepOn, rowTarget, colTarget)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = bfr.getModel().performEvents(rowTarget, colTarget, stepOn);
-            scheduleMultipleRenderTasks(eventTasks);
+            handleEvents(stepOn, rowTarget, colTarget);
         }
         stepOn = new Notification.StepOn(rowActor, colActor, getTarget());
-        if(bfr.getModel().isAnyEventTriggerable(rowActor, colActor, stepOn)){
+        if(isAnyEventTriggerable(stepOn, rowActor, colActor)){
             this.eventTriggered = true;
-            Array<AnimationScheduler.Task> eventTasks = bfr.getModel().performEvents(rowActor, colActor, stepOn);
-            scheduleMultipleRenderTasks(eventTasks);
+           handleEvents(stepOn, rowActor, colActor);
         }
 
     }

@@ -88,98 +88,9 @@ public class Battlefield extends Model {
         return 0;
     }
 
+
+
     // --------------- EVENT HANDLING --------------------------------------
-
-
-    /**
-     *
-     * @param row
-     * @param col
-     * @param data
-     * @return true if an event is triggered on a specific tile, holds wether by the tile itself or the unit on it.
-     */
-    public boolean isAnyEventTriggerable(int row, int col, Object data){
-        boolean any = false;
-        if(isTileExisted(row, col)) {
-            any = tiles[row][col].isAnyEventTriggerable(data);
-            if (!any) {
-                for (int i = 0; i < unitAreas.size; i++) {
-                    if (unitAreas.get(i).contains(row, col) && unitAreas.get(i).isAnyEventTriggerable(data)) {
-                        any = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return any;
-    }
-
-    /**
-     * event ordering:
-     * - tile
-     * - area
-     * - bf
-     *
-     * @param row
-     * @param col
-     * @param data
-     * @return
-     */
-    public Array<Task> performEvents(int row, int col, Object data){
-        Array<Task> tasks = new Array<Task>();
-        if(isTileExisted(row, col)){
-            tasks.addAll(tiles[row][col].performEvents(data));
-            for(int i = 0; i < unitAreas.size; i++){
-                if(unitAreas.get(i).contains(row, col)) {
-                    tasks.addAll(unitAreas.get(i).performEvents(data));
-                }
-            }
-        }
-        return tasks;
-    }
-
-    @Override
-    public boolean isAnyEventTriggerable(Object data) {
-        for(int r = 0; r < tiles.length; r++){
-            for(int c = 0; c < tiles[0].length; c++){
-                if(isAnyEventTriggerable(r, c, data))
-                    return true;
-            }
-        }
-        for(int i = 0; i < unitAreas.size; i++){
-            if(unitAreas.get(i).isAnyEventTriggerable(data))
-                return true;
-        }
-        for(int i = 0; i < armyTurnOrder.size(); i++){
-            if(armyTurnOrder.get(i).isAnyEventTriggerable(data))
-                return true;
-        }
-        return super.isAnyEventTriggerable(data);
-    }
-
-    /**
-     *
-     * @param data
-     * @return all render tasks associated with the handled events
-     */
-    @Override
-    public Array<Task> performEvents(Object data) {
-        Array<Task> tasks = super.performEvents(data);
-
-        for(int i = 0; i < armyTurnOrder.size(); i++){
-            tasks.addAll(armyTurnOrder.get(i).performEvents(data));
-        }
-        for(int i = 0; i < unitAreas.size; i++){
-            tasks.addAll(unitAreas.get(i).performEvents(data));
-        }
-        for(int r = 0; r < tiles.length; r++){
-            for(int c = 0; c < tiles[0].length; c++){
-                tasks.addAll(tiles[r][c].performEvents(data));
-            }
-        }
-
-        return tasks;
-    }
 
     public void removeEventTrigger(Trigger trigger){
         this.remove(trigger);
@@ -1351,6 +1262,40 @@ public class Battlefield extends Model {
     public String toString() {
         return "battlefield";
     }
+
+
+    public String triggerToString(){
+        String str ="BATTLEFIELD ";
+        str  += "\n"+super.triggerToString();
+        str +="\n\nARMIES : ";
+        for(int i = 0; i< armyTurnOrder.size(); i++){
+            if(armyTurnOrder.get(i).holdEvent())
+                str += "\n"+armyTurnOrder.get(i).triggerToString();
+        }
+        str +="\n\nAREAS : ";
+        for(int i = 0; i< unitAreas.size; i++){
+            if(unitAreas.get(i).holdEvent())
+                str += "\n"+unitAreas.get(i).triggerToString();
+        }
+
+        str +="\n\nUNITS : ";
+        for(int r = 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileOccupied(r,c) && getUnit(r, c).holdEvent())
+                    str += "\n"+getUnit(r, c).triggerToString();
+            }
+        }
+
+        str +="\n\nTILES : ";
+        for(int r = 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileExisted(r,c) && getTile(r, c).holdEvent())
+                    str += "\n"+getTile(r, c).triggerToString();
+            }
+        }
+        return str;
+    }
+
 
     //----------------- NODE HELPER CLASSES -------------------
 

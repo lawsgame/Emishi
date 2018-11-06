@@ -1,16 +1,17 @@
 package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 
 public abstract class Trigger {
-    private Array<EventCommand> eventCommands;
+    protected final Array<BattleCommand> eventCommands;
     private boolean once;
 
     public Trigger(boolean once){
         this.once = once;
-        this.eventCommands = new Array<EventCommand>();
+        this.eventCommands = new Array<BattleCommand>();
     }
 
     public abstract boolean isTriggered(Object data);
@@ -33,11 +34,12 @@ public abstract class Trigger {
         return tasks;
     }
 
-    public void addEvent(EventCommand event){
+    public void addEvent(BattleCommand event){
         this.eventCommands.add(event);
     }
 
     public boolean isEmpty(){
         return eventCommands.size == 0;
     }
+
 }
