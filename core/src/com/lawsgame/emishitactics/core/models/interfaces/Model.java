@@ -17,6 +17,7 @@ public abstract class Model extends Observable{
     public void remove(Trigger trigger) { triggers.removeValue(trigger, true);}
 
     public boolean isAnyEventTriggerable(Object data){
+
         for(int i =0; i < triggers.size; i++){
             if(triggers.get(i).isTriggered(data)){
                 return true;
@@ -27,15 +28,17 @@ public abstract class Model extends Observable{
 
     public Array<Task> performEvents(Object data){
         Array<Task> tasks = new Array<Task>();
+
         for(int i = 0; i < triggers.size; i++){
             if(triggers.get(i).isTriggered(data)) {
                 tasks.addAll(triggers.get(i).performEvent(data));
                 if (triggers.get(i).isEmpty()) {
-                    triggers.removeIndex(i);
+                    remove(triggers.get(i));
                     i--;
                 }
             }
         }
+
         return tasks;
     }
 

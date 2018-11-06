@@ -45,11 +45,11 @@ public class Notification {
         public final boolean moralOnly;
         public final int damageDealt;
         public final int lifeDamageTaken;
+        public final State state;
+
         public boolean crippled;
         public boolean disabled;
         public int healFromDamage;
-        public final State state;
-
         public boolean critical;
         public boolean backstab;
         public Data.Orientation fleeingOrientation;
@@ -69,6 +69,15 @@ public class Notification {
             this.disabled = false;
             this.crippled =false;
             this.healFromDamage = 0;
+        }
+
+        public void set(boolean crippled, boolean disabled, int healFromDamage, boolean critical, boolean backstab, Data.Orientation fleeingOrientation){
+            this.crippled = crippled;
+            this.disabled = disabled;
+            this.healFromDamage = healFromDamage;
+            this.critical = critical;
+            this.backstab = backstab;
+            this.fleeingOrientation  = fleeingOrientation;
         }
 
         public boolean isRelevant(){

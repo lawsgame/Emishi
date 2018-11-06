@@ -169,11 +169,13 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
-    public void addUnitRenderer(int r, int c, IUnit unit) {
+    public BattleUnitRenderer addUnitRenderer(int r, int c, IUnit unit) {
         if(!isUnitRendererCreated(unit)) {
-            unitRenderers.add(new TempoUnitRenderer(r, c, unit));
+            BattleUnitRenderer bur = new TempoUnitRenderer(r, c, unit);
+            unitRenderers.add(bur);
+            return bur;
         }
-
+        return null;
     }
 
     public void removeUnitRenderer(IUnit unit) {

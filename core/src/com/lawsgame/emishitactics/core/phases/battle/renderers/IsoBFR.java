@@ -200,8 +200,16 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public void addTileRenderer(int row, int col, Tile model) {
+
         if(assetProvider != null && getModel().checkIndexes(row, col)){
-            tileRenderers.get(2*row + 2*col).add(IsoTileRenderer.create(row, col, model, assetProvider, this));
+            int renderIndex  = 2*row + 2*col;
+            for(int i = 0; i < tileRenderers.get(renderIndex).size; i++){
+                if(tileRenderers.get(renderIndex).get(i).row == row && tileRenderers.get(renderIndex).get(i).col == col){
+                    model.detach(tileRenderers.get(renderIndex).get(i));
+                    tileRenderers.get(renderIndex).removeIndex(i);
+                }
+            }
+            tileRenderers.get(renderIndex).add(IsoTileRenderer.create(row, col, model, assetProvider, this));
         }
     }
 
@@ -228,6 +236,7 @@ public class IsoBFR extends BattlefieldRenderer {
         }
         return null;
     }
+
 
     protected void updateBURRenderCall(IsoUnitRenderer unitRenderer){
         removeUnitRenderer(unitRenderer.getModel());
@@ -283,8 +292,13 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    public void addUnitRenderer(int row, int col, IUnit model) {
-        addUnitRenderer(row, col, new IsoUnitRenderer(row, col, model, this));
+    public BattleUnitRenderer addUnitRenderer(int row, int col, IUnit model) {
+        if(!isUnitRendererCreated(model)) {
+            BattleUnitRenderer bur = new IsoUnitRenderer(row, col, model, this);
+            addUnitRenderer(row, col, bur);
+            return bur;
+        }
+        return null;
     }
 
     @Override

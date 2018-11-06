@@ -11,9 +11,14 @@ import com.lawsgame.emishitactics.engine.rendering.Animation;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
 public abstract class IsoTileRenderer extends Renderer<Tile> {
+    public final int row;
+    public final int col;
 
-    protected IsoTileRenderer(Tile model) {
+    protected IsoTileRenderer(int row, int col, Tile model) {
+
         super(model);
+        this.row = row;
+        this.col = col;
     }
 
     public static IsoTileRenderer create(int row, int col, Tile model, AssetProvider provider, IsoBFR bfr){
@@ -57,7 +62,7 @@ public abstract class IsoTileRenderer extends Renderer<Tile> {
         private Sprite lowerPart;
 
         protected SimpleITR(int row, int col, Tile model, AssetProvider provider, IsoBFR bfr) {
-            super(model);
+            super(row, col, model);
             Array<Sprite> spriteset = provider.getTileSpriteSet(model.getType().getUpperPart());
             if(spriteset.size > 0){
                 this.upperPart = spriteset.get(0);
@@ -96,7 +101,7 @@ public abstract class IsoTileRenderer extends Renderer<Tile> {
         private Animation lowerAnimation;
 
         protected AnimatedITR(int row, int col, Tile model, AssetProvider provider, IsoBFR bfr) {
-            super(model);
+            super(row, col, model);
             this.upperPart = provider.getTileSpriteSet(model.getType().getUpperPart());
             this.lowerPart = provider.getTileSpriteSet(model.getType().getLowerPart());
             this.upperAnimation = new Animation(upperPart.size, Data.ANIMATION_NORMAL_SPEED, true, true, true);

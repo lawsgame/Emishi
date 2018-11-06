@@ -15,11 +15,12 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.trigger.UponDisappearingTrigger;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -40,6 +41,9 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
     MoveCommand moveCommand = null;
     ActorCommand customedCommand = null;
+    WalkCommand walkCommand = null;
+    ReinforcementEvent reinforcementEvent = null;
+
     Area ccActionArea;
     Area ccImpactArea;
     Area ccTargets;
@@ -49,7 +53,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         super(bim, true, true, true, true, false);
 
         sltdUnit = bim.player.getArmy().getWarlord();
-        sltdUnit.applyDamage(4, false);
+        sltdUnit.applyDamage(0, false);
 
         sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
@@ -80,8 +84,23 @@ public class TestBIS extends BattleInteractionState implements Observer{
         customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
 
+        /*
         moveCommand = new MoveCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        //bim.bfr.getUnitRenderer(sltdUnit).setVisible(false);
+        bim.bfr.getUnitRenderer(sltdUnit).setVisible(false);
+        */
+
+        walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        walkCommand.setFree(true);
+
+        /*
+        reinforcementEvent = new ReinforcementEvent(bim.bfr, bim.scheduler);
+        IUnit unit = new Unit("marco");
+        bim.player.getArmy().add(unit);
+       bim.player.getArmy().appointSoldier(unit, 0);
+        if(unit.isMobilized()) System.out.println("unit mobilized");
+        reinforcementEvent.addStiffeners(unit, 0, 7, 3, 7);
+        */
+
 
         ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
         ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
@@ -89,6 +108,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         bim.bfr.addAreaRenderer(ccImpactArea);
         bim.bfr.addAreaRenderer(ccActionArea);
         bim.bfr.addAreaRenderer(ccTargets);
+
 
         IUnit randomFoe = bim.battlefield.getUnit(13,8);
         randomFoe.addNativeAbility(Data.Ability.GUARD);
@@ -133,6 +153,12 @@ public class TestBIS extends BattleInteractionState implements Observer{
                 }
             }
         }
+
+        //TRAP EVENT
+
+
+        TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler);
+
     }
 
     @Override
@@ -152,10 +178,20 @@ public class TestBIS extends BattleInteractionState implements Observer{
         int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
         //bim.moveCamera(row, col, true);
 
+        // EVENT
+
+        /*
+        System.out.println("EVENT !!");
+        if(!reinforcementEvent.apply()){
+            System.out.println("Applicable ? "+reinforcementEvent.isApplicable());
+        }
+        */
+
         //WALK UNIT
 
         //bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
 
+        /*
         if(!bim.battlefield.isTileOccupied(row, col)){
             moveCommand.setPath(bim.battlefield.getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation()));
             moveCommand.setReveal(false);
@@ -166,7 +202,24 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
             //System.out.println(bim.scheduler);
         }
+        */
 
+
+        if(!bim.battlefield.isTileOccupied(row, col)){
+            if(!walkCommand.apply(actorPos[0], actorPos[1], row, col)){
+                System.out.println("command failed to be applied");
+                System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
+                System.out.println("    target ?    : "+customedCommand.isTargetValid());
+            }
+        }
+
+
+        /*
+        TrapEvent event = new TrapEvent(bim.bfr, bim.scheduler, 3, row, col);
+        if(!event.apply()){
+            System.out.println("not applicable");
+        }
+        */
 
 
         // TEST CUSTOMED COMMAND

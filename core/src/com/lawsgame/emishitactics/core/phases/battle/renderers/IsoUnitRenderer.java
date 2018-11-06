@@ -360,11 +360,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             alpha = 1f;
             pushed = false;
         }
-
-        System.out.println("");
-        System.out.println("    cX : "+getCenterX());
-        System.out.println("    cY : "+getCenterY());
-        System.out.println("    render call : "+bfr.getRenderCall(this));
     }
 
     private void handleDeplacement(float dt){

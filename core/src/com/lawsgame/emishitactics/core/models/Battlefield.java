@@ -130,9 +130,10 @@ public class Battlefield extends Model {
         if(isTileExisted(row, col)){
             tasks.addAll(tiles[row][col].performEvents(data));
             for(int i = 0; i < unitAreas.size; i++){
-                tasks.addAll(unitAreas.get(i).performEvents(data));
+                if(unitAreas.get(i).contains(row, col)) {
+                    tasks.addAll(unitAreas.get(i).performEvents(data));
+                }
             }
-            tasks.addAll(performEvents(data));
         }
         return tasks;
     }
@@ -565,15 +566,17 @@ public class Battlefield extends Model {
      * @param notifyObservers
      */
     public void deploy(int row, int col, IUnit unit, boolean notifyObservers){
-        if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER))
-                && !isUnitDeployed(unit)
-                && unit.isMobilized()){
+        if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) && isUnitDeployable(unit)){
 
             this.units[row][col] = unit;
             addArmyId(unit.getArmy());
             if(notifyObservers)
                 notifyAllObservers(new  Notification.SetUnit(row, col, unit));
         }
+    }
+
+    public boolean isUnitDeployable(IUnit unit) {
+        return unit != null && !isUnitDeployed(unit) && unit.isMobilized();
     }
 
     public void randomlyDeploy(IArmy army){
@@ -831,6 +834,8 @@ public class Battlefield extends Model {
 
 
     private static final CheckMoveMap checkmap = new CheckMoveMap();
+
+
 
     static class CheckMoveMap{
         int rowOrigin;

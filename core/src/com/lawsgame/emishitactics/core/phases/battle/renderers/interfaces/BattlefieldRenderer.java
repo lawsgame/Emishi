@@ -38,7 +38,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
     public abstract AreaRenderer getAreaRenderer(Area area);
     public abstract void addTileRenderer(int row, int col, Tile model);
-    public abstract void addUnitRenderer(int row, int col, IUnit model);
+    public abstract BattleUnitRenderer addUnitRenderer(int row, int col, IUnit model);
     public abstract void addAreaRenderer(Area area);
     public abstract void removeUnitRenderer(IUnit model);
     public abstract void removeAreaRenderer(Area model);

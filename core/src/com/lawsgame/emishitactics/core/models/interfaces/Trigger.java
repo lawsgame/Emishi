@@ -19,14 +19,16 @@ public abstract class Trigger {
         Array<Task> tasks = new Array<Task>();
         if(isTriggered(data)){
             for(int i = 0; i < eventCommands.size; i++){
-                if(eventCommands.get(i).isApplicable()){
-                    eventCommands.get(i).setDecoupled(true);
-                    eventCommands.get(i).apply();
+                eventCommands.get(i).setDecoupled(true);
+                if(eventCommands.get(i).apply()){
                     tasks.addAll(eventCommands.get(i).confiscateTasks());
                 }
             }
-            if(once)
+
+            if(once) {
                 eventCommands.clear();
+            }
+
         }
         return tasks;
     }
