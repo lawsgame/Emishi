@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
@@ -57,4 +58,56 @@ public abstract class Model extends Observable{
         return str;
     }
 
+
+
+    // ---------------------- TRIGGER ----------------------------------------------
+
+    public static abstract class Trigger {
+        protected final Array<BattleCommand> eventCommands;
+        private boolean once;
+        private String tag;
+
+        public Trigger(boolean once){
+            this.once = once;
+            this.eventCommands = new Array<BattleCommand>();
+            this.tag = "";
+        }
+
+        public abstract boolean isTriggered(Object data);
+
+        public Array<Task> performEvent(Object data){
+            Array<Task> tasks = new Array<Task>();
+            if(isTriggered(data)){
+                for(int i = 0; i < eventCommands.size; i++){
+                    eventCommands.get(i).setDecoupled(true);
+                    if(eventCommands.get(i).apply()){
+                        tasks.addAll(eventCommands.get(i).confiscateTasks());
+                    }
+                }
+
+                if(once) {
+                    eventCommands.clear();
+                }
+
+            }
+            return tasks;
+        }
+
+        public void addEvent(BattleCommand event){
+            this.eventCommands.add(event);
+        }
+
+        public boolean isEmpty(){
+            return eventCommands.size == 0;
+        }
+
+        public void setTag(String tag){
+            this.tag = tag;
+        }
+
+        public String toString(){
+            return (tag.equals("")) ? super.toString() : tag;
+        }
+
+    }
 }

@@ -70,8 +70,8 @@ public class MoveCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return super.isTargetValid(rowActor0, colActor0, rowTarget0, colTarget0) && path.size > 0 && !getBattlefield().isTileOccupied(path.peek()[0], path.peek()[1]);
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+        return super.isTargetValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0) && path.size > 0 && !getBattlefield().isTileOccupied(path.peek()[0], path.peek()[1]);
     }
 
     // -------------- GETTERS & SETTERS -----------------------------------------

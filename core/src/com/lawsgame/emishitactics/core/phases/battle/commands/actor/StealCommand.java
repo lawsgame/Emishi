@@ -21,8 +21,8 @@ public class StealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid() {
-        return super.isInitiatorValid() && bfr.getModel().getUnit(rowActor, colActor).has(Data.Ability.STEAL);
+    public boolean isInitiatorValid(IUnit initiator) {
+        return super.isInitiatorValid(initiator) && initiator.has(Data.Ability.STEAL);
     }
 
     @Override
@@ -59,8 +59,8 @@ public class StealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0, true);
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+        return isEnemyTargetValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0, true);
     }
 
     @Override

@@ -9,11 +9,10 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
@@ -128,7 +127,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         */
 
 
-        Trigger trigger;
+        Model.Trigger trigger;
         for(int r = 0; r < bim.battlefield.getNbRows(); r++){
             for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
                 if(bim.battlefield.isTileOccupied(r, c)){
@@ -170,7 +169,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler);
 
-        System.out.println(bim.bfr.getModel().triggerToString());
+        //System.out.println(bim.bfr.getModel().triggerToString());
 
     }
 

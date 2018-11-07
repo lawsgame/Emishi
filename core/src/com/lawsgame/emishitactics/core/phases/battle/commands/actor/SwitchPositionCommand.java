@@ -55,19 +55,19 @@ public class SwitchPositionCommand extends ActorCommand {
         Notification.StepOn stepOn = new Notification.StepOn(rowTarget, colTarget, getInitiator());
         if(isAnyEventTriggerable(stepOn, rowTarget, colTarget)){
             this.eventTriggered = true;
-            handleEvents(stepOn, rowTarget, colTarget);
+            handleEvents(stepOn, rowTarget, colTarget, false, false);
         }
         stepOn = new Notification.StepOn(rowActor, colActor, getTarget());
         if(isAnyEventTriggerable(stepOn, rowActor, colActor)){
             this.eventTriggered = true;
-           handleEvents(stepOn, rowActor, colActor);
+           handleEvents(stepOn, rowActor, colActor, false, false);
         }
 
     }
 
     @Override
-    public boolean isInitiatorValid() {
-        return super.isInitiatorValid() && !getInitiator().isCrippled();
+    public boolean isInitiatorValid(IUnit initiator) {
+        return super.isInitiatorValid(initiator) && !initiator.isCrippled();
     }
 
     @Override
@@ -92,8 +92,8 @@ public class SwitchPositionCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return isTargetAllyValid(rowActor0, colActor0, rowTarget0, colTarget0, false, true);
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+        return isTargetAllyValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0, false, true);
     }
 
     @Override

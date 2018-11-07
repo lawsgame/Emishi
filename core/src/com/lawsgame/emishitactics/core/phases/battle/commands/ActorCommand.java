@@ -184,14 +184,14 @@ public abstract class ActorCommand extends BattleCommand{
     protected void unexecute(){ }
 
 
-    protected boolean isAnyEventTriggerable(Object data){
+    protected final boolean isAnyEventTriggerable(Object data){
         Array<int[]> area = getImpactArea();
         area.add(new int[]{rowActor, colActor});
         Utils.arrayRemoveClones(area);
         return isAnyEventTriggerable(data, area);
     }
 
-    protected void handleEvents(Object data){
+    protected final void handleEvents(Object data){
         Array<int[]> area = getImpactArea();
         area.add(new int[]{rowActor, colActor});
         Utils.arrayRemoveClones(area);
@@ -204,22 +204,27 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     @Override
-    public boolean isApplicable() {
+    public final boolean isApplicable() {
         return isInitiatorValid() && isTargetValid();
     }
 
+    // called to checked initiator requirements AND that the actor DOES stand on the tile {rowActor, colActor}
+    public  final boolean isInitiatorValid(){
+        return isInitiatorValid(initiator) && bfr.getModel().getUnit(rowActor, colActor) == initiator;
+    }
 
-    // called to checked initiator requirements
-    public  boolean isInitiatorValid(){
+    /**
+     * intrinsec requirements checking
+     */
+    public boolean isInitiatorValid(IUnit initiator){
         boolean valid = false;
-        if(bfr.getModel().isTileOccupied(rowActor, colActor)){
-            IUnit actor = bfr.getModel().getUnit(rowActor, colActor);
-            if(!actor.isOutOfAction()) {
-                if (free || choice.getCost() <= actor.getActionPoints()) {
+        if(bfr.getModel().isUnitDeployed(initiator)){
+            if(!initiator.isOutOfAction()) {
+                if (free || choice.getCost() <= initiator.getActionPoints()) {
                     if (choice.isActedBased()) {
-                        valid = (free || !actor.hasActed()) && !actor.isDisabled();
+                        valid = (free || !initiator.hasActed()) && !initiator.isDisabled();
                     } else {
-                        valid = (free || !actor.hasMoved()) && !actor.isCrippled();
+                        valid = (free || !initiator.hasMoved()) && !initiator.isCrippled();
                     }
                 }
             }
@@ -234,15 +239,21 @@ public abstract class ActorCommand extends BattleCommand{
      * @return whether or not THIS SPECIFIC TARGET is at range by the initiator performing the given action if one's is standing the buildingType (rowActor, colActor)
      * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public boolean isTargetValid() {
-        return isTargetValid(rowActor, colActor, rowTarget, colTarget);
+    public final boolean isTargetValid() {
+        if(isTargetValid(getInitiator(), rowActor, colActor, rowTarget, colTarget)){
+            provideActionPanelInfos();
+            return true;
+        }
+        return false;
     }
 
-        /*
+    protected void provideActionPanelInfos(){}
+
+    /*
     required for testing retaliation availability for the attacked target without copy and paste the code of the
     ActorCommand.isTargetValid() method.
      */
-    public abstract boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0);
+    public abstract boolean isTargetValid(IUnit actor, int rowActor0, int colActor0, int rowTarget0, int colTarget0);
 
 
     public void highlightTargets(final boolean enable){
@@ -359,27 +370,25 @@ public abstract class ActorCommand extends BattleCommand{
         return Utils.arrayGetElementsInBothOnly(impactArea, targets);
      }
 
-    public Array<int[]> getTargetsFromImpactArea(){
+    public final Array<int[]> getTargetsFromImpactArea(){
         return getTargetsFromImpactArea(rowActor, colActor, rowTarget, colTarget, initiator);
     }
 
 
     //------------------- HELPER METHODS -----------------------------
 
-    protected final boolean isTargetAllyValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired, boolean canMove){
+    protected final boolean isTargetAllyValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired, boolean canMove){
         boolean valid = false;
-        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)
-                && (choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC)){
-            IUnit actor = bfr.getModel().getUnit(rowActor0, colActor0);
-            int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
+        if(initiator != null && choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC){
+            int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
                 Array<int[]> impactArea = getImpactArea(rowActor0, colActor0, rowTarget0, colTarget0);
                 for(int i = 0; i < impactArea.size; i++) {
-                    if(bfr.getModel().isTileOccupiedByAlly(impactArea.get(i)[0], impactArea.get(i)[1], actor.getArmy().getAffiliation())
+                    if(bfr.getModel().isTileOccupiedByAlly(impactArea.get(i)[0], impactArea.get(i)[1], initiator.getArmy().getAffiliation())
                             && (!woundedRequired || bfr.getModel().getUnit(impactArea.get(i)[0], impactArea.get(i)[1]).isWounded())
-                            && (!canMove || !actor.isCrippled())) {
+                            && (!canMove || !initiator.isCrippled())) {
 
                         valid = true;
                     }
@@ -389,18 +398,16 @@ public abstract class ActorCommand extends BattleCommand{
         return valid;
     }
 
-    protected final boolean isEnemyTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
+    protected final boolean isEnemyTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
         boolean valid = false;
-        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)
-                && (choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC)){
-            IUnit actor = bfr.getModel().getUnit(rowActor0, colActor0);
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
+        if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC){
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
                 Array<int[]> impactArea = getImpactArea(rowActor0, colActor0, rowTarget0, colTarget0);
                 for(int i = 0; i < impactArea.size; i++) {
-                    if (bfr.getModel().isTileOccupiedByFoe(impactArea.get(i)[0], impactArea.get(i)[1], actor.getArmy().getAffiliation())
+                    if (bfr.getModel().isTileOccupiedByFoe(impactArea.get(i)[0], impactArea.get(i)[1], initiator.getArmy().getAffiliation())
                             && (!stealableRequired || bfr.getModel().getUnit(impactArea.get(i)[0], impactArea.get(i)[1]).isStealable())) {
                         valid = true;
                     }
@@ -410,18 +417,18 @@ public abstract class ActorCommand extends BattleCommand{
         return valid;
     }
 
-    protected final Array<int[]> getAlliesAtRange(int row, int col, IUnit actor, boolean woundedRequired, boolean canMove){
+    protected final Array<int[]> getAlliesAtRange(int row, int col, IUnit initiator, boolean woundedRequired, boolean canMove){
         Array<int[]>  targetsAtRange = new Array<int[]>();
-        if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
+        if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
                 for (int c = col - rangeMin; c <= col + rangeMax; c++) {
 
                     dist = Utils.dist(row, col, r, c);
                     if(rangeMin <= dist && dist <= rangeMax){
-                        targetsAtRange.addAll(getTargetedAllies(row, col, r, c, actor, woundedRequired, canMove));
+                        targetsAtRange.addAll(getTargetedAllies(row, col, r, c, initiator, woundedRequired, canMove));
                     }
                 }
             }
@@ -430,18 +437,18 @@ public abstract class ActorCommand extends BattleCommand{
         return Utils.arrayRemoveClones(targetsAtRange);
     }
 
-    protected final Array<int[]> getFoesAtRange(int row, int col, IUnit actor, boolean stealableRequired){
+    protected final Array<int[]> getFoesAtRange(int row, int col, IUnit initiator, boolean stealableRequired){
         Array<int[]>  targetsAtRange = new Array<int[]>();
-        if(choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? actor.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
+        if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
                 for (int c = col - rangeMin; c <= col + rangeMax; c++) {
 
                     dist = Utils.dist(row, col, r, c);
                     if(rangeMin <= dist && dist <= rangeMax){
-                        targetsAtRange.addAll(getTargetedFoes(row, col, r, c, actor, stealableRequired));
+                        targetsAtRange.addAll(getTargetedFoes(row, col, r, c, initiator, stealableRequired));
                     }
                 }
             }
@@ -450,15 +457,15 @@ public abstract class ActorCommand extends BattleCommand{
         return Utils.arrayRemoveClones(targetsAtRange);
     }
 
-    protected final Array<int[]> getTargetedAllies(int rowActor, int colActor, int rowTarget, int colTarget, IUnit actor, boolean woundedRequired, boolean canMove){
+    protected final Array<int[]> getTargetedAllies(int rowActor, int colActor, int rowTarget, int colTarget, IUnit initiator, boolean woundedRequired, boolean canMove){
         Array<int[]> targets = getImpactArea(rowActor, colActor, rowTarget, colTarget);
-        if(actor == null){
+        if(initiator == null){
             targets.clear();
         }else {
             for (int i = 0; i < targets.size; i++) {
-                if (!bfr.getModel().isTileOccupiedByAlly(targets.get(i)[0], targets.get(i)[1], actor.getArmy().getAffiliation())
+                if (!bfr.getModel().isTileOccupiedByAlly(targets.get(i)[0], targets.get(i)[1], initiator.getArmy().getAffiliation())
                         || (woundedRequired && !bfr.getModel().getUnit(targets.get(i)[0], targets.get(i)[1]).isWounded())
-                        || (canMove && actor.isCrippled())) {
+                        || (canMove && initiator.isCrippled())) {
 
                     targets.removeIndex(i);
                     i--;
@@ -467,13 +474,13 @@ public abstract class ActorCommand extends BattleCommand{
         }
         return targets;
     }
-    protected final Array<int[]> getTargetedFoes(int rowActor, int colActor, int rowTarget, int colTarget, IUnit actor, boolean stealableRequired){
+    protected final Array<int[]> getTargetedFoes(int rowActor, int colActor, int rowTarget, int colTarget, IUnit initiator, boolean stealableRequired){
         Array<int[]> targets = getImpactArea(rowActor, colActor, rowTarget, colTarget);
-        if(actor == null) {
+        if(initiator == null) {
             targets.clear();
         }else {
             for (int i = 0; i < targets.size; i++) {
-                if (!bfr.getModel().isTileOccupiedByFoe(targets.get(i)[0], targets.get(i)[1], actor.getArmy().getAffiliation())
+                if (!bfr.getModel().isTileOccupiedByFoe(targets.get(i)[0], targets.get(i)[1], initiator.getArmy().getAffiliation())
                         || (stealableRequired && !bfr.getModel().getUnit(targets.get(i)[0], targets.get(i)[1]).isStealable())) {
                     targets.removeIndex(i);
                     i--;

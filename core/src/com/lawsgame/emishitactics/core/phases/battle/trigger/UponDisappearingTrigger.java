@@ -1,9 +1,9 @@
 package com.lawsgame.emishitactics.core.phases.battle.trigger;
 
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
-public class UponDisappearingTrigger extends Trigger {
+public class UponDisappearingTrigger extends Model.Trigger {
 
     protected IUnit wounded;
 

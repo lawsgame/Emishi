@@ -22,8 +22,8 @@ public class GuardCommand extends SelfInflitedCommand {
 
 
     @Override
-    public boolean isInitiatorValid() {
-        return super.isInitiatorValid() && bfr.getModel().getUnit(rowActor, colActor).has(Data.Ability.GUARD);
+    public boolean isInitiatorValid(IUnit initiator) {
+        return super.isInitiatorValid(initiator) && initiator.has(Data.Ability.GUARD);
     }
 
     @Override

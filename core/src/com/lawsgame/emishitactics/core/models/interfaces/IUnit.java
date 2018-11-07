@@ -154,7 +154,8 @@ public abstract class IUnit extends Model {
     public abstract boolean sameArmyAs(IUnit unit);
     public abstract void setLeadership(int leadership);
     public abstract IUnit getWarchief();
-    public abstract int getChiefCharismaBonus();
+    public abstract int getChiefCharisma();
+    public abstract void replenishMoral(boolean turnBeginning);
     public abstract int getSquadIndex();
 
 

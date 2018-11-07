@@ -3,18 +3,14 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
-import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 public class ReinforcementEvent extends BattleCommand {
     private Array<IUnit> reinforcements;
@@ -33,7 +29,7 @@ public class ReinforcementEvent extends BattleCommand {
 
     public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, final IArmy currentArmy){
 
-        Trigger trigger = new Trigger(true) {
+        Model.Trigger trigger = new Model.Trigger(true) {
 
             @Override
             public boolean isTriggered(Object data) {

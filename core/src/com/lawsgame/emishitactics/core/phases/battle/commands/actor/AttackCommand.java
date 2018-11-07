@@ -42,36 +42,50 @@ public class AttackCommand extends ActorCommand {
 
         scheduleRenderTask(initialBlow.resetOrientation());
 
-        System.out.println(scheduler);
+        //System.out.println(scheduler);
 
 
     }
-
 
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        initialBlow.setInitiator(rowActor0, colActor0);
-        if(initialBlow.isInitiatorValid()) {
-            initialBlow.setTarget(rowTarget0, colTarget0);
+    public boolean isInitiatorValid(IUnit initiator) {
+        return initialBlow.isInitiatorValid(initiator);
+    }
 
-            retalationBlows.clear();
+    @Override
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+        return initialBlow.isTargetValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0);
+    }
+
+    @Override
+    protected void provideActionPanelInfos() {
+
+        retalationBlows.clear();
+        initialBlow.setInitiator(rowActor, colActor);
+        initialBlow.setTarget(rowTarget, colTarget);
+        if(initialBlow.isApplicable()) {
+
             HitCommand blow;
-            Array<int[]> targets = getTargetsFromImpactArea();
-            for(int i = 0; i < targets.size; i++){
+            Array<int[]> targets = initialBlow.getTargetsFromImpactArea();
+            for (int i = 0; i < targets.size; i++) {
+
                 blow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, outcome.playerInventory);
                 blow.setFree(true);
                 blow.setDecoupled(true);
+                blow.setRetaliation(true);
+
                 blow.init();
                 blow.setInitiator(targets.get(i)[0], targets.get(i)[1]);
-                blow.setTarget(rowActor0, colActor0);
-                if(blow.isApplicable())
+                blow.setTarget(rowActor, colActor);
+                if (blow.isApplicable())
                     retalationBlows.add(blow);
             }
-            return initialBlow.isTargetValid(rowActor0, colActor0, rowTarget0, colTarget0);
         }
-        return false;
+
     }
+
+
 
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {

@@ -42,7 +42,7 @@ public class WalkCommand extends ActorCommand {
 
                     // perform event
                     this.eventTriggered = true;
-                    handleEvents(stepOn, subpath.peek()[0], subpath.peek()[1]);
+                    handleEvents(stepOn, subpath.peek()[0], subpath.peek()[1], false, false);
 
                     // keep walking if possible
                     WalkCommand walkCommand = new WalkCommand(bfr, scheduler, outcome.playerInventory);
@@ -83,13 +83,14 @@ public class WalkCommand extends ActorCommand {
      * @return true if the target buildingType if a valid buildingType to move to.
      */
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
-        if (bfr.getModel().isTileOccupied(rowActor0, colActor0)) {
 
+        //TODO: ignore actor when fetching a valid path
+
+        if(initiator != null) {
             this.validPath = bfr.getModel().getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getInitiator().has(Data.Ability.PATHFINDER), getInitiator().getArmy().getAffiliation());
             if (validPath.size > 0 && validPath.size <= getInitiator().getAppMobility()) {
-
                 valid = true;
             }
         }
@@ -107,19 +108,6 @@ public class WalkCommand extends ActorCommand {
             moveCommand.undo();
             scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
         }
-
-        /*
-        if(bfr.getModel().isTileOccupied(rowTarget, colTarget)){
-            IUnit unit = bfr.getModel().getUnit(rowTarget, colTarget);
-            if(unit == getInitiator()) {
-                BattleUnitRenderer walkerRenderer = bfr.getUnitRenderer(getInitiator());
-                bfr.getModel().moveUnit(rowTarget, colTarget, rowActor, colActor, false);
-                unit.setOrientation(oldWalkerOrientation);
-                scheduleRenderTask(new StandardTask(bfr.getModel(), walkerRenderer, new Notification.SetUnit(rowActor, colActor, unit)));
-                scheduleRenderTask(new StandardTask(walkerRenderer, oldWalkerOrientation));
-            }
-        }
-        */
     }
 
 

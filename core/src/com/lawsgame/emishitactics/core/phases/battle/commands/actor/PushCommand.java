@@ -22,8 +22,8 @@ public class PushCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid() {
-        return super.isInitiatorValid() && !bfr.getModel().getUnit(rowActor, colActor).isHorseman();
+    public boolean isInitiatorValid(IUnit initiator) {
+        return super.isInitiatorValid(initiator) && !initiator.isHorseman();
     }
 
     @Override
@@ -69,18 +69,17 @@ public class PushCommand extends ActorCommand {
         Notification.StepOn stepOn = new Notification.StepOn(rowEndTile, colEndTile, getTarget());
         if(isAnyEventTriggerable(stepOn, rowEndTile, colEndTile)){
             this.eventTriggered = true;
-            handleEvents(stepOn, rowEndTile, colEndTile);
+            handleEvents(stepOn, rowEndTile, colEndTile, false, false);
         }
 
     }
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
-        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)){
+        if(initiator != null){
 
-            IUnit pusher = bfr.getModel().getUnit(rowActor0, colActor0);
-            if(bfr.getModel().isTileOccupiedByAlly(rowTarget0, colTarget0, pusher.getArmy().getAffiliation()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
+            if(bfr.getModel().isTileOccupiedByAlly(rowTarget0, colTarget0, initiator.getArmy().getAffiliation()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
 
                 IUnit pushed = bfr.getModel().getUnit(rowTarget0, colTarget0);
                 if(rowActor0 < rowTarget0 && bfr.getModel().isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.Ability.PATHFINDER)))

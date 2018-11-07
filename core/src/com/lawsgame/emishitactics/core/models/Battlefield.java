@@ -11,13 +11,9 @@ import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
-import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 
 
 import java.util.LinkedList;
-import java.util.Observable;
 
 
 /*
@@ -369,13 +365,16 @@ public class Battlefield extends Model {
     /*
     if one is true, its parent are as well
 
+    isTileDeploymentTile
+
     checkIndexes
     > isTileLooted
     > isTileExisted
+    -> isTileLooted
     -> isTilePlunderable
     -> isTileReachable
-    |-> isTileAvailable
     -> isTileOccupied
+    --> isTileAvailable
     --> isTileOccupiedByX
 
     > isTileReachable && isTileOccupied ==
@@ -398,12 +397,12 @@ public class Battlefield extends Model {
         return r > -1 && r < getNbRows() && c > -1 && c < getNbColumns();
     }
 
-    public boolean isTileLooted(int row, int col){
-        return checkIndexes(row,col) && tiles[row][col] != null && tiles[row][col].isLooted();
-    }
-
     public boolean isTileExisted(int r, int c){
         return checkIndexes(r,c) && getTile(r,c) != null;
+    }
+
+    public boolean isTileLooted(int row, int col){
+        return isTileExisted(row, col) && tiles[row][col].isLooted();
     }
 
     public boolean isTileOfType(int r, int c, TileType tileType){
@@ -415,17 +414,15 @@ public class Battlefield extends Model {
     }
 
     public boolean isTileReachable(int row, int col, boolean pathfinder) {
-        if(isTileExisted(row, col)){
-            return getTile(row, col).getType().isReachable(pathfinder);
-        }
-        return false;
+        return isTileExisted(row, col) && getTile(row, col).getType().isReachable(pathfinder);
     }
 
     public boolean isTileOccupied(int row , int col){
-        if(isTileExisted(row, col) && units != null){
-            return this.units[row][col] != null;
-        }
-        return false;
+        return isTileExisted(row, col) && units != null && this.units[row][col] != null;
+    }
+
+    public boolean isTileOccupied(int row, int col, IUnit ignoredUnit){
+        return isTileOccupied(row, col) && units[row][col] != ignoredUnit;
     }
 
     public boolean isTileAvailable(int row, int col, boolean pathfinder){
@@ -531,10 +528,12 @@ public class Battlefield extends Model {
 
 
     public boolean isUnitDeployed(IUnit unit) {
-        for (int r = 0; r < getNbRows(); r++) {
-            for (int c = 0; c < getNbRows(); c++) {
-                if (this.units[r][c] == unit) {
-                    return true;
+        if(unit != null) {
+            for (int r = 0; r < getNbRows(); r++) {
+                for (int c = 0; c < getNbRows(); c++) {
+                    if (this.units[r][c] == unit) {
+                        return true;
+                    }
                 }
             }
         }

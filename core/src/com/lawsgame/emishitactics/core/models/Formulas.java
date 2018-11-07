@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
@@ -109,7 +108,7 @@ public class Formulas {
     public static int getLootRate(IUnit attacker){
         int lootRate = 0;
         if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled())
-            lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharismaBonus()/2;
+            lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharisma()/2;
         return lootRate;
     }
 

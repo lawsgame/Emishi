@@ -535,8 +535,8 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getAppMoral() {;
-        return getAppBravery() + getChiefCharismaBonus();
+    public int getAppMoral() {
+        return getAppBravery();
     }
 
     @Override
@@ -964,7 +964,7 @@ public class Unit extends IUnit{
 
     @Override
     public int getAppAttackAccuracy() {
-        return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + Data.WC_CHARISMA_BONUS_ATT_ACC*getChiefCharismaBonus();
+        return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + Data.WC_CHARISMA_BONUS_ATT_ACC* getChiefCharisma();
     }
 
     @Override
@@ -1102,7 +1102,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public int getChiefCharismaBonus() {
+    public int getChiefCharisma() {
         int chiefCharisma = 0;
         if(isMobilized()){
             chiefCharisma = army.getWarchief(this).getAppCharisma() - Data.SQUAD_SIZE_EXCEEDANCE_CHA_MALUS * getArmy().getSquadExceedingCapacity(this);
@@ -1110,6 +1110,15 @@ public class Unit extends IUnit{
                 chiefCharisma = 0;
         }
         return chiefCharisma;
+    }
+
+    @Override
+    public void replenishMoral(boolean turnBeginning) {
+        if(turnBeginning) {
+            this.setCurrentMoral(this.getCurrentMoral() + getChiefCharisma() + getAppBravery() / Data.BRAVERY_MORAL_RECOVERY_RATE);
+        }else{
+            resetCurrentMoral();
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.ai;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Inventory;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
@@ -22,56 +23,77 @@ public class AggressiveAI extends PassiveAI {
 
             int rowEndTile = actorPos[0];
             int colEndTile = actorPos[1];
+            IUnit actor = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
             boolean attackPerformed = false;
             AttackCommand attackCommand = new AttackCommand(bfr, scheduler, playerInventory);
             WalkCommand walkCommand = new WalkCommand(bfr, scheduler, playerInventory);
             EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory);
 
+
+            // foe at range without moving
             int[] attackTarget;
             Array<int[]> attackTargetsAtRange;
-            attackCommand.setInitiator(actorPos[0], actorPos[1]);
+            attackCommand.setInitiator(rowEndTile, colEndTile);
             if(attackCommand.isInitiatorValid()) {
                 attackTargetsAtRange = attackCommand.getTargetsAtRange();
                 if (attackTargetsAtRange.size > 0) {
                     attackTarget = attackTargetsAtRange.random();
-                    attackPerformed = applyAndStore(attackCommand,  attackTarget[0], attackTarget[1], bundle);
+                    attackPerformed = checkApplyAndStore(attackCommand,  attackTarget[0], attackTarget[1], bundle);
                 }
             }
 
-            if(!attackPerformed){
+            System.out.println("ACTOR : "+actor.getName());
+
+            //seek for foes
+            walkCommand.setInitiator(rowEndTile, colEndTile);
+            if(!attackPerformed && walkCommand.isInitiatorValid()){
+
+                System.out.println("walkCommand initiator valid ? : "+walkCommand.isInitiatorValid());
+
                 int[] moveTarget;
-                Array<int[]> moveTargetsAtRange;
-                walkCommand.setInitiator(actorPos[0], actorPos[1]);
-                if(walkCommand.isInitiatorValid()){
+                Array<int[]> moveTargetsAtRange = walkCommand.getTargetsAtRange();
+                loop :
+                {
+                    while (moveTargetsAtRange.size > 0) {
+                        moveTarget = moveTargetsAtRange.random();
+                        moveTargetsAtRange.removeValue(moveTarget, true);
 
-                    moveTargetsAtRange = walkCommand.getTargetsAtRange();
-                    for(int i = 0; i < moveTargetsAtRange.size ; i++){
 
-                        moveTarget = moveTargetsAtRange.get(i);
-                        attackTargetsAtRange = attackCommand.getTargetsAtRange(moveTarget[0], moveTarget[1], attackCommand.getInitiator());
-                        if(attackTargetsAtRange.size > 0){
+                        // for a given destination {moveTarget} check if a foe can be targeted from there
+                        attackTargetsAtRange = attackCommand.getTargetsAtRange(moveTarget[0], moveTarget[1], actor);
 
+                        if (attackTargetsAtRange.size > 0) {
+                            // target found
                             attackTarget = attackTargetsAtRange.random();
-                            if(applyAndStore(walkCommand, moveTarget[0], moveTarget[1], bundle)){
 
+                            System.out.println("    interesting MOVE TILE: " + moveTarget[0] + " " + moveTarget[1]);
+                            System.out.println("        1) actor valid ? : "+walkCommand.isInitiatorValid(actor));
+                            System.out.println("        2) target valid ? : "+walkCommand.isTargetValid(actor, moveTarget[0], moveTarget[1], attackTarget[0], attackTarget[1]));
+                            System.out.println("        TARGET TILE: " + attackTarget[0] + " " + attackTarget[1]);
+                            System.out.println("            1) actor valid ? : "+attackCommand.isInitiatorValid(actor));
+                            System.out.println("            2) target valid ? : "+attackCommand.isTargetValid(actor, moveTarget[0], moveTarget[1], attackTarget[0], attackTarget[1]));
+
+
+                            // apply
+                            if (checkApplyAndStore(walkCommand, moveTarget[0], moveTarget[1], bundle)) {
                                 rowEndTile = moveTarget[0];
                                 colEndTile = moveTarget[1];
                                 attackCommand.setInitiator(rowEndTile, colEndTile);
-                                if(!applyAndStore(attackCommand, attackTarget[0], attackTarget[1], bundle)){
-                                    walkCommand.undo();
-                                }
+                                checkApplyAndStore(attackCommand, attackTarget[0], attackTarget[1], bundle);
                             }
+
+                            break;
+
                         }
                     }
                 }
             }
 
             endUnitTurnCommand.setInitiator(rowEndTile, colEndTile);
-            if(endUnitTurnCommand.isInitiatorValid()){
-                applyAndStore(endUnitTurnCommand, bundle);
-            }
+            checkApplyAndStore(endUnitTurnCommand, rowEndTile, colEndTile, bundle);
 
 
+            System.out.println(bundle.toString());
         }
         return bundle;
     }

@@ -67,6 +67,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         if(currentCommand.isTargetValid()){
             if(currentCommand.isUndoable()){
                 currentCommand.attach(this);
+                currentCommand.highlightTargets(false);
                 currentCommand.apply();
                 historic.push(currentCommand);
                 bim.bfr.getAreaRenderer(actionArea).setVisible(false);

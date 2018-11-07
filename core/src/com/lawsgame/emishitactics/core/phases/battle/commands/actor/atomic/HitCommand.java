@@ -253,12 +253,13 @@ public class HitCommand extends ActorCommand{
     //------------------------- CHECK METHODS ---------------------------------
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        if(isEnemyTargetValid(rowActor0, colActor0, rowTarget0, colTarget0, false)){
-            setDefenders(rowActor0, colActor0, rowTarget0, colTarget0);
-            return true;
-        }
-        return false;
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+        return isEnemyTargetValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0, false);
+    }
+
+    @Override
+    protected void provideActionPanelInfos() {
+        setDefenders(rowActor, colActor, rowTarget, colTarget);
     }
 
     private void setDefenders(int rowActor, int colActor, int rowTarget, int colTarget){
@@ -307,7 +308,6 @@ public class HitCommand extends ActorCommand{
                         bfr.getModel()));
             }
         }
-        System.out.println("data size :"+getDefenderData().size);
 
 
     }

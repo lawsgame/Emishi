@@ -20,7 +20,6 @@ public class Data {
     public static final float MAX_UNITS_UNDER_WARLORD = 6; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 5; // including the war chief himself / herself
     public static final int MAX_ACTION_POINTS = 100;
-    public static final int NB_BUILDING_MAX = 2;
     public static final int DEX_FACTOR_ATT_ACC = 3;
     public static final int DEX_FACTOR_AVO = 4;
     public static final int HIT_RATE_BACK_ACC_BONUS = 20;
@@ -31,9 +30,9 @@ public class Data {
     public static final int BASE_DROP_RATE = 5;
     public static final int GUARD_REACTION_RANGE_MIN = 1;
     public static final int GUARD_REACTION_RANGE_MAX = 1;
-    public static final float DEALT_DAMAGE_LN_RANDOM = 1.5f;
     public static final int WC_CHARISMA_BONUS_ATT_ACC = 3;
     public static final int SQUAD_SIZE_EXCEEDANCE_CHA_MALUS = 3;
+    public static final int BRAVERY_MORAL_RECOVERY_RATE = 3;
     public static final float[] BANNER_STRENGTH_BONUS_COST    = new float[]{1,     2, 3, 4};
     public static final float[] BANNER_RANGE_BONUS_COST       = new float[]{1,     6};
     public static final float[] BANNER_LOOTRATE_BONUS_COST    = new float[]{0.1f,  1, 2, 3, 4, 5};
@@ -149,7 +148,7 @@ public class Data {
         GUARDED(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         WOUNDED(        AnimSpriteSetId.WOUNDED),
         LEVELUP(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        SWITCH_WEAPON(  AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION),
+        SWITCH_WEAPON(  AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         SPECIAL_MOVE(   AnimSpriteSetId.SPECIAL_MOVE);
 
         AnimSpriteSetId soldierId;

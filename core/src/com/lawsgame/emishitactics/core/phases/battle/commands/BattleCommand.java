@@ -49,6 +49,10 @@ public abstract class BattleCommand extends Observable implements Observer {
     public abstract boolean isApplicable();
     public abstract boolean isUndoable();
 
+
+
+    // ---------------- TASK SCHEDULING -------------------------
+
     public final boolean isExecuting(){
         return tasksScheduled && renderTasks.size > 0;
     }
@@ -109,7 +113,9 @@ public abstract class BattleCommand extends Observable implements Observer {
     }
 
 
-    protected boolean isAnyEventTriggerable(Object data, Array<int[]> area) {
+    // --------------- EVENT HANDLING ----------------------------------
+
+    protected final boolean isAnyEventTriggerable(Object data, Array<int[]> area) {
         Battlefield bf = bfr.getModel();
         boolean eventTrig = false;
 
@@ -131,7 +137,7 @@ public abstract class BattleCommand extends Observable implements Observer {
     }
 
 
-    protected boolean isAnyEventTriggerable(Object data, int row, int col){
+    protected final boolean isAnyEventTriggerable(Object data, int row, int col){
         Battlefield bf = bfr.getModel();
 
         if(bf.isTileExisted(row, col)) {
@@ -174,7 +180,7 @@ public abstract class BattleCommand extends Observable implements Observer {
      * @param area : tiles to check for event to trigger
      * @return if a event has been triggered
      */
-    protected void handleEvents(Object data, Array<int[]> area) {
+    protected final void handleEvents(Object data, Array<int[]> area) {
 
         scheduleMultipleRenderTasks(bfr.getModel().performEvents(data));
 
@@ -182,11 +188,21 @@ public abstract class BattleCommand extends Observable implements Observer {
             scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data));
 
         for(int i = 0; i< area.size; i++)
-            handleEvents(data, area.get(i)[0], area.get(i)[1]);
+            handleEvents(data, area.get(i)[0], area.get(i)[1], true, true);
     }
 
 
-    protected void handleEvents(Object data, int row, int col){
+    protected final void handleEvents(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
+
+        if(ignoreBFEvents) {
+            scheduleMultipleRenderTasks(bfr.getModel().performEvents(data));
+        }
+
+        if(ignoreArmieEvents) {
+            for (int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++) {
+                scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data));
+            }
+        }
 
         if(bfr.getModel().isTileExisted(row, col)) {
             // check unit
@@ -207,7 +223,7 @@ public abstract class BattleCommand extends Observable implements Observer {
         }
     }
 
-    protected void removeOutOfActionUnits(){
+    protected final void removeOutOfActionUnits(){
         Array<IUnit> OOAUnits = bfr.getModel().getOOAUnits();
         bfr.getModel().removeOOAUnits(false);
         StandardTask removeOOAUnitTask = new StandardTask();
@@ -217,7 +233,7 @@ public abstract class BattleCommand extends Observable implements Observer {
         scheduleRenderTask(removeOOAUnitTask);
     }
 
-    public void setDecoupled(boolean decoupled) {
+    public final void setDecoupled(boolean decoupled) {
         this.decoupled = decoupled;
     }
 

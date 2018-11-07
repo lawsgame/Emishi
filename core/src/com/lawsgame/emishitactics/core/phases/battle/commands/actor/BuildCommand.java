@@ -36,20 +36,21 @@ public class BuildCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid() {
-        return super.isInitiatorValid() && bfr.getModel().getUnit(rowActor, colActor).has(Ability.BUILD);
+    public boolean isInitiatorValid(IUnit initiator) {
+        return super.isInitiatorValid(initiator) && initiator.has(Ability.BUILD);
     }
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
-        if(bfr.getModel().isTileOccupied(rowActor0, colActor0) && bfr.getModel().isTileExisted(rowTarget0, colTarget0)){
+        if(initiator != null){
 
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (choice.getRangeMin() <= dist && dist <= choice.getRangeMax()) {
 
                 if(buildingType == Data.TileType.WATCH_TOWER
-                        && bfr.getModel().isTileOfType(rowTarget0, colTarget0, Data.TileType.PLAIN) ) {
+                        && bfr.getModel().isTileOfType(rowTarget0, colTarget0, Data.TileType.PLAIN)
+                        &&  !bfr.getModel().isTileOccupied(rowTarget0, colTarget0)) {
 
                     valid = true;
                 } else if (buildingType == Data.TileType.BRIDGE

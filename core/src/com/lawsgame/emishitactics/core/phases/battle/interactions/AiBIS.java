@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.ai.AggressiveAI;
+import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
@@ -42,8 +43,13 @@ public class AiBIS extends BattleInteractionState implements Observer {
         this.trackrecord = new Stack<ActorCommand>();
         this.waitForCommand = true;
 
-        this.threadAI.start();
+        // AI ON DIFFERENT THREAD
+        //this.threadAI.start();
+
         this.ai.attach(this);
+
+        // AI ON THE SAME THREAD
+        ai.run();
     }
 
     @Override
@@ -55,30 +61,38 @@ public class AiBIS extends BattleInteractionState implements Observer {
     }
 
     private  void next(){
+
         System.out.println("    > next()");
+
         if(isFinished()){
+
             System.out.println("    > next.proceed()");
+
             proceed();
         }else {
+
             System.out.println("    > next.executeCommand()");
+
             waitForCommand = executeNextCommand();
         }
+    }
+
+    private boolean isFinished(){
+        return bundleQueue.isEmpty() && !threadAI.isAlive();
     }
 
     @Override
     public void update60(float dt) {
         super.update60(dt);
         if(waitForCommand){
-            System.out.println("    > update60.executeCommand()");
-            waitForCommand = executeNextCommand();
 
+            System.out.println("    > update60.executeCommand()");
+
+            waitForCommand = executeNextCommand();
         }
 
     }
 
-    private boolean isFinished(){
-        return bundleQueue.isEmpty() && !threadAI.isAlive();
-    }
 
     private void proceed(){
         if(bim.battlefield.getSolver().isBattleOver()){
@@ -95,6 +109,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
     @Override
     public synchronized void getNotification(Observable sender, Object data) {
+
         System.out.println("    > getNotification() : "+sender.getClass().getName());
 
         if(sender instanceof AI) {
@@ -102,11 +117,13 @@ public class AiBIS extends BattleInteractionState implements Observer {
             if (data instanceof AI.CommandBundle) {
 
                 storeCommandBundle((AI.CommandBundle) data);
+
                 System.out.println("        > getNotification.storeBundle()");
 
             } else if (data == sender) {
 
                 System.out.println("        > getNotification.ai_thread_finished");
+
                 this.ai.detach(this);
             }
         }else if(sender instanceof BattleCommand){
@@ -114,10 +131,12 @@ public class AiBIS extends BattleInteractionState implements Observer {
             if(data instanceof ActorCommand) {
 
                 System.out.println("    > getNotification.handleOutcome()");
+
                 handleOutcome((ActorCommand) data);
             }else{
 
                 System.out.println("    > getNotification.next()");
+
                 next();
             }
         }
@@ -131,7 +150,9 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
     private boolean executeNextCommand(){
         boolean noCommandAvailable = true;
+
         System.out.println("    > AIBIS.waitForCommand ? "+bundleQueue.isEmpty());
+
         if(!bundleQueue.isEmpty()) {
 
             noCommandAvailable = false;
@@ -140,7 +161,9 @@ public class AiBIS extends BattleInteractionState implements Observer {
             if (bundle.isEmpty()) {
 
                 bundleQueue.pop();
+
                 System.out.println("    > executeCommand.next() : bundle is empty");
+
                 next();
             }else{
 

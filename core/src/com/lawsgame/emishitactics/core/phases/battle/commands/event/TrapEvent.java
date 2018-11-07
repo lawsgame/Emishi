@@ -4,9 +4,8 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.interfaces.Trigger;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.EventCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -32,7 +31,7 @@ public class TrapEvent extends BattleCommand{
         TrapEvent event = new TrapEvent(bfr, scheduler, damage, rowTile, colTile);
         if(bfr.getModel().isTileExisted(rowTile, colTile) && tile != null) {
 
-            Trigger trigger = new Trigger(false) {
+            Model.Trigger trigger = new Model.Trigger(false) {
                 @Override
                 public boolean isTriggered(Object data) {
                     if (data instanceof Notification.StepOn) {
@@ -73,6 +72,8 @@ public class TrapEvent extends BattleCommand{
         }
 
         scheduler.addTask(task);
+
+        removeOutOfActionUnits();
     }
 
     @Override

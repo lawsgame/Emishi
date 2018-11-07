@@ -76,22 +76,11 @@ public abstract class AI extends Observable implements Runnable {
      * @param bundle
      * @return true if the command is successfully applied and bundle updated
      */
-    protected boolean applyAndStore(ActorCommand command, CommandBundle bundle){
-        if(command.isTargetValid()){
-            bundle.offer(command, app.getPanel(command));
-            command.setDecoupled(true);
-            command.apply();
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean applyAndStore(ActorCommand command, int rowTarget, int colTarget, CommandBundle bundle){
+    protected boolean checkApplyAndStore(final ActorCommand command, int rowTarget, int colTarget, final CommandBundle bundle){
         command.setTarget(rowTarget, colTarget);
-        if(command.isTargetValid()){
+        command.setDecoupled(true);
+        if(command.apply()){
             bundle.offer(command, app.getPanel(command));
-            command.setDecoupled(true);
-            command.apply();
             return true;
         }
         return false;

@@ -389,7 +389,7 @@ public class IsoBFR extends BattlefieldRenderer {
     @Override
     protected void setBuildTask(Notification.Build build) {
         //TODO:
-
+        addTileRenderer(build.row, build.col, build.tile);
 
 
 

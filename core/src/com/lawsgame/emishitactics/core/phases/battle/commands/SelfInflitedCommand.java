@@ -15,20 +15,15 @@ public abstract class SelfInflitedCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isTargetValid(int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        boolean valid = false;
-        if(bfr.getModel().isTileOccupied(rowActor0, colActor0)
-                && rowActor0 == rowTarget0
-                && colActor0 == colTarget0){
-            valid = true;
-        }
-        return valid;
+    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+        return initiator != null && rowActor0 == rowTarget0 && colActor0 == colTarget0;
     }
 
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
         Array<int[]> target = new Array<int[]>();
-        target.add(new int[]{row, col});
+        if(actor != null)
+            target.add(new int[]{row, col});
         return target;
     }
 

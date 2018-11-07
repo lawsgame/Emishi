@@ -23,7 +23,6 @@ public class Army extends IArmy{
     private boolean playerControlled;
     private final Data.Affiliation affiliation;
     private Data.Allegiance allegiance;
-    private int buildingResources;
     private Array<Array<IUnit>> mobilizedTroups;
     private Array<IUnit> nonMobTroups;
     private boolean ldCondEnabled;
@@ -279,26 +278,6 @@ public class Army extends IArmy{
     @Override
     public int getBannerRange(IUnit unit){
         return (unit.isMobilized()) ? (int) Math.sqrt(getWarchief(unit).getAppCharisma()) : 0;
-    }
-
-    @Override
-    public int getBuildingResources() {
-        return buildingResources;
-    }
-
-    @Override
-    public boolean isThereStillbuildingResources() {
-        return buildingResources > 0;
-    }
-
-    @Override
-    public void decrementBuildingResources() {
-        buildingResources--;
-    }
-
-    @Override
-    public void resetBuildingResources() {
-        buildingResources = Data.NB_BUILDING_MAX;
     }
 
     @Override
@@ -634,8 +613,14 @@ public class Army extends IArmy{
     public void replenishMoral(boolean turnBeginning) {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(!mobilizedTroups.get(i).get(j).isOutOfAction() || ! turnBeginning)
+                if(turnBeginning) {
+                    if(!mobilizedTroups.get(i).get(j).isOutOfAction()){
+
+                        mobilizedTroups.get(i).get(j).replenishMoral(turnBeginning);
+                    }
+                }else{
                     mobilizedTroups.get(i).get(j).resetCurrentMoral();
+                }
             }
         }
     }

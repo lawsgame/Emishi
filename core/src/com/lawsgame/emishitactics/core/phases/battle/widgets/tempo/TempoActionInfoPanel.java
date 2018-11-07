@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
@@ -227,9 +228,18 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
         public void set(ActorCommand command) {
             if(command != null && command instanceof SwitchWeaponCommand && command.isTargetValid()){
                 SwitchWeaponCommand swc = (SwitchWeaponCommand)command;
+
+                Weapon cw = command.getInitiator().getCurrentWeapon();
+                Weapon nw = swc.getInitiator().getWeapon(swc.getWeaponIndex());
                 builder = new StringBuilder();
                 builder.append(command.getInitiator().getName());
-                builder.append("\n"+command.getInitiator().getCurrentWeapon().toString()+" => "+swc.getInitiator().getWeapon(swc.getWeaponIndex()));
+                builder.append("\nName        : "+cw+" => "+nw);
+                builder.append("\nMight       : "+cw.getTemplate().getDamageMin()+" - "+cw.getTemplate().getDamageMax()+" => "+nw.getTemplate().getDamageMin()+" - "+nw.getTemplate().getDamageMax());
+                builder.append("\nAccuracy    : "+cw.getTemplate().getAccuracy()+" => "+nw.getTemplate().getAccuracy());
+                builder.append("\nRange       : "+cw.getTemplate().getRangeMin()+" - "+cw.getTemplate().getRangeMax()+" => "+nw.getTemplate().getRangeMin()+" - "+nw.getTemplate().getRangeMax());
+                builder.append("\nDurability  : "+cw.getDurability()+"/"+cw.getTemplate().getDurabilityMax()+" => "+nw.getDurability()+"/"+cw.getTemplate().getDurabilityMax());
+                builder.append("\nDamage type : "+cw.getTemplate().getDamageType()+" => "+nw.getTemplate().getDamageType());
+                builder.append("\nability     : "+cw.getTemplate().getAbility().name().toLowerCase()+" => "+nw.getTemplate().getAbility().name().toLowerCase());
             }
         }
     }

@@ -91,11 +91,15 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
             if (row == currentCommand.getRowTarget() && col == currentCommand.getColTarget()) {
                 //ACTION VALIDATE
 
+
                 // clear the HUD before hand
                 if(bim.app.isPanelAvailable(currentCommand))
                     bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
                 bim.bfr.getAreaRenderer(impactArea).setVisible(false);
                 bim.removeTileHighlighting(false);
+                currentCommand.highlightTargets(false);
+
+                // await for  the command to notify its completion
                 currentCommand.attach(this);
 
                 currentCommand.apply();

@@ -37,10 +37,6 @@ public abstract class IArmy extends Model{
     public abstract Banner getSquadBanner(IUnit unit, boolean stillFighting);
     public abstract int getBannerRange(int squadIndex);
     public abstract int getBannerRange(IUnit unit);
-    public abstract int getBuildingResources();
-    public abstract boolean isThereStillbuildingResources();
-    public abstract void decrementBuildingResources();
-    public abstract void resetBuildingResources();
     public abstract boolean isDeployedTroopsStillFighting(Battlefield battlefield);
     public abstract void setDone(boolean done, boolean notifyObserves);
     public abstract boolean isDone();
