@@ -49,9 +49,10 @@ public class Unit extends IUnit{
 
     protected int currentMoral;
     protected int currentHitPoints;
+
     protected int actionPoints = 0;
-    protected boolean disabled;
-    protected boolean crippled;
+    protected boolean disabled = false;
+    protected boolean crippled = false;
 
     protected Array<Data.Ability> nativeAbilities;
     protected Array<Equipment> equipments;

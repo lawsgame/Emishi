@@ -366,13 +366,13 @@ public class Data {
         TOUCHED_TILE            (3, true, AreaColor.WHITE),
         SELECTED_UNIT           (0, true, AreaColor.LIGHT_BLUE),
         BANNER_AREA             (0, true, AreaColor.LIGHT_BROWN),
-        MOVE_AREA               (1, false, AreaColor.TURQUOISE),
-        ACTION_AREA             (1, false, AreaColor.TURQUOISE),
+        MOVE_AREA               (1, false, AreaColor.RED_ORANGE),
+        ACTION_AREA             (1, false, AreaColor.RED_ORANGE),
         GUARD_AREA              (0, true, AreaColor.DEEP_BLUE),
         DEPLOYMENT_AREA         (2, true, AreaColor.ORANGE),
         VANGUARD_DEPLOYMENT_AREA(2, true, AreaColor.YELLOW),
         FOE_ACTION_AREA         (0, true, AreaColor.RED_PURPLE),
-        COVER                   (0, true, AreaColor.RED_ORANGE);
+        COVER                   (0, true, AreaColor.TURQUOISE);
 
 
         private int layerIndex;

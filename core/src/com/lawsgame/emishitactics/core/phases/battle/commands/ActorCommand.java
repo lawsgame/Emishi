@@ -375,21 +375,24 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
 
+
     //------------------- HELPER METHODS -----------------------------
 
     protected final boolean isTargetAllyValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired, boolean canMove){
         boolean valid = false;
         if(initiator != null && choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC){
+
             int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
             int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
+
                 Array<int[]> impactArea = getImpactArea(rowActor0, colActor0, rowTarget0, colTarget0);
                 for(int i = 0; i < impactArea.size; i++) {
-                    if(bfr.getModel().isTileOccupiedByAlly(impactArea.get(i)[0], impactArea.get(i)[1], initiator.getArmy().getAffiliation())
+
+                    if(bfr.getModel().isTileOccupiedByAlly(impactArea.get(i)[0], impactArea.get(i)[1], initiator)
                             && (!woundedRequired || bfr.getModel().getUnit(impactArea.get(i)[0], impactArea.get(i)[1]).isWounded())
                             && (!canMove || !initiator.isCrippled())) {
-
                         valid = true;
                     }
                 }
@@ -401,12 +404,15 @@ public abstract class ActorCommand extends BattleCommand{
     protected final boolean isEnemyTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
         boolean valid = false;
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC){
+
             int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
             int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
+
                 Array<int[]> impactArea = getImpactArea(rowActor0, colActor0, rowTarget0, colTarget0);
                 for(int i = 0; i < impactArea.size; i++) {
+
                     if (bfr.getModel().isTileOccupiedByFoe(impactArea.get(i)[0], impactArea.get(i)[1], initiator.getArmy().getAffiliation())
                             && (!stealableRequired || bfr.getModel().getUnit(impactArea.get(i)[0], impactArea.get(i)[1]).isStealable())) {
                         valid = true;
@@ -420,6 +426,7 @@ public abstract class ActorCommand extends BattleCommand{
     protected final Array<int[]> getAlliesAtRange(int row, int col, IUnit initiator, boolean woundedRequired, boolean canMove){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
+
             int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
             int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
@@ -440,6 +447,7 @@ public abstract class ActorCommand extends BattleCommand{
     protected final Array<int[]> getFoesAtRange(int row, int col, IUnit initiator, boolean stealableRequired){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
+
             int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
             int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
@@ -463,7 +471,7 @@ public abstract class ActorCommand extends BattleCommand{
             targets.clear();
         }else {
             for (int i = 0; i < targets.size; i++) {
-                if (!bfr.getModel().isTileOccupiedByAlly(targets.get(i)[0], targets.get(i)[1], initiator.getArmy().getAffiliation())
+                if (!bfr.getModel().isTileOccupiedByAlly(targets.get(i)[0], targets.get(i)[1], initiator)
                         || (woundedRequired && !bfr.getModel().getUnit(targets.get(i)[0], targets.get(i)[1]).isWounded())
                         || (canMove && initiator.isCrippled())) {
 

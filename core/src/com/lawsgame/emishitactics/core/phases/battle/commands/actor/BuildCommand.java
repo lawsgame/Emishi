@@ -50,10 +50,11 @@ public class BuildCommand extends ActorCommand {
 
                 if(buildingType == Data.TileType.WATCH_TOWER
                         && bfr.getModel().isTileOfType(rowTarget0, colTarget0, Data.TileType.PLAIN)
-                        &&  !bfr.getModel().isTileOccupied(rowTarget0, colTarget0)) {
+                        &&  !bfr.getModel().isTileOccupied(rowTarget0, colTarget0, initiator)) {
 
                     valid = true;
                 } else if (buildingType == Data.TileType.BRIDGE
+                        &&  !bfr.getModel().isTileOccupied(rowTarget0, colTarget0, initiator)
                         && bfr.getModel().isTileOfType(rowTarget0, colTarget0, Data.TileType.SHALLOWS)
                         && ((bfr.getModel().isTileOfType(rowTarget0, colTarget0 + 1,Data.TileType.PLAIN) && bfr.getModel().isTileOfType(rowTarget0, colTarget0 - 1, Data.TileType.PLAIN))
                             || (bfr.getModel().isTileOfType(rowTarget0 + 1, colTarget0,Data.TileType.PLAIN) && bfr.getModel().isTileOfType(rowTarget0 - 1, colTarget0, Data.TileType.PLAIN)))) {
@@ -78,11 +79,13 @@ public class BuildCommand extends ActorCommand {
                 if (rangeMin <= dist && dist <= rangeMax && bfr.getModel().isTileExisted(r, c)) {
 
                     if (buildingType == Data.TileType.WATCH_TOWER
-                            && bfr.getModel().isTileOfType(r, c, Data.TileType.PLAIN)) {
+                            && bfr.getModel().isTileOfType(r, c, Data.TileType.PLAIN)
+                            && !bfr.getModel().isTileOccupied(r,c, actor)) {
 
                         targetsAtRange.add(new int[]{r, c});
                     } else if (buildingType == Data.TileType.BRIDGE
                             && bfr.getModel().isTileOfType(r, c, Data.TileType.SHALLOWS)
+                            && !bfr.getModel().isTileOccupied(r,c, actor)
                             && ((bfr.getModel().isTileOfType(r, c + 1, Data.TileType.PLAIN) && bfr.getModel().isTileOfType(r, c - 1, Data.TileType.PLAIN))
                             || (bfr.getModel().isTileOfType(r + 1, c, Data.TileType.PLAIN) && bfr.getModel().isTileOfType(r - 1, c, Data.TileType.PLAIN)))) {
 

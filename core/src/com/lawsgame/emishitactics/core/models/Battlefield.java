@@ -429,12 +429,27 @@ public class Battlefield extends Model {
         return isTileReachable(row, col, pathfinder) && !isTileOccupied(row, col);
     }
 
-    public boolean isTileOccupiedBySameSquad(int row , int col, IUnit unit){
-        return isTileOccupied(row, col) && this.units[row][col].sameSquadAs(unit);
+    public boolean isTileAvailable(int row, int col, boolean pathfinder, IUnit ignoredUnit){
+        return isTileReachable(row, col, pathfinder) && !isTileOccupied(row, col, ignoredUnit);
+    }
+
+    public boolean isTileOccupiedByAnotherSquadMember(int row , int col, IUnit squadMember){
+        return isTileOccupied(row, col, squadMember) && this.units[row][col].sameSquadAs(squadMember);
     }
 
     public boolean isTileOccupiedByAlly(int row , int col, Affiliation affiliation){
         return isTileOccupied(row, col) && getUnit(row, col).isAllyWith(affiliation);
+    }
+
+    /**
+     *
+     * @param row :
+     * @param col :
+     * @param actor :
+     * @return true if the tile is occupied by another ally
+     */
+    public boolean isTileOccupiedByAlly(int row , int col, IUnit actor){
+        return isTileOccupied(row, col, actor) && getUnit(row, col).isMobilized() && getUnit(row, col).isAllyWith(actor.getArmy().getAffiliation());
     }
 
     public boolean isTileOccupiedByFoe(int row , int col, Data.Affiliation affiliation){
@@ -724,7 +739,7 @@ public class Battlefield extends Model {
                     if (checkIndexes(r, c )
                             && dist > 0
                             && dist <= bannerRange
-                            && isTileOccupiedBySameSquad(r, c, getUnit(r, c))
+                            && isTileOccupiedByAnotherSquadMember(r, c, getUnit(r, c))
                             && getUnit(r, c).isStandardBearer()) {
                         return true;
                     }

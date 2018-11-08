@@ -73,7 +73,6 @@ public class AggressiveAI extends PassiveAI {
                             System.out.println("            1) actor valid ? : "+attackCommand.isInitiatorValid(actor));
                             System.out.println("            2) target valid ? : "+attackCommand.isTargetValid(actor, moveTarget[0], moveTarget[1], attackTarget[0], attackTarget[1]));
 
-
                             // apply
                             if (checkApplyAndStore(walkCommand, moveTarget[0], moveTarget[1], bundle)) {
                                 rowEndTile = moveTarget[0];

@@ -114,7 +114,7 @@ public class DeploymentBIS extends BattleInteractionState {
         for(int i = 0; i < tiles.size; i++){
             r = tiles.get(i)[0];
             c = tiles.get(i)[1];
-            if(bim.battlefield.isTileOccupiedBySameSquad(r, c, sltdUnit) && bim.battlefield.getUnit(r,c) != sltdUnit){
+            if(bim.battlefield.isTileOccupiedByAnotherSquadMember(r, c, sltdUnit)){
                 squadmembers.add(bim.battlefield.removeUnit(r, c, true));
             }
         }
