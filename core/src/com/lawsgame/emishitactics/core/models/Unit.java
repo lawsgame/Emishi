@@ -547,8 +547,8 @@ public class Unit extends IUnit{
 
     @Override
     public void setCurrentMoral(int moral) {
-        if(0 <= moral && moral <= getAppMoral()){
-            this.currentMoral = moral;
+        if(0 <= moral){
+            this.currentMoral = ( moral > getAppMoral())? getAppMoral() : moral;
         }
     }
 

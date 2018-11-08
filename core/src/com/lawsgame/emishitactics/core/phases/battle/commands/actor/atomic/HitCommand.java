@@ -406,7 +406,7 @@ public class HitCommand extends ActorCommand{
             this.colInitTarget = colInitTarget;
             this.rowInitDefender = rowInitDefender;
             this.colInitDefender = colInitDefender;
-            this.hitrate = 90; //Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
+            this.hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
             this.damageDealt = 1; //Formulas.getDealtDamage(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
             this.lootRate = Formulas.getLootRate(attacker);
         }

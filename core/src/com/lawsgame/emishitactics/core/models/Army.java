@@ -613,14 +613,7 @@ public class Army extends IArmy{
     public void replenishMoral(boolean turnBeginning) {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(turnBeginning) {
-                    if(!mobilizedTroups.get(i).get(j).isOutOfAction()){
-
-                        mobilizedTroups.get(i).get(j).replenishMoral(turnBeginning);
-                    }
-                }else{
-                    mobilizedTroups.get(i).get(j).resetCurrentMoral();
-                }
+                mobilizedTroups.get(i).get(j).replenishMoral(turnBeginning);
             }
         }
     }

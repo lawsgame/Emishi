@@ -68,7 +68,7 @@ public class AggressiveAI extends PassiveAI {
 
                             System.out.println("    interesting MOVE TILE: " + moveTarget[0] + " " + moveTarget[1]);
                             System.out.println("        1) actor valid ? : "+walkCommand.isInitiatorValid(actor));
-                            System.out.println("        2) target valid ? : "+walkCommand.isTargetValid(actor, moveTarget[0], moveTarget[1], attackTarget[0], attackTarget[1]));
+                            System.out.println("        2) target valid ? : "+walkCommand.isTargetValid(actor, actorPos[0], actorPos[1], moveTarget[0], moveTarget[1]));
                             System.out.println("        TARGET TILE: " + attackTarget[0] + " " + attackTarget[1]);
                             System.out.println("            1) actor valid ? : "+attackCommand.isInitiatorValid(actor));
                             System.out.println("            2) target valid ? : "+attackCommand.isTargetValid(actor, moveTarget[0], moveTarget[1], attackTarget[0], attackTarget[1]));

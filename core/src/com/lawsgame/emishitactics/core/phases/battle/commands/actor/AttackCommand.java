@@ -12,96 +12,63 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class AttackCommand extends ActorCommand {
+public class AttackCommand extends HitCommand {
 
-    protected HitCommand initialBlow;
     protected Array<HitCommand> retalationBlows;
 
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, Data.ActionChoice.ATTACK, scheduler, playerInventory, false);
-
-        this.initialBlow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, playerInventory);
-        this.initialBlow.setDecoupled(true);
-        this.initialBlow.setFree(true);
+        super(bfr, Data.ActionChoice.ATTACK, scheduler, playerInventory);
         this.retalationBlows = new Array<HitCommand>();
 
     }
 
     @Override
     protected void execute() {
-
-
-        if(initialBlow.apply())
-            scheduleMultipleRenderTasks(initialBlow.confiscateTasks());
+        super.execute();
 
         for(int i = 0; i < retalationBlows.size; i++){
             if(retalationBlows.get(i).apply()){
+                outcome.merge(retalationBlows.get(i).getOutcome());
                 scheduleMultipleRenderTasks(retalationBlows.get(i).confiscateTasks());
             }
         }
 
-        scheduleRenderTask(initialBlow.resetOrientation());
+        scheduleRenderTask(resetOrientation());
 
         //System.out.println(scheduler);
 
 
     }
 
-
-    @Override
-    public boolean isInitiatorValid(IUnit initiator) {
-        return initialBlow.isInitiatorValid(initiator);
-    }
-
-    @Override
-    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return initialBlow.isTargetValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0);
-    }
-
     @Override
     protected void provideActionPanelInfos() {
+        super.provideActionPanelInfos();
 
         retalationBlows.clear();
-        initialBlow.setInitiator(rowActor, colActor);
-        initialBlow.setTarget(rowTarget, colTarget);
-        if(initialBlow.isApplicable()) {
+        HitCommand blow;
+        Array<int[]> targets = getTargetsFromImpactArea();
+        for (int i = 0; i < targets.size; i++) {
 
-            HitCommand blow;
-            Array<int[]> targets = initialBlow.getTargetsFromImpactArea();
-            for (int i = 0; i < targets.size; i++) {
+            blow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, outcome.playerInventory);
+            blow.setFree(true);
+            blow.setDecoupled(true);
+            blow.setRetaliation(true);
 
-                blow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, outcome.playerInventory);
-                blow.setFree(true);
-                blow.setDecoupled(true);
-                blow.setRetaliation(true);
-
-                blow.init();
-                blow.setInitiator(targets.get(i)[0], targets.get(i)[1]);
-                blow.setTarget(rowActor, colActor);
-                if (blow.isApplicable())
-                    retalationBlows.add(blow);
-            }
+            blow.init();
+            blow.setInitiator(targets.get(i)[0], targets.get(i)[1]);
+            blow.setTarget(rowActor, colActor);
+            if (blow.isApplicable())
+                retalationBlows.add(blow);
         }
 
-    }
 
-
-
-    @Override
-    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
-        return initialBlow.getTargetsAtRange(row, col, actor);
-    }
-
-    @Override
-    public Array<int[]> getTargetsFromImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0, IUnit actor) {
-        return initialBlow.getTargetsFromImpactArea(rowActor0, colActor0, rowTarget0,colTarget0, actor);
     }
 
     // -------------------- COMODITY BATTLE PANEL METHODS ------------------
 
 
     public HitCommand getInitialBlow(){
-        return initialBlow;
+        return this;
     }
 
     public Array<HitCommand> getRetalationBlows(){
