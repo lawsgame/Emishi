@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.ai;
 
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
@@ -16,7 +16,7 @@ public class PassiveAI extends AI {
     }
 
     @Override
-    public int[] nextUnit(IArmy army) {
+    public int[] nextUnit(MilitaryForce army) {
         return bfr.getModel().getStillActiveUnitCoords(army.getId()).random();
     }
 

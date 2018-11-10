@@ -42,7 +42,7 @@ public class WalkCommand extends ActorCommand {
 
                     // perform event
                     this.eventTriggered = true;
-                    handleEvents(stepOn, subpath.peek()[0], subpath.peek()[1], false, false);
+                    handleEvents(stepOn, subpath.peek()[0], subpath.peek()[1]);
 
                     // keep walking if possible
                     WalkCommand walkCommand = new WalkCommand(bfr, scheduler, outcome.playerInventory);

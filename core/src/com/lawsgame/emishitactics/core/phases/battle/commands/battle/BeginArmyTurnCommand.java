@@ -1,15 +1,15 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands.event;
+package com.lawsgame.emishitactics.core.phases.battle.commands.battle;
 
 import com.lawsgame.emishitactics.core.models.Notification.BeginArmyTurn;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class BeginArmyTurnCommand extends BattleCommand {
-    protected IArmy army;
+    protected MilitaryForce army;
 
-    public BeginArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, IArmy army) {
+    public BeginArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, MilitaryForce army) {
         super(bfr, scheduler);
         this.army = army;
     }
@@ -33,7 +33,7 @@ public class BeginArmyTurnCommand extends BattleCommand {
             if (army.isPlayerControlled())
                 bfr.getModel().incrementTurn();
 
-            handleEvents(new BeginArmyTurn(army), -1, -1, false, false);
+            handleEvents(new BeginArmyTurn(army), -1, -1);
         }
     }
 

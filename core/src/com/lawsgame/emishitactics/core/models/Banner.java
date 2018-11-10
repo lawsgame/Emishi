@@ -1,148 +1,84 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
+import com.lawsgame.emishitactics.core.models.Data.BannerBonus;
+
+import java.util.HashMap;
 
 public class Banner extends Model  {
 
+    private final IUnit bearer;
+    private BannerBonus currentBonus;
+    private HashMap<BannerBonus, Integer> bonuses;
 
-    private int maxpoints;
-    private int usedpoints;
-    private int strength;
-    private int range;
-    private int lootrate;
-    private int apregen;
-
-    public Banner(){
-        this.maxpoints = 0;
-        this.usedpoints = 0;
-        this.strength = 0;
-        this.range = 0;
-        this.lootrate = 0;
-        this.apregen = 0;
+    public Banner(IUnit bearer){
+        this.bearer = bearer;
+        this.bonuses = new HashMap<BannerBonus, Integer>();
+        this.currentBonus = BannerBonus.STRENGTH;
+        this.reset();
     }
 
-    public void incrementMaxPoints(){
-        this.maxpoints++;
-    }
+    public void reset(){
+        bonuses.clear();
+        for(int i = 0; i < BannerBonus.values().length; i++){
+            bonuses.put(BannerBonus.values()[i], 0);
+        }
 
-    public void setMaxPoints(int leadership){
-        this.maxpoints = leadership;
-        this.usedpoints = 0;
-        this.strength = 0;
-        this.range = 0;
-        this.lootrate = 0;
-        this.apregen = 0;
     }
 
     public int getMaxPoints(){
-        return maxpoints;
+        return bearer.getAppLeadership();
     }
 
     public int getUsedPoints(){
-        return usedpoints;
+        int usedPoints = 0;
+        for (BannerBonus bb : bonuses.keySet()) {
+            for(int i = 1; i <= bonuses.get(bb); i++) {
+                usedPoints += bb.getCost()[i - 1];
+            }
+        }
+        return usedPoints;
     }
 
     public int getRemainingPoints(){
         return getMaxPoints() - getUsedPoints();
     }
 
-
-
-    // ------------- SETTERS && GETTERS --------------------
-
-    public boolean decrementStrength(){
-        if(0 < strength){
-            this.usedpoints -= Data.BANNER_STRENGTH_BONUS_COST[strength];
-            this.strength--;
+    public boolean decrementBonus(BannerBonus bb){
+        if(0 < bonuses.get(bb)){
+            this.bonuses.put(bb, bonuses.get(bb) -1);
             return true;
         }
         return false;
     }
 
-    public boolean decrementRange(){
-        if(0 < range){
-            this.usedpoints -= Data.BANNER_RANGE_BONUS_COST[range];
-            this.range--;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean decrementLootrate(){
-        if(0 < lootrate){
-            this.usedpoints -= Data.BANNER_LOOTRATE_BONUS_COST[lootrate];
-            this.lootrate--;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean decrementAPRegen(){
-        if(0 < apregen){
-            this.usedpoints -= Data.BANNER_AP_REGEN_BONUS_COST[apregen];
-            this.apregen--;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean incrementStrength(){
-        boolean notmaxed = strength <  Data.BANNER_STRENGTH_BONUS_COST.length - 1;
-        boolean enoughPoints =  Data.BANNER_STRENGTH_BONUS_COST[strength + 1] <= getRemainingPoints();
+    public boolean increment(BannerBonus bb){
+        boolean notmaxed = bonuses.get(bb) < bb.getCost().length;
+        boolean enoughPoints =  bb.getCost()[bonuses.get(bb)] <= getRemainingPoints();
         if(notmaxed && enoughPoints){
-            this.usedpoints +=  Data.BANNER_STRENGTH_BONUS_COST[strength + 1];
-            this.strength++;
-            return true;
-        }
-        return false;
-    }
-    public boolean incrementRange(){
-        boolean notmaxed = range <  Data.BANNER_RANGE_BONUS_COST.length - 1;
-        boolean enoughPoints =  Data.BANNER_RANGE_BONUS_COST[range + 1] <= getRemainingPoints();
-        if(notmaxed && enoughPoints){
-            this.usedpoints +=  Data.BANNER_RANGE_BONUS_COST[range + 1];
-            this.range++;
-            return true;
-        }
-        return false;
-    }
-    public boolean incrementLootRate(){
-        boolean notmaxed = lootrate <  Data.BANNER_LOOTRATE_BONUS_COST.length - 1;
-        boolean enoughPoints =  Data.BANNER_LOOTRATE_BONUS_COST[lootrate + 1] <= getRemainingPoints();
-        if(notmaxed && enoughPoints){
-            this.usedpoints +=  Data.BANNER_LOOTRATE_BONUS_COST[lootrate + 1];
-            this.lootrate++;
-            return true;
-        }
-        return false;
-    }
-    public boolean incrementAPRegen(){
-        boolean notmaxed = apregen <  Data.BANNER_AP_REGEN_BONUS_COST.length - 1;
-        boolean enoughPoints =  Data.BANNER_AP_REGEN_BONUS_COST[apregen + 1] <= getRemainingPoints();
-        if(notmaxed && enoughPoints){
-            this.usedpoints +=  Data.BANNER_AP_REGEN_BONUS_COST[apregen + 1];
-            this.apregen++;
+            this.bonuses.put(bb, bonuses.get(bb) + 1);
             return true;
         }
         return false;
     }
 
-
-
-    public float getStrength() {
-        return strength * Data.BANNER_STRENGTH_BONUS_COST[0];
+    public float getValue(BannerBonus bb, boolean inFight){
+        return (bb == currentBonus || !inFight) ? bonuses.get(bb) * bb.getBaseValue() : 0;
     }
 
-    public float getRange() {
-        return range * Data.BANNER_RANGE_BONUS_COST[0];
+    public void setCurrentBonus(BannerBonus currentBonus) {
+        this.currentBonus = currentBonus;
     }
 
-    public float getLootrate() {
-        return lootrate * Data.BANNER_LOOTRATE_BONUS_COST[0];
+    public String toString(){
+        String res = "\nBanner of "+bearer;
+        res += "\n    war chief ? "+bearer.isWarChief()+"\n";
+        for(BannerBonus bb : BannerBonus.values()) {
+            res +="\n    "+bb.name()+" : "+bonuses.get(bb)+" pts => value : "+getValue(bb, false);
+        }
+        return res;
     }
 
-    public float getAPRegeneration() {
-        return apregen * Data.BANNER_AP_REGEN_BONUS_COST[1];
-    }
 
 }

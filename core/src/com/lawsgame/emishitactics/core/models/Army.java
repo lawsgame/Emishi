@@ -2,10 +2,10 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
-public class Army extends IArmy{
+public class Army extends MilitaryForce {
 
 
     /**
@@ -17,7 +17,7 @@ public class Army extends IArmy{
      *
      */
 
-    private static int ids = 1;
+    private static int ids = 0;
 
     private int id;
     private boolean playerControlled;
@@ -37,15 +37,10 @@ public class Army extends IArmy{
         this.allegiance = Data.Allegiance.getStandard();
     }
 
-    private static boolean firstCall = true;
     public static Army createPlayerArmyTemplate(){
         Army playerArmy = new Army(Affiliation.ALLY);
         playerArmy.playerControlled = true;
         playerArmy.ldCondEnabled = true;
-        if(firstCall){
-            playerArmy.id = 0;
-            firstCall = false;
-        }
         return playerArmy;
     }
 
@@ -351,7 +346,7 @@ public class Army extends IArmy{
         boolean successfullytAdded = false;
         if( unit != null && !contains(unit) ){
             if (unit.getArmy() != null) {
-                IArmy army = unit.getArmy();
+                MilitaryForce army = unit.getArmy();
                 army.remove(unit);
             }
             unit.setArmy(this);
@@ -641,15 +636,6 @@ public class Army extends IArmy{
     @Override
     public boolean isSquadOversized(IUnit unit) {
         return getSquadExceedingCapacity(unit) > 0;
-    }
-
-    @Override
-    public Array<Notification.TakeDamage> dealDamageUponUnitRemoval(IUnit removed) {
-        //TODO:
-
-
-
-        return null;
     }
 
     @Override

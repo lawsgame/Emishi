@@ -69,7 +69,7 @@ public class PushCommand extends ActorCommand {
         Notification.StepOn stepOn = new Notification.StepOn(rowEndTile, colEndTile, getTarget());
         if(isAnyEventTriggerable(stepOn, rowEndTile, colEndTile)){
             this.eventTriggered = true;
-            handleEvents(stepOn, rowEndTile, colEndTile, false, false);
+            handleEvents(stepOn, rowEndTile, colEndTile);
         }
 
     }

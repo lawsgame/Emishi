@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Weapon;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
@@ -64,7 +64,7 @@ public class LongUnitPanel extends UnitPanel {
         builder.append("\nExperience : "+unit.getExperience());
 
         if (unit.isMobilized()) {
-            IArmy army = unit.getArmy();
+            MilitaryForce army = unit.getArmy();
             builder.append("\n\n    ARMY\n");
             builder.append("\nWarlord : " + army.getWarlord().getName());
             builder.append("\n  > war chiefs: "+army.getNbOfSquads()+"/"+army.getWarlord().getMaxWarChiefs());
@@ -72,11 +72,12 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\n  > squad members: "+army.getSquad(unit, true).size+"/"+unit.getWarchief().getMaxSoldiersAs(unit.getWarchief().isWarlord()));
             Banner banner = army.getSquadBanner(unit, false);
             builder.append("\nBanner");
-            builder.append("\n  | points   :"+banner.getRemainingPoints()+"/"+banner.getMaxPoints());
-            builder.append("\n  | strength :"+banner.getStrength());
-            builder.append("\n  | range    :"+banner.getRange());
-            builder.append("\n  | loot     :"+banner.getLootrate());
-            builder.append("\n  | AP regen :"+banner.getAPRegeneration());
+            builder.append("\n  | points        : "+banner.getRemainingPoints()+"/"+banner.getMaxPoints());
+            builder.append("\n  | strength      : "+banner.getValue(Data.BannerBonus.STRENGTH, false));
+            builder.append("\n  | range         : "+banner.getValue(Data.BannerBonus.RANGE, false));
+            builder.append("\n  | loot          : "+banner.getValue(Data.BannerBonus.LOOT_RATE, false)+"%");
+            builder.append("\n  | AP reduc cost : "+banner.getValue(Data.BannerBonus.AP_COST, false));
+            builder.append("\n  | moral reduc   : "+banner.getValue(Data.BannerBonus.MORAL_SHIELD, false)+"%");
 
 
         }

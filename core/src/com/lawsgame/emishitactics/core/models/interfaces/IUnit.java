@@ -137,10 +137,10 @@ public abstract class IUnit extends Model {
     public abstract int getMaxWarChiefs();
 
     /**
-     * NOT to be used outsite an implementation of an implementaiont of an IArmy class
+     * NOT to be used outsite an implementation of an implementaiont of an MilitaryForce class
      * @param army
      */
-    public abstract void setArmy(IArmy army);
+    public abstract void setArmy(MilitaryForce army);
 
     /**
      *
@@ -149,7 +149,7 @@ public abstract class IUnit extends Model {
      */
     public abstract boolean isAllyWith(Affiliation affiliation);
     public abstract Array<IUnit> getSquad(boolean stillFighting);
-    public abstract IArmy getArmy();
+    public abstract MilitaryForce getArmy();
     public abstract boolean sameSquadAs(IUnit unit);
     public abstract boolean sameArmyAs(IUnit unit);
     public abstract void setLeadership(int leadership);

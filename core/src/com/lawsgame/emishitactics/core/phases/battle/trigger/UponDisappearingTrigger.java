@@ -8,7 +8,7 @@ public class UponDisappearingTrigger extends Model.Trigger {
     protected IUnit wounded;
 
     public UponDisappearingTrigger(boolean once, IUnit wounded) {
-        super(once);
+        super(once, true);
         this.wounded = wounded;
     }
 

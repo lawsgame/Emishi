@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 
-public abstract class IArmy extends Model{
+public abstract class MilitaryForce extends Model{
 
 
     public abstract int getId();
@@ -51,14 +51,13 @@ public abstract class IArmy extends Model{
     public abstract boolean disengage(IUnit unit);
     public abstract void disbandAllSquads();
 
-    public abstract void checkComposition();
+    protected abstract void checkComposition();
     public abstract void setLeadershipConditionEnabled(boolean enabled);
 
     public abstract void replenishMoral(boolean turnBeginning);
     public abstract void updateActionPoints();
     public abstract int getSquadExceedingCapacity(IUnit unit);
     public abstract boolean isSquadOversized(IUnit unit);
-    public abstract Array<Notification.TakeDamage> dealDamageUponUnitRemoval(IUnit removed);
 
     public abstract String toLongString();
 }

@@ -1,6 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class BattlefieldTest {
         assertTrue(!battlefield.getSolver().isBattleOver());
 
         //battlefield.nextArmy();
-        IArmy army = battlefield.getCurrentArmy();
+        MilitaryForce army = battlefield.getCurrentArmy();
 
         assertTrue(army == army1);
 

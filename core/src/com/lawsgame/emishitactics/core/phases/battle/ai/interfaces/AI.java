@@ -2,9 +2,9 @@ package com.lawsgame.emishitactics.core.phases.battle.ai.interfaces;
 
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.BeginArmyTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -20,14 +20,14 @@ public abstract class AI extends Observable implements Runnable {
     protected AnimationScheduler scheduler;
     protected ActionPanelPool app;
     protected Inventory playerInventory;
-    protected IArmy army;
+    protected MilitaryForce army;
 
     public AI(
             BattlefieldRenderer bfr,
             AnimationScheduler scheduler,
             ActionPanelPool app,
             Inventory playerInventory,
-            IArmy army) {
+            MilitaryForce army) {
         this.bfr = bfr;
         this.scheduler = scheduler;
         this.app = app;
@@ -36,7 +36,7 @@ public abstract class AI extends Observable implements Runnable {
     }
 
 
-    public abstract int[] nextUnit(IArmy army);
+    public abstract int[] nextUnit(MilitaryForce army);
     public abstract CommandBundle getCommandPackage(int[] actor);
 
     @Override

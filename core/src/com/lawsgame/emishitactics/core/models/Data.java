@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 
+import java.util.HashMap;
 import java.util.Random;
 
 public class Data {
@@ -33,10 +34,7 @@ public class Data {
     public static final int WC_CHARISMA_BONUS_ATT_ACC = 3;
     public static final int SQUAD_SIZE_EXCEEDANCE_CHA_MALUS = 3;
     public static final int BRAVERY_MORAL_RECOVERY_RATE = 3;
-    public static final float[] BANNER_STRENGTH_BONUS_COST    = new float[]{1,     2, 3, 4};
-    public static final float[] BANNER_RANGE_BONUS_COST       = new float[]{1,     6};
-    public static final float[] BANNER_LOOTRATE_BONUS_COST    = new float[]{0.1f,  1, 2, 3, 4, 5};
-    public static final float[] BANNER_AP_REGEN_BONUS_COST    = new float[]{1,     2, 6};
+
 
     // RENDER parameters
         public static final float SPEED_TEMPO_WALK = 3f;  //tile/s
@@ -70,6 +68,30 @@ public class Data {
         return r.nextInt(n);
     }
 
+
+    public enum BannerBonus {
+        STRENGTH    (1,     new float[]{2, 4, 6}),
+        MORAL_SHIELD(0.1f,  new float[]{1, 2, 3, 4, 5}),
+        LOOT_RATE   (1,     new float[]{1, 2, 3, 4, 5}),
+        AP_COST     (1,     new float[]{3, 5}),
+        RANGE       (1,     new float[]{6});
+
+        private float baseValue;
+        private float[] cost;
+
+        BannerBonus(float baseValue, float[] cost) {
+            this.baseValue = baseValue;
+            this.cost = cost;
+        }
+
+        public float getBaseValue() {
+            return baseValue;
+        }
+
+        public float[] getCost() {
+            return cost;
+        }
+    }
 
     public enum Environment{
         PRINCIPALITY;

@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.EndArmyTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.battle.EndArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;

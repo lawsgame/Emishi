@@ -82,6 +82,7 @@ public class HitCommand extends ActorCommand{
 
     @Override
     protected void execute() {
+        Notification.OOAReport report;
 
         initiatorInitOr = getInitiator().getOrientation();
 
@@ -96,14 +97,14 @@ public class HitCommand extends ActorCommand{
             }
         }
 
-        // PERFORM REGULAR_ATTACK
+        // PERFORM ATTACK
         performAttack();
 
-        // HANDLE EVENTS
-        handleEvents(Notification.Fight.get());
-
         // REMOVE OOA UNITS
-        removeOutOfActionUnits();
+        report = removeOutOfActionUnits();
+
+        // HANDLE EVENTS
+        handleEvents(report);
 
         // SWITCH BACK GUARDIAN - TARGET
         for(int i = 0; i < defendersData.size; i++) {

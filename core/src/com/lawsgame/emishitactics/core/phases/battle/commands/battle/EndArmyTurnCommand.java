@@ -1,8 +1,8 @@
-package com.lawsgame.emishitactics.core.phases.battle.commands.event;
+package com.lawsgame.emishitactics.core.phases.battle.commands.battle;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -11,9 +11,9 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class EndArmyTurnCommand extends BattleCommand {
-    protected IArmy army;
+    protected MilitaryForce army;
 
-    public EndArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, IArmy army) {
+    public EndArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, MilitaryForce army) {
         super(bfr, scheduler);
         this.army = army;
     }

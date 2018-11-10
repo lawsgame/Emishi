@@ -24,7 +24,7 @@ import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 
@@ -162,7 +162,7 @@ public class BattlefieldLoader {
                 XmlReader.Element squadElt;
                 XmlReader.Element unitElt;
                 IUnit unit;
-                IArmy army;
+                MilitaryForce army;
                 for (int j = 0; j < battleElt.getChildCount(); j++) {
 
                     armyElt = battleElt.getChild(j);
@@ -288,20 +288,22 @@ public class BattlefieldLoader {
             }
 
             if(attributeElt.get("id").equals("banner")) {
-                unit.getBanner().setMaxPoints(unit.getAppLeadership());
+
                 int bonusBanner = attributeElt.getInt("strength");
                 for(int i = 0; i < bonusBanner; i++)
-                    unit.getBanner().incrementStrength();
+                    unit.getBanner().increment(Data.BannerBonus.STRENGTH);
                 bonusBanner = attributeElt.getInt("range");
                 for(int i = 0; i < bonusBanner; i++)
-                    unit.getBanner().incrementRange();
+                    unit.getBanner().increment(Data.BannerBonus.RANGE);
                 bonusBanner = attributeElt.getInt("lootrate");
                 for(int i = 0; i < bonusBanner; i++)
-                    unit.getBanner().incrementLootRate();
-                bonusBanner = attributeElt.getInt("apregen");
+                    unit.getBanner().increment(Data.BannerBonus.LOOT_RATE);
+                bonusBanner = attributeElt.getInt("apcost");
                 for(int i = 0; i < bonusBanner; i++)
-                    unit.getBanner().incrementAPRegen();
-
+                    unit.getBanner().increment(Data.BannerBonus.AP_COST);
+                bonusBanner = attributeElt.getInt("moralshield");
+                for(int i = 0; i < bonusBanner; i++)
+                    unit.getBanner().increment(Data.BannerBonus.MORAL_SHIELD);
             }
 
             if(attributeElt.get("id").equals("Orientation")) {

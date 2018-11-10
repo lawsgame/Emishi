@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
@@ -23,21 +23,20 @@ public class Notification {
     }
 
     public static class BeginArmyTurn{
-        public final IArmy army;
+        public final MilitaryForce army;
 
-        public BeginArmyTurn(IArmy army) {
+        public BeginArmyTurn(MilitaryForce army) {
             this.army = army;
         }
     }
 
+    public static class OOAReport {
+        public final Array<IUnit> OOAUnits;
+        public final Array<int[]> OOACoords;
 
-    public static class Fight{
-        private static Fight fight;
-
-        private Fight(){}
-
-        public static Fight get() {
-            return fight;
+        public OOAReport(){
+            this.OOAUnits = new Array<IUnit>();
+            this.OOACoords = new Array<int[]>();
         }
     }
 

@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
@@ -27,9 +27,9 @@ public class ReinforcementEvent extends BattleCommand {
         this.paths = new Array<Array<int[]>>();
     }
 
-    public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, final IArmy currentArmy){
+    public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, final MilitaryForce currentArmy){
 
-        Model.Trigger trigger = new Model.Trigger(true) {
+        Model.Trigger trigger = new Model.Trigger( true, true) {
 
             @Override
             public boolean isTriggered(Object data) {

@@ -8,7 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.Environment;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
@@ -38,7 +38,7 @@ public class Battlefield extends Model {
     private Environment environment;
 
     private int turn;
-    public LinkedList<IArmy> armyTurnOrder;
+    public LinkedList<MilitaryForce> armyTurnOrder;
     private BattleSolver solver;
 
 
@@ -54,7 +54,7 @@ public class Battlefield extends Model {
         setWeather(weather, true);
 
         setSolver(solver);
-        this.armyTurnOrder = new LinkedList<IArmy>();
+        this.armyTurnOrder = new LinkedList<MilitaryForce>();
         this.turn = 0;
     }
 
@@ -88,7 +88,31 @@ public class Battlefield extends Model {
 
     // --------------- EVENT HANDLING --------------------------------------
 
-    public void removeEventTrigger(Trigger trigger){
+    @Override
+    public void setAllTriggersActive(boolean active){
+        this.setAllTriggersActive(active);
+        for(int r = 0; r < tiles.length; r++){
+            for(int c = 0; c < tiles[0].length; c++){
+                if(isTileExisted(r, c)) {
+                    tiles[r][c].setAllTriggersActive(active);
+                    if(isTileOccupied(r, c)){
+                        units[r][c].setAllTriggersActive(active);
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < unitAreas.size; i++){
+            unitAreas.get(i).setAllTriggersActive(active);
+        }
+        for(int i = 0; i < armyTurnOrder.size(); i++){
+            armyTurnOrder.get(i).setAllTriggersActive(active);
+        }
+
+    }
+
+
+
+    public void remove(Trigger trigger){
         this.remove(trigger);
         for(int r = 0; r < tiles.length; r++){
             for(int c = 0; c < tiles[0].length; c++){
@@ -117,7 +141,7 @@ public class Battlefield extends Model {
      */
     public void pushPlayerArmyTurnForward(){
         if(!armyTurnOrder.isEmpty()) {
-            IArmy army = armyTurnOrder.peek();
+            MilitaryForce army = armyTurnOrder.peek();
             while (!army.isPlayerControlled()) {
                 armyTurnOrder.offer(armyTurnOrder.pop());
                 army = armyTurnOrder.peek();
@@ -131,7 +155,7 @@ public class Battlefield extends Model {
      * only for loaded AI armies which do not use Battlefield.randomlyDeploy()
      * @param army
      */
-    public void addArmyId(IArmy army){
+    public void addArmyId(MilitaryForce army){
         //performEvent if the army if already deployed
         boolean armyAlreadyAdded = false;
         for(int i = 0; i < armyTurnOrder.size(); i++){
@@ -146,7 +170,7 @@ public class Battlefield extends Model {
     }
 
 
-    public IArmy getCurrentArmy() {
+    public MilitaryForce getCurrentArmy() {
         return armyTurnOrder.peek();
     }
 
@@ -158,7 +182,7 @@ public class Battlefield extends Model {
 
         if(!armyTurnOrder.isEmpty()) {
             armyTurnOrder.offer(armyTurnOrder.pop());
-            IArmy army = armyTurnOrder.peek();
+            MilitaryForce army = armyTurnOrder.peek();
             while (!armyTurnOrder.isEmpty() && !army.isDeployedTroopsStillFighting(this)) {
                armyTurnOrder.pop();
                army = armyTurnOrder.peek();
@@ -502,7 +526,7 @@ public class Battlefield extends Model {
         return unit != null && !isUnitDeployed(unit) && unit.isMobilized();
     }
 
-    public void randomlyDeploy(IArmy army){
+    public void randomlyDeploy(MilitaryForce army){
         if(army != null) {
             randomlyDeploy(army.getMobilizedUnits(true), 0);
             addArmyId(army);
@@ -1283,19 +1307,19 @@ public class Battlefield extends Model {
         str  += "\n"+super.triggerToString();
         str +="\n\nARMIES : ";
         for(int i = 0; i< armyTurnOrder.size(); i++){
-            if(armyTurnOrder.get(i).holdEvent())
+            if(armyTurnOrder.get(i).holdEventTrigger())
                 str += "\n"+armyTurnOrder.get(i).triggerToString();
         }
         str +="\n\nAREAS : ";
         for(int i = 0; i< unitAreas.size; i++){
-            if(unitAreas.get(i).holdEvent())
+            if(unitAreas.get(i).holdEventTrigger())
                 str += "\n"+unitAreas.get(i).triggerToString();
         }
 
         str +="\n\nUNITS : ";
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
-                if(isTileOccupied(r,c) && getUnit(r, c).holdEvent())
+                if(isTileOccupied(r,c) && getUnit(r, c).holdEventTrigger())
                     str += "\n"+getUnit(r, c).triggerToString();
             }
         }
@@ -1303,7 +1327,7 @@ public class Battlefield extends Model {
         str +="\n\nTILES : ";
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
-                if(isTileExisted(r,c) && getTile(r, c).holdEvent())
+                if(isTileExisted(r,c) && getTile(r, c).holdEventTrigger())
                     str += "\n"+getTile(r, c).triggerToString();
             }
         }

@@ -1,9 +1,8 @@
 package com.lawsgame.emishitactics.core.phases.battle.ai;
 
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -15,7 +14,7 @@ public class SimpleAI extends AI {
     }
 
     @Override
-    public int[] nextUnit(IArmy army) {
+    public int[] nextUnit(MilitaryForce army) {
         return new int[2];
     }
 

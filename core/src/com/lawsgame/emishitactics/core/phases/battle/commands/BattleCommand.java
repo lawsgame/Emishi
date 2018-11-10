@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Notification.OOAReport;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
@@ -113,7 +114,35 @@ public abstract class BattleCommand extends Observable implements Observer {
     }
 
 
+    /**
+     * 1) remove all OOA units model and view wise.
+     * 2) setup report to keep track of the OOA units, usefull for event handling purposes.
+     *
+     * @return the report
+     */
+    protected final OOAReport removeOutOfActionUnits(){
+        Array<IUnit> OOAUnits = bfr.getModel().getOOAUnits();
+
+        OOAReport report = new OOAReport();
+        for(int i = 0; i < OOAUnits.size; i++){
+            report.OOAUnits.add(OOAUnits.get(i));
+            report.OOACoords.add(bfr.getModel().getUnitPos(OOAUnits.get(i)));
+        }
+
+        bfr.getModel().removeOOAUnits(false);
+
+        StandardTask removeOOAUnitTask = new StandardTask();
+        for(int i = 0; i < OOAUnits.size; i++)
+            removeOOAUnitTask.addThread(new StandardTask.RendererThread(bfr, OOAUnits.get(i)));
+        //removeOOAUnitTask.tag("remove OOA units");
+        scheduleRenderTask(removeOOAUnitTask);
+
+        return report;
+    }
+
+
     // --------------- EVENT HANDLING ----------------------------------
+
 
     protected final boolean isAnyEventTriggerable(Object data, Array<int[]> area) {
         Battlefield bf = bfr.getModel();
@@ -130,7 +159,7 @@ public abstract class BattleCommand extends Observable implements Observer {
         }
 
         for(int i = 0; i< area.size; i++){
-            eventTrig = isAnyEventTriggerable(data, area.get(i)[0], area.get(i)[1]);
+            eventTrig = isAnyEventTriggerable(data, area.get(i)[0], area.get(i)[1], true, true);
         }
 
         return eventTrig;
@@ -138,6 +167,11 @@ public abstract class BattleCommand extends Observable implements Observer {
 
 
     protected final boolean isAnyEventTriggerable(Object data, int row, int col){
+        return isAnyEventTriggerable(data, row, col, false, false);
+    }
+
+
+    private boolean isAnyEventTriggerable(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
         Battlefield bf = bfr.getModel();
 
         if(bf.isTileExisted(row, col)) {
@@ -183,20 +217,22 @@ public abstract class BattleCommand extends Observable implements Observer {
     protected final void handleEvents(Object data, Array<int[]> area) {
 
         scheduleMultipleRenderTasks(bfr.getModel().performEvents(data));
-
         for(int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++)
             scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data));
-
         for(int i = 0; i< area.size; i++)
             handleEvents(data, area.get(i)[0], area.get(i)[1], true, true);
     }
 
 
-    protected final void handleEvents(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
+    protected final void handleEvents(Object data, int row, int col){
+        handleEvents(data, row, col, false, false);
+    }
 
-        if(ignoreBFEvents) {
+
+    private void handleEvents(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
+
+        if(ignoreBFEvents)
             scheduleMultipleRenderTasks(bfr.getModel().performEvents(data));
-        }
 
         if(ignoreArmieEvents) {
             for (int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++) {
@@ -206,9 +242,8 @@ public abstract class BattleCommand extends Observable implements Observer {
 
         if(bfr.getModel().isTileExisted(row, col)) {
             // check unit
-            if(bfr.getModel().isTileOccupied(row, col)){
+            if(bfr.getModel().isTileOccupied(row, col))
                 scheduleMultipleRenderTasks(bfr.getModel().getUnit(row, col).performEvents(data));
-            }
 
             // check tile
             scheduleMultipleRenderTasks(bfr.getModel().getTile(row, col).performEvents(data));
@@ -223,14 +258,8 @@ public abstract class BattleCommand extends Observable implements Observer {
         }
     }
 
-    protected final void removeOutOfActionUnits(){
-        Array<IUnit> OOAUnits = bfr.getModel().getOOAUnits();
-        bfr.getModel().removeOOAUnits(false);
-        StandardTask removeOOAUnitTask = new StandardTask();
-        for(int i = 0; i < OOAUnits.size; i++)
-            removeOOAUnitTask.addThread(new StandardTask.RendererThread(bfr, OOAUnits.get(i)));
-        removeOOAUnitTask.tag("remove OOA units");
-        scheduleRenderTask(removeOOAUnitTask);
+    public void reactiveTriggers(){
+        bfr.getModel().setAllTriggersActive(true);
     }
 
     public final void setDecoupled(boolean decoupled) {

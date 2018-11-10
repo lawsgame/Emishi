@@ -10,9 +10,10 @@ import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
-import com.lawsgame.emishitactics.core.models.interfaces.IArmy;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Stack;
@@ -32,7 +33,7 @@ public class Unit extends IUnit{
     protected int experience = 0;
     protected int commandmentExperience = 0;
     protected boolean rightHanded = true;
-    private IArmy army = null;
+    private MilitaryForce army = null;
 
     protected int mobility;
     protected int charisma;
@@ -123,7 +124,7 @@ public class Unit extends IUnit{
         this.weapons = new Array<Weapon>();
         this.weapons.add(Weapon.FIST);
         this.equipments = new Array<Equipment>();
-        this.banner = new Banner();
+        this.banner = new Banner(this);
         this.nativeAbilities = new Array<Data.Ability>();
         this.nativeAbilities.addAll(template.getNativeAbilities());
 
@@ -1052,7 +1053,7 @@ public class Unit extends IUnit{
 
 
     @Override
-    public void setArmy(IArmy army) {
+    public void setArmy(MilitaryForce army) {
         this.army = army;
     }
 
@@ -1067,7 +1068,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public IArmy getArmy() {
+    public MilitaryForce getArmy() {
         return army;
     }
 

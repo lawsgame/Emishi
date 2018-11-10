@@ -217,14 +217,14 @@ public class TestBIS extends BattleInteractionState implements Observer{
         */
 
 
-        if(!bim.battlefield.isTileOccupied(row, col)){
-            if(!walkCommand.apply(actorPos[0], actorPos[1], row, col)){
+
+        if(!bim.battlefield.isTileOccupied(row, col)) {
+            if (!walkCommand.apply(actorPos[0], actorPos[1], row, col)) {
                 System.out.println("command failed to be applied");
-                System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
-                System.out.println("    target ?    : "+customedCommand.isTargetValid());
+                System.out.println("    initiator ? : " + customedCommand.isInitiatorValid());
+                System.out.println("    target ?    : " + customedCommand.isTargetValid());
             }
         }
-
 
         /*
         TrapEvent event = new TrapEvent(bim.bfr, bim.scheduler, 3, row, col);
