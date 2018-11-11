@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.LinkedList;
 import java.util.TreeMap;
 
 import static org.junit.Assert.assertTrue;
@@ -18,7 +19,7 @@ public class UtilsTest {
     private Array<int[]> a2;
 
     @BeforeClass
-    public static void testOnfly(){
+    public static void testOnfly()  {
 
     }
 

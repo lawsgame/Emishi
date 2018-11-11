@@ -48,6 +48,7 @@ public class Data {
     public static final float BLINK_PERIOD_WOUNDED_BASE = 7.0f;
     public static final float BLINK_PERIOD_WOUNDED_AMPLITUDE = 2.0f;
     public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
+    public static final float EARTHQUAKE_DURATION = 4.0f;
 
 
     // EXP parameter

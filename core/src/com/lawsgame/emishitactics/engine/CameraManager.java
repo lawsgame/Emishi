@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.lawsgame.emishitactics.engine.math.functions.Function;
+import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
 import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
@@ -12,20 +14,37 @@ import static com.lawsgame.emishitactics.engine.GamePhase.getAspRatio;
 public class CameraManager extends Observable implements GameUpdatableEntity {
     private static final float CAM_STD_VELOCITY = 1;
 
-    protected OrthographicCamera camera;     // level camera
-    protected float worldWidth;               // defines the rectangle within the camera is allowed to move.
-    protected float worldHeight;              // defines the rectangle within the camera is allowed to move.
+    protected OrthographicCamera camera;    // level camera
+    protected float worldWidth;             // defines the rectangle within the camera is allowed to move.
+    protected float worldHeight;            // defines the rectangle within the camera is allowed to move.
     private Viewport viewport;              // defines the dimension of the frame through the player see the level
     private Rectangle clipBounds;           // specific
 
-    // smooth camera variables
-    private Vector vTarget;
-    private Vector vSpeedFactor;
+
+    // SMOOTH CAMERA MOVEMENT VARIABLES
+
     private float time;
     private float duration;
-    private  Vector dl;
-    private boolean cameraMoving;
+
+    private boolean cameraMovingToTarget;
     private float cameraVelocity;
+    private Vector vTarget;
+    private Vector vSpeedFactor;
+    private  Vector dl;
+
+    private boolean cameraMoving;
+    private VectorialFunction dp;
+    private Function paramSpeed;
+    private static final Function DEFAULT_PARAM_SPEED = new Function() {
+        @Override
+        public float getValue(float t) {
+            return t;
+        }
+    };
+
+
+
+
 
     public CameraManager(float worldWidth, float worldHeight, float portWidth){
         this.worldHeight = worldHeight;
@@ -41,9 +60,6 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.camera.update();
 
 
-
-
-
         //--***$$$ OLD MODEL $$$***----
 
         this.vTarget = new Vector(0,0);
@@ -51,6 +67,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.dl = new Vector(0,0);
         this.duration = 0;
         this.time = 0f;
+        this.cameraMovingToTarget = false;
         this.cameraMoving = false;
         this.cameraVelocity = CAM_STD_VELOCITY;
 
@@ -82,11 +99,12 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
     }
 
     public boolean isCameraMoving(){
-        return cameraMoving;
+        return cameraMovingToTarget || cameraMoving;
     }
 
     private void moveTo(float xTarget, float yTarget){
-        if(!cameraMoving){
+        if(!isCameraMoving()){
+            cameraMovingToTarget = true;
 
             //addExpGained xTarget & yTarget, addExpGained change it if too clase to the camera frame borders
             vTarget.x = xTarget;
@@ -104,10 +122,25 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
             duration = (float) (2*Math.sqrt(journey.length()/cameraVelocity));
             vSpeedFactor.x = cameraVelocity * journey.x / journey.length();
             vSpeedFactor.y = cameraVelocity * journey.y / journey.length();
-            cameraMoving = true;
 
 
         }
+    }
+
+    public void move(VectorialFunction dp, Function speed, float duration){
+        this.cameraMovingToTarget = false;
+        this.cameraMoving = true;
+        this.time = 0;
+        this.duration = duration;
+        this.dp = dp;
+        this.paramSpeed = speed;
+
+        dp.setTZero(speed.getValue(camera.position.x), speed.getValue(camera.position.y));
+    }
+
+
+    public void move(VectorialFunction dp, float duration){
+        move(dp, DEFAULT_PARAM_SPEED, duration);
     }
 
     /**
@@ -116,9 +149,9 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
      */
     @Override
     public void update(float dt) {
-        if(cameraMoving){
+        if(cameraMovingToTarget){
             if( (vTarget.x == camera.position.x && vTarget.y == camera.position.y)){
-                cameraMoving = false;
+                cameraMovingToTarget = false;
             }else{
 
                 //--***$$$ MODEL $$$***----
@@ -139,11 +172,26 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
                 clipBounds.y += dl.y;
             }
         }
+
+        if(cameraMoving){
+            time +=dt;
+            if(time > duration){
+                cameraMoving = false;
+            }else{
+                //setCamPos(dp.getX(paramSpeed.getValue(time)), dp.getY(paramSpeed.getValue(time)));
+                camera.position.x = dp.getX(paramSpeed.getValue(time));
+                camera.position.y = dp.getY(paramSpeed.getValue(time));
+                clipBounds.x = camera.position.x - clipBounds.width / 2f;
+                clipBounds.y = camera.position.y  - clipBounds.height / 2f;
+                camera.update();
+
+            }
+        }
     }
 
 
     /**
-     * 1) performEvent whether or not the new camera position is inside the world boundaries
+     * 1) whether or not the new camera position is inside the world boundaries
      * 2) modify the camera position consequently
      * 3) update the camera to take the change into account
      * 4) update the clip bounds and the components instances to follow the camera accordingly

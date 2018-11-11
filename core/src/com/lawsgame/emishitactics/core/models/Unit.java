@@ -1277,15 +1277,15 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public TakeDamage applyDamage(int damageDealt, boolean moralDamageOnly){
+    public TakeDamage applyDamage(int damageDealt, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralModifier){
         TakeDamage.State state = TakeDamage.State.UNDAMAGED;
         int lifeDamageTaken = 0;
 
         // moral damaga
-        if (!has(Data.Ability.UNBREAKABLE)) {
-            if(this.currentMoral > damageDealt) {
+        if (!has(Data.Ability.UNBREAKABLE) || !ignoreMoralDamage) {
+            if(this.currentMoral > damageDealt * moralModifier) {
                 state = TakeDamage.State.WOUNDED;
-                this.currentMoral -= damageDealt;
+                this.currentMoral -= damageDealt * moralModifier;
             }else{
                 state = TakeDamage.State.FLED;
                 this.currentMoral = 0;
@@ -1294,7 +1294,7 @@ public class Unit extends IUnit{
         }
 
         // physical damage
-        if(!moralDamageOnly){
+        if(!ignorePhysicalDamage){
             if(this.currentHitPoints > damageDealt) {
                 lifeDamageTaken = damageDealt;
                 this.currentHitPoints -= damageDealt;
@@ -1307,16 +1307,7 @@ public class Unit extends IUnit{
             }
         }
 
-        /*
-        if(isOutOfAction() && isWarChief()){
-            int moralDamage = getWarchief().getAppCharisma();
-            Array<IUnit> squad = getArmy().getSquad(this, true);
-            for(int i = 0; i < squad.size; i++){
-                notifications.addAll(squad.get(i).applyDamage(moralDamage, true));
-            }
-        }
-        */
-        return new TakeDamage(this, moralDamageOnly, damageDealt, lifeDamageTaken, state);
+        return new TakeDamage(this, ignorePhysicalDamage, ignoreMoralDamage, damageDealt, lifeDamageTaken, state);
     }
 
     @Override

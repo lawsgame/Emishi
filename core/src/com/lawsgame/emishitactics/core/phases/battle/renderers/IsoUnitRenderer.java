@@ -388,11 +388,10 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
 
     @Override
-    public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
+    public void displayTakeHit(boolean ignorePhysicalDamage, boolean ignoreMoralDamage, int damageTaken, boolean critical, boolean backstab) {
         this.blinkPeriod = new WoundedPeriod();
         setBlinking(true);
         display((backstab) ? AnimId.BACKSTAB : AnimId.WOUNDED);
-
     }
 
     @Override

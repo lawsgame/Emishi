@@ -225,7 +225,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
-    public void displayTakeHit(boolean moralOnly, int damageTaken, boolean critical, boolean backstab) {
+    public void displayTakeHit(boolean ignorePhysicalDamage, boolean ignoreMoralDamage, int damageTaken, boolean critical, boolean backstab) {
         if(backstab){
             unitSprite.setRegion(TempoSpritePool.get().getUnitSprite(AnimSpriteSetId.PUSHED_BACKSTABBED, getModel().getArmy().getAffiliation()));
         }else{
@@ -233,7 +233,6 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         }
         countDown.run();
     }
-
 
     @Override
     public void displayTreated(int healedHP) {

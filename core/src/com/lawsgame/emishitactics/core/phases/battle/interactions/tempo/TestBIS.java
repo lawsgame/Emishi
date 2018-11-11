@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -17,12 +18,15 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackComman
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.trigger.UponDisappearingTrigger;
+import com.lawsgame.emishitactics.engine.math.functions.Function;
+import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
@@ -44,6 +48,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
     WalkCommand walkCommand = null;
     ReinforcementEvent reinforcementEvent = null;
 
+
     Area ccActionArea;
     Area ccImpactArea;
     Area ccTargets;
@@ -53,7 +58,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         super(bim, true, true, true, true, false);
 
         sltdUnit = bim.player.getArmy().getWarlord();
-        sltdUnit.applyDamage(0, false);
+        sltdUnit.applyDamage(0, false, false, 1f);
 
         sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
@@ -75,7 +80,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         //hitCommand.setRepeatableOnKill(true);
         hitCommand.setResetOrientation(true);
         hitCommand.setSpecialmove(true);
-        //hitCommand.setMoralDamage(true);
+        //hitCommand.setIgnorePhysicalDamage(true);
         //hitCommand.setHealingFromDamage(true);
         //hitCommand.setRetaliation(true);
         customedCommand = hitCommand;
@@ -170,6 +175,8 @@ public class TestBIS extends BattleInteractionState implements Observer{
         TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler);
 
         //System.out.println(bim.bfr.getModel().triggerToString());
+
+
 
     }
 
@@ -313,80 +320,42 @@ public class TestBIS extends BattleInteractionState implements Observer{
     public void update60(float dt) {
         animation.update(dt);
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.U) && !historic.isEmpty()){
-            ActorCommand command = historic.peek();
-            if(command.isUndoable()){
-                command.undo();
-                historic.pop();
-            }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+            //EarthquakeEvent earthquakeEvent = new EarthquakeEvent(bim.bfr, bim.scheduler, 4f, bim.gcm);
+            //earthquakeEvent.apply();
+
+
+
+
+            VectorialFunction vf = new VectorialFunction() {
+
+                float xZero = 0;
+                float yZero = 0;
+                float duration = 4;
+
+                @Override
+                public float getX(float t) {
+                    return xZero + 0.15f*(1f - (float)Math.exp(t - duration))*MathUtils.sin(14*t)*MathUtils.cos(60*t);
+                }
+
+                @Override
+                public float getY(float t) {
+                    return yZero; //+ 0.02f*MathUtils.sin(11*t+13);
+                }
+
+                @Override
+                public void setTZero(float xZero, float yZero) {
+                    this.xZero = xZero - getX(0);
+                    this.yZero = yZero - getY(0);
+                }
+            };
+
+            bim.gcm.move(vf, 4.0f);
+
         }
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            if(!historic.isEmpty())
-                historic.pop().pushRenderTasks();
-            customedCommand.pushRenderTasks();
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
-
-            int[] sltdUnitPos = bim.battlefield.getUnitPos(sltdUnit);
-            Array<int[]> path = new Array<int[]>();
-            path.add(new int[]{sltdUnitPos[0], sltdUnitPos[1] + 1});
-            /*
-            bim.bfr.getUnitRenderer(sltdUnit).displayWalk(path, false);
-            bim.scheduler.addTask(new StandardTask(bim.battlefield, bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path)));
-            */
-
-            /*
-            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.AnimId.REGULAR_ATTACK);
-            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.Orientation.WEST);
-            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, Data.AnimId.BACKSTAB);
-            bim.bfr.getUnitRenderer(sltdUnit).getNotification(sltdUnit, new Notification.Walk(sltdUnit, path));
-            */
-
-            /*
-            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.REGULAR_ATTACK));
-            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.Orientation.WEST));
-            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), Data.AnimId.BACKSTAB));
-            bim.scheduler.addTask(new StandardTask(bim.battlefield, bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path)));
-            */
-
-
-
-            StandardTask task = new StandardTask();
-
-            StandardTask.RendererThread thread0 = new StandardTask.RendererThread(bim.bfr.getUnitRenderer(sltdUnit));
-            thread0.addQuery(Data.AnimId.REGULAR_ATTACK);
-            thread0.addQuery(Data.Orientation.WEST);
-            thread0.addQuery(Data.AnimId.BACKSTAB);
-
-            StandardTask.RendererThread thread1 = new StandardTask.RendererThread(bim.bfr.getUnitRenderer(foeWL));
-            thread1.addQuery(Data.AnimId.SPECIAL_MOVE);
-
-            task.addThread(thread0);
-            task.addThread(thread1);
-            bim.scheduler.addTask(task);
-
-            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(sltdUnit), new Notification.Walk(sltdUnit, path, false)));
-
-
-            /*
-            int[] foePos = bim.battlefield.getUnitPos(foeWL);
-            path.get(0)[0] = foePos[0];
-            path.get(0)[1] = foePos[1] + 1;
-            bim.scheduler.addTask(new StandardTask(bim.bfr.getUnitRenderer(foeWL), new Notification.Walk(foeWL, path)));
-            */
-
-            //bim.bfr.removeUnitRenderer(sltdUnit);
-        }
     }
 
-
-    /*
-    @Override
-    public void renderBetween(SpriteBatch batch) {
-        tempoAreaWidget.render(batch);
-    }
-    */
 
     @Override
     public void init() {

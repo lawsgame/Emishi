@@ -6,6 +6,16 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
 
+    public static final class Earthquake{
+        private static Earthquake earthquakeNotification;
+
+        public static Earthquake getInstance(){
+            if(earthquakeNotification == null)
+                earthquakeNotification = new Earthquake();
+            return earthquakeNotification;
+        }
+    }
+
     public static class StepOn {
         public final IUnit walker;
         public int rowTile;
@@ -52,7 +62,8 @@ public class Notification {
 
     public static class TakeDamage {
         public final IUnit wounded;
-        public final boolean moralOnly;
+        public final boolean ignorePhysicalDmg;
+        public final boolean ignoreMoralDmg;
         public final int damageDealt;
         public final int lifeDamageTaken;
         public final State state;
@@ -70,9 +81,10 @@ public class Notification {
             UNDAMAGED, DIED
         }
 
-        public TakeDamage(IUnit wounded, boolean moralOnly, int damageDealt, int lifeDamageTaken, State state){
+        public TakeDamage(IUnit wounded, boolean ignorePhysicalDmg, boolean ignoreMoralDmg, int damageDealt, int lifeDamageTaken, State state){
             this.wounded = wounded;
-            this.moralOnly = moralOnly;
+            this.ignorePhysicalDmg = ignorePhysicalDmg;
+            this.ignoreMoralDmg = ignoreMoralDmg;
             this.damageDealt = damageDealt;
             this.lifeDamageTaken = lifeDamageTaken;
             this.state = state;

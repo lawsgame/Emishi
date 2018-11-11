@@ -155,7 +155,7 @@ public class StandardTask extends Task {
         }
 
         public void addQuery(SimpleCommand command, float delay){
-            if(command != null){
+            if(command != null && delay >= 0){
                 commands.offer(command);
                 delays.offer(delay);
             }
@@ -189,7 +189,7 @@ public class StandardTask extends Task {
         @Override
         void update(float dt) {
             countDown.update(dt);
-            if(countDown.isFinished()){
+            if(countDown.isFinished()&& commands.size() > 0) {
                 commands.pop();
                 delays.pop();
                 launch();
@@ -286,6 +286,42 @@ public class StandardTask extends Task {
                 str += "\n        Notif => sender : " + bundles.get(j) + " => " + senders.get(j);
             }
             return str;
+        }
+    }
+
+
+
+    public static class DelayThread extends Thread{
+        protected CountDown countDown;
+        protected boolean initiated = false;
+
+        public DelayThread(float delay){
+            countDown = new CountDown(delay);
+        }
+
+        @Override
+        void init() {
+            countDown.run();
+        }
+
+        @Override
+        boolean isCompleted() {
+            return countDown.isFinished();
+        }
+
+        @Override
+        boolean isEmpty() {
+            return countDown.getDelay() == 0;
+        }
+
+        @Override
+        void update(float dt) {
+            countDown.update(dt);
+        }
+
+        @Override
+        public String toString() {
+            return "   DelayThread : duration = "+countDown.getDelay();
         }
     }
 }

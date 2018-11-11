@@ -217,10 +217,17 @@ public abstract class ActorCommand extends BattleCommand{
      * intrinsec requirements checking
      */
     public boolean isInitiatorValid(IUnit initiator){
+        System.out.println("\n\nCHECK INIT VALID");
         boolean valid = false;
+        System.out.println(bfr.getModel().isUnitDeployed(initiator));
         if(bfr.getModel().isUnitDeployed(initiator)){
+            System.out.println("    > deployed");
             if(!initiator.isOutOfAction()) {
+                System.out.println("    > In action");
+                System.out.print("     >free : "+free);
+                System.out.println(" OR cost:"+choice.getCost() +" <= "+ initiator.getActionPoints());
                 if (free || choice.getCost() <= initiator.getActionPoints()) {
+                    System.out.println("    > allowed");
                     if (choice.isActedBased()) {
                         valid = (free || !initiator.hasActed()) && !initiator.isDisabled();
                     } else {
@@ -229,6 +236,7 @@ public abstract class ActorCommand extends BattleCommand{
                 }
             }
         }
+        System.out.println("    > valid ? "+valid+"\n");
         return valid;
     }
 

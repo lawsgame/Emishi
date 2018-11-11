@@ -86,8 +86,6 @@ public class WalkCommand extends ActorCommand {
     public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
 
-        //TODO: ignore actor when fetching a valid path
-
         if(initiator != null) {
             this.validPath = bfr.getModel().getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getInitiator().has(Data.Ability.PATHFINDER), getInitiator().getArmy().getAffiliation());
             if (validPath.size > 0 && validPath.size <= getInitiator().getAppMobility()) {

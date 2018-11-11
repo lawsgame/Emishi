@@ -36,7 +36,8 @@ public class HitCommand extends ActorCommand{
     protected boolean retaliation;
     protected boolean resetOrientation;
     protected boolean specialmove;
-    protected boolean moralDamage;
+    protected boolean ignorePhysicalDamage;
+    protected boolean ignoreMoralDamage;
     protected boolean cripplingTarget;
     protected boolean disablingTarget;
     protected boolean repeatableOnKill;
@@ -50,9 +51,9 @@ public class HitCommand extends ActorCommand{
         this.cripplingTarget = false;
         this.disablingTarget = false;
         this.healingFromDamage = false;
-        this.moralDamage = false;
+        this.ignorePhysicalDamage = false;
+        this.ignoreMoralDamage = false;
         this.repeatableOnKill = false;
-
         this.defendersData = new Array<DefenderData>();
 
         this.switchcommand = new SwitchPositionCommand(bfr, scheduler, playerInventory);
@@ -173,7 +174,7 @@ public class HitCommand extends ActorCommand{
             int dicesroll = Utils.getMean(2, 100);
             if (dicesroll < defendersData.get(i).hitrate) {
 
-                TakeDamage notif = data.defenderRenderer.getModel().applyDamage(data.damageDealt, moralDamage);
+                TakeDamage notif = data.defenderRenderer.getModel().applyDamage(data.damageDealt, ignorePhysicalDamage, ignoreMoralDamage, 1f);
                 notif.critical = false;
                 notif.crippled = cripplingTarget;
                 notif.disabled = disablingTarget;
@@ -354,8 +355,12 @@ public class HitCommand extends ActorCommand{
         this.healingFromDamage = healingFromDamage;
     }
 
-    public void setMoralDamage(boolean moralDamage) {
-        this.moralDamage = moralDamage;
+    public void setIgnorePhysicalDamage(boolean ignorePhysicalDamage) {
+        this.ignorePhysicalDamage = ignorePhysicalDamage;
+    }
+
+    public void setIgnoreMoralDamage(boolean ignoreMoralDamage) {
+        this.ignoreMoralDamage = ignoreMoralDamage;
     }
 
     public void setRepeatableOnKill(boolean repeatableOnKill) {

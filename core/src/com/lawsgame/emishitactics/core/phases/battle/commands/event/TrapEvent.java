@@ -59,7 +59,7 @@ public class TrapEvent extends BattleCommand{
     protected void execute() {
 
         IUnit victim = bfr.getModel().getUnit(row, col);
-        TakeDamage takeDamage = victim.applyDamage(damage, false);
+        TakeDamage takeDamage = victim.applyDamage(damage, false, true, 1f);
         takeDamage.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
 
         StandardTask task = new StandardTask();

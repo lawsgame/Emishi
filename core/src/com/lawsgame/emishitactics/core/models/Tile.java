@@ -11,9 +11,11 @@ import com.lawsgame.emishitactics.core.models.interfaces.Model;
 public class Tile extends Model{
 
     protected TileType type;
+    protected boolean fragile;
 
     public Tile(TileType type){
         this.type = type;
+        this.fragile = false;
     }
 
     public TileType getType() {
@@ -32,6 +34,13 @@ public class Tile extends Model{
         return type.name();
     }
 
+    public boolean isFragile() {
+        return fragile;
+    }
+
+    public void setFragile(boolean fragile) {
+        this.fragile = fragile;
+    }
 
     //------------- SUB CLASS ---------------------
 
