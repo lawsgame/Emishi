@@ -16,18 +16,24 @@ public class PassiveAI extends AI {
     }
 
     @Override
+    protected void prepare(MilitaryForce army) {
+
+    }
+
+    @Override
     public int[] nextUnit(MilitaryForce army) {
         return bfr.getModel().getStillActiveUnitCoords(army.getId()).random();
     }
 
     @Override
-    public CommandBundle getCommandPackage(int[] actorPos) {
-        CommandBundle bundle = new CommandBundle();
+    public void setCommandBundle(int[] actorPos, final CommandBundle bundle) {
+
         if(actorPos != null) {
             EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory);
             endUnitTurnCommand.setInitiator(actorPos[0], actorPos[1]);
             checkApplyAndStore(endUnitTurnCommand, actorPos[0], actorPos[1], bundle);
         }
-        return bundle;
     }
+
+
 }

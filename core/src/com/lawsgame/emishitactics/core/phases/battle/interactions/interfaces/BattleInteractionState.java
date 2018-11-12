@@ -61,6 +61,18 @@ public abstract class BattleInteractionState extends InteractionState {
     public void renderAhead(SpriteBatch batch){}
 
 
+    /**
+     *
+     * player input are taken into account only if the camera does not move.
+     *
+     * First, it check wether the input is handled by BIS.handleTouchInput()
+     * If not (aka. return false), the input is handled generically by using:
+     *      1) BIM.focusOn()
+     *      2) (optional) updating FFA if the given tile is occupied by a foe.
+     *
+     * @param gameX
+     * @param gameY
+     */
     @Override
     public void onTouch(float gameX, float gameY) {
         if(!bim.gcm.isCameraMoving()) {

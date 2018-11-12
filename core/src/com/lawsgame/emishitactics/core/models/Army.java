@@ -307,6 +307,11 @@ public class Army extends MilitaryForce {
         for(int i = 0; i < mobilizedTroups.size; i++){
             for(int j = 0; j < mobilizedTroups.get(i).size; j++){
                 if(!mobilizedTroups.get(i).get(j).isDone() && !mobilizedTroups.get(i).get(j).isOutOfAction()){
+                    /*
+                    System.out.println(toString()+" is not done yet. By instance, "+mobilizedTroups.get(i).get(j).getName()+" is still active!");
+                    System.out.println("    OOA ? " + mobilizedTroups.get(i).get(j).isOutOfAction()+" in particular, "
+                            +mobilizedTroups.get(i).get(j).getCurrentMoral()+" moral & "+mobilizedTroups.get(i).get(j).getCurrentHP()+" HP");*/
+
                     return false;
                 }
             }

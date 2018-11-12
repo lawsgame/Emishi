@@ -174,7 +174,9 @@ public class HitCommand extends ActorCommand{
             int dicesroll = Utils.getMean(2, 100);
             if (dicesroll < defendersData.get(i).hitrate) {
 
-                TakeDamage notif = data.defenderRenderer.getModel().applyDamage(data.damageDealt, ignorePhysicalDamage, ignoreMoralDamage, 1f);
+                int[] dealDamageRange = Formulas.getDealtDamageRange(rowActor, colActor, data.rowInitTarget, data.colInitTarget, getInitiator(),data.defenderRenderer.getModel(), bfr.getModel());
+                int appliedDamage = Formulas.getRandomDamageInput(dealDamageRange);
+                TakeDamage notif = data.defenderRenderer.getModel().takeDamage(appliedDamage, ignorePhysicalDamage, ignoreMoralDamage, 1f);
                 notif.critical = false;
                 notif.crippled = cripplingTarget;
                 notif.disabled = disablingTarget;
@@ -385,7 +387,7 @@ public class HitCommand extends ActorCommand{
         public final int rowInitDefender;
         public final int colInitDefender;
         public final int hitrate;
-        public final int damageDealt;
+        public final int[] damageDealt;
         public final int lootRate;
 
 
@@ -413,7 +415,7 @@ public class HitCommand extends ActorCommand{
             this.rowInitDefender = rowInitDefender;
             this.colInitDefender = colInitDefender;
             this.hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
-            this.damageDealt = 1; //Formulas.getDealtDamage(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
+            this.damageDealt = Formulas.getDealtDamageRange(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
             this.lootRate = Formulas.getLootRate(attacker);
         }
 
@@ -422,12 +424,12 @@ public class HitCommand extends ActorCommand{
         }
 
         public String toString(){
-            String str = "\nATTACKER : "+attacker.getName();
-            str +="\nTARGET : "+targetRenderer.getModel().getName();
-            str +="\nDEFENDER : "+defenderRenderer.getModel().getName();
-            str +="\n\nDamage dealt : "+damageDealt;
-            str +="\nHit rate : "+hitrate;
-            str +="\nLoot rate : "+lootRate;
+            String str = "\n    HITCOMMAND :\n   attacker : "+attacker.getName();
+            str +=  "\n   target : "+targetRenderer.getModel().getName();
+            str +=  "\n   defender : "+defenderRenderer.getModel().getName();
+            str +="\n\n   Damage dealt : "+damageDealt;
+            str +=  "\n   Hit rate : "+hitrate;
+            str +=  "\n   Loot rate : "+lootRate;
             return str;
         }
     }

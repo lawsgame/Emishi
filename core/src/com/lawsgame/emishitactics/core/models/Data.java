@@ -70,19 +70,27 @@ public class Data {
     }
 
 
+    public enum BBMode{
+        OFFENSIVE,
+        DEFENSIVE,
+        ALL
+    }
+
     public enum BannerBonus {
-        STRENGTH    (1,     new float[]{2, 4, 6}),
-        MORAL_SHIELD(0.1f,  new float[]{1, 2, 3, 4, 5}),
-        LOOT_RATE   (1,     new float[]{1, 2, 3, 4, 5}),
-        AP_COST     (1,     new float[]{3, 5}),
-        RANGE       (1,     new float[]{6});
+        STRENGTH    (1,     new float[]{2, 4, 6},       BBMode.OFFENSIVE),
+        MORAL_SHIELD(0.1f,  new float[]{1, 2, 3, 4, 5}, BBMode.DEFENSIVE),
+        LOOT_RATE   (1,     new float[]{1, 2, 3, 4, 5}, BBMode.ALL),
+        AP_COST     (1,     new float[]{3, 5},          BBMode.OFFENSIVE),
+        RANGE       (1,     new float[]{6},             BBMode.ALL);
 
         private float baseValue;
         private float[] cost;
+        private BBMode mode;        // in switch mode, this bonus is enabled
 
-        BannerBonus(float baseValue, float[] cost) {
+        BannerBonus(float baseValue, float[] cost, BBMode mode) {
             this.baseValue = baseValue;
             this.cost = cost;
+            this.mode = mode;
         }
 
         public float getBaseValue() {
@@ -91,6 +99,10 @@ public class Data {
 
         public float[] getCost() {
             return cost;
+        }
+
+        public BBMode getMode() {
+            return mode;
         }
     }
 
@@ -231,11 +243,11 @@ public class Data {
         //TEST_CHOICE         (0, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}, {0, 1}, {0, -1}}),
 
         MOVE                (0, 0, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        WALK                (1, 0, true, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
+        WALK                (0, 0, true, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
         ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
-        SWITCH_POSITION     (1, 0, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        PUSH                (1, 0, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        SWITCH_WEAPON       (1, 0, false, true, 0, 0, false, new int[][]{{0, 0}}),
+        SWITCH_POSITION     (0, 0, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        PUSH                (0, 0, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        SWITCH_WEAPON       (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}}),
         CHOOSE_ORIENTATION  (0, 0, false, true, 0, 0, true, new int[][]{{0, 0}}),
         HEAL                (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
         GUARD               (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
@@ -857,12 +869,12 @@ public class Data {
 
     public enum UnitTemplate {
         SOLAIRE(1, 4, 5, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.HEAL},
-                3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
+                3, 5, 7, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
                 0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
                 0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f),
         SOLAR_KNIGHT(1, 4, 5, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.GUARD},
-                3, 8, 6, 4, 7, 9, 3, 33, 6, 4, 3,
+                3, 6, 7, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
                 0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
                 0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f);

@@ -68,6 +68,7 @@ import java.util.Stack;
  *  1 - update the model
  *  2 - push the render task
  *  3 - set the outcome bundle
+ *  4 - (optional) check for events
  */
 public abstract class ActorCommand extends BattleCommand{
 
@@ -131,22 +132,23 @@ public abstract class ActorCommand extends BattleCommand{
         if(super.apply()) {
 
             /*
-             * 1) set as moved or acted if required
+             * 1) set as moved or acted
              * 2) actor pays the cost of performing this action
+             * 3) clean and solve the outcome
              */
             if(!free){
 
                 if(choice.isActedBased()) {
-                    getInitiator().setActed(registerAction);
+                    getInitiator().setActed(true);
                 }else {
-                    getInitiator().setMoved(registerAction);
+                    getInitiator().setMoved(true);
                 }
 
                 getInitiator().addActionPoints(-choice.getCost());
-            }
 
-            outcome.clean();
-            outcome.resolve();
+                outcome.clean();
+                outcome.resolve();
+            }
 
             return true;
         }
@@ -217,17 +219,10 @@ public abstract class ActorCommand extends BattleCommand{
      * intrinsec requirements checking
      */
     public boolean isInitiatorValid(IUnit initiator){
-        System.out.println("\n\nCHECK INIT VALID");
         boolean valid = false;
-        System.out.println(bfr.getModel().isUnitDeployed(initiator));
         if(bfr.getModel().isUnitDeployed(initiator)){
-            System.out.println("    > deployed");
             if(!initiator.isOutOfAction()) {
-                System.out.println("    > In action");
-                System.out.print("     >free : "+free);
-                System.out.println(" OR cost:"+choice.getCost() +" <= "+ initiator.getActionPoints());
                 if (free || choice.getCost() <= initiator.getActionPoints()) {
-                    System.out.println("    > allowed");
                     if (choice.isActedBased()) {
                         valid = (free || !initiator.hasActed()) && !initiator.isDisabled();
                     } else {
@@ -236,7 +231,6 @@ public abstract class ActorCommand extends BattleCommand{
                 }
             }
         }
-        System.out.println("    > valid ? "+valid+"\n");
         return valid;
     }
 
@@ -582,6 +576,7 @@ public static class Outcome {
         public Array<DroppedItemHolder> droppedItemHolders;
         public Inventory playerInventory;
         boolean resolved;
+        boolean relevant;                                   // was not empty while being solved
 
         public Outcome(Inventory playerInventory) {
             this.playerInventory = playerInventory;
@@ -594,6 +589,7 @@ public static class Outcome {
             this.droppedItemHolders.clear();
             this.expHolders.clear();
             this.resolved = false;
+            this.relevant = false;
 
         }
 
@@ -606,8 +602,10 @@ public static class Outcome {
         }
 
         public void merge(Outcome outcome){
-            expHolders.addAll(outcome.expHolders);
-            droppedItemHolders.addAll(outcome.droppedItemHolders);
+            if(!outcome.resolved) {
+                expHolders.addAll(outcome.expHolders);
+                droppedItemHolders.addAll(outcome.droppedItemHolders);
+            }
         }
 
         public boolean isExpHandled(){
@@ -621,7 +619,7 @@ public static class Outcome {
         void clean(){
             // remove OOA units
             for (int i = 0; i < expHolders.size; i++) {
-                if (expHolders.get(i).isIrrelevant()) {
+                if (expHolders.get(i).experience == 0 || expHolders.get(i).receiver.isOutOfAction()) {
                     expHolders.removeIndex(i);
                     i--;
                 }
@@ -640,6 +638,10 @@ public static class Outcome {
             }
         }
 
+
+        /**
+         * distribute exp points and add looted item a to the player inventory
+         */
         void resolve(){
             if(!resolved) {
                 resolved = true;
@@ -658,7 +660,7 @@ public static class Outcome {
         public String toString(){
             String str = "\nOUTCOME\n";
             for(int i = 0; i < expHolders.size; i++){
-                str += "\nReceiver : "+ expHolders.get(i).receiver.getName()+" => experience gained : "+ expHolders.get(i).experience;
+                str += "\nReceiver : "+ expHolders.get(i).receiver.getName()+" ("+((expHolders.get(i).receiver.isOutOfAction() ? "OOA": "FIGHTING")+") => experience gained : "+ expHolders.get(i).experience);
             }
             for(int i = 0; i < droppedItemHolders.size; i++){
                 str += "\nStolen item : "+ droppedItemHolders.get(i).toString();
@@ -690,10 +692,6 @@ public static class Outcome {
             statGained = receiver.addExpPoints(experience);
         }
 
-
-        public boolean isIrrelevant() {
-            return experience == 0 || receiver.isOutOfAction();
-        }
     }
 
 

@@ -77,16 +77,36 @@ public class SelectActionBIS extends BattleInteractionState {
                 choicePanel.setVisible(true);
             }else{
 
+                Utils.undoCommands(historic);
+                if(historic.size() > 0){
+                    rowSltdUnit = historic.peek().getRowActor();
+                    colSltdUnit = historic.peek().getColActor();
+                    bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, false);
+                    resetChoicePanel();
+                    return true;
+                }else{
+                    if(!touchedUnit.isDone()){
+                        bim.replace(new SelectActionBIS(bim, touchedUnit));
+                        return true;
+                    }else{
+                        bim.replace(new SelectActionBIS(bim, selectedUnit));
+                        return true;
+                    }
+                }
+
+                /*
                 if (Utils.undoCommands(historic) && !touchedUnit.isDone()) {
                     bim.replace(new SelectActionBIS(bim, touchedUnit));
                     return true;
                 } else {
                     // if not all commands are undoable, all the undoable ones are disabled, the unit is updated and a new choice panel is provided
-                    bim.focusOn(row, col, true, true, true, false, false);
+                    rowSltdUnit = historic.peek().getRowActor();
+                    colSltdUnit = historic.peek().getColActor();
+                    bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, false);
                     resetChoicePanel();
-                    choicePanel.setVisible(false);
                     return true;
                 }
+                */
             }
         }
         return false;

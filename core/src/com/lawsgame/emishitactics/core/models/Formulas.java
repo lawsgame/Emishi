@@ -11,15 +11,18 @@ public class Formulas {
         return (hitrate > 0) ? hitrate : 0;
     }
 
-    public static int getDealtDamage(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
-        int dealtdamage = getRandomlyAttackMight(
-                    getCurrentAttackMightRange(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield));
-        dealtdamage -= getCurrentDefense(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield);
-        return (dealtdamage > 0) ? dealtdamage : 0;
+    public static int[] getDealtDamageRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+        int[] dealtdamage = getCurrentAttackMightRange(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield);
+        int defense = getCurrentDefense(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield);
+        dealtdamage[0] -= defense;
+        dealtdamage[1] -= defense;
+        if(dealtdamage[0] < 0) dealtdamage[0] = 0;
+        if(dealtdamage[1] < 0) dealtdamage[1] = 0;
+        return dealtdamage;
     }
 
-    public static int getRandomlyAttackMight(int[] attackMightRange){
-        return MathUtils.random(attackMightRange[0], attackMightRange[1]);
+    public static int getRandomDamageInput(int[] expectedDealtDamageRange){
+        return MathUtils.random(expectedDealtDamageRange[0], expectedDealtDamageRange[1]);
     }
 
     /**

@@ -19,6 +19,7 @@ public class AttackCommand extends HitCommand {
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, Data.ActionChoice.ATTACK, scheduler, playerInventory);
         this.retalationBlows = new Array<HitCommand>();
+        this.setFree(false);
 
     }
 
@@ -34,9 +35,6 @@ public class AttackCommand extends HitCommand {
         }
 
         scheduleRenderTask(resetOrientation());
-
-        //System.out.println(scheduler);
-
 
     }
 

@@ -162,7 +162,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                 builder.append(data.defenderRenderer.getModel().getCurrentMoral());
                 builder.append(" - ");
                 builder.append(data.defenderRenderer.getModel().getCurrentHP());
-                builder.append("\nDamage : " + data.damageDealt);
+                builder.append("\nDamage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
                 builder.append("\nHit rate : " + data.hitrate+"%");
                 builder.append("\nLoot rate : " + data.lootRate+"%");
 
@@ -185,7 +185,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                         builder.append(data.defenderRenderer.getModel().getCurrentMoral());
                         builder.append(" - ");
                         builder.append(data.defenderRenderer.getModel().getCurrentHP());
-                        builder.append("\nDamage : " + data.damageDealt);
+                        builder.append("\nDamage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
                         builder.append("\nHit rate : " + data.hitrate+"%");
                         builder.append("\nLoot rate : " + data.lootRate+"%");
 

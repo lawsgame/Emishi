@@ -67,11 +67,12 @@ public class LongUnitPanel extends UnitPanel {
             MilitaryForce army = unit.getArmy();
             builder.append("\n\n    ARMY\n");
             builder.append("\nWarlord : " + army.getWarlord().getName());
-            builder.append("\n  > war chiefs: "+army.getNbOfSquads()+"/"+army.getWarlord().getMaxWarChiefs());
+            builder.append(", WCs : "+army.getNbOfSquads()+"/"+army.getWarlord().getMaxWarChiefs());
             builder.append("\nWar chief : " + army.getWarchief(unit).getName());
-            builder.append("\n  > squad members: "+army.getSquad(unit, true).size+"/"+unit.getWarchief().getMaxSoldiersAs(unit.getWarchief().isWarlord()));
+            builder.append(", Squad: "+army.getSquad(unit, true).size+"/"+unit.getWarchief().getMaxSoldiersAs(unit.getWarchief().isWarlord()));
             Banner banner = army.getSquadBanner(unit, false);
             builder.append("\nBanner");
+            builder.append("\n  | mode        : "+banner.getMode().name().toLowerCase());
             builder.append("\n  | points        : "+banner.getRemainingPoints()+"/"+banner.getMaxPoints());
             builder.append("\n  | strength      : "+banner.getValue(Data.BannerBonus.STRENGTH, false));
             builder.append("\n  | range         : "+banner.getValue(Data.BannerBonus.RANGE, false));
@@ -127,8 +128,8 @@ public class LongUnitPanel extends UnitPanel {
         builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getBaseLeadership()+")");
         builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getBaseMobility()+")");
 
-        builder.append("\n\nREGULAR_ATTACK might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
-        builder.append("\nREGULAR_ATTACK accuracy : "+unit.getAppAttackAccuracy());
+        builder.append("\n\nattack might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
+        builder.append("\nattack accuracy : "+unit.getAppAttackAccuracy());
         builder.append("\nAvoidance : "+unit.getAppAvoidance());
         builder.append("\nRange : ("+unit.getAppWeaponRangeMin()+", "+unit.getAppWeaponRangeMax()+")");
 

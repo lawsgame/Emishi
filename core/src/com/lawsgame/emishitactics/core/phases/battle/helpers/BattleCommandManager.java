@@ -83,12 +83,14 @@ public class BattleCommandManager {
     public Array<ActionChoice> getAvailableChoices(int rowActor, int colActor, Stack<ActorCommand> history){
         Array<ActionChoice> choices = new Array<ActionChoice>();
         ActionChoice choice;
+
         for (int  i = 0; i < commandPool.size; i++) {
             if(history != null && commandPool.get(i).size > 0 && !Utils.stackContainsAtLeastOneElementOf(history, commandPool.get(i))) {
 
                 choice = commandPool.get(i).get(0).getActionChoice();
                 if(!choice.isEndTurnActionOnly()) {
                     for (int j = 0; j < commandPool.get(i).size; j++) {
+                        commandPool.get(i).get(j).init();
                         commandPool.get(i).get(j).setInitiator(rowActor, colActor);
                         if (commandPool.get(i).get(j).isInitiatorValid()) {
                             choices.add(choice);
@@ -98,6 +100,9 @@ public class BattleCommandManager {
                 }
             }
         }
+
+        System.out.println("");
+
         return choices;
     }
 

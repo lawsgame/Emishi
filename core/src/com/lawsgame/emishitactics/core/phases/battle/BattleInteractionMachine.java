@@ -157,12 +157,12 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      * @param rowTarget
      * @param colTarget
      * @param moveCamSmoothly :     if true, the camera to the tile location smoothy, else the camera position is updated instantaneously
-     * @param highlightAllsquad :   if true and the tile is occupied by a unit, his whole squad is also highlighted
+     * @param highligthSquad :      if true and the tile is occupied by a unit, his whole squad is also highlighted
      * @param displayPanels :       if true, the short info panels are displayed
      * @param targetIsSelected :    govern each area type / color is used to highlight the focused tile
      * @param resetMemory :         the method keep in memory which tile has been focused on the last time it was called to only updated short info panels which require to be updated, if true, this memory is erased.
      */
-    public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean highlightAllsquad, boolean displayPanels, boolean targetIsSelected, boolean resetMemory){
+    public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean highligthSquad, boolean displayPanels, boolean targetIsSelected, boolean resetMemory){
         if(resetMemory){
             rowFocus = -1;
             colFocus = -1;
@@ -171,7 +171,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         if(battlefield.isTileExisted(rowTarget, colTarget)) {
             moveCamera(rowTarget, colTarget, moveCamSmoothly);
-            highlight(rowTarget, colTarget, highlightAllsquad, targetIsSelected);
+            highlight(rowTarget, colTarget, highligthSquad, targetIsSelected);
             if(displayPanels) {
 
                 if(rowTarget != rowFocus || colTarget != colFocus || shortTilePanel.isHiding()) {

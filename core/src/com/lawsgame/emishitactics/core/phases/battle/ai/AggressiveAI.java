@@ -17,8 +17,8 @@ public class AggressiveAI extends PassiveAI {
     }
 
     @Override
-    public CommandBundle getCommandPackage(int[] actorPos) {
-        CommandBundle bundle = new CommandBundle();
+    public void setCommandBundle(int[] actorPos, final CommandBundle bundle) {
+
         if(actorPos != null) {
 
             int rowEndTile = actorPos[0];
@@ -94,6 +94,5 @@ public class AggressiveAI extends PassiveAI {
 
             System.out.println(bundle.toString());
         }
-        return bundle;
     }
 }

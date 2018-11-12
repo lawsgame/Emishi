@@ -181,7 +181,7 @@ public abstract class IUnit extends Model {
     public abstract int getRecoveredHitPoints(int healPower);
     public abstract int getRecoveredMoralPoints(int healPower);
     public abstract boolean treated(int healPower);
-    public abstract TakeDamage applyDamage(int damageTaken, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralAbsorption);
+    public abstract TakeDamage takeDamage(int damageTaken, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralAbsorption);
 
 
 }

@@ -80,6 +80,8 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                         receiverPos = bim.battlefield.getUnitPos(holder.receiver);
                         experience = expLvls[expLvls.length - 1];
 
+                        System.out.println("HandleOutcomeBIS : current receiver : "+holder.receiver+" and its pos: "+receiverPos[0]+" "+receiverPos[1]);
+
                         HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
                         experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
                         experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, experience), 0f));

@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.engine.math.geometry;
 
+@Deprecated
 public interface Shape {
 
 	float getXCenter();

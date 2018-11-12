@@ -1117,7 +1117,9 @@ public class Unit extends IUnit{
     @Override
     public void replenishMoral(boolean turnBeginning) {
         if(turnBeginning) {
-            this.setCurrentMoral(this.getCurrentMoral() + getChiefCharisma() + getAppBravery() / Data.BRAVERY_MORAL_RECOVERY_RATE);
+            if(!this.isOutOfAction()) {
+                this.setCurrentMoral(this.getCurrentMoral() + getChiefCharisma() + getAppBravery() / Data.BRAVERY_MORAL_RECOVERY_RATE);
+            }
         }else{
             resetCurrentMoral();
         }
@@ -1277,7 +1279,7 @@ public class Unit extends IUnit{
     }
 
     @Override
-    public TakeDamage applyDamage(int damageDealt, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralModifier){
+    public TakeDamage takeDamage(int damageDealt, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralModifier){
         TakeDamage.State state = TakeDamage.State.UNDAMAGED;
         int lifeDamageTaken = 0;
 

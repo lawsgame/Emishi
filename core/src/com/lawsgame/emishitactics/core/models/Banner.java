@@ -9,13 +9,13 @@ import java.util.HashMap;
 public class Banner extends Model  {
 
     private final IUnit bearer;
-    private BannerBonus currentBonus;
     private HashMap<BannerBonus, Integer> bonuses;
+    private Data.BBMode mode;
 
     public Banner(IUnit bearer){
         this.bearer = bearer;
         this.bonuses = new HashMap<BannerBonus, Integer>();
-        this.currentBonus = BannerBonus.STRENGTH;
+        this.mode = Data.BBMode.OFFENSIVE;
         this.reset();
     }
 
@@ -64,11 +64,15 @@ public class Banner extends Model  {
     }
 
     public float getValue(BannerBonus bb, boolean inFight){
-        return (bb == currentBonus || !inFight) ? bonuses.get(bb) * bb.getBaseValue() : 0;
+        return (bb.getMode() == mode || bb.getMode() == Data.BBMode.ALL || !inFight) ? bonuses.get(bb) * bb.getBaseValue() : 0;
     }
 
-    public void setCurrentBonus(BannerBonus currentBonus) {
-        this.currentBonus = currentBonus;
+    public void setMode(Data.BBMode mode) {
+        this.mode = mode;
+    }
+
+    public Data.BBMode getMode() {
+        return mode;
     }
 
     public String toString(){

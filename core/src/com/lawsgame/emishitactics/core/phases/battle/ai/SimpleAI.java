@@ -6,6 +6,7 @@ import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.engine.patterns.command.Command;
 
 public class SimpleAI extends AI {
 
@@ -14,13 +15,17 @@ public class SimpleAI extends AI {
     }
 
     @Override
+    protected void prepare(MilitaryForce army) {
+
+    }
+
+    @Override
     public int[] nextUnit(MilitaryForce army) {
         return new int[2];
     }
 
     @Override
-    public CommandBundle getCommandPackage(int[] actorPos) {
-        CommandBundle bundle = new CommandBundle();
+    public void setCommandBundle(int[] actorPos, final CommandBundle bundle) {
         if(actorPos != null && bfr.getModel().isTileOccupied(actorPos[0], actorPos[1])) {
 
             //ActorCommand command = new AttackCommand(bfr, scheduler, playerInventory);
@@ -40,6 +45,7 @@ public class SimpleAI extends AI {
             }
             */
         }
-        return bundle;
     }
+
+
 }

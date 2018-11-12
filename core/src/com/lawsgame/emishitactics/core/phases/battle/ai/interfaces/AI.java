@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.ai.interfaces;
 
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Inventory;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
@@ -35,9 +36,9 @@ public abstract class AI extends Observable implements Runnable {
         this.army = army;
     }
 
-
+    protected abstract void prepare(MilitaryForce army);
     public abstract int[] nextUnit(MilitaryForce army);
-    public abstract CommandBundle getCommandPackage(int[] actor);
+    public abstract void setCommandBundle(int[] actor, final CommandBundle bundle);
 
     @Override
     public void run() {
@@ -55,19 +56,28 @@ public abstract class AI extends Observable implements Runnable {
             bundle.offer(beginCommand, null);
             notifyAllObservers(bundle);
 
+            prepare(army);
             while (!army.isDone()) {
                 actorPos = nextUnit(army);
-                bundle = getCommandPackage(actorPos);
+
+                IUnit selectedUnit = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
+
+                bundle = new CommandBundle();
+                setCommandBundle(actorPos, bundle);
                 notifyAllObservers(bundle);
                 if (bf.getSolver().isBattleOver()) {
                     break;
                 }
+
+                System.out.println(selectedUnit+" => is done ? : "+selectedUnit.isDone()+" or dead ? "+selectedUnit.isOutOfAction()+"");
             }
         }
 
         notifyAllObservers(this);
 
     }
+
+
 
     /**
      *
@@ -90,7 +100,7 @@ public abstract class AI extends Observable implements Runnable {
         public LinkedList<BattleCommand> commands;
         public LinkedList<ActionInfoPanel> panels;
 
-        public CommandBundle() {
+        private CommandBundle() {
             this.commands = new LinkedList<BattleCommand>();
             this.panels = new LinkedList<ActionInfoPanel>();
         }

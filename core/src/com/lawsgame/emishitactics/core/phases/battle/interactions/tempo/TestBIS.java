@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
@@ -18,14 +17,11 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackComman
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.trigger.UponDisappearingTrigger;
-import com.lawsgame.emishitactics.engine.math.functions.Function;
 import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -58,7 +54,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         super(bim, true, true, true, true, false);
 
         sltdUnit = bim.player.getArmy().getWarlord();
-        sltdUnit.applyDamage(0, false, false, 1f);
+        sltdUnit.takeDamage(0, false, false, 1f);
 
         sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
