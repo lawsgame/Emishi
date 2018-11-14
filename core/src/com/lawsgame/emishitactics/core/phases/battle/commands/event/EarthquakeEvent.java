@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
@@ -17,15 +18,15 @@ public class EarthquakeEvent extends BattleCommand {
     private float earthquakeDuration;
     private final CameraManager gcm;
 
-    public EarthquakeEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, float earthquakeDuration, CameraManager gcm) {
-        super(bfr, scheduler);
+    public EarthquakeEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, float earthquakeDuration, CameraManager gcm) {
+        super(bfr, scheduler, playerInventory);
         this.earthquakeDuration = earthquakeDuration;
         this.gcm = gcm;
     }
 
 
-    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, CameraManager gcm, final int turn){
-        EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, Data.EARTHQUAKE_DURATION, gcm);
+    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, final int turn){
+        EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, playerInventory, Data.EARTHQUAKE_DURATION, gcm);
 
         Model.Trigger trigger = new Model.Trigger(true, false) {
 

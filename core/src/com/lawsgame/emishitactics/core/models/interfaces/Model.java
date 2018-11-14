@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -32,12 +33,12 @@ public abstract class Model extends Observable{
         return false;
     }
 
-    public Array<Task> performEvents(Object data){
+    public Array<Task> performEvents(Object data, final ActorCommand.Outcome callerOutcome){
         Array<Task> tasks = new Array<Task>();
 
         for(int i = 0; i < triggers.size; i++){
             if(triggers.get(i).isActive() && triggers.get(i).isTriggered(data)) {
-                tasks.addAll(triggers.get(i).performEvent());
+                tasks.addAll(triggers.get(i).performEvent(callerOutcome));
                 if (triggers.get(i).isEmpty() || triggers.get(i).isUseOnce()) {
                     remove(triggers.get(i));
                     i--;
@@ -84,12 +85,18 @@ public abstract class Model extends Observable{
 
         public abstract boolean isTriggered(Object data);
 
-        Array<Task> performEvent(){
+        /**
+         *
+         * @param callerOutcome : outcome of the source of the event triggering ( NotNull is it is an ActorCommand)
+         * @return the render tasks generate to those events.
+         */
+        Array<Task> performEvent(ActorCommand.Outcome callerOutcome){
             Array<Task> tasks = new Array<Task>();
 
             for(int i = 0; i < eventCommands.size; i++){
                 eventCommands.get(i).setDecoupled(true);
                 if(eventCommands.get(i).apply()){
+                    callerOutcome.merge( eventCommands.get(i).getOutcome());
                     tasks.addAll(eventCommands.get(i).confiscateTasks());
                 }
             }

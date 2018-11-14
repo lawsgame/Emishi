@@ -14,7 +14,7 @@ public class SelectActorBIS extends BattleInteractionState {
         this.rowInit = rowInit;
         this.colInit = colInit;
         if(newPlayerTurn){
-            BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bim.bfr, bim.scheduler, bim.player.getArmy());
+            BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.player.getArmy());
             beginCommand.apply();
         }
 

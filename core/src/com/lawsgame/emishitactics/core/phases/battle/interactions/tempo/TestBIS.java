@@ -134,7 +134,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
                 if(bim.battlefield.isTileOccupied(r, c)){
                     final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.battlefield.getUnit(r, c));
                     trigger = new UponDisappearingTrigger(true, woundedRenderer.getModel());
-                    trigger.addEvent(new BattleCommand(bim.bfr, bim.scheduler) {
+                    trigger.addEvent(new BattleCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) {
 
                         @Override
                         protected void execute() {
@@ -168,7 +168,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         //TRAP EVENT
 
 
-        TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler);
+        TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler, bim.player.getInventory());
 
         //System.out.println(bim.bfr.getModel().triggerToString());
 

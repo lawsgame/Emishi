@@ -12,7 +12,7 @@ public class EndArmyTurnBIS extends BattleInteractionState implements Observer {
 
     public EndArmyTurnBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false, true, false);
-        endArmyTurnCommand = new EndArmyTurnCommand(bim.bfr, bim.scheduler, bim.battlefield.getCurrentArmy());
+        endArmyTurnCommand = new EndArmyTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.battlefield.getCurrentArmy());
     }
 
     @Override

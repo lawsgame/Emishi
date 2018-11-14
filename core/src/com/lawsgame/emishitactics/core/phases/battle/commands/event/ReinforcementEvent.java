@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
@@ -19,15 +20,15 @@ public class ReinforcementEvent extends BattleCommand {
     private Array<Array<int[]>> paths;
 
 
-    public ReinforcementEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler) {
-        super(bfr, scheduler);
+    public ReinforcementEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, scheduler, playerInventory);
         this.reinforcements = new Array<IUnit>();
         this.entryPoints = new Array<int[]>();
         this.deploymentPositions = new Array<int[]>();
         this.paths = new Array<Array<int[]>>();
     }
 
-    public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, final MilitaryForce currentArmy){
+    public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, final MilitaryForce currentArmy){
 
         Model.Trigger trigger = new Model.Trigger( true, true) {
 
@@ -42,7 +43,7 @@ public class ReinforcementEvent extends BattleCommand {
             }
         };
 
-        ReinforcementEvent event = new ReinforcementEvent(bfr, scheduler);
+        ReinforcementEvent event = new ReinforcementEvent(bfr, scheduler, playerInventory);
         trigger.addEvent(event);
         bfr.getModel().add(trigger);
         return event;

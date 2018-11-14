@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.OOAReport;
 import com.lawsgame.emishitactics.core.models.Notification.StepOn;
 import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
@@ -17,23 +18,26 @@ public class TrapEvent extends BattleCommand{
     private int damage;
     private int row;
     private int col;
+    private Inventory playerInventory;
 
-    public TrapEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, int damage, int row, int col) {
-        super(bfr, scheduler);
+    public TrapEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, int damage, int row, int col) {
+        super(bfr, scheduler, playerInventory);
         this.damage = damage;
         this.row = row;
         this.col = col;
+        this.playerInventory = playerInventory;
+
     }
 
 
 
-    public static TrapEvent addTrigger(final int rowTile, final int colTile, int damage, BattlefieldRenderer bfr, AnimationScheduler scheduler){
-        return addTrigger(bfr.getModel().getTile(rowTile, colTile), rowTile, colTile, damage, bfr, scheduler);
+    public static TrapEvent addTrigger(final int rowTile, final int colTile, int damage, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
+        return addTrigger(bfr.getModel().getTile(rowTile, colTile), rowTile, colTile, damage, bfr, scheduler, playerInventory);
     }
 
-    private static TrapEvent addTrigger(Tile tile, final int rowTile, final int colTile, int damage, BattlefieldRenderer bfr, AnimationScheduler scheduler){
+    private static TrapEvent addTrigger(Tile tile, final int rowTile, final int colTile, int damage, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
 
-        TrapEvent event = new TrapEvent(bfr, scheduler, damage, rowTile, colTile);
+        TrapEvent event = new TrapEvent(bfr, scheduler, playerInventory, damage, rowTile, colTile);
         if(bfr.getModel().isTileExisted(rowTile, colTile) && tile != null) {
 
             Model.Trigger trigger = new Model.Trigger(false, false) {
@@ -68,7 +72,7 @@ public class TrapEvent extends BattleCommand{
         if(bfr.getModel().isTileExisted(row, col) && bfr.getModel().getTile(row, col).getType() != Data.TileType.TRAP) {
 
             Tile tile = new Tile(Data.TileType.TRAP);
-            addTrigger(tile, row, col, damage, bfr, scheduler);
+            addTrigger(tile, row, col, damage, bfr, scheduler, playerInventory);
             bfr.getModel().setTile(row, col, tile, false);
 
             task.addThread(new StandardTask.RendererThread(bfr, new SetTile(row, col, tile)));

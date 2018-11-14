@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine.FocusOn;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand.Outcome;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand.Outcome;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -57,7 +57,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
     @Override
     public void init() {
-        System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName()+"\n" +outcome.toString());
+        System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName());
 
         super.init();
         if(outcome.isHandled()){

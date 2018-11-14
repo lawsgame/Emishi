@@ -86,13 +86,10 @@ public abstract class ActorCommand extends BattleCommand{
     protected int colTarget;
     protected boolean eventTriggered;
 
-    protected Outcome outcome;
-
 
     public ActorCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free){
-        super(bfr, scheduler);
+        super(bfr, scheduler, playerInventory);
         this.choice = choice;
-        this.outcome = new Outcome(playerInventory);
         this.free = free;
     }
 
@@ -123,11 +120,6 @@ public abstract class ActorCommand extends BattleCommand{
 
     @Override
     public final boolean apply() {
-        // disable the blinking of the target
-        // this.highlightTargets(false);
-
-        // Outcome and animation scheduler cleared.
-        this.outcome.reset();
 
         if(super.apply()) {
 
@@ -139,15 +131,22 @@ public abstract class ActorCommand extends BattleCommand{
             if(!free){
 
                 if(choice.isActedBased()) {
-                    getInitiator().setActed(true);
+                    getInitiator().setActed(registerAction);
                 }else {
-                    getInitiator().setMoved(true);
+                    getInitiator().setMoved(registerAction);
                 }
 
                 getInitiator().addActionPoints(-choice.getCost());
 
                 outcome.clean();
                 outcome.resolve();
+
+
+                System.out.println("ACTION REPORT");
+                System.out.println("");
+                System.out.println(scheduler);
+                System.out.println(outcome);
+
             }
 
             return true;
@@ -178,6 +177,7 @@ public abstract class ActorCommand extends BattleCommand{
 
                 getInitiator().addActionPoints(choice.getCost());
             }
+
             return true;
         }
         return false;
@@ -536,10 +536,6 @@ public abstract class ActorCommand extends BattleCommand{
         return bfr.getModel().getTile(rowTarget, colTarget).getType();
     }
 
-    public final Outcome getOutcome(){
-        return outcome;
-    }
-
     public final Battlefield getBattlefield() {
         return bfr.getModel();
     }
@@ -566,144 +562,5 @@ public abstract class ActorCommand extends BattleCommand{
     public String toShortString() {
         return "ActorCommand  : " +getActionChoice().name();
     }
-
-    // ----------------- Encounter outcome CLASS -----------------
-
-
-
-public static class Outcome {
-        public Array<ExperiencePointsHolder> expHolders;
-        public Array<DroppedItemHolder> droppedItemHolders;
-        public Inventory playerInventory;
-        boolean resolved;
-        boolean relevant;                                   // was not empty while being solved
-
-        public Outcome(Inventory playerInventory) {
-            this.playerInventory = playerInventory;
-            this.expHolders = new Array<ExperiencePointsHolder>();
-            this.droppedItemHolders = new Array<DroppedItemHolder>();
-            this.resolved = false;
-        }
-
-        public void reset(){
-            this.droppedItemHolders.clear();
-            this.expHolders.clear();
-            this.resolved = false;
-            this.relevant = false;
-
-        }
-
-        public void add(IUnit receiver, int experience){
-            expHolders.add(new ExperiencePointsHolder(receiver, experience));
-        }
-
-        public void add(Item droppedItem, boolean playerOwned){
-            droppedItemHolders.add(new DroppedItemHolder(droppedItem, playerOwned));
-        }
-
-        public void merge(Outcome outcome){
-            if(!outcome.resolved) {
-                expHolders.addAll(outcome.expHolders);
-                droppedItemHolders.addAll(outcome.droppedItemHolders);
-            }
-        }
-
-        public boolean isExpHandled(){
-            return expHolders.size == 0;
-        }
-
-        public boolean isHandled(){
-            return expHolders.size == 0 && droppedItemHolders.size == 0;
-        }
-
-        void clean(){
-            // remove OOA units
-            for (int i = 0; i < expHolders.size; i++) {
-                if (expHolders.get(i).experience == 0 || expHolders.get(i).receiver.isOutOfAction()) {
-                    expHolders.removeIndex(i);
-                    i--;
-                }
-            }
-
-            // merges identical receivers and sums the associated exp gains
-            for (int i = 0; i < expHolders.size; i++) {
-                for (int j = i + 1; j < expHolders.size; j++) {
-                    if (expHolders.get(i).receiver == expHolders.get(j).receiver) {
-                        if(expHolders.get(i).experience < expHolders.get(j).experience)
-                            expHolders.get(i).experience = expHolders.get(j).experience;
-                        expHolders.removeIndex(j);
-                        j--;
-                    }
-                }
-            }
-        }
-
-
-        /**
-         * distribute exp points and add looted item a to the player inventory
-         */
-        void resolve(){
-            if(!resolved) {
-                resolved = true;
-                for (int i = 0; i < expHolders.size; i++) {
-                    expHolders.get(i).solve();
-                }
-
-                for (int i = 0; i < droppedItemHolders.size; i++) {
-                    if (droppedItemHolders.get(i).playerOwned)
-                        playerInventory.storeItem(droppedItemHolders.get(i).droppedItem);
-                }
-            }
-        }
-
-        @Override
-        public String toString(){
-            String str = "\nOUTCOME\n";
-            for(int i = 0; i < expHolders.size; i++){
-                str += "\nReceiver : "+ expHolders.get(i).receiver.getName()+" ("+((expHolders.get(i).receiver.isOutOfAction() ? "OOA": "FIGHTING")+") => experience gained : "+ expHolders.get(i).experience);
-            }
-            for(int i = 0; i < droppedItemHolders.size; i++){
-                str += "\nStolen item : "+ droppedItemHolders.get(i).toString();
-            }
-            return str+"\n";
-        }
-    }
-
-    public static class ExperiencePointsHolder {
-        public final IUnit receiver;
-        public int experience;
-        private Stack<int[]> statGained; // the 12 first entries are statistic inscreased while the last entry is experience gained before leveling up
-
-        public ExperiencePointsHolder(IUnit receiver, int experience){
-            this.receiver = receiver;
-            this.experience = experience;
-            this.statGained = new Stack<int[]>();
-        }
-
-        public boolean hasNext(){
-            return statGained.size() > 0;
-        }
-
-        public int[] next(){
-            return statGained.pop();
-        }
-
-        void solve(){
-            statGained = receiver.addExpPoints(experience);
-        }
-
-    }
-
-
-    public static class DroppedItemHolder {
-        public Item droppedItem;
-        public boolean playerOwned;
-
-        public DroppedItemHolder(Item droppedItem, boolean playerOwned) {
-            this.droppedItem = droppedItem;
-            this.playerOwned = playerOwned;
-        }
-    }
-
 
 }

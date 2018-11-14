@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -7,8 +8,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class MessageEvent extends BattleCommand{
     protected String message;
 
-    public MessageEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, String message) {
-        super(bfr, scheduler);
+    public MessageEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, String message) {
+        super(bfr, scheduler, playerInventory);
         this.message = message;
     }
 

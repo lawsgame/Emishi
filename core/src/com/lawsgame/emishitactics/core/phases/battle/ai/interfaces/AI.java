@@ -49,7 +49,7 @@ public abstract class AI extends Observable implements Runnable {
         if(!bf.getSolver().isBattleOver()) {
 
 
-            BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bfr, scheduler,army);
+            BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bfr, scheduler,playerInventory, army);
             beginCommand.setDecoupled(true);
             beginCommand.apply();
             bundle = new CommandBundle();

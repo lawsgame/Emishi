@@ -383,7 +383,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     @Override
     public void displayAttack(Notification.Attack query) {
         display(query.specialmove ? Data.AnimId.SPECIAL_MOVE : Data.AnimId.REGULAR_ATTACK);
-        System.out.println("display attack life dranied :"+query.lifeDrained);
     }
 
 
