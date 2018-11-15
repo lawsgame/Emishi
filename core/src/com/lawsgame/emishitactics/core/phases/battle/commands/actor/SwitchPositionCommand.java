@@ -66,8 +66,8 @@ public class SwitchPositionCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(IUnit initiator) {
-        return super.isInitiatorValid(initiator) && !initiator.isCrippled();
+    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator) {
+        return super.isInitiatorValid(rowActor, colActor, initiator) && !initiator.isCrippled();
     }
 
     @Override

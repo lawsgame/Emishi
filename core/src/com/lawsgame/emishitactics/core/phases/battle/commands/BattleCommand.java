@@ -151,6 +151,18 @@ public abstract class BattleCommand extends Observable implements Observer {
         return report;
     }
 
+    public boolean isDecoupled() {
+        return decoupled;
+    }
+
+    public String showTask(){
+        String str = "\nPUSHABLE RENDER TASKS\n";
+        for(Task task: renderTasks){
+            str += "\n"+task.toString();
+        }
+        return str;
+    }
+
 
     // --------------- EVENT HANDLING ----------------------------------
 

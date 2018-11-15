@@ -60,7 +60,7 @@ public class LongUnitPanel extends UnitPanel {
         }
         builder.append("\nHit points: " + unit.getCurrentHP() + "/"+unit.getAppHitpoints());
         builder.append("\nMoral: " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-        builder.append("\nAction Points : " + unit.getActionPoints()+" (+"+unit.getAppAPRecoveryRate()+" /turn)");
+        builder.append("\nAction Points : " + unit.getCurrentActionPoints());
         builder.append("\nExperience : "+unit.getExperience());
 
         if (unit.isMobilized()) {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
@@ -17,6 +18,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackComman
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -42,7 +44,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
     MoveCommand moveCommand = null;
     ActorCommand customedCommand = null;
     WalkCommand walkCommand = null;
-    ReinforcementEvent reinforcementEvent = null;
+    EarthquakeEvent event = null;
 
 
     Area ccActionArea;
@@ -98,7 +100,6 @@ public class TestBIS extends BattleInteractionState implements Observer{
         IUnit unit = new Unit("marco");
         bim.player.getArmy().add(unit);
        bim.player.getArmy().appointSoldier(unit, 0);
-        if(unit.isMobilized()) System.out.println("unit mobilized");
         reinforcementEvent.addStiffeners(unit, 0, 7, 3, 7);
         */
 
@@ -170,7 +171,15 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler, bim.player.getInventory());
 
-        //System.out.println(bim.bfr.getModel().triggerToString());
+        for(int r = 0; r < bim.battlefield.getNbRows(); r++){
+            for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
+                if(bim.battlefield.getTile(r,c).getType().isUrbanArea()){
+                    bim.battlefield.getTile(r,c).setFragile(true);
+                }
+            }
+        }
+
+        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.gcm, 0);
 
 
 
@@ -195,13 +204,6 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         // EVENT
 
-        /*
-        System.out.println("EVENT !!");
-        if(!reinforcementEvent.apply()){
-            System.out.println("Applicable ? "+reinforcementEvent.isApplicable());
-        }
-        */
-
         //WALK UNIT
 
         //bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
@@ -224,18 +226,10 @@ public class TestBIS extends BattleInteractionState implements Observer{
         if(!bim.battlefield.isTileOccupied(row, col)) {
             if (!walkCommand.apply(actorPos[0], actorPos[1], row, col)) {
                 System.out.println("command failed to be applied");
-                System.out.println("    initiator ? : " + customedCommand.isInitiatorValid());
-                System.out.println("    target ?    : " + customedCommand.isTargetValid());
+                System.out.println("    initiator ? : " + walkCommand.isInitiatorValid());
+                System.out.println("    target ?    : " + walkCommand.isTargetValid());
             }
         }
-
-        /*
-        TrapEvent event = new TrapEvent(bim.bfr, bim.scheduler, 3, row, col);
-        if(!event.apply()){
-            System.out.println("not applicable");
-        }
-        */
-
 
         // TEST CUSTOMED COMMAND
 
@@ -319,34 +313,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
             //EarthquakeEvent earthquakeEvent = new EarthquakeEvent(bim.bfr, bim.scheduler, 4f, bim.gcm);
             //earthquakeEvent.apply();
-
-
-
-
-            VectorialFunction vf = new VectorialFunction() {
-
-                float xZero = 0;
-                float yZero = 0;
-                float duration = 4;
-
-                @Override
-                public float getX(float t) {
-                    return xZero + 0.15f*(1f - (float)Math.exp(t - duration))*MathUtils.sin(14*t)*MathUtils.cos(60*t);
-                }
-
-                @Override
-                public float getY(float t) {
-                    return yZero; //+ 0.02f*MathUtils.sin(11*t+13);
-                }
-
-                @Override
-                public void setTZero(float xZero, float yZero) {
-                    this.xZero = xZero - getX(0);
-                    this.yZero = yZero - getY(0);
-                }
-            };
-
-            bim.gcm.move(vf, 4.0f);
+            event.apply();
 
         }
 

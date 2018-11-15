@@ -122,11 +122,10 @@ public abstract class IUnit extends Model {
     public abstract int[] getAppAttackMight();
     public abstract int getAppDefense(DamageType damageType);
     public abstract int getAppAvoidance();
-    public abstract int getAppAPRecoveryRate();
-    public abstract int getCurrentAPRecoveryRate(int rowUnit, int colUnit, Battlefield battlefield);
     public abstract void setActionPoints(int ap);
+    public abstract void resetActionPoints();
     public abstract void addActionPoints(int points);
-    public abstract int getActionPoints();
+    public abstract int getCurrentActionPoints();
 
 
     //ARMY

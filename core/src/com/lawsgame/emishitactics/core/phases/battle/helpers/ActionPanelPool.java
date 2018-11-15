@@ -26,8 +26,9 @@ public class ActionPanelPool {
 
     public ActionInfoPanel getPanel(ActorCommand command){
         ActionInfoPanel panel = panels.get(command.getActionChoice());
-        if(panel != null)
+        if(panel != null) {
             panel.set(command);
+        }
         return panel;
     }
 

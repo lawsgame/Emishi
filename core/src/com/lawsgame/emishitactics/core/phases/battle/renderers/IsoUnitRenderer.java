@@ -194,6 +194,16 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     }
 
     @Override
+    public int getCurrentRow() {
+        return bfr.getRow(getCenterX(), getCenterY());
+    }
+
+    @Override
+    public int getCurrentCol() {
+        return bfr.getCol(getCenterX(), getCenterY());
+    }
+
+    @Override
     public void setDone(boolean done) {
         this.done = done;
         this.display(state);

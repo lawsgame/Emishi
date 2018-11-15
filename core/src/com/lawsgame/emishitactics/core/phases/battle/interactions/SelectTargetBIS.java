@@ -99,7 +99,6 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
     @Override
     public void getNotification(Observable sender, Object data) {
         if(data instanceof ActorCommand && data == currentCommand){
-            System.out.println("command retrieved");
             bim.replace(new HandleOutcomeBIS(bim, historic, false));
         }
     }

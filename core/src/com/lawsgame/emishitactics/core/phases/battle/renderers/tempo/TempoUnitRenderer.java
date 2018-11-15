@@ -417,6 +417,15 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
         return unitSprite.getY();
     }
 
+    @Override
+    public int getCurrentRow() {
+        return (int) unitSprite.getX();
+    }
+
+    @Override
+    public int getCurrentCol() {
+        return (int) unitSprite.getY();
+    }
 
 
 }

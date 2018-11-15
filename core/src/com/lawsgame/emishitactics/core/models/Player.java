@@ -18,7 +18,7 @@ public class Player {
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.setLeadership(19);
-        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 5, Data.WeaponType.SWORD, false, false, false, false, false);
+        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 8, Data.WeaponType.SWORD, false, false, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
         /*

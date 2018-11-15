@@ -11,13 +11,10 @@ import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
-import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-
-import java.util.Stack;
 
 /**
  *
@@ -136,17 +133,22 @@ public abstract class ActorCommand extends BattleCommand{
                     getInitiator().setMoved(registerAction);
                 }
 
-                getInitiator().addActionPoints(-choice.getCost());
+                initiator.addActionPoints(-choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
 
                 outcome.clean();
                 outcome.resolve();
 
 
-                System.out.println("ACTION REPORT");
-                System.out.println("");
-                System.out.println(scheduler);
+                System.out.println("\n              -----***$$ BEGIN $$***-----");
+                System.out.println("\nACTION REPORT of "+initiator.getName()+" performing "+choice.name());
+                System.out.println();
+                if(!isDecoupled())
+                    System.out.println(scheduler);
+                else{
+                    System.out.println(showTask());
+                }
                 System.out.println(outcome);
-
+                System.out.println("\n              ------***$$ END $$***------\n");
             }
 
             return true;
@@ -175,7 +177,7 @@ public abstract class ActorCommand extends BattleCommand{
                 else
                     getInitiator().setMoved(false);
 
-                getInitiator().addActionPoints(choice.getCost());
+                initiator.addActionPoints(choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
             }
 
             return true;
@@ -212,22 +214,34 @@ public abstract class ActorCommand extends BattleCommand{
 
     // called to checked initiator requirements AND that the actor DOES stand on the tile {rowActor, colActor}
     public  final boolean isInitiatorValid(){
-        return isInitiatorValid(initiator) && bfr.getModel().getUnit(rowActor, colActor) == initiator;
+        return isInitiatorValid(rowActor, colActor, initiator) && bfr.getModel().getUnit(rowActor, colActor) == initiator;
     }
 
     /**
      * intrinsec requirements checking
      */
-    public boolean isInitiatorValid(IUnit initiator){
+    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator){
+
+        System.out.println(              "initiator : "+initiator);
+        System.out.println("            deployed ? "+bfr.getModel().isUnitDeployed(initiator));
+
         boolean valid = false;
         if(bfr.getModel().isUnitDeployed(initiator)){
+
+
+
             if(!initiator.isOutOfAction()) {
-                if (free || choice.getCost() <= initiator.getActionPoints()) {
+                if (free || choice.getCost(rowActor, colActor, initiator, bfr.getModel()) <= initiator.getCurrentActionPoints()) {
+
+                    System.out.println("OK");
+
                     if (choice.isActedBased()) {
                         valid = (free || !initiator.hasActed()) && !initiator.isDisabled();
                     } else {
                         valid = (free || !initiator.hasMoved()) && !initiator.isCrippled();
                     }
+
+                    System.out.println("valid ? "+valid);
                 }
             }
         }

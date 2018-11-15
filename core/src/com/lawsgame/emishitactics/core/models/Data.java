@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -20,7 +21,7 @@ public class Data {
     public static final int HEAL_BASE_POWER = 3;
     public static final float MAX_UNITS_UNDER_WARLORD = 6; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 5; // including the war chief himself / herself
-    public static final int MAX_ACTION_POINTS = 100;
+    public static final int AP_REGEN = 3;
     public static final int DEX_FACTOR_ATT_ACC = 3;
     public static final int DEX_FACTOR_AVO = 4;
     public static final int HIT_RATE_BACK_ACC_BONUS = 20;
@@ -34,6 +35,7 @@ public class Data {
     public static final int WC_CHARISMA_BONUS_ATT_ACC = 3;
     public static final int SQUAD_SIZE_EXCEEDANCE_CHA_MALUS = 3;
     public static final int BRAVERY_MORAL_RECOVERY_RATE = 3;
+    public static final float CHANCE_OF_COLLAPSING = 1f; //over 1
 
 
     // RENDER parameters
@@ -77,10 +79,10 @@ public class Data {
     }
 
     public enum BannerBonus {
-        STRENGTH    (1,     new float[]{2, 4, 6},       BBMode.OFFENSIVE),
+        STRENGTH    (1,     new float[]{1, 3, 5},       BBMode.OFFENSIVE),
         MORAL_SHIELD(0.1f,  new float[]{1, 2, 3, 4, 5}, BBMode.DEFENSIVE),
         LOOT_RATE   (1,     new float[]{1, 2, 3, 4, 5}, BBMode.ALL),
-        AP_COST     (1,     new float[]{3, 5},          BBMode.OFFENSIVE),
+        AP_COST     (1,     new float[]{3, 6},          BBMode.OFFENSIVE),
         RANGE       (1,     new float[]{6},             BBMode.ALL);
 
         private float baseValue;
@@ -244,15 +246,15 @@ public class Data {
 
         MOVE                (0, 0, true, false, 0, 0, false, new int[][]{{0, 0}}),
         WALK                (0, 0, true, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
-        ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
+        ATTACK              (3, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
         SWITCH_POSITION     (0, 0, true, false, 1, 1, false, new int[][]{{0, 0}}),
         PUSH                (0, 0, false, true, 1, 1, false, new int[][]{{0, 0}}),
         SWITCH_WEAPON       (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}}),
         CHOOSE_ORIENTATION  (0, 0, false, true, 0, 0, true, new int[][]{{0, 0}}),
-        HEAL                (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        GUARD               (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
-        STEAL               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        BUILD               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        HEAL                (3, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        GUARD               (3, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
+        STEAL               (3, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        BUILD               (5, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
         END_TURN            (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
@@ -295,7 +297,7 @@ public class Data {
             this(cost, experience, undoable, actedBased, -1, -1, rangedBasedType, endTurnActionOnly, impactArea);
         }
 
-        public int getCost() {
+        public int getCost(int rowActor, int colActor, IUnit actor, Battlefield battlefield) {
             return cost;
         }
 
@@ -470,24 +472,24 @@ public class Data {
     }
 
     public enum TileType {
-        VILLAGE(        "village", 204, 143, 37,                    true, true, true, true, true,         5, 0, 1, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.VILLAGE),
-        SANCTUARY(      "sanctuary", 228, 56, 56,                   true, true, true, true, true,         5, 0, 1, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.SANCTUARY),
-        STOCKADE(       "stockade", 204, 112, 37,                   true, true, false, true, true,        5, 0, 2, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.STOCKADE),
-        CASTLE(         "castle", 204, 73 ,37 ,                     true, true, false, true, true,        5, 0, 3, 20, 0, false,    TileSpriteSetId.PLAIN, TileSpriteSetId.CASTLE),
-        ANCIENT_SITE(   "ancient site", 38 ,67, 47,                 true, true, true, true, true,         0, 1, 0, 0, 0, true,      TileSpriteSetId.PLAIN, TileSpriteSetId.ANCIENT_SITE),
-        RUINS(          "ruins", 152, 152, 152,                     true, false, false, true, true,       0, 0, 1, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.RUINS),
-        MOUNTAINS(      "mountain", 101, 91, 16,                    false, false, false, false, true,     0, 0, 3, 10, 0, false,    TileSpriteSetId.MOUNTAINS, null),
-        FOREST(         "deep forest", 5, 96, 34,                   false, false, false, false, true,     0, 0, 1, 30, 0, false,    TileSpriteSetId.PLAIN, TileSpriteSetId.FOREST),
-        OCEAN(          "deep waters", 25, 157, 197,                false, false, false, false,false,     0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, null),
-        SHALLOWS(       "shallows", 30, 211, 227,                   false, false, false, false, true,     0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, null),
-        HILLS(          "hill", 146, 134, 40,                       false, false, false, true, true,      0, 1, 0, 0, 0, true,      TileSpriteSetId.HILLS, null),
-        WOODS(          "woods", 10, 158, 57,                       false, false, false, true, true,      0, 0, 0, 15, 0, false,    TileSpriteSetId.PLAIN, TileSpriteSetId.WOODS),
-        SWAMP(          "swamp", 112, 155, 80,                      false, false, false, true, true,      0, 0, 0, 0, -15, false,   TileSpriteSetId.SWAMP, null),
-        PLAIN(          "plain", 17, 215, 80,                       false, false, false, true, true,      0, 0, 0, 0, 0, false,     TileSpriteSetId.PLAIN, null),
-        BRIDGE(         "wooden bridge", 85, 96, 134,               false, false, false, true, true,      0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BRIDGE),
-        BROKEN_BRIDGE(  "broken wooden bridge", 95, 101, 124,       false, false, false, false, false,    0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BROKEN_BRIDGE),
-        WATCH_TOWER(    "future bridge", 193, 26, 137,              true, true, false, true, true,        3, 0, 1, 0, 0, true,      TileSpriteSetId.PLAIN, TileSpriteSetId.WATCH_TOWER),
-        TRAP(           "trap", 99, 26, 137,                        true, true, false, true, true,        3, 0, 1, 0, 0, true,      TileSpriteSetId.TRAP, null);
+        VILLAGE(        "village", 204, 143, 37,                    true, true, true, true,         5, 0, 1, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.VILLAGE),
+        SANCTUARY(      "sanctuary", 228, 56, 56,                   true, true, true, true,         5, 0, 1, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.SANCTUARY),
+        STOCKADE(       "stockade", 204, 112, 37,                   true, true, true, true,        5, 0, 2, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.STOCKADE),
+        CASTLE(         "castle", 204, 73 ,37 ,                     true, true, true, true,        5, 0, 3, 20, 0, false,    TileSpriteSetId.PLAIN, TileSpriteSetId.CASTLE),
+        ANCIENT_SITE(   "ancient site", 38 ,67, 47,                 true, true, true, true,         0, 1, 0, 0, 0, true,      TileSpriteSetId.PLAIN, TileSpriteSetId.ANCIENT_SITE),
+        RUINS(          "ruins", 152, 152, 152,                     true, false, true, true,       0, 0, 1, 0, 0, false,     TileSpriteSetId.PLAIN, TileSpriteSetId.RUINS),
+        MOUNTAINS(      "mountain", 101, 91, 16,                    false, false, false, true,     0, 0, 3, 10, 0, false,    TileSpriteSetId.MOUNTAINS, null),
+        FOREST(         "deep forest", 5, 96, 34,                   false, false, false, true,     0, 0, 1, 30, 0, false,    TileSpriteSetId.PLAIN, TileSpriteSetId.FOREST),
+        OCEAN(          "deep waters", 25, 157, 197,                false, false, false,false,     0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, null),
+        SHALLOWS(       "shallows", 30, 211, 227,                   false, false, false, true,     0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, null),
+        HILLS(          "hill", 146, 134, 40,                       false, false, true, true,      0, 1, 0, 0, 0, true,      TileSpriteSetId.HILLS, null),
+        WOODS(          "woods", 10, 158, 57,                       false, false, true, true,      0, 0, 0, 15, 0, false,    TileSpriteSetId.PLAIN, TileSpriteSetId.WOODS),
+        SWAMP(          "swamp", 112, 155, 80,                      false, false, true, true,      0, 0, 0, 0, -15, false,   TileSpriteSetId.SWAMP, null),
+        PLAIN(          "plain", 17, 215, 80,                       false, false, true, true,      0, 0, 0, 0, 0, false,     TileSpriteSetId.PLAIN, null),
+        BRIDGE(         "wooden bridge", 85, 96, 134,               false, false, true, true,      0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BRIDGE),
+        BROKEN_BRIDGE(  "broken wooden bridge", 95, 101, 124,       false, false, false, false,    0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BROKEN_BRIDGE),
+        WATCH_TOWER(    "future bridge", 193, 26, 137,              true, true, true, true,        3, 0, 1, 0, 0, true,      TileSpriteSetId.PLAIN, TileSpriteSetId.WATCH_TOWER),
+        TRAP(           "trap", 99, 26, 137,                        true, true, true, true,        3, 0, 1, 0, 0, true,      TileSpriteSetId.TRAP, null);
 
         private String name;
 
@@ -496,8 +498,7 @@ public class Data {
         private int b;
 
         private boolean urbanArea;          // the unit standing on cannot be backstab
-        private boolean plunderable;        // can be turn into ruins
-        private boolean lootable;           // possess a valuable element
+        private boolean plunderable;        // can be turn into ruins if destructible
         private boolean reachable;          // can be traversable by standard unit
         private boolean reachableForPathFinder;
 
@@ -512,7 +513,7 @@ public class Data {
         private TileSpriteSetId upperPart;
 
         TileType(String name, int r, int g, int b,
-                 boolean urbanArea, boolean plunderable, boolean lootable, boolean reachable, boolean reachableForPathFinder,
+                 boolean urbanArea, boolean plunderable, boolean reachable, boolean reachableForPathFinder,
                  int healPower, int attackMightBonus, int defenseBonus, int avoidBonus, int attackAccBonus, boolean rangeBonus,
                  TileSpriteSetId lowerPart, TileSpriteSetId upperPart) {
             this.name = name;
@@ -521,7 +522,6 @@ public class Data {
             this.b = b;
             this.urbanArea = urbanArea;
             this.plunderable = plunderable;
-            this.lootable = lootable;
             this.reachable = reachable;
             this.reachableForPathFinder = reachableForPathFinder;
             this.healPower = healPower;
@@ -559,11 +559,7 @@ public class Data {
         }
 
         public boolean isPlunderable() {
-            return plunderable;
-        }
-
-        public boolean isLootable() {
-            return lootable;
+            return isDestructible() && plunderable;
         }
 
         public boolean isReachable(boolean pathfinder) {
@@ -594,6 +590,32 @@ public class Data {
 
         public TileSpriteSetId getUpperPart() {
             return upperPart;
+        }
+
+        public boolean isDestructible(){
+            return this != this.getDamagedType();
+        }
+
+        public TileType getDamagedType(){
+            TileType damagedType = null;
+            switch (this){
+
+                case VILLAGE:
+                case SANCTUARY:
+                case STOCKADE:
+                case CASTLE:
+                case WATCH_TOWER:
+                case ANCIENT_SITE:
+                    damagedType = RUINS;
+                    break;
+                case BRIDGE:
+                    damagedType = BROKEN_BRIDGE;
+                    break;
+            }
+
+            if(damagedType == null)
+                damagedType = this;
+            return damagedType;
         }
 
     }

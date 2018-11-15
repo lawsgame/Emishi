@@ -34,12 +34,7 @@ public class ReinforcementEvent extends BattleCommand {
 
             @Override
             public boolean isTriggered(Object data) {
-                if(data instanceof Notification.BeginArmyTurn){
-                    if(bfr.getModel().getCurrentArmy() == currentArmy && turn == bfr.getModel().getTurn()){
-                        return true;
-                    }
-                }
-                return false;
+                return data instanceof Notification.BeginArmyTurn && bfr.getModel().getCurrentArmy() == currentArmy && turn <= bfr.getModel().getTurn();
             }
         };
 
@@ -72,31 +67,33 @@ public class ReinforcementEvent extends BattleCommand {
             thread.addQuery(bfr.getModel(), new Notification.Walk(unit, paths.get(i), true));
             deployTask.addThread(thread);
         }
+
         scheduleRenderTask(deployTask);
+        handleEvents(null, -1,-1);
     }
 
     @Override
-    protected void unexecute() {
-
-    }
+    protected void unexecute() { }
 
     @Override
     public boolean isApplicable() {
         paths.clear();
         Array<int[]> path;
         for(int i = 0; i < deploymentPositions.size; i++){
-            System.out.println(i+" : "+reinforcements.get(i).getName());
+
             // check unit requirements
             if(!bfr.getModel().isUnitDeployable(reinforcements.get(i))){
-                System.out.println("    > undeployable");
                 return false;
+            }
 
+            // check tile requirements
+            if(bfr.getModel().isTileOccupied(deploymentPositions.get(i)[0], deploymentPositions.get(i)[1])){
+                return false;
             }
 
             // deployment tile should be different for each soldier
             for (int j = 0; j < deploymentPositions.size; j++) {
                 if (deploymentPositions.get(j)[0] == deploymentPositions.get(i)[0] && deploymentPositions.get(j)[1] == deploymentPositions.get(i)[0]) {
-                    System.out.println("    > same tile for deployment");
                     return false;
                 }
             }
@@ -110,7 +107,6 @@ public class ReinforcementEvent extends BattleCommand {
                     reinforcements.get(i).has(Data.Ability.PATHFINDER),
                     reinforcements.get(i).getArmy().getAffiliation());
             if(path.size == 0){
-                System.out.println("    > path invalid");
                 return false;
             }else{
                 paths.add(path);
@@ -124,6 +120,15 @@ public class ReinforcementEvent extends BattleCommand {
         return false;
     }
 
+    /**
+     * allow to add one more unit to deploy.
+     *
+     * @param unit : any unit not yet deployed
+     * @param entryRow : row of the tile where the unit begins to appear
+     * @param entryCol : col of the tile where the unit begins to appear
+     * @param deploymentRow : reachable tile row where the unit stand at the end of his move
+     * @param deploymentCol : reachable tile col where the unit stand at the end of his move
+     */
     public void addStiffeners(IUnit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){
         reinforcements.add(unit);
         entryPoints.add(new int[]{entryRow, entryCol});

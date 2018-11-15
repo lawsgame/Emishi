@@ -59,9 +59,6 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.camera.setToOrtho(false, portWidth, gamePortHeight);
         this.camera.update();
 
-
-        //--***$$$ OLD MODEL $$$***----
-
         this.vTarget = new Vector(0,0);
         this.vSpeedFactor = new Vector(0,0);
         this.dl = new Vector(0,0);
@@ -106,7 +103,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         if(!isCameraMoving()){
             cameraMovingToTarget = true;
 
-            //addExpGained xTarget & yTarget, addExpGained change it if too clase to the camera frame borders
+            //set xTarget & yTarget, adapt it if too clase to the camera frame borders
             vTarget.x = xTarget;
             vTarget.y = yTarget;
             if(0 > xTarget - getPortWidth()/2)          vTarget.x = getPortWidth()/2f;
@@ -127,15 +124,15 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         }
     }
 
-    public void move(VectorialFunction dp, Function speed, float duration){
+    public void move(VectorialFunction curve, Function speed, float duration){
         this.cameraMovingToTarget = false;
         this.cameraMoving = true;
         this.time = 0;
         this.duration = duration;
-        this.dp = dp;
+        this.dp = curve;
         this.paramSpeed = speed;
 
-        dp.setTZero(speed.getValue(camera.position.x), speed.getValue(camera.position.y));
+        this.dp.setTZero(speed.getValue(camera.position.x), speed.getValue(camera.position.y));
     }
 
 

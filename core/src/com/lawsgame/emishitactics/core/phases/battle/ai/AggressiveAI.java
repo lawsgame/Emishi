@@ -29,6 +29,8 @@ public class AggressiveAI extends PassiveAI {
             WalkCommand walkCommand = new WalkCommand(bfr, scheduler, playerInventory);
             EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory);
 
+            System.out.println("\n____________________________________________________________________");
+            System.out.println("      > AggressiveAI.setCommandBundle() with ACTOR : "+actor.getName());
 
             // foe at range without moving
             int[] attackTarget;
@@ -39,16 +41,16 @@ public class AggressiveAI extends PassiveAI {
                 if (attackTargetsAtRange.size > 0) {
                     attackTarget = attackTargetsAtRange.random();
                     attackPerformed = checkApplyAndStore(attackCommand,  attackTarget[0], attackTarget[1], bundle);
+                    System.out.println("                    attack performed without moving");
+
                 }
             }
-
-            System.out.println("ACTOR : "+actor.getName());
 
             //seek for foes
             walkCommand.setInitiator(rowEndTile, colEndTile);
             if(!attackPerformed && walkCommand.isInitiatorValid()){
 
-                System.out.println("walkCommand initiator valid ? : "+walkCommand.isInitiatorValid());
+                System.out.println("            walkCommand initiator valid ? : "+walkCommand.isInitiatorValid());
 
                 int[] moveTarget;
                 Array<int[]> moveTargetsAtRange = walkCommand.getTargetsAtRange();
@@ -66,12 +68,12 @@ public class AggressiveAI extends PassiveAI {
                             // target found
                             attackTarget = attackTargetsAtRange.random();
 
-                            System.out.println("    interesting MOVE TILE: " + moveTarget[0] + " " + moveTarget[1]);
-                            System.out.println("        1) actor valid ? : "+walkCommand.isInitiatorValid(actor));
-                            System.out.println("        2) target valid ? : "+walkCommand.isTargetValid(actor, actorPos[0], actorPos[1], moveTarget[0], moveTarget[1]));
-                            System.out.println("        TARGET TILE: " + attackTarget[0] + " " + attackTarget[1]);
-                            System.out.println("            1) actor valid ? : "+attackCommand.isInitiatorValid(actor));
-                            System.out.println("            2) target valid ? : "+attackCommand.isTargetValid(actor, moveTarget[0], moveTarget[1], attackTarget[0], attackTarget[1]));
+                            System.out.println("                interesting MOVE TILE: " + moveTarget[0] + " " + moveTarget[1]);
+                            System.out.println("                    1) actor valid ? : "+walkCommand.isInitiatorValid(actorPos[0], actorPos[1], actor));
+                            System.out.println("                    2) target valid ? : "+walkCommand.isTargetValid(actor, actorPos[0], actorPos[1], moveTarget[0], moveTarget[1]));
+                            System.out.println("                    TARGET TILE: " + attackTarget[0] + " " + attackTarget[1]);
+                            System.out.println("                        1) actor valid ? : "+attackCommand.isInitiatorValid(actorPos[0], actorPos[1], actor));
+                            System.out.println("                        2) target valid ? : "+attackCommand.isTargetValid(actor, moveTarget[0], moveTarget[1], attackTarget[0], attackTarget[1]));
 
                             // apply
                             if (checkApplyAndStore(walkCommand, moveTarget[0], moveTarget[1], bundle)) {
@@ -92,6 +94,7 @@ public class AggressiveAI extends PassiveAI {
             checkApplyAndStore(endUnitTurnCommand, rowEndTile, colEndTile, bundle);
 
 
+            System.out.println("\n         > AggresiveAI.setCommandBundle() : result:");
             System.out.println(bundle.toString());
         }
     }

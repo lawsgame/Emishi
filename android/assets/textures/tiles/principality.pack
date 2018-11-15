@@ -1,7 +1,7 @@
 
 principality.png
 format: RGBA8888
-filter: Linear,Linear
+filter: Nearest,Nearest
 repeat: none
 hills
   rotate: false
@@ -73,58 +73,65 @@ plain
   orig: 128, 128
   offset: 0, 0
   index: 0
-sanctuary
+ruins
   rotate: false
   xy: 256, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 0
-stockade
+sanctuary
   rotate: false
   xy: 384, 256
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 0
-swamp
+stockade
   rotate: false
   xy: 512, 384
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 0
-undefined
+swamp
   rotate: false
   xy: 384, 128
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 0
-village
+undefined
   rotate: false
   xy: 384, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 0
-watch_tower
+village
   rotate: false
   xy: 512, 256
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 0
-water
+watch_tower
   rotate: false
   xy: 640, 384
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 0
-woods
+water
   rotate: false
   xy: 512, 128
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 0
+woods
+  rotate: false
+  xy: 512, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0

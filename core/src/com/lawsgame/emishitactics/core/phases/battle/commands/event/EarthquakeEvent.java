@@ -1,10 +1,12 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -48,20 +50,33 @@ public class EarthquakeEvent extends BattleCommand {
     @Override
     protected void execute() {
         StandardTask task = new StandardTask();
+        Array<int[]> tilesTurnIntoRuins = new Array<int[]>();
 
+        IUnit victim;
+        Notification.TakeDamage notif;
         Battlefield bf = bfr.getModel();
         for(int r = 0; r < bf.getNbRows(); r++){
             for(int c = 0; c < bf.getNbColumns(); c++){
-                if(bf.isTileExisted(r, c) && bf.getTile(r, c).isFragile()){
+                if(bf.isTileExisted(r, c) && bf.getTile(r, c).collapse()){
 
-                    if(bf.getTile(r, c).getType() == Data.TileType.BRIDGE)
-                        bf.setTile(r, c, Data.TileType.BROKEN_BRIDGE, false);
-                    else
-                        bf.setTile(r, c, Data.TileType.RUINS, false);
+                    tilesTurnIntoRuins.add(new int[]{r, c});
+                    bf.setTile(r, c, bf.getTile(r,c).getType().getDamagedType(), false);
                     task.addThread(new StandardTask.RendererThread(bfr, new Notification.SetTile(r, c, bf.getTile(r, c))));
-                }
 
-                if(bf.isTileOccupied(r, c) && !bf.getUnit(r, c).isOutOfAction()){
+                    if(bf.isTileOccupied(r, c)){
+                        victim = bf.getUnit(r,c);
+                        if(!victim.isOutOfAction()){
+                            notif = victim.takeDamage(3, false, false, 1f);
+                            victim.setCrippled(true, false);
+                            notif.critical = false;
+                            notif.crippled = true;
+                            notif.disabled = false;
+                            notif.backstab = false;
+                            notif.fleeingOrientation = victim.getOrientation().getOpposite();
+                            task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), notif));
+                        }
+                    }
+                }else if(bf.isTileOccupied(r, c) && !bf.getUnit(r, c).isOutOfAction()){
                     task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(bf.getUnit(r, c)), Data.AnimId.WOUNDED));
                 }
             }
@@ -79,9 +94,9 @@ public class EarthquakeEvent extends BattleCommand {
         task.addThread(new StandardTask.DelayThread(earthquakeDuration));
 
         scheduleRenderTask(task);
-        handleEvents(Notification.Earthquake.getInstance(), -1, -1);
+        Notification.OOAReport report = removeOutOfActionUnits();
+        handleEvents(report, tilesTurnIntoRuins);
 
-        System.out.println(scheduler);
     }
 
     @Override

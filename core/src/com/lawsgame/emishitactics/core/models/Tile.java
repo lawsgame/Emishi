@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -35,7 +36,11 @@ public class Tile extends Model{
     }
 
     public boolean isFragile() {
-        return fragile;
+        return type.isDestructible() && fragile;
+    }
+
+    public boolean collapse(){
+        return isFragile() && MathUtils.random() <= Data.CHANCE_OF_COLLAPSING;
     }
 
     public void setFragile(boolean fragile) {

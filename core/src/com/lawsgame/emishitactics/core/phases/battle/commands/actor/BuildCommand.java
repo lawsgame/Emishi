@@ -36,8 +36,8 @@ public class BuildCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(IUnit initiator) {
-        return super.isInitiatorValid(initiator) && initiator.has(Ability.BUILD);
+    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator) {
+        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.has(Ability.BUILD);
     }
 
     @Override

@@ -34,13 +34,7 @@ public class EndArmyTurnBIS extends BattleInteractionState implements Observer {
     public void getNotification(Observable sender, Object data) {
         if(sender instanceof BattleCommand && sender == data){
             endArmyTurnCommand.detach(this);
-
-            //System.out.println(bim.battlefield.getCurrentArmy().toShortString());
-
             bim.battlefield.nextArmy();
-
-            //System.out.println(bim.battlefield.getCurrentArmy().toShortString());
-
             if(bim.battlefield.getCurrentArmy().isPlayerControlled()){
                 bim.replace(new SelectActorBIS(bim, true));
             }else {

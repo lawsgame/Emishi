@@ -138,6 +138,7 @@ public class Unit extends IUnit{
 
         this.currentHitPoints = getAppHitpoints();
         resetCurrentMoral();
+        resetActionPoints();
     }
 
     public Unit(String name){
@@ -986,30 +987,28 @@ public class Unit extends IUnit{
 
     @Override
     public void setActionPoints(int ap) {
-        this.actionPoints = ap % Data.MAX_ACTION_POINTS;
+        this.actionPoints = (ap > 0) ? ap : 0;
+    }
+
+    @Override
+    public void resetActionPoints() {
+        this.actionPoints = getAppSkill();
     }
 
     @Override
     public void addActionPoints(int points) {
         this.actionPoints += points;
-        if(actionPoints > Data.MAX_ACTION_POINTS) actionPoints = Data.MAX_ACTION_POINTS;
-        if(actionPoints < 0 ) actionPoints = 0;
+        if(actionPoints < 0 )
+            actionPoints = 0;
+
     }
 
     @Override
-    public int getActionPoints() {
+    public int getCurrentActionPoints() {
         return this.actionPoints;
     }
 
-    @Override
-    public int getAppAPRecoveryRate() {
-        return getAppSkill();
-    }
 
-    @Override
-    public int getCurrentAPRecoveryRate(int rowUnit, int colUnit, Battlefield battlefield) {
-        return getAppSkill();
-    }
 
     @Override
     public boolean isMobilized() {
@@ -1106,7 +1105,7 @@ public class Unit extends IUnit{
     @Override
     public int getChiefCharisma() {
         int chiefCharisma = 0;
-        if(isMobilized()){
+        if(isMobilized() && !army.getWarchief(this).isOutOfAction()){
             chiefCharisma = army.getWarchief(this).getAppCharisma() - Data.SQUAD_SIZE_EXCEEDANCE_CHA_MALUS * getArmy().getSquadExceedingCapacity(this);
             if(chiefCharisma < 0 )
                 chiefCharisma = 0;

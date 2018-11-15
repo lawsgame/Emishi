@@ -6,16 +6,6 @@ import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
 
-    public static final class Earthquake{
-        private static Earthquake earthquakeNotification;
-
-        public static Earthquake getInstance(){
-            if(earthquakeNotification == null)
-                earthquakeNotification = new Earthquake();
-            return earthquakeNotification;
-        }
-    }
-
     public static class StepOn {
         public final IUnit walker;
         public int rowTile;

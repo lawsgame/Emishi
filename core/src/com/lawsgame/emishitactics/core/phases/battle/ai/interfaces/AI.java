@@ -11,6 +11,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.LinkedList;
@@ -60,7 +61,7 @@ public abstract class AI extends Observable implements Runnable {
             while (!army.isDone()) {
                 actorPos = nextUnit(army);
 
-                IUnit selectedUnit = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
+                //IUnit selectedUnit = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
 
                 bundle = new CommandBundle();
                 setCommandBundle(actorPos, bundle);
@@ -68,8 +69,6 @@ public abstract class AI extends Observable implements Runnable {
                 if (bf.getSolver().isBattleOver()) {
                     break;
                 }
-
-                System.out.println(selectedUnit+" => is done ? : "+selectedUnit.isDone()+" or dead ? "+selectedUnit.isOutOfAction()+"");
             }
         }
 
@@ -89,8 +88,9 @@ public abstract class AI extends Observable implements Runnable {
     protected boolean checkApplyAndStore(final ActorCommand command, int rowTarget, int colTarget, final CommandBundle bundle){
         command.setTarget(rowTarget, colTarget);
         command.setDecoupled(true);
+        ActionInfoPanel panel = app.getPanel(command);
         if(command.apply()){
-            bundle.offer(command, app.getPanel(command));
+            bundle.offer(command, panel);
             return true;
         }
         return false;

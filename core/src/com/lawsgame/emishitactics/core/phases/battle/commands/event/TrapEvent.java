@@ -65,6 +65,7 @@ public class TrapEvent extends BattleCommand{
         IUnit victim = bfr.getModel().getUnit(row, col);
         TakeDamage takeDamage = victim.takeDamage(damage, false, true, 1f);
         takeDamage.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
+        victim.setCrippled(true , false);
 
         StandardTask task = new StandardTask();
         task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), takeDamage));

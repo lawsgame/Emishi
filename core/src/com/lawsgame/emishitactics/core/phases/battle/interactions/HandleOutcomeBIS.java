@@ -58,6 +58,15 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     @Override
     public void init() {
         System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName());
+        System.out.println(outcome);
+
+        /*
+         * BUG HANDLE OUTCOME:
+         * handle outcome has been implemented for handling player interaction first
+         * Not to handle outcome of AI-Driven interaction. Therefore, if a unit yet alive at the end of an action of the currently displyad outcome.
+         * An error can arive since if the unit dies later during the AIs turn and the action resulting in this death has already been applied to the model.
+         * Nasty bug!!
+         */
 
         super.init();
         if(outcome.isHandled()){
@@ -67,8 +76,11 @@ public class HandleOutcomeBIS extends BattleInteractionState{
             }
         }else {
             int[] expLvls;
-            int[] receiverPos;
             int experience;
+            float xReceiverBUR;
+            float yReceiverBUR;
+            int rowReceiver;
+            int colReceiver;
             while (!outcome.isHandled()) {
 
                 if(!outcome.isExpHandled()){
@@ -77,14 +89,18 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                     ActorCommand.ExperiencePointsHolder holder = outcome.expHolders.peek();
                     if(holder.hasNext()){
                         expLvls = holder.next();
-                        receiverPos = bim.battlefield.getUnitPos(holder.receiver);
                         experience = expLvls[expLvls.length - 1];
+                        xReceiverBUR = bim.bfr.getUnitRenderer(holder.receiver).getCenterX();
+                        yReceiverBUR = bim.bfr.getUnitRenderer(holder.receiver).getCenterY();
+                        rowReceiver = bim.bfr.getRow(xReceiverBUR, yReceiverBUR);
+                        colReceiver = bim.bfr.getCol(xReceiverBUR, yReceiverBUR);
 
-                        System.out.println("HandleOutcomeBIS : current receiver : "+holder.receiver+" and its pos: "+receiverPos[0]+" "+receiverPos[1]);
+                        //A TESTER!!!!
+
 
                         HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
-                        experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, receiverPos[0], receiverPos[1]), 0f));
-                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, experience), 0f));
+                        experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, rowReceiver, colReceiver), 0f));
+                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(rowReceiver, colReceiver, holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, experience), 0f));
                         tasks.add(experienceTask);
 
                         if(expLvls.length > 1){
@@ -122,9 +138,19 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     }
 
     private void proceed(){
+        /*
+        the order of this if/else if/else is WEIRD
+        indeed, it checks if the BIS is called by AIBIS before checking if the battle is over.
+
+        Here is the explanation :
+        Technically the condition :im.battlefield.getSolver().isBattleOver() can be true way before all the outcomes of the actions
+        taken by the AI are displayed since it check the condition model wise and not render wise.
+        Therefore, it needs to handle the battle is over condition indepedently within the AIBIS class.
+        (cf AIBIS.proceed())
+         */
         if(aiTurn) {
-            bim.rollback();
-        }else if(bim.battlefield.getSolver().isBattleOver()) {
+             bim.rollback();
+         }else if(bim.battlefield.getSolver().isBattleOver()) {
             bim.replace(new BattleOverBIS(bim));
         }else{
             if(!historic.isEmpty()&& historic.peek().getInitiator() != null) {
@@ -194,12 +220,11 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         private LootPanel lootPanel;
         private int experience;
 
-        public DisplayExperiencePanel(IUnit receiver, BattleInteractionMachine bim, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int experience) {
+        public DisplayExperiencePanel(int rowReceiver, int colReceiver, IUnit receiver, BattleInteractionMachine bim, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int experience) {
             this.bim = bim;
             this.receiver = receiver;
-            int[] receiverPos = bim.battlefield.getUnitPos(receiver);
-            this.rowReceiver = receiverPos[0];
-            this.colReceiver = receiverPos[1];
+            this.rowReceiver= rowReceiver;
+            this.colReceiver = colReceiver;
             this.experiencePanel = experiencePanel;
             this.levelUpPanel = levelUpPanel;
             this.lootPanel = lootPanel;

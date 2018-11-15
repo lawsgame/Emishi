@@ -719,6 +719,7 @@ public class Battlefield extends Model {
         return target;
     }
 
+
     public int[] getUnitPos(IUnit unit){
         for(int r = getNbRows()-1; r > -1 ; r--){
             for(int c = 0; c < getNbColumns(); c++){
@@ -730,20 +731,6 @@ public class Battlefield extends Model {
         return null;
     }
 
-    public Array<IUnit> findUnit(Affiliation a) {
-        Array<IUnit> units = new Array<IUnit>();
-        for(int r = getNbRows()-1; r > -1 ; r--){
-            for(int c = 0; c < getNbColumns(); c++){
-                if(isTileOccupied(r, c)) {
-                    IUnit unit = getUnit(r, c);
-                    if(unit.isMobilized() && unit.getArmy().getAffiliation() == a) {
-                        units.add(unit);
-                    }
-                }
-            }
-        }
-        return units;
-    }
 
 
     /**

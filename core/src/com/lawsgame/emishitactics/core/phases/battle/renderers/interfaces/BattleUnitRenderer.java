@@ -90,6 +90,8 @@ public abstract class BattleUnitRenderer extends Renderer<IUnit> implements Game
     public abstract void setPos(int row, int col);
     public abstract float getCenterX();
     public abstract float getCenterY();
+    public abstract int getCurrentRow();
+    public abstract int getCurrentCol();
     public abstract void setDone(boolean done);
     public abstract void setTargeted(boolean targeted);
     public abstract void setDisabled(boolean disabled);

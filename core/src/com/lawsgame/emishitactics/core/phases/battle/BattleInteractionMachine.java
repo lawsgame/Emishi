@@ -196,8 +196,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         }
     }
 
-    protected void moveCamera(int row, int col, boolean smoothly){
-        gcm.focusOn(bfr.getCenterX(row, col), bfr.getCenterY(row, col) , smoothly);
+    protected void moveCamera(int rowTile, int colTile, boolean smoothly){
+        gcm.focusOn(bfr.getCenterX(rowTile, colTile), bfr.getCenterY(rowTile, colTile) , smoothly);
     }
 
     protected void highlight(int row, int col, boolean bannerShown, boolean selected){
@@ -217,9 +217,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         if(bannerShown && battlefield.isTileOccupied(row, col)) {
             IUnit warchief = battlefield.getUnit(row, col).getWarchief();
             if (warchief != battlefield.getUnit(row, col)) {
-                int[] warchiefPos = battlefield.getUnitPos(warchief);
-                if(warchiefPos != null) {
-                    warchiefBannerCoveredArea.setTiles(warchiefPos[0], warchiefPos[1], 0, warchief.getArmy().getBannerRange(warchief), true);
+                if(bfr.getModel().isUnitDeployed(warchief) && !warchief.isOutOfAction()) {
+                    warchiefBannerCoveredArea.setTiles(bfr.getUnitRenderer(warchief).getCurrentRow(), bfr.getUnitRenderer(warchief).getCurrentCol(), 0, warchief.getArmy().getBannerRange(warchief), true);
                     bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(true);
                 }
             }
