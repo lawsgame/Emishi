@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -22,7 +22,7 @@ public class GuardCommand extends SelfInflitedCommand {
 
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator) {
+    public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
         return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.has(Data.Ability.GUARD);
     }
 
@@ -39,7 +39,7 @@ public class GuardCommand extends SelfInflitedCommand {
         task.addThread(new RendererThread(bfr, area));
         task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.GUARD));
         // animated guarded units as well
-        IUnit guardedUnit;
+        Unit guardedUnit;
         int dist;
         int rangeMin = Data.GUARD_REACTION_RANGE_MIN;
         int rangeMax = Data.GUARD_REACTION_RANGE_MAX;

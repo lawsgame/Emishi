@@ -2,20 +2,29 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 
 public class Notification {
 
+    public static class StateChanged {
+        private  static StateChanged changed = null;
+
+        public static StateChanged getInstance(){
+            if(changed == null)
+                changed = new StateChanged();
+            return changed;
+        }
+    }
+
     public static class StepOn {
-        public final IUnit walker;
+        public final Unit walker;
         public int rowTile;
         public int colTile;
 
-        public StepOn(IUnit walker){
+        public StepOn(Unit walker){
             this.walker = walker;
         }
 
-        public StepOn(int rowTile, int colTile, IUnit walker){
+        public StepOn(int rowTile, int colTile, Unit walker){
             this.walker = walker;
             this.rowTile = rowTile;
             this.colTile = colTile;
@@ -31,11 +40,11 @@ public class Notification {
     }
 
     public static class OOAReport {
-        public final Array<IUnit> OOAUnits;
+        public final Array<Unit> OOAUnits;
         public final Array<int[]> OOACoords;
 
         public OOAReport(){
-            this.OOAUnits = new Array<IUnit>();
+            this.OOAUnits = new Array<Unit>();
             this.OOACoords = new Array<int[]>();
         }
     }
@@ -51,7 +60,7 @@ public class Notification {
     }
 
     public static class TakeDamage {
-        public final IUnit wounded;
+        public final Unit wounded;
         public final boolean ignorePhysicalDmg;
         public final boolean ignoreMoralDmg;
         public final int damageDealt;
@@ -71,7 +80,7 @@ public class Notification {
             UNDAMAGED, DIED
         }
 
-        public TakeDamage(IUnit wounded, boolean ignorePhysicalDmg, boolean ignoreMoralDmg, int damageDealt, int lifeDamageTaken, State state){
+        public TakeDamage(Unit wounded, boolean ignorePhysicalDmg, boolean ignoreMoralDmg, int damageDealt, int lifeDamageTaken, State state){
             this.wounded = wounded;
             this.ignorePhysicalDmg = ignorePhysicalDmg;
             this.ignoreMoralDmg = ignoreMoralDmg;
@@ -163,20 +172,20 @@ public class Notification {
     }
 
     public static class Build extends  SetTile{
-        public IUnit builder;
+        public Unit builder;
 
-        public Build(int row, int col, Tile tile, IUnit builder){
+        public Build(int row, int col, Tile tile, Unit builder){
             super(row, col, tile);
             this.builder = builder;
         }
     }
 
     public static class Walk {
-        public final IUnit unit;
+        public final Unit unit;
         public Array<int[]> path;
         public final boolean reveal;
 
-        public Walk(IUnit unit, Array<int[]> path, boolean reveal){
+        public Walk(Unit unit, Array<int[]> path, boolean reveal){
             this.unit = unit;
             this.path = path;
             this.reveal = reveal;
@@ -186,9 +195,9 @@ public class Notification {
     public static class SetUnit {
         public int row;
         public int col;
-        public IUnit unitModel;
+        public Unit unitModel;
 
-        public SetUnit(int row, int col, IUnit unitModel){
+        public SetUnit(int row, int col, Unit unitModel){
             this.row = row;
             this.col = col;
             this.unitModel = unitModel;

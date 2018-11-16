@@ -1,6 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.models.Data.BannerBonus;
 
@@ -8,11 +8,11 @@ import java.util.HashMap;
 
 public class Banner extends Model  {
 
-    private final IUnit bearer;
+    private final Unit bearer;
     private HashMap<BannerBonus, Integer> bonuses;
     private Data.BBMode mode;
 
-    public Banner(IUnit bearer){
+    public Banner(Unit bearer){
         this.bearer = bearer;
         this.bonuses = new HashMap<BannerBonus, Integer>();
         this.mode = Data.BBMode.OFFENSIVE;

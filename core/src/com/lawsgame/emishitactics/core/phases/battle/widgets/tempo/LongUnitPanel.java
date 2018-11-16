@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 
@@ -43,7 +43,7 @@ public class LongUnitPanel extends UnitPanel {
     }
 
     @Override
-    public void set(IUnit unit) {
+    public void set(Unit unit) {
 
         builder = new StringBuilder("   MAIN\n");
         builder.append("\nName : " + unit.getName());

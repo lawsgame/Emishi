@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -83,7 +83,7 @@ public class WalkCommand extends ActorCommand {
      * @return true if the target buildingType if a valid buildingType to move to.
      */
     @Override
-    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
 
         if(initiator != null) {
@@ -96,7 +96,7 @@ public class WalkCommand extends ActorCommand {
     }
 
     @Override
-    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+    public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
         return bfr.getModel().getMoveArea(row, col, actor);
     }
 

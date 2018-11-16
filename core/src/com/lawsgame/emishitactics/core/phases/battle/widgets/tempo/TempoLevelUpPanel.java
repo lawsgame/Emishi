@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
 
@@ -29,7 +29,7 @@ public class TempoLevelUpPanel extends LevelUpPanel {
     }
 
     @Override
-    public void set(I18NBundle bundle, IUnit luckyGuy, int[] statisticGain) {
+    public void set(I18NBundle bundle, Unit luckyGuy, int[] statisticGain) {
         builder = new StringBuilder();
 
         builder.append("name : "+luckyGuy.getName());

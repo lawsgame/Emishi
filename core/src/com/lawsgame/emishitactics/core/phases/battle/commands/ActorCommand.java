@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -75,8 +75,8 @@ public abstract class ActorCommand extends BattleCommand{
     private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as "registerAction" while being applied nor it costs any OA point
 
 
-    private IUnit initiator;
-    private IUnit target;
+    private Unit initiator;
+    private Unit target;
     protected int rowActor;
     protected int colActor;
     protected int rowTarget;
@@ -220,7 +220,7 @@ public abstract class ActorCommand extends BattleCommand{
     /**
      * intrinsec requirements checking
      */
-    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator){
+    public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator){
 
         System.out.println(              "initiator : "+initiator);
         System.out.println("            deployed ? "+bfr.getModel().isUnitDeployed(initiator));
@@ -269,7 +269,7 @@ public abstract class ActorCommand extends BattleCommand{
     required for testing retaliation availability for the attacked target without copy and paste the code of the
     ActorCommand.isTargetValid() method.
      */
-    public abstract boolean isTargetValid(IUnit actor, int rowActor0, int colActor0, int rowTarget0, int colTarget0);
+    public abstract boolean isTargetValid(Unit actor, int rowActor0, int colActor0, int rowTarget0, int colTarget0);
 
 
     public void highlightTargets(final boolean enable){
@@ -297,7 +297,7 @@ public abstract class ActorCommand extends BattleCommand{
      * @return whether or not ANY TARGET is at range by the initiator performing the given action if one's is standing the buildingType (row, col)
      * while ignoring the initiator's history and the unit other requirements to actually perform this action, namely : weapon/item and ability requirements.
      */
-    public final boolean atActionRange(int row, int col, IUnit actor){
+    public final boolean atActionRange(int row, int col, Unit actor){
         return getTargetsAtRange(row, col, actor).size > 0;
     }
 
@@ -311,7 +311,7 @@ public abstract class ActorCommand extends BattleCommand{
      *
      * return : all tile coords of available targets
      */
-    public abstract Array<int[]> getTargetsAtRange(int row, int col, IUnit actor);
+    public abstract Array<int[]> getTargetsAtRange(int row, int col, Unit actor);
 
     public final Array<int[]> getTargetsAtRange(){
         if(bfr.getModel().isTileOccupied(rowActor, colActor))
@@ -333,7 +333,7 @@ public abstract class ActorCommand extends BattleCommand{
                     actionArea = bfr.getModel().getMoveArea(rowActor, colActor);
                     break;
                 case WEAPON:
-                    IUnit actor = bfr.getModel().getUnit(rowActor, colActor);
+                    Unit actor = bfr.getModel().getUnit(rowActor, colActor);
                     int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, bfr.getModel());
                     int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, bfr.getModel());
                     actionArea = Utils.getEreaFromRange(bfr.getModel(), rowActor, colActor, rangeMin, rangeMax);
@@ -380,7 +380,7 @@ public abstract class ActorCommand extends BattleCommand{
      * @param actor
      * @return the actual target to be acted upon by the actor if he was at (rowA, colA) and targets the tile (rowT, colT)
      */
-    public Array<int[]> getTargetsFromImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0, IUnit actor){
+    public Array<int[]> getTargetsFromImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0, Unit actor){
         Array<int[]> impactArea = getImpactArea(rowActor0, colActor0, rowTarget0, colTarget0);
         Array<int[]> targets = getTargetsAtRange(rowActor0, colActor0, actor);
         return Utils.arrayGetElementsInBothOnly(impactArea, targets);
@@ -394,7 +394,7 @@ public abstract class ActorCommand extends BattleCommand{
 
     //------------------- HELPER METHODS -----------------------------
 
-    protected final boolean isTargetAllyValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired, boolean canMove){
+    protected final boolean isTargetAllyValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired, boolean canMove){
         boolean valid = false;
         if(initiator != null && choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC){
 
@@ -417,7 +417,7 @@ public abstract class ActorCommand extends BattleCommand{
         return valid;
     }
 
-    protected final boolean isEnemyTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
+    protected final boolean isEnemyTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean stealableRequired){
         boolean valid = false;
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC){
 
@@ -439,7 +439,7 @@ public abstract class ActorCommand extends BattleCommand{
         return valid;
     }
 
-    protected final Array<int[]> getAlliesAtRange(int row, int col, IUnit initiator, boolean woundedRequired, boolean canMove){
+    protected final Array<int[]> getAlliesAtRange(int row, int col, Unit initiator, boolean woundedRequired, boolean canMove){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
 
@@ -460,7 +460,7 @@ public abstract class ActorCommand extends BattleCommand{
         return Utils.arrayRemoveClones(targetsAtRange);
     }
 
-    protected final Array<int[]> getFoesAtRange(int row, int col, IUnit initiator, boolean stealableRequired){
+    protected final Array<int[]> getFoesAtRange(int row, int col, Unit initiator, boolean stealableRequired){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
 
@@ -481,7 +481,7 @@ public abstract class ActorCommand extends BattleCommand{
         return Utils.arrayRemoveClones(targetsAtRange);
     }
 
-    protected final Array<int[]> getTargetedAllies(int rowActor, int colActor, int rowTarget, int colTarget, IUnit initiator, boolean woundedRequired, boolean canMove){
+    protected final Array<int[]> getTargetedAllies(int rowActor, int colActor, int rowTarget, int colTarget, Unit initiator, boolean woundedRequired, boolean canMove){
         Array<int[]> targets = getImpactArea(rowActor, colActor, rowTarget, colTarget);
         if(initiator == null){
             targets.clear();
@@ -498,7 +498,7 @@ public abstract class ActorCommand extends BattleCommand{
         }
         return targets;
     }
-    protected final Array<int[]> getTargetedFoes(int rowActor, int colActor, int rowTarget, int colTarget, IUnit initiator, boolean stealableRequired){
+    protected final Array<int[]> getTargetedFoes(int rowActor, int colActor, int rowTarget, int colTarget, Unit initiator, boolean stealableRequired){
         Array<int[]> targets = getImpactArea(rowActor, colActor, rowTarget, colTarget);
         if(initiator == null) {
             targets.clear();
@@ -526,7 +526,7 @@ public abstract class ActorCommand extends BattleCommand{
         return choice;
     }
 
-    public final IUnit getInitiator(){
+    public final Unit getInitiator(){
         return initiator;
     }
 
@@ -538,7 +538,7 @@ public abstract class ActorCommand extends BattleCommand{
         return colActor;
     }
 
-    public final IUnit getTarget(){
+    public final Unit getTarget(){
         return target;
     }
 

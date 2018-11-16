@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
 import com.lawsgame.emishitactics.core.models.Notification.Attack;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
@@ -233,7 +233,7 @@ public class HitCommand extends ActorCommand{
     }
 
 
-    protected void updateOutcome(IUnit receiver, Array<TakeDamage> notifs){
+    protected void updateOutcome(Unit receiver, Array<TakeDamage> notifs){
         int experience = 0;
         int lootRate = getLootRate();
         int dicesResult;
@@ -257,7 +257,7 @@ public class HitCommand extends ActorCommand{
     //------------------------- CHECK METHODS ---------------------------------
 
     @Override
-    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         return isEnemyTargetValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0, false);
     }
 
@@ -269,12 +269,12 @@ public class HitCommand extends ActorCommand{
     private void setDefenders(int rowActor, int colActor, int rowTarget, int colTarget){
         defendersData.clear();
 
-        IUnit target;
+        Unit target;
         Array<int[]> targetsPos = getTargetsFromImpactArea(rowActor, colActor, rowTarget, colTarget, getInitiator());
-        IUnit defender;
+        Unit defender;
         int[] defenderPos;
-        IUnit guardian;
-        Array<IUnit> unavailableGuardians = new Array<IUnit>();
+        Unit guardian;
+        Array<Unit> unavailableGuardians = new Array<Unit>();
 
         //remove units already targeted by the attack to become guardians of other targeted units
         for (int i = 0; i < targetsPos.size; i++) {
@@ -317,12 +317,12 @@ public class HitCommand extends ActorCommand{
     }
 
     @Override
-    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+    public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
         return getFoesAtRange(row, col, actor, false);
     }
 
     @Override
-    public Array<int[]> getTargetsFromImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0, IUnit actor) {
+    public Array<int[]> getTargetsFromImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0, Unit actor) {
         return getTargetedFoes(rowActor0, colActor0, rowTarget0, colTarget0, actor, false);
     }
 
@@ -377,7 +377,7 @@ public class HitCommand extends ActorCommand{
     //------------------------- DEFENDER DATA --------------------------------
 
     public static class DefenderData {
-        public final IUnit attacker;
+        public final Unit attacker;
         public final BattleUnitRenderer targetRenderer;
         public final BattleUnitRenderer defenderRenderer;
         public final Orientation targetInitOrientation;
@@ -392,7 +392,7 @@ public class HitCommand extends ActorCommand{
 
 
         public DefenderData(
-                IUnit attacker,
+                Unit attacker,
                 BattleUnitRenderer targetRenderer,
                 BattleUnitRenderer defenderRenderer,
                 Orientation targetInitOrientation,

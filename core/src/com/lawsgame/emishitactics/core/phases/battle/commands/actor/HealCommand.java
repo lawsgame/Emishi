@@ -5,7 +5,7 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -19,7 +19,7 @@ public class HealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator) {
+    public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
         return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.has(Data.Ability.HEAL);
     }
 
@@ -43,12 +43,12 @@ public class HealCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         return isTargetAllyValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0, true, false);
     }
 
     @Override
-    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+    public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
         return getAlliesAtRange(row, col, actor, true, false);
     }
 

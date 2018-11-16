@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
@@ -57,7 +57,7 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
 
 
 
-    public TempoUnitRenderer(int row, int col, IUnit model) {
+    public TempoUnitRenderer(int row, int col, Unit model) {
         super(model);
         this.unitSprite = new Sprite();
         unitSprite.setX(col);

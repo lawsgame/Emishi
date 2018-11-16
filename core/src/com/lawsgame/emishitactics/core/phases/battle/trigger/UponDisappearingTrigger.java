@@ -1,13 +1,13 @@
 package com.lawsgame.emishitactics.core.phases.battle.trigger;
 
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 public class UponDisappearingTrigger extends Model.Trigger {
 
-    protected IUnit wounded;
+    protected Unit wounded;
 
-    public UponDisappearingTrigger(boolean once, IUnit wounded) {
+    public UponDisappearingTrigger(boolean once, Unit wounded) {
         super(once, true);
         this.wounded = wounded;
     }

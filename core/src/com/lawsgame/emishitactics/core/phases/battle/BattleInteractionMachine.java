@@ -14,7 +14,7 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
@@ -147,7 +147,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     // -------------------- SHARED METHOD -----------------------------
 
     private int rowFocus = -1, colFocus = -1;
-    private IUnit focusUnit = null;
+    private Unit focusUnit = null;
     /**
      * convient method which
      *  - move the camera at the relevant location
@@ -215,7 +215,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         // show warchief positon and his banner covered area
         if(bannerShown && battlefield.isTileOccupied(row, col)) {
-            IUnit warchief = battlefield.getUnit(row, col).getWarchief();
+            Unit warchief = battlefield.getUnit(row, col).getWarchief();
             if (warchief != battlefield.getUnit(row, col)) {
                 if(bfr.getModel().isUnitDeployed(warchief) && !warchief.isOutOfAction()) {
                     warchiefBannerCoveredArea.setTiles(bfr.getUnitRenderer(warchief).getCurrentRow(), bfr.getUnitRenderer(warchief).getCurrentCol(), 0, warchief.getArmy().getBannerRange(warchief), true);
@@ -308,18 +308,18 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     public static class FoeActionArea{
         private Area actionArea;
-        private Array<IUnit> foes;
+        private Array<Unit> foes;
 
         public FoeActionArea(BattlefieldRenderer bfr){
             this.actionArea = new Area(bfr.getModel(), Data.AreaType.FOE_ACTION_AREA);
-            this.foes = new Array<IUnit>();
+            this.foes = new Array<Unit>();
             bfr.addAreaRenderer(this.actionArea);
         }
 
         public void update(int rowFoe, int colFoe){
             Battlefield bf = actionArea.getBattlefield();
             if(bf.isTileOccupied(rowFoe, colFoe)) {
-                IUnit foe  = bf.getUnit(rowFoe, colFoe);
+                Unit foe  = bf.getUnit(rowFoe, colFoe);
                 if (foes.contains(foe, true)) {
 
                     this.foes.removeValue(foe, true);

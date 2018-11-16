@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
 
@@ -36,7 +36,7 @@ public class ShortUnitPanel extends UnitPanel {
     }
 
     @Override
-    public void set(IUnit unit) {
+    public void set(Unit unit) {
         builder = new StringBuilder("");
         builder.append("Name : " + unit.getName());
         builder.append("\nLevel : " + unit.getLevel());

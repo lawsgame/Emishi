@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine.FocusOn;
@@ -155,7 +155,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         }else{
             if(!historic.isEmpty()&& historic.peek().getInitiator() != null) {
 
-                IUnit actor = historic.peek().getInitiator();
+                Unit actor = historic.peek().getInitiator();
                 if(actor.isOutOfAction() || actor.isDone()) {
                         bim.replace(new EndUnitTurnBIS(bim, actor));
                 }else{
@@ -211,7 +211,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
 
     static class DisplayExperiencePanel extends SimpleCommand {
-        private IUnit receiver;
+        private Unit receiver;
         private int rowReceiver;
         private int colReceiver;
         private BattleInteractionMachine bim;
@@ -220,7 +220,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         private LootPanel lootPanel;
         private int experience;
 
-        public DisplayExperiencePanel(int rowReceiver, int colReceiver, IUnit receiver, BattleInteractionMachine bim, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int experience) {
+        public DisplayExperiencePanel(int rowReceiver, int colReceiver, Unit receiver, BattleInteractionMachine bim, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int experience) {
             this.bim = bim;
             this.receiver = receiver;
             this.rowReceiver= rowReceiver;
@@ -244,14 +244,14 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     }
 
     static class DisplayLevelupPanel extends SimpleCommand{
-        private IUnit receiver;
+        private Unit receiver;
         private I18NBundle bundle;
         private ExperiencePanel experiencePanel;
         private LevelUpPanel levelUpPanel;
         private LootPanel lootPanel;
         private int[] statGain;
 
-        public DisplayLevelupPanel(IUnit receiver, I18NBundle bundle, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int[] statGain) {
+        public DisplayLevelupPanel(Unit receiver, I18NBundle bundle, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int[] statGain) {
             this.receiver = receiver;
             this.bundle = bundle;
             this.experiencePanel = experiencePanel;

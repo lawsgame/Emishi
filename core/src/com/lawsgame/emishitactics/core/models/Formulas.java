@@ -2,16 +2,16 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 
 public class Formulas {
 
-    public static int getHitRate(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+    public static int getHitRate(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         int hitrate = getCurrentAttackAccuracy(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield) - getCurrentAvoidance(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield);
         return (hitrate > 0) ? hitrate : 0;
     }
 
-    public static int[] getDealtDamageRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+    public static int[] getDealtDamageRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         int[] dealtdamage = getCurrentAttackMightRange(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield);
         int defense = getCurrentDefense(rowAttacker0, colAttacker0, rowDefender0, colDefender0, attacker, defender, battlefield);
         dealtdamage[0] -= defense;
@@ -38,7 +38,7 @@ public class Formulas {
         return p;
     }
 
-    public static int[] getCurrentAttackMightRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+    public static int[] getCurrentAttackMightRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         int[] attackMight = attacker.getAppAttackMight();
         for(int i =0; i < attackMight.length; i++) {
             attackMight[i] += battlefield.getTile(rowAttacker0, colAttacker0).getType().getAttackMightBonus();
@@ -46,7 +46,7 @@ public class Formulas {
         return attackMight;
     }
 
-    public static int getCurrentAttackAccuracy(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+    public static int getCurrentAttackAccuracy(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
 
         int attackAccuracy = attacker.getAppAttackAccuracy();
         attackAccuracy += battlefield.getTile(rowAttacker0, colAttacker0).getType().getAttackAccBonus();
@@ -56,19 +56,19 @@ public class Formulas {
         return attackAccuracy;
     }
 
-    private static boolean isBackstabAttack(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+    private static boolean isBackstabAttack(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         Data.Orientation attackOr = Utils.getOrientationFromCoords(rowAttacker0, colAttacker0, rowDefender0, colDefender0);
         Data.Orientation defenderOr = defender.getOrientation();
         return attackOr == defenderOr;
     }
 
-    public static int getCurrentDefense(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+    public static int getCurrentDefense(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         int defense = defender.getAppDefense(attacker.getCurrentWeapon().getTemplate().getDamageType());
         defense += battlefield.getTile(rowDefender0, colDefender0).getType().getDefenseBonus();
         return defense;
     }
 
-    public static int getCurrentAvoidance(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, IUnit attacker, IUnit defender, Battlefield battlefield){
+    public static int getCurrentAvoidance(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         int avoidance = defender.getAppAvoidance();
         avoidance += battlefield.getTile(rowDefender0, colDefender0).getType().getAvoidBonus();
         return avoidance;
@@ -83,13 +83,13 @@ public class Formulas {
 
 
     /*
-    public static int getGainedExperienceFoeEachSquadMember(IUnit attacker, Array<IUnit> targetedSquad){
+    public static int getGainedExperienceFoeEachSquadMember(Unit attacker, Array<Unit> targetedSquad){
         int expPerSquadMember = 0;
         if(attacker.isMobilized()) {
 
             // calculate the mean of the squad members' level
             int levelmean = 0;
-            Array<IUnit> victoriousSquad = attacker.getSquad(true);
+            Array<Unit> victoriousSquad = attacker.getSquad(true);
             for (int i = 0; i < victoriousSquad.size; i++) {
                 levelmean = victoriousSquad.get(i).getLevel();
             }
@@ -108,7 +108,7 @@ public class Formulas {
     }
     */
 
-    public static int getLootRate(IUnit attacker){
+    public static int getLootRate(Unit attacker){
         int lootRate = 0;
         if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled())
             lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharisma()/2;
@@ -117,7 +117,7 @@ public class Formulas {
 
 
 
-    public static int getStealRate(int rowRobber, int colRobber, int rowStolen, int colStolen, IUnit stealer, IUnit stolen, Battlefield battlefield){
+    public static int getStealRate(int rowRobber, int colRobber, int rowStolen, int colStolen, Unit stealer, Unit stolen, Battlefield battlefield){
         int stealRate = 0;
         if(stolen.isStealable()) {
             stealRate = 100 + 10 * (stolen.getAppAgility() - stolen.getAppDexterity());
@@ -128,7 +128,7 @@ public class Formulas {
         return stealRate;
     }
 
-    public static int getHealPower(int rowActor, int colActor, int rowTarget, int colTarget, IUnit healer, IUnit patient, Battlefield battlefield) {
+    public static int getHealPower(int rowActor, int colActor, int rowTarget, int colTarget, Unit healer, Unit patient, Battlefield battlefield) {
         return Data.HEAL_BASE_POWER + healer.getLevel()/2;
     }
 }

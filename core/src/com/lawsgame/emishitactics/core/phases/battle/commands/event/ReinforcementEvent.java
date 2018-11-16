@@ -5,7 +5,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -14,7 +14,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class ReinforcementEvent extends BattleCommand {
-    private Array<IUnit> reinforcements;
+    private Array<Unit> reinforcements;
     private Array<int[]> entryPoints;
     private Array<int[]> deploymentPositions;
     private Array<Array<int[]>> paths;
@@ -22,7 +22,7 @@ public class ReinforcementEvent extends BattleCommand {
 
     public ReinforcementEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, scheduler, playerInventory);
-        this.reinforcements = new Array<IUnit>();
+        this.reinforcements = new Array<Unit>();
         this.entryPoints = new Array<int[]>();
         this.deploymentPositions = new Array<int[]>();
         this.paths = new Array<Array<int[]>>();
@@ -47,7 +47,7 @@ public class ReinforcementEvent extends BattleCommand {
     @Override
     protected void execute() {
 
-        IUnit unit;
+        Unit unit;
         StandardTask deployTask = new StandardTask();
         StandardTask.RendererThread thread;
         for(int i = 0; i < reinforcements.size; i++) {
@@ -129,7 +129,7 @@ public class ReinforcementEvent extends BattleCommand {
      * @param deploymentRow : reachable tile row where the unit stand at the end of his move
      * @param deploymentCol : reachable tile col where the unit stand at the end of his move
      */
-    public void addStiffeners(IUnit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){
+    public void addStiffeners(Unit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){
         reinforcements.add(unit);
         entryPoints.add(new int[]{entryRow, entryCol});
         deploymentPositions.add(new int[]{deploymentRow, deploymentCol});

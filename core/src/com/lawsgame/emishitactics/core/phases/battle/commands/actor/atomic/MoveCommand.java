@@ -5,7 +5,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -57,7 +57,7 @@ public class MoveCommand extends SelfInflitedCommand {
     @Override
     protected void unexecute() {
         if(bfr.getModel().isTileOccupied(path.peek()[0], path.peek()[1])){
-            IUnit unit = bfr.getModel().getUnit(path.peek()[0], path.peek()[1]);
+            Unit unit = bfr.getModel().getUnit(path.peek()[0], path.peek()[1]);
             if(unit == getInitiator()) {
                 BattleUnitRenderer walkerRenderer = bfr.getUnitRenderer(getInitiator());
                 bfr.getModel().moveUnit(path.peek()[0], path.peek()[1], rowActor, colActor, false);
@@ -70,7 +70,7 @@ public class MoveCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         return super.isTargetValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0) && path.size > 0 && !getBattlefield().isTileOccupied(path.peek()[0], path.peek()[1]);
     }
 

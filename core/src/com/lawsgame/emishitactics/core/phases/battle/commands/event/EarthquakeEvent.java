@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -52,7 +52,7 @@ public class EarthquakeEvent extends BattleCommand {
         StandardTask task = new StandardTask();
         Array<int[]> tilesTurnIntoRuins = new Array<int[]>();
 
-        IUnit victim;
+        Unit victim;
         Notification.TakeDamage notif;
         Battlefield bf = bfr.getModel();
         for(int r = 0; r < bf.getNbRows(); r++){

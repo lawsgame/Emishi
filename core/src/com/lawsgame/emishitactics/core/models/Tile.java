@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
@@ -71,10 +71,10 @@ public class Tile extends Model{
         }
     }
 
-    public static class RecruitTile extends LootableTile<IUnit>{
+    public static class RecruitTile extends LootableTile<Unit>{
 
 
-        public RecruitTile(TileType type, IUnit loot) {
+        public RecruitTile(TileType type, Unit loot) {
             super(type, loot);
         }
     }

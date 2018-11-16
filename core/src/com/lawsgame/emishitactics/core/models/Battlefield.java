@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.Environment;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 
@@ -31,7 +31,7 @@ import java.util.LinkedList;
 
 public class Battlefield extends Model {
     private Tile[][] tiles;
-    private IUnit[][] units;
+    private Unit[][] units;
     private Array<Area> deploymentAreas;
     private Array<UnitArea> unitAreas;
     private Weather weather;
@@ -45,7 +45,7 @@ public class Battlefield extends Model {
     public Battlefield (int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
         if(nbRows > 0 && nbCols > 0) {
             this.tiles = new Tile[nbRows][nbCols];
-            this.units = new IUnit[nbRows][nbCols];
+            this.units = new Unit[nbRows][nbCols];
         }
         this.deploymentAreas = new Array<Area>();
         this.deploymentAreas.add(new Area(this, Data.AreaType.DEPLOYMENT_AREA));
@@ -259,7 +259,7 @@ public class Battlefield extends Model {
         }
     }
 
-    public Array<UnitArea> removeUnitAreas(IUnit actor, AreaType type, boolean notifyObservers){
+    public Array<UnitArea> removeUnitAreas(Unit actor, AreaType type, boolean notifyObservers){
         Array<UnitArea> removedAreas = new Array<UnitArea>();
         for(int i = 0; i < unitAreas.size; i++){
             if(unitAreas.get(i).getActor() == actor && unitAreas.get(i).getType() == type){
@@ -273,7 +273,7 @@ public class Battlefield extends Model {
         return removedAreas;
     }
 
-    public Array<UnitArea> removeAllAttachedArea(IUnit actor, boolean moved, boolean notifyObservers){
+    public Array<UnitArea> removeAllAttachedArea(Unit actor, boolean moved, boolean notifyObservers){
         Array<UnitArea> removedAreas = new Array<UnitArea>();
         for(int i = 0; i < unitAreas.size; i++){
             if(unitAreas.get(i).getActor() == actor && (!moved || unitAreas.get(i).isRemovedUponMovingUnit())){
@@ -305,7 +305,7 @@ public class Battlefield extends Model {
         return unitAreas;
     }
 
-    public boolean isUnitAreaExisted(IUnit actor, AreaType type){
+    public boolean isUnitAreaExisted(Unit actor, AreaType type){
         for(int i = 0; i < unitAreas.size; i++){
             if(unitAreas.get(i).getActor() == actor && unitAreas.get(i).getType() == type){
                 return true;
@@ -323,8 +323,8 @@ public class Battlefield extends Model {
         return false;
     }
 
-    public Array<IUnit> getAvailableGuardian(int row, int col, Affiliation alleageance){
-        Array<IUnit> guardians =  new Array<IUnit>();
+    public Array<Unit> getAvailableGuardian(int row, int col, Affiliation alleageance){
+        Array<Unit> guardians =  new Array<Unit>();
         for (int k = 0; k < unitAreas.size; k++) {
             if (unitAreas.get(k).getType() == AreaType.GUARD_AREA
                     && unitAreas.get(k).getActor() != null
@@ -336,9 +336,9 @@ public class Battlefield extends Model {
         return guardians;
     }
 
-    public IUnit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance){
-        Array<IUnit> guardians = getAvailableGuardian(row, col , alleageance);
-        IUnit electedGuardian = null;
+    public Unit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance){
+        Array<Unit> guardians = getAvailableGuardian(row, col , alleageance);
+        Unit electedGuardian = null;
         if(guardians.size > 0) {
             electedGuardian = guardians.get(0);
             for (int i = 1; i < guardians.size; i++) {
@@ -350,8 +350,8 @@ public class Battlefield extends Model {
         return electedGuardian;
     }
 
-    public IUnit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance, Array<IUnit> alreadyAffectedGuardian){
-        Array<IUnit> guardians = getAvailableGuardian(row, col , alleageance);
+    public Unit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance, Array<Unit> alreadyAffectedGuardian){
+        Array<Unit> guardians = getAvailableGuardian(row, col , alleageance);
         for(int i =0; i < guardians.size; i++){
             if(alreadyAffectedGuardian.contains(guardians.get(i), true)){
                guardians.removeIndex(i);
@@ -359,7 +359,7 @@ public class Battlefield extends Model {
             }
         }
 
-        IUnit electedGuardian = null;
+        Unit electedGuardian = null;
         if(guardians.size > 0) {
             electedGuardian = guardians.get(0);
             for (int i = 1; i < guardians.size; i++) {
@@ -445,7 +445,7 @@ public class Battlefield extends Model {
         return isTileExisted(row, col) && units != null && this.units[row][col] != null;
     }
 
-    public boolean isTileOccupied(int row, int col, IUnit ignoredUnit){
+    public boolean isTileOccupied(int row, int col, Unit ignoredUnit){
         return isTileOccupied(row, col) && units[row][col] != ignoredUnit;
     }
 
@@ -453,11 +453,11 @@ public class Battlefield extends Model {
         return isTileReachable(row, col, pathfinder) && !isTileOccupied(row, col);
     }
 
-    public boolean isTileAvailable(int row, int col, boolean pathfinder, IUnit ignoredUnit){
+    public boolean isTileAvailable(int row, int col, boolean pathfinder, Unit ignoredUnit){
         return isTileReachable(row, col, pathfinder) && !isTileOccupied(row, col, ignoredUnit);
     }
 
-    public boolean isTileOccupiedByAnotherSquadMember(int row , int col, IUnit squadMember){
+    public boolean isTileOccupiedByAnotherSquadMember(int row , int col, Unit squadMember){
         return isTileOccupied(row, col, squadMember) && this.units[row][col].sameSquadAs(squadMember);
     }
 
@@ -472,7 +472,7 @@ public class Battlefield extends Model {
      * @param actor :
      * @return true if the tile is occupied by another ally
      */
-    public boolean isTileOccupiedByAlly(int row , int col, IUnit actor){
+    public boolean isTileOccupiedByAlly(int row , int col, Unit actor){
         return isTileOccupied(row, col, actor) && getUnit(row, col).isMobilized() && getUnit(row, col).isAllyWith(actor.getArmy().getAffiliation());
     }
 
@@ -512,7 +512,7 @@ public class Battlefield extends Model {
      * @param unit
      * @param notifyObservers
      */
-    public void deploy(int row, int col, IUnit unit, boolean notifyObservers){
+    public void deploy(int row, int col, Unit unit, boolean notifyObservers){
         if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) && isUnitDeployable(unit)){
 
             this.units[row][col] = unit;
@@ -522,7 +522,7 @@ public class Battlefield extends Model {
         }
     }
 
-    public boolean isUnitDeployable(IUnit unit) {
+    public boolean isUnitDeployable(Unit unit) {
         return unit != null && !isUnitDeployed(unit) && unit.isMobilized();
     }
 
@@ -539,13 +539,13 @@ public class Battlefield extends Model {
      * @param mobilizedTroops
      * @param areaIndex
      */
-    public void randomlyDeploy(Array<IUnit> mobilizedTroops, int areaIndex){
+    public void randomlyDeploy(Array<Unit> mobilizedTroops, int areaIndex){
 
         Array<int[]> deploymentsTile = getDeploymentArea(areaIndex).getTiles();
 
         int[] coords;
         Array<int[]> remainingAvailableTiles = new Array<int[]>();
-        Array<IUnit> remainingUnits = new Array<IUnit>();
+        Array<Unit> remainingUnits = new Array<Unit>();
         for (int i = 0; i < deploymentsTile.size; i++) {
             coords = deploymentsTile.get(i);
             if (coords.length >= 2 && isTileAvailable(coords[0], coords[1], false)) {
@@ -557,7 +557,7 @@ public class Battlefield extends Model {
 
         }
 
-        IUnit unit;
+        Unit unit;
         while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
             coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
             unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
@@ -566,7 +566,7 @@ public class Battlefield extends Model {
     }
 
 
-    public boolean isUnitDeployed(IUnit unit) {
+    public boolean isUnitDeployed(Unit unit) {
         if(unit != null) {
             for (int r = 0; r < getNbRows(); r++) {
                 for (int c = 0; c < getNbRows(); c++) {
@@ -581,8 +581,8 @@ public class Battlefield extends Model {
 
     public void switchUnitPositions(int rowUnit1, int colUnit1, int rowUnit2, int colUnit2){
         if(isTileOccupied(rowUnit1, colUnit1) && isTileOccupied(rowUnit2, colUnit2)){
-            IUnit unit1 = getUnit(rowUnit1, colUnit1);
-            IUnit unit2 = getUnit(rowUnit2, colUnit2);
+            Unit unit1 = getUnit(rowUnit1, colUnit1);
+            Unit unit2 = getUnit(rowUnit2, colUnit2);
             if(isTileReachable(rowUnit1, colUnit1, unit2.has(Data.Ability.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(Data.Ability.PATHFINDER)))){
                 removeAllAttachedArea(unit1,  true,false);
                 removeAllAttachedArea(unit2, true, false);
@@ -596,7 +596,7 @@ public class Battlefield extends Model {
     public void moveUnit(int rowI, int colI, int rowf, int colf, boolean notifyObservers){
 
         if(isTileOccupied(rowI, colI)) {
-            IUnit unit = getUnit(rowI, colI);
+            Unit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(Data.Ability.PATHFINDER))){
                 removeAllAttachedArea(unit,true,  notifyObservers);
                 this.units[rowf][colf] = unit;
@@ -610,7 +610,7 @@ public class Battlefield extends Model {
 
     public boolean isUnitGuarding(int rowUnit, int colUnit){
         if(isTileOccupied(rowUnit, colUnit)){
-            IUnit unit = getUnit(rowUnit, colUnit);
+            Unit unit = getUnit(rowUnit, colUnit);
             if(unit.isMobilized()) {
                 for(int i = 0; i < unitAreas.size; i++){
                     if (unitAreas.get(i).getType() == AreaType.GUARD_AREA
@@ -629,14 +629,14 @@ public class Battlefield extends Model {
 
 
 
-    public IUnit getUnit(int row, int col){
+    public Unit getUnit(int row, int col){
         if(checkIndexes(row, col))
             return this.units[row][col];
         return null;
     }
 
-    public Array<IUnit> getStillActiveUnits(int armyId) {
-        Array<IUnit> activeUnits = new Array<IUnit>();
+    public Array<Unit> getStillActiveUnits(int armyId) {
+        Array<Unit> activeUnits = new Array<Unit>();
         for(int r =0; r<getNbRows();r++){
             for(int c = 0; c<getNbColumns(); c++){
                 if(isTileOccupied(r, c)
@@ -676,8 +676,8 @@ public class Battlefield extends Model {
     }
 
 
-    public IUnit removeUnit(int row, int col, boolean notifyObservers){
-        IUnit unit = this.units[row][col];
+    public Unit removeUnit(int row, int col, boolean notifyObservers){
+        Unit unit = this.units[row][col];
         this.units[row][col] = null;
         removeAllAttachedArea(unit, false, notifyObservers);
         if(notifyObservers)
@@ -695,8 +695,8 @@ public class Battlefield extends Model {
         }
     }
 
-    public Array<IUnit> getOOAUnits() {
-        Array<IUnit> OOAUnits = new Array<IUnit>();
+    public Array<Unit> getOOAUnits() {
+        Array<Unit> OOAUnits = new Array<Unit>();
         for(int r= 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileOccupied(r, c) && getUnit(r, c).isOutOfAction()){
@@ -707,8 +707,8 @@ public class Battlefield extends Model {
         return OOAUnits;
     }
 
-    public IUnit getUnitByName(String name) {
-        IUnit target = null;
+    public Unit getUnitByName(String name) {
+        Unit target = null;
         for(int r = getNbRows()-1; r > -1 ; r--){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileOccupied(r, c) && getUnit(r, c).getName().equals(name)){
@@ -720,7 +720,7 @@ public class Battlefield extends Model {
     }
 
 
-    public int[] getUnitPos(IUnit unit){
+    public int[] getUnitPos(Unit unit){
         for(int r = getNbRows()-1; r > -1 ; r--){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileOccupied(r, c) && getUnit(r, c) == unit){
@@ -740,7 +740,7 @@ public class Battlefield extends Model {
      * @param col
      * @return whether or not there is a standard bearer at range if the given unit is standing on the given buildingType = {row, col}
      */
-    public boolean  isStandardBearerAtRange(IUnit unit, int row, int col){
+    public boolean  isStandardBearerAtRange(Unit unit, int row, int col){
         int dist;
         if(isTileExisted(row, col)&& unit.isMobilized()) {
             int bannerRange = unit.getArmy().getBannerRange(unit);
@@ -787,7 +787,7 @@ public class Battlefield extends Model {
 
         CheckMoveMap(){ }
 
-        public Array<int[]> getActionArea(Battlefield bf, int rowActor, int colActor, IUnit actor, boolean moveOnly){
+        public Array<int[]> getActionArea(Battlefield bf, int rowActor, int colActor, Unit actor, boolean moveOnly){
             if(actor != null) {
                 set(bf, rowActor, colActor, actor);
                 setTilesMRP(actor);
@@ -798,7 +798,7 @@ public class Battlefield extends Model {
             return new Array<int[]>();
         }
 
-        private void addAttackTiles(IUnit actor) {
+        private void addAttackTiles(Unit actor) {
 
             int dist;
             int rangeMin;
@@ -833,7 +833,7 @@ public class Battlefield extends Model {
          * @param rowActor
          * @param colActor
          */
-        private void set( Battlefield bf, int rowActor, int colActor, IUnit actor){
+        private void set( Battlefield bf, int rowActor, int colActor, Unit actor){
             if(actor.isMobilized()) {
 
                 // get actor relevant pieces of information
@@ -879,7 +879,7 @@ public class Battlefield extends Model {
         }
 
         // MRP = mobility remaining points
-        private void setTilesMRP(IUnit actor){
+        private void setTilesMRP(Unit actor){
             checkTiles[rowRelActor][colRelActor] = moveRange;
             if(moveRange > 0){
                 if(checkIndexes(rowRelActor + 1, colRelActor))
@@ -894,7 +894,7 @@ public class Battlefield extends Model {
 
         }
 
-        private void updateTilesMRP(int row, int col, int remainingMovePoints, IUnit actor, Data.Orientation comefrom) {
+        private void updateTilesMRP(int row, int col, int remainingMovePoints, Unit actor, Data.Orientation comefrom) {
             if(remainingMovePoints > checkTiles[row][col]) {
                 if (remainingMovePoints == 1) {
                     if (battlefield.isTileAvailable(rowOrigin + row, colOrigin + col, pathfinder)
@@ -920,7 +920,7 @@ public class Battlefield extends Model {
         /**
          * condemn tiles occupied by allies and therefore unreachable.
          */
-        private void condemnTiles(IUnit actor){
+        private void condemnTiles(Unit actor){
             int oldMoveAreaSize = 0;
             int moveAreaSize = getMoveAreaSize();
             while(oldMoveAreaSize != moveAreaSize){
@@ -998,7 +998,7 @@ public class Battlefield extends Model {
         return checkmap.getActionArea(this, rowActor, colActor, getUnit(rowActor, colActor), true);
     }
 
-    public Array<int[]> getMoveArea(int row, int col, IUnit actor){
+    public Array<int[]> getMoveArea(int row, int col, Unit actor){
         return checkmap.getActionArea(this, row, col, actor,true);
     }
 
@@ -1013,7 +1013,7 @@ public class Battlefield extends Model {
         return checkmap.getActionArea(this, rowActor, colActor, getUnit(rowActor, colActor), false);
     }
 
-    public Array<int[]> getActionArea(int row, int col, IUnit actor){
+    public Array<int[]> getActionArea(int row, int col, Unit actor){
         return checkmap.getActionArea(this, row, col, actor,false);
     }
 

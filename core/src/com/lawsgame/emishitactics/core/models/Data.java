@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -297,7 +297,7 @@ public class Data {
             this(cost, experience, undoable, actedBased, -1, -1, rangedBasedType, endTurnActionOnly, impactArea);
         }
 
-        public int getCost(int rowActor, int colActor, IUnit actor, Battlefield battlefield) {
+        public int getCost(int rowActor, int colActor, Unit actor, Battlefield battlefield) {
             return cost;
         }
 

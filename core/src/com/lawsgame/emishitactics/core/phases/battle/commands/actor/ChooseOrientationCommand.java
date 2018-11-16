@@ -5,7 +5,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -38,14 +38,14 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator) {
+    public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
         return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.getOrientation() != newOrientation;
     }
 
     @Override
     public void unexecute() {
         if(oldOrientation != null && bfr.getModel().isTileOccupied(rowActor, colActor)) {
-            IUnit unit = bfr.getModel().getUnit(rowActor, colActor);
+            Unit unit = bfr.getModel().getUnit(rowActor, colActor);
             if(getInitiator() == unit) {
                 unit.setOrientation(oldOrientation);
                 scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(unit), oldOrientation));

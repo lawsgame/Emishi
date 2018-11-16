@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.Notification.StepOn;
 import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
 import com.lawsgame.emishitactics.core.models.Notification.SetTile;
 import com.lawsgame.emishitactics.core.models.Tile;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -62,7 +62,7 @@ public class TrapEvent extends BattleCommand{
     @Override
     protected void execute() {
 
-        IUnit victim = bfr.getModel().getUnit(row, col);
+        Unit victim = bfr.getModel().getUnit(row, col);
         TakeDamage takeDamage = victim.takeDamage(damage, false, true, 1f);
         takeDamage.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
         victim.setCrippled(true , false);

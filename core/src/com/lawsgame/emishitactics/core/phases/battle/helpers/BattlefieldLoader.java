@@ -25,7 +25,7 @@ import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 
 import java.io.IOException;
@@ -161,7 +161,7 @@ public class BattlefieldLoader {
                 XmlReader.Element armyElt;
                 XmlReader.Element squadElt;
                 XmlReader.Element unitElt;
-                IUnit unit;
+                Unit unit;
                 MilitaryForce army;
                 for (int j = 0; j < battleElt.getChildCount(); j++) {
 
@@ -223,8 +223,8 @@ public class BattlefieldLoader {
         return bf;
     }
 
-    private static IUnit instanciateUnit(XmlReader.Element unitElt){
-        IUnit unit;
+    private static Unit instanciateUnit(XmlReader.Element unitElt){
+        Unit unit;
 
         String name = unitElt.get("name");
         String title = unitElt.get("title");

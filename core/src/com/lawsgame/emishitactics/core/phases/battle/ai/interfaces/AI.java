@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.ai.interfaces;
 
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
@@ -61,7 +61,7 @@ public abstract class AI extends Observable implements Runnable {
             while (!army.isDone()) {
                 actorPos = nextUnit(army);
 
-                //IUnit selectedUnit = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
+                //Unit selectedUnit = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
 
                 bundle = new CommandBundle();
                 setCommandBundle(actorPos, bundle);

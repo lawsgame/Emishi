@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -20,7 +20,7 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.Bat
 public class DeploymentBIS extends BattleInteractionState {
     private int rowUnit;
     private int colUnit;
-    private IUnit sltdUnit;
+    private Unit sltdUnit;
     private Area moveArea;
     private StartButton startButton;
 
@@ -67,7 +67,7 @@ public class DeploymentBIS extends BattleInteractionState {
     @Override
     public boolean handleTouchInput(int row, int col) {
         if(bim.battlefield.isTileOccupiedByAlly(row, col, bim.player.getArmy().getAffiliation())){
-            IUnit touchedUnit = bim.battlefield.getUnit(row, col);
+            Unit touchedUnit = bim.battlefield.getUnit(row, col);
             if (touchedUnit != sltdUnit || !initialized) {
 
                 //touchedUnit become the selected unit
@@ -109,7 +109,7 @@ public class DeploymentBIS extends BattleInteractionState {
         //fetch all squad member
         int r;
         int c;
-        Array<IUnit> squadmembers = new Array<IUnit>();
+        Array<Unit> squadmembers = new Array<Unit>();
         Array<int[]> tiles = bim.battlefield.getDeploymentArea(areaUnitIndex).getTiles();
         for(int i = 0; i < tiles.size; i++){
             r = tiles.get(i)[0];
@@ -132,7 +132,7 @@ public class DeploymentBIS extends BattleInteractionState {
     }
 
 
-    private boolean isUnitRedeployingWithinTheSameArea(int rowTarget, int colTarget, IUnit unit){
+    private boolean isUnitRedeployingWithinTheSameArea(int rowTarget, int colTarget, Unit unit){
         int[] unitPos = bim.battlefield.getUnitPos(unit);
         int areaTargetIndex = getDeploymentAreaIndex(rowTarget, colTarget);
         int areaUnitIndex = getDeploymentAreaIndex(unitPos[0], unitPos[1]);

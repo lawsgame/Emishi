@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.models;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.AreaType;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 
@@ -42,7 +42,7 @@ public  class Area extends Model {
         this(battlefield , type, Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax));
     }
 
-    public static UnitArea createGuardedArea(Battlefield bf, int rowActor, int colActor, IUnit actor){
+    public static UnitArea createGuardedArea(Battlefield bf, int rowActor, int colActor, Unit actor){
         return new UnitArea(bf,
                 Data.AreaType.GUARD_AREA,
                 Utils.getEreaFromRange(bf, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX),
@@ -229,16 +229,16 @@ public  class Area extends Model {
     // --------------- SPECIFIC IMPLEMENTATION OF THE AREA CLASS
 
     public static class UnitArea extends Area{
-        private IUnit actor;
+        private Unit actor;
         private boolean removedUponMovingUnit;
 
-        public UnitArea(Battlefield battlefield, AreaType type, Array<int[]> tiles, IUnit actor, boolean removedUponMovingUnit) {
+        public UnitArea(Battlefield battlefield, AreaType type, Array<int[]> tiles, Unit actor, boolean removedUponMovingUnit) {
             super(battlefield, type, tiles);
             this.actor = actor;
             this.removedUponMovingUnit = removedUponMovingUnit;
         }
 
-        public IUnit getActor(){
+        public Unit getActor(){
             return actor;
         }
 

@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.Tile;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -156,7 +156,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
-    public void removeAreaRenderersAssociatedWith(IUnit unit){
+    public void removeAreaRenderersAssociatedWith(Unit unit){
         Area.UnitArea areaModel;
         for(int i = 0; i < areaRenderers.size; i++){
             if(areaRenderers.get(i).getModel() instanceof Area.UnitArea){
@@ -169,7 +169,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
-    public BattleUnitRenderer addUnitRenderer(int r, int c, IUnit unit) {
+    public BattleUnitRenderer addUnitRenderer(int r, int c, Unit unit) {
         if(!isUnitRendererCreated(unit)) {
             BattleUnitRenderer bur = new TempoUnitRenderer(r, c, unit);
             unitRenderers.add(bur);
@@ -178,7 +178,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return null;
     }
 
-    public void removeUnitRenderer(IUnit unit) {
+    public void removeUnitRenderer(Unit unit) {
         if(unit != null) {
             for(int i = 0; i< unitRenderers.size; i++){
                 if(unitRenderers.get(i).getModel() == unit){
@@ -190,7 +190,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
-    public boolean isUnitRendererCreated(IUnit unit) {
+    public boolean isUnitRendererCreated(Unit unit) {
         for (BattleUnitRenderer ur : unitRenderers) {
             if (ur.getModel() == unit) {
                 return true;
@@ -211,7 +211,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
 
     @Override
-    public BattleUnitRenderer getUnitRenderer(IUnit model) {
+    public BattleUnitRenderer getUnitRenderer(Unit model) {
         for(int i = 0; i < unitRenderers.size; i++){
             if(unitRenderers.get(i).getModel() == model)
                 return unitRenderers.get(i);

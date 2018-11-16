@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data.Ability;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.Build;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -36,12 +36,12 @@ public class BuildCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator) {
+    public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
         return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.has(Ability.BUILD);
     }
 
     @Override
-    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
         if(initiator != null){
 
@@ -67,7 +67,7 @@ public class BuildCommand extends ActorCommand {
     }
 
     @Override
-    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+    public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
         Array<int[]> targetsAtRange = new Array<int[]>();
         int rangeMin = choice.getRangeMin();
         int rangeMax = choice.getRangeMax();

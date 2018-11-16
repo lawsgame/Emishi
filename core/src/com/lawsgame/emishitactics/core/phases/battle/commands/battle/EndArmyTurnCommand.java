@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -36,7 +36,7 @@ public class EndArmyTurnCommand extends BattleCommand {
         army.setDone(false, false);
 
         //push render tasks
-        Array<Array<IUnit>> mobilizedTroops = army.getAllSquads();
+        Array<Array<Unit>> mobilizedTroops = army.getAllSquads();
         StandardTask resetDoneTask = new StandardTask();
         StandardTask.RendererThread doneThread;
         BattleUnitRenderer bur;

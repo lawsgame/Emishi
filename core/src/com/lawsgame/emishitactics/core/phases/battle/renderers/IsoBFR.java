@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
@@ -214,7 +214,7 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    public BattleUnitRenderer getUnitRenderer(IUnit model) {
+    public BattleUnitRenderer getUnitRenderer(Unit model) {
         for(int i = 0; i < unitRenderers.size; i++){
             for(int j = 0; j < unitRenderers.get(i).size; j++){
                 if(unitRenderers.get(i).get(j).getModel() == model){
@@ -292,7 +292,7 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    public BattleUnitRenderer addUnitRenderer(int row, int col, IUnit model) {
+    public BattleUnitRenderer addUnitRenderer(int row, int col, Unit model) {
         if(!isUnitRendererCreated(model)) {
             BattleUnitRenderer bur = new IsoUnitRenderer(row, col, model, this);
             addUnitRenderer(row, col, bur);
@@ -302,7 +302,7 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    public void removeUnitRenderer(IUnit model) {
+    public void removeUnitRenderer(Unit model) {
         BattleUnitRenderer bur;
         for (int i = 0; i < unitRenderers.size; i++) {
             for (int j = 0; j < unitRenderers.get(i).size; j++) {
@@ -317,7 +317,7 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    protected boolean isUnitRendererCreated(IUnit model) {
+    protected boolean isUnitRendererCreated(Unit model) {
         for(int i = 0; i < unitRenderers.size; i++){
             for(int j = 0; j < unitRenderers.get(i).size; j++){
                 if(unitRenderers.get(i).get(j).getModel() == model){
@@ -363,7 +363,7 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    protected void removeAreaRenderersAssociatedWith(IUnit model) {
+    protected void removeAreaRenderersAssociatedWith(Unit model) {
         Area.UnitArea unitArea;
         for(int i = 0; i < areaRenderers.size; i++){
             for(int j = 0; j < areaRenderers.get(i).size; j++){

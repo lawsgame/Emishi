@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
@@ -22,7 +22,7 @@ public class PushCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isInitiatorValid(int rowActor, int colActor, IUnit initiator) {
+    public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
         return super.isInitiatorValid(rowActor, colActor, initiator) && !initiator.isHorseman();
     }
 
@@ -30,8 +30,8 @@ public class PushCommand extends ActorCommand {
     protected void execute() {
 
         // update model
-        IUnit actor = bfr.getModel().getUnit(rowActor, colActor);
-        IUnit pushed = bfr.getModel().getUnit(rowTarget, colTarget);
+        Unit actor = bfr.getModel().getUnit(rowActor, colActor);
+        Unit pushed = bfr.getModel().getUnit(rowTarget, colTarget);
         Data.Orientation pushOr = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         pushed.setOrientation(pushOr);
         int rowEndTile;
@@ -75,13 +75,13 @@ public class PushCommand extends ActorCommand {
     }
 
     @Override
-    public boolean isTargetValid(IUnit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
+    public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
         if(initiator != null){
 
             if(bfr.getModel().isTileOccupiedByAlly(rowTarget0, colTarget0, initiator.getArmy().getAffiliation()) && Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0) == 1){
 
-                IUnit pushed = bfr.getModel().getUnit(rowTarget0, colTarget0);
+                Unit pushed = bfr.getModel().getUnit(rowTarget0, colTarget0);
                 if(rowActor0 < rowTarget0 && bfr.getModel().isTileAvailable(rowTarget0 + 1, colTarget0, pushed.has(Data.Ability.PATHFINDER), initiator))
                     valid = true;
                 if(rowActor0 > rowTarget0 && bfr.getModel().isTileAvailable(rowTarget0 - 1, colTarget0, pushed.has(Data.Ability.PATHFINDER), initiator))
@@ -96,7 +96,7 @@ public class PushCommand extends ActorCommand {
     }
 
     @Override
-    public Array<int[]> getTargetsAtRange(int row, int col, IUnit actor) {
+    public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
         Array<int[]> targetsAtRange = new Array<int[]>();
         if(actor.isMobilized()) {
             if (bfr.getModel().isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAffiliation())

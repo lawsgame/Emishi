@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Weapon;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
@@ -210,7 +210,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
         public void set(ActorCommand command) {
             if(command != null && command instanceof HealCommand && command.isTargetValid()) {
                 HealCommand currentCommand = (HealCommand)command;
-                IUnit target = currentCommand.getTarget();
+                Unit target = currentCommand.getTarget();
                 builder = new StringBuilder();
                 builder.append(command.getInitiator().getName()+" => "+command.getTarget().getName());
                 builder.append("\nHP : "+target.getCurrentHP()+" -> "+currentCommand.getRecoveredHitPoints());
@@ -255,7 +255,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
         public void set(ActorCommand command) {
             if(command != null && command instanceof StealCommand && command.isTargetValid()){
                 StealCommand sc = (StealCommand)command;
-                IUnit target = sc.getTarget();
+                Unit target = sc.getTarget();
                 builder = new StringBuilder();
                 builder.append(command.getInitiator().getName()+" => "+command.getTarget().getName());
                 builder.append("\nSteal rate : "+sc.getStealRate()+"%");

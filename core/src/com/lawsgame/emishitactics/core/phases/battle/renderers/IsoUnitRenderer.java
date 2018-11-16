@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.models.Data.AnimId;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.math.functions.Function;
 import com.lawsgame.emishitactics.engine.math.geometry.Vector;
@@ -64,7 +64,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
 
 
-    public IsoUnitRenderer(int row, int col, IUnit model, IsoBFR bfr) {
+    public IsoUnitRenderer(int row, int col, Unit model, IsoBFR bfr) {
         super(model);
 
         this.bfr = bfr;

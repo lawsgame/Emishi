@@ -6,7 +6,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.OOAReport;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
@@ -132,7 +132,7 @@ public abstract class BattleCommand extends Observable implements Observer {
      * @return the report
      */
     protected final OOAReport removeOutOfActionUnits(){
-        Array<IUnit> OOAUnits = bfr.getModel().getOOAUnits();
+        Array<Unit> OOAUnits = bfr.getModel().getOOAUnits();
 
         OOAReport report = new OOAReport();
         for(int i = 0; i < OOAUnits.size; i++){
@@ -324,7 +324,7 @@ public abstract class BattleCommand extends Observable implements Observer {
 
         }
 
-        public void add(IUnit receiver, int experience){
+        public void add(Unit receiver, int experience){
             expHolders.add(new ExperiencePointsHolder(receiver, experience));
         }
 
@@ -401,11 +401,11 @@ public abstract class BattleCommand extends Observable implements Observer {
     }
 
     public static class ExperiencePointsHolder {
-        public final IUnit receiver;
+        public final Unit receiver;
         public int experience;
         private Stack<int[]> statGained; // the 12 first entries are statistic inscreased while the last entry is experience gained before leveling up
 
-        public ExperiencePointsHolder(IUnit receiver, int experience){
+        public ExperiencePointsHolder(Unit receiver, int experience){
             this.receiver = receiver;
             this.experience = experience;
             this.statGained = new Stack<int[]>();

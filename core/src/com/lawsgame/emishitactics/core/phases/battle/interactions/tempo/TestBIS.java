@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
@@ -33,8 +33,8 @@ import java.util.LinkedList;
 
 public class TestBIS extends BattleInteractionState implements Observer{
 
-    IUnit sltdUnit;
-    IUnit foeWL;
+    Unit sltdUnit;
+    Unit foeWL;
 
     Array<Sprite> sprites;
     Animation animation;
@@ -97,7 +97,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         /*
         reinforcementEvent = new ReinforcementEvent(bim.bfr, bim.scheduler);
-        IUnit unit = new Unit("marco");
+        Unit unit = new Unit("marco");
         bim.player.getArmy().add(unit);
        bim.player.getArmy().appointSoldier(unit, 0);
         reinforcementEvent.addStiffeners(unit, 0, 7, 3, 7);
@@ -112,7 +112,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         bim.bfr.addAreaRenderer(ccTargets);
 
 
-        IUnit randomFoe = bim.battlefield.getUnit(13,8);
+        Unit randomFoe = bim.battlefield.getUnit(13,8);
         randomFoe.addNativeAbility(Data.Ability.GUARD);
         int[] randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
         GuardCommand guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());

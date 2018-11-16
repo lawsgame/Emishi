@@ -5,7 +5,7 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -78,7 +78,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
             }
         }else{
 
-            IUnit touchedPCUnit = null;
+            Unit touchedPCUnit = null;
             if(bim.bfr.getModel().isTileOccupiedByPlayerControlledUnit(row, col))
                 touchedPCUnit = bim.bfr.getModel().getUnit(row, col);
 

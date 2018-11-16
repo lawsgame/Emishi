@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +13,7 @@ public class OutcomeTest {
 
     ActorCommand.Outcome outcome;
     ActorCommand.Outcome outcome1;
-    IUnit unit1;
+    Unit unit1;
 
     @Before
     public void before(){

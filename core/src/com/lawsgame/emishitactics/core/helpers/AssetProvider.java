@@ -20,7 +20,7 @@ import com.lawsgame.emishitactics.core.models.Data.AreaColor;
 import com.lawsgame.emishitactics.core.models.Data.TileSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.engine.datastructures.Map2;
 
 import java.util.HashMap;
@@ -294,7 +294,7 @@ public class AssetProvider implements Disposable{
         for(int r = 0; r < battlefield.getNbRows(); r++){
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
                 if (battlefield.isTileOccupied(r, c)) {
-                    IUnit unit = battlefield.getUnit(r, c);
+                    Unit unit = battlefield.getUnit(r, c);
 
                     filename = new String[3];
                     filename[0] = unit.getTemplate().name().toLowerCase();

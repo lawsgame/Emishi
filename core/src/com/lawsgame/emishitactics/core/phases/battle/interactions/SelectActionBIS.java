@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -25,7 +25,7 @@ public class SelectActionBIS extends BattleInteractionState {
     private ChoicePanel choicePanel;
     private ChoicePanel commandPanel;
 
-    public SelectActionBIS(BattleInteractionMachine bim, IUnit actor, Stack<ActorCommand> historic) {
+    public SelectActionBIS(BattleInteractionMachine bim, Unit actor, Stack<ActorCommand> historic) {
         super(bim, true, true, true, false, true);
         int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
         this.rowSltdUnit = actorPos[0];
@@ -36,7 +36,7 @@ public class SelectActionBIS extends BattleInteractionState {
 
     }
 
-    public SelectActionBIS(BattleInteractionMachine bim, IUnit actor) {
+    public SelectActionBIS(BattleInteractionMachine bim, Unit actor) {
         this(bim, actor, new Stack<ActorCommand>());
     }
 
@@ -71,8 +71,8 @@ public class SelectActionBIS extends BattleInteractionState {
 
         if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)){
 
-            IUnit touchedUnit = bim.battlefield.getUnit(row, col);
-            IUnit selectedUnit = bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
+            Unit touchedUnit = bim.battlefield.getUnit(row, col);
+            Unit selectedUnit = bim.battlefield.getUnit(rowSltdUnit, colSltdUnit);
             if(touchedUnit == selectedUnit) {
                 choicePanel.setVisible(true);
             }else{

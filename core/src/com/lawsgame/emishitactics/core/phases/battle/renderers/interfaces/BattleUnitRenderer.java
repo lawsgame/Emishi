@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.engine.GameElement;
 import com.lawsgame.emishitactics.engine.patterns.command.Command;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -11,11 +11,11 @@ import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
 import java.util.LinkedList;
 
-public abstract class BattleUnitRenderer extends Renderer<IUnit> implements GameElement {
+public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameElement {
 
     private LinkedList<Object> notificationQueue;
 
-    public BattleUnitRenderer(IUnit model) {
+    public BattleUnitRenderer(Unit model) {
         super(model);
         this.notificationQueue = new LinkedList<Object>();
     }

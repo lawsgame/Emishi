@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
@@ -14,11 +14,11 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePa
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 
 public class EndUnitTurnBIS extends BattleInteractionState {
-    private IUnit actor;
+    private Unit actor;
     EndUnitTurnCommand endUnitTurnCommand;
     private ChoicePanel orientationChoicePanel;
 
-    public EndUnitTurnBIS(BattleInteractionMachine bim, IUnit actor) {
+    public EndUnitTurnBIS(BattleInteractionMachine bim, Unit actor) {
         super(bim, true, true, true, false, true);
         this.actor = actor;
         this.orientationChoicePanel = new TempoChoicePanel(bim.asm);

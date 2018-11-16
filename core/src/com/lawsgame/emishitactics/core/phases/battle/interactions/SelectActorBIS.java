@@ -1,6 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -51,7 +51,7 @@ public class SelectActorBIS extends BattleInteractionState {
     @Override
     public boolean handleTouchInput(int row, int col) {
         if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)){
-            IUnit selectedUnit = bim.battlefield.getUnit(row, col);
+            Unit selectedUnit = bim.battlefield.getUnit(row, col);
             if(!selectedUnit.isDone()) {
                 bim.replace(new SelectActionBIS(bim, selectedUnit));
                 return true;

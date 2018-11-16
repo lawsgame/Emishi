@@ -5,20 +5,20 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
-import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
-import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Stack;
 
-public class Unit extends IUnit{
+public class Unit extends Model {
 
     protected String name;
     protected int level;
@@ -169,37 +169,37 @@ public class Unit extends IUnit{
         return new CharacterUnit(name, title, template, level, weaponType, false, shielbearer, horseman, horsemanUponPromotion, true);
     }
 
-    @Override
+     
     public String getName(I18NBundle bundle) {
         return bundle.get(name);
     }
 
-    @Override
+     
     public String getName() {
         return name;
     }
 
-    @Override
+     
     public void setName(String namekey) {
         this.name = namekey;
     }
 
-    @Override
+     
     public Data.UnitTemplate getTemplate() {
         return template;
     }
 
-    @Override
+     
     public Data.WeaponType getWeaponType() {
         return weaponType;
     }
 
-    @Override
+     
     public int getLevel() {
         return level;
     }
 
-    @Override
+     
     public int[] levelup() {
         int mob = 0;
         int cha = 0;
@@ -370,63 +370,63 @@ public class Unit extends IUnit{
 
     }
 
-    @Override
+     
     public boolean isPromoted() {
         return Data.PROMOTION_LEVEL <= level ;
     }
 
-    @Override
+     
     public boolean isRightHanded() {
         return rightHanded;
     }
 
-    @Override
+     
     public boolean setRightHanded(boolean righthanded) {
         return this.rightHanded = righthanded;
     }
 
-    @Override
+     
     public boolean isCharacter() {
         return character;
     }
 
-    @Override
+     
     public boolean isStandardBearer() {
         return isWarChief();
     }
 
-    @Override
+     
     public boolean isHorseman() {
         return horseman;
     }
 
-    @Override
+     
     public boolean isShielbearer() { return shielbearer; }
 
-    @Override
+     
     public void setHorseman(boolean horseman) { this.horseman = horseman; }
 
-    @Override
+     
     public boolean isHorsemanUponPromotion() { return horsemanUponPromotion; }
 
-    @Override
+     
     public void setHorsemanUponPromotion(boolean horseman) {
         this.horsemanUponPromotion = horseman;
         if(isPromoted())
             this.horseman = horseman;
     }
 
-    @Override
+     
     public Banner getBanner() {
         return banner;
     }
 
-    @Override
+     
     public String getTitle(I18NBundle bundle) {
         return template.getName(bundle);
     }
 
-    @Override
+     
     public boolean addWeapon(Weapon weapon) {
         boolean weaponAdded = false;
         if(weapon.getTemplate().getWeaponType() == weaponType) {
@@ -441,7 +441,7 @@ public class Unit extends IUnit{
         return weaponAdded;
     }
 
-    @Override
+     
     public Weapon removeWeapon(int index) {
         Weapon weaponToreturn = null;
         if(0 <= index && index < weapons.size) {
@@ -452,7 +452,7 @@ public class Unit extends IUnit{
         return weaponToreturn;
     }
 
-    @Override
+     
     public Weapon replace(int index, Weapon weapon) {
         Weapon weaponToreturn = null;
         if(weapon.getTemplate().getWeaponType() == this.weaponType){
@@ -464,7 +464,7 @@ public class Unit extends IUnit{
         return weaponToreturn;
     }
 
-    @Override
+     
     public Array<Weapon> removeAllWeapons() {
         Array<Weapon> removedWeapons = weapons;
         weapons = new Array<Weapon>();
@@ -473,17 +473,17 @@ public class Unit extends IUnit{
         return removedWeapons;
     }
 
-    @Override
+     
     public Array<Weapon> getWeapons() {
         return weapons;
     }
 
-    @Override
+     
     public Weapon getCurrentWeapon() {
         return weapons.get(0);
     }
 
-    @Override
+     
     public boolean switchWeapon(int index) {
         if (0 < index && index < weapons.size) {
             weapons.swap(0, index);
@@ -492,7 +492,7 @@ public class Unit extends IUnit{
         return false;
     }
 
-    @Override
+     
     public Weapon getWeapon(int index) {
         Weapon weapon = null;
         if (0 < index && index < weapons.size) {
@@ -501,27 +501,27 @@ public class Unit extends IUnit{
         return weapon;
     }
 
-    @Override
+     
     public int getBaseHitpoints() {
         return hitPoints;
     }
 
-    @Override
+     
     public int getAppHitpoints() {
         return hitPoints;
     }
 
-    @Override
+     
     public float getAppGrHitpoints() {
         return  (isPromoted()) ? template.getGetProGrowthHP() : template.getGrowthHP();
     }
 
-    @Override
+     
     public int getCurrentHP() {
         return currentHitPoints;
     }
 
-    @Override
+     
     public void setCurrentHitPoints(int hitPoints) {
         if(0<= hitPoints && hitPoints <= getAppHitpoints()){
             this.currentHitPoints = hitPoints;
@@ -530,31 +530,31 @@ public class Unit extends IUnit{
         }
     }
 
-    @Override
+     
     public void resetCurrentMoral() {
         this.currentMoral = getAppMoral();
         if(this.currentMoral > this.currentHitPoints)
             this.currentMoral = currentHitPoints;
     }
 
-    @Override
+     
     public int getAppMoral() {
         return getAppBravery();
     }
 
-    @Override
+     
     public int getCurrentMoral() {
         return currentMoral;
     }
 
-    @Override
+     
     public void setCurrentMoral(int moral) {
         if(0 <= moral){
             this.currentMoral = ( moral > getAppMoral())? getAppMoral() : moral;
         }
     }
 
-    @Override
+     
     public int getExperience() {
         return experience;
     }
@@ -564,7 +564,7 @@ public class Unit extends IUnit{
      * @param experience
      * @return an array of exp gained between each level up
      */
-    @Override
+     
     public int[] setExperience(int experience) {
         // get the number of lvl gained and the resulting exp array
         int levelsGained = experience / Data.EXP_REQUIRED_LD_LEVEL_UP;
@@ -581,7 +581,7 @@ public class Unit extends IUnit{
         return exps;
     }
 
-    @Override
+     
     public Stack<int[]> addExpPoints(int exp) {
         Stack<int[]> gainLvl = new Stack<int[]>();
 
@@ -596,17 +596,17 @@ public class Unit extends IUnit{
         return gainLvl;
     }
 
-    @Override
+     
     public int getLeadershipExperience() {
         return commandmentExperience;
     }
 
-    @Override
+     
     public void setLeadershipExperience(int experience) {
         this.commandmentExperience = experience % Data.EXP_REQUIRED_LD_LEVEL_UP;
     }
 
-    @Override
+     
     public boolean addLdExpPoints(int exp) {
         this.commandmentExperience += exp;
         if(commandmentExperience > Data.EXP_REQUIRED_LD_LEVEL_UP){
@@ -617,47 +617,47 @@ public class Unit extends IUnit{
         return false;
     }
 
-    @Override
+     
     public int getBaseCharisma() {
         return charisma;
     }
 
-    @Override
+     
     public int getAppCharisma() {
         return charisma;
     }
 
-    @Override
+     
     public float getAppGrCharisma() {
         return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
     }
 
-    @Override
+     
     public int getBaseLeadership() {
         return leadership;
     }
 
-    @Override
+     
     public int getAppLeadership() {
         return leadership;
     }
 
-    @Override
+     
     public int getBaseStrength() {
         return strength;
     }
 
-    @Override
+     
     public int getAppStrength() {
         return strength;
     }
 
-    @Override
+     
     public float getAppGrStrength() {
         return (isPromoted()) ? template.getProGrowthStr() : template.getGrowthStr();
     }
 
-    @Override
+     
     public int getBaseArmor(Data.DamageType damageType) {
         int armor = 0;
         switch(damageType){
@@ -668,12 +668,12 @@ public class Unit extends IUnit{
         return armor;
     }
 
-    @Override
+     
     public int getAppArmor(Data.DamageType damageType) {
         return getBaseArmor(damageType);
     }
 
-    @Override
+     
     public float getAppGrArmor(DamageType damageType) {
         float growthrate = 0;
         switch(damageType){
@@ -684,82 +684,82 @@ public class Unit extends IUnit{
         return growthrate;
     }
 
-    @Override
+     
     public int getBaseAgility() {
         return agility;
     }
 
-    @Override
+     
     public int getAppAgility() {
         return agility;
     }
 
-    @Override
+     
     public float getAppGrAgility() {
         return (isPromoted()) ? template.getProGrowthAg() : template.getGrowthAg();
     }
 
-    @Override
+     
     public int getBaseDexterity() {
         return dexterity;
     }
 
-    @Override
+     
     public int getAppDexterity() {
         return dexterity;
     }
 
-    @Override
+     
     public float getAppGrDexterity() {
         return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
     }
 
-    @Override
+     
     public int getBaseSkill() {
         return skill;
     }
 
-    @Override
+     
     public int getAppSkill() {
         return skill;
     }
 
-    @Override
+     
     public float getAppGrSkill() {
         return (isPromoted()) ? template.getProGrowthSk() : template.getGrowthSk();
     }
 
-    @Override
+     
     public int getBaseBravery() {
         return bravery;
     }
 
-    @Override
+     
     public int getAppBravery() {
         return bravery;
     }
 
-    @Override
+     
     public float getAppGrBravery() {
         return (isPromoted()) ? template.getProGrowthBr() : template.getGrowthBr();
     }
 
-    @Override
+     
     public int getBaseMobility() {
         return mobility;
     }
 
-    @Override
+     
     public int getAppMobility() {
         return mobility;
     }
 
-    @Override
+     
     public void addNativeAbility(Data.Ability guard) {
 
     }
 
-    @Override
+     
     public boolean has(Data.Ability ability) {
         boolean hasAbility = false;
         for(int i = 0; i < equipments.size; i++){
@@ -787,7 +787,7 @@ public class Unit extends IUnit{
         return hasAbility;
     }
 
-    @Override
+     
     public Array<Data.Ability> getAbilities() {
         Array<Data.Ability> abilities = new Array<Data.Ability>();
         Data.Ability ability;
@@ -813,12 +813,12 @@ public class Unit extends IUnit{
         return abilities;
     }
 
-    @Override
+     
     public boolean has(Equipment item) {
         return equipments.contains(item, true);
     }
 
-    @Override
+     
     public boolean addEquipment(Equipment item) {
         boolean itemAdded = false;
         if(!equipments.contains(item, true) && equipments.size < ((isPromoted()) ? Data.MAX_ITEM_CARRIED_UPON_PROMOTION: Data.MAX_ITEM_CARRIED)){
@@ -828,19 +828,19 @@ public class Unit extends IUnit{
         return itemAdded;
     }
 
-    @Override
+     
     public Array<Equipment> disequipAllEquipment() {
         Array<Equipment> removedItems = equipments;
         this.equipments = new Array<Equipment>();
         return removedItems;
     }
 
-    @Override
+     
     public Array<Equipment> getEquipments() {
         return equipments;
     }
 
-    @Override
+     
     public Equipment removeEquipment(int index) {
         Equipment item = null;
         if(0 <= index && index < equipments.size ){
@@ -849,7 +849,7 @@ public class Unit extends IUnit{
         return item;
     }
 
-    @Override
+     
     public Equipment replaceEquipment(int index, Equipment item) {
         Equipment olditem = null;
         if(0 <= index && index < equipments.size ){
@@ -864,7 +864,7 @@ public class Unit extends IUnit{
 
     // --------------- LOOT & STEAL ----------------------
 
-    @Override
+     
     public boolean isStealable() {
         boolean stealable = false;
         if(!has(Data.Ability.VIGILANT)) {
@@ -886,12 +886,12 @@ public class Unit extends IUnit{
         return stealable;
     }
 
-    @Override
+     
     public Item getRandomlyStealableItem() {
         return getStealableItems().random();
     }
 
-    @Override
+     
     public Item getRandomlyDroppableItem() {
         Item droppedItem = null;
 
@@ -922,7 +922,7 @@ public class Unit extends IUnit{
         return droppedItem;
     }
 
-    @Override
+     
     public Array<Item> getStealableItems() {
         Array<Item> stealableItems = new Array<Item>();
         for(int i =0; i < weapons.size; i++){
@@ -938,22 +938,22 @@ public class Unit extends IUnit{
         return stealableItems;
     }
 
-    @Override
+     
     public int getAppWeaponRangeMin() {
         return getCurrentWeapon().getTemplate().getRangeMin();
     }
 
-    @Override
+     
     public int getAppWeaponRangeMax() {
         return getCurrentWeapon().getTemplate().getRangeMax();
     }
 
-    @Override
+     
     public int getCurrentWeaponRangeMin(int rowUnit, int colUnit, Battlefield battlefield) {
         return getCurrentWeapon().getTemplate().getRangeMin();
     }
 
-    @Override
+     
     public int getCurrentWeaponRangeMax(int rowUnit, int colUnit, Battlefield battlefield) {
         int rangeMax = getCurrentWeapon().getTemplate().getRangeMax();
         if(battlefield.isTileExisted(rowUnit, colUnit)){
@@ -965,37 +965,37 @@ public class Unit extends IUnit{
         return rangeMax;
     }
 
-    @Override
+     
     public int getAppAttackAccuracy() {
         return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + Data.WC_CHARISMA_BONUS_ATT_ACC* getChiefCharisma();
     }
 
-    @Override
+     
     public int[] getAppAttackMight() {
         return new int[]{getCurrentWeapon().getTemplate().getDamageMin() + getAppStrength(), getCurrentWeapon().getTemplate().getDamageMax() + getAppStrength()};
     }
 
-    @Override
+     
     public int getAppDefense(DamageType damageType) {
         return getAppArmor(damageType);
     }
 
-    @Override
+     
     public int getAppAvoidance() {
         return Data.DEX_FACTOR_AVO * getAppAgility();
     }
 
-    @Override
+     
     public void setActionPoints(int ap) {
         this.actionPoints = (ap > 0) ? ap : 0;
     }
 
-    @Override
+     
     public void resetActionPoints() {
         this.actionPoints = getAppSkill();
     }
 
-    @Override
+     
     public void addActionPoints(int points) {
         this.actionPoints += points;
         if(actionPoints < 0 )
@@ -1003,29 +1003,29 @@ public class Unit extends IUnit{
 
     }
 
-    @Override
+     
     public int getCurrentActionPoints() {
         return this.actionPoints;
     }
 
 
 
-    @Override
+     
     public boolean isMobilized() {
         return (army != null) && getArmy().isUnitMobilized(this);
     }
 
-    @Override
+     
     public boolean isWarChief() {
         return isMobilized() && army.getWarChiefs().contains(this, true);
     }
 
-    @Override
+     
     public boolean isWarlord() {
         return isMobilized() && this == army.getWarlord();
     }
 
-    @Override
+     
     public int getMaxSoldiersAs(boolean warlord) {
         int maxSoldiers;
         if(warlord){
@@ -1042,7 +1042,7 @@ public class Unit extends IUnit{
         return maxSoldiers;
     }
 
-    @Override
+     
     public int getMaxWarChiefs() {
         int maxWC = this.leadership / 6;
         if(maxWC > 3 )
@@ -1051,30 +1051,30 @@ public class Unit extends IUnit{
     }
 
 
-    @Override
+     
     public void setArmy(MilitaryForce army) {
         this.army = army;
     }
 
-    @Override
+     
     public boolean isAllyWith(Data.Affiliation affiliation) {
         return (army != null) && army.getAffiliation() == affiliation;
     }
 
-    @Override
-    public Array<IUnit> getSquad(boolean stillFighting) {
-        return (army != null) ? army.getSquad(this, stillFighting) : new Array<IUnit>();
+     
+    public Array<Unit> getSquad(boolean stillFighting) {
+        return (army != null) ? army.getSquad(this, stillFighting) : new Array<Unit>();
     }
 
-    @Override
+     
     public MilitaryForce getArmy() {
         return army;
     }
 
-    @Override
-    public boolean sameSquadAs(IUnit unit) {
+     
+    public boolean sameSquadAs(Unit unit) {
         if(army != null){
-            Array<IUnit> squad =  army.getSquad(unit, false);
+            Array<Unit> squad =  army.getSquad(unit, false);
             for(int i = 0; i < squad.size; i++){
                 if(squad.get(i) == this){
                     return true;
@@ -1085,24 +1085,24 @@ public class Unit extends IUnit{
         return false;
     }
 
-    @Override
-    public boolean sameArmyAs(IUnit unit) {
+     
+    public boolean sameArmyAs(Unit unit) {
         return army != null && unit.getArmy() != null && this.army == unit.getArmy();
     }
 
-    @Override
+     
     public void setLeadership(int leadership) {
         this.leadership = leadership;
     }
 
-    @Override
-    public IUnit getWarchief() {
+     
+    public Unit getWarchief() {
         if(isMobilized())
             return army.getWarchief(this);
         return null;
     }
 
-    @Override
+     
     public int getChiefCharisma() {
         int chiefCharisma = 0;
         if(isMobilized() && !army.getWarchief(this).isOutOfAction()){
@@ -1113,7 +1113,7 @@ public class Unit extends IUnit{
         return chiefCharisma;
     }
 
-    @Override
+     
     public void replenishMoral(boolean turnBeginning) {
         if(turnBeginning) {
             if(!this.isOutOfAction()) {
@@ -1124,7 +1124,7 @@ public class Unit extends IUnit{
         }
     }
 
-    @Override
+     
     public int getSquadIndex() {
         int squadIndex = -1;
         if(isMobilized()){
@@ -1143,12 +1143,12 @@ public class Unit extends IUnit{
         return squadIndex;
     }
 
-    @Override
+     
     public void setOrientation(Data.Orientation orientation) {
         this.orientation = orientation;
     }
 
-    @Override
+     
     public void setOrientation(Orientation orientation, boolean notifyObservers) {
         setOrientation(orientation);
         if(notifyObservers)
@@ -1156,87 +1156,87 @@ public class Unit extends IUnit{
 
     }
 
-    @Override
+     
     public Data.Orientation getOrientation() {
         return orientation;
     }
 
-    @Override
+     
     public void setBehaviour(Data.Behaviour behaviour) {
         this.behaviour = behaviour;
     }
 
-    @Override
+     
     public Data.Behaviour getBehaviour() {
         return behaviour;
     }
 
 
-    @Override
+     
     public boolean hasActed() {
         return acted;
     }
 
-    @Override
+     
     public boolean hasMoved() {
         return moved;
     }
 
-    @Override
+     
     public boolean isWounded() {
         return currentHitPoints < getAppHitpoints();
     }
 
-    @Override
+     
     public boolean isOutOfAction() {
         return currentMoral == 0 || currentHitPoints == 0;
     }
 
-    @Override
+     
     public boolean isDead() {
         return currentHitPoints == 0;
     }
 
-    @Override
+     
     public void setActed(boolean acted) {
         this.acted = acted;
     }
 
-    @Override
+     
     public void setMoved(boolean moved) {
         this.moved = moved;
     }
 
-    @Override
+     
     public boolean isDisabled() {
         return disabled;
     }
 
-    @Override
+     
     public void setDisabled(boolean disabled, boolean notifyObservers)  {
         this.disabled = disabled;
         if(notifyObservers)
             notifyAllObservers(Notification.Disabled.get(disabled));
     }
 
-    @Override
+     
     public boolean isCrippled() {
         return crippled;
     }
 
-    @Override
+     
     public void setCrippled(boolean crippled, boolean notifyObservers) {
         this.crippled = crippled;
         if(notifyObservers)
             notifyAllObservers(Notification.Crippled.get(crippled));
     }
 
-    @Override
+     
     public boolean isDone() {
         return acted && moved;
     }
 
-    @Override
+     
     public int getRecoveredHitPoints(int healPower) {
         int recoveredHP ;
         if(healPower + hitPoints > getAppHitpoints()){
@@ -1247,7 +1247,7 @@ public class Unit extends IUnit{
         return recoveredHP;
     }
 
-    @Override
+     
     public int getRecoveredMoralPoints(int healPower) {
         int recoveredMoralPoints;
         if(healPower + hitPoints > getAppMoral()){
@@ -1258,7 +1258,7 @@ public class Unit extends IUnit{
         return recoveredMoralPoints;
     }
 
-    @Override
+     
     public boolean treated(int healPower) {
         if(isWounded()) {
             if (healPower + hitPoints > getAppHitpoints()) {
@@ -1277,7 +1277,7 @@ public class Unit extends IUnit{
         return false;
     }
 
-    @Override
+     
     public TakeDamage takeDamage(int damageDealt, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralModifier){
         TakeDamage.State state = TakeDamage.State.UNDAMAGED;
         int lifeDamageTaken = 0;
@@ -1311,7 +1311,7 @@ public class Unit extends IUnit{
         return new TakeDamage(this, ignorePhysicalDamage, ignoreMoralDamage, damageDealt, lifeDamageTaken, state);
     }
 
-    @Override
+     
     public String toString() {
         return getName();
     }
@@ -1355,7 +1355,7 @@ public class Unit extends IUnit{
             this.title = title;
         }
 
-        @Override
+         
         public String getTitle(I18NBundle bundle) {
             return bundle.get(title);
         }

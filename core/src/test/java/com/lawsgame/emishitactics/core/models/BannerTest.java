@@ -1,6 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 
 public class BannerTest {
     private Banner banner;
-    private IUnit unit;
+    private Unit unit;
 
     public BannerTest(){}
 

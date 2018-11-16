@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -35,16 +35,16 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract float getCenterY(int row, int col);
     public abstract void setGameCamParameters(CameraManager cameraManager);
 
-    public abstract BattleUnitRenderer getUnitRenderer(IUnit model);
+    public abstract BattleUnitRenderer getUnitRenderer(Unit model);
     public abstract AreaRenderer getAreaRenderer(Area area);
     public abstract void addTileRenderer(int row, int col, Tile model);
-    public abstract BattleUnitRenderer addUnitRenderer(int row, int col, IUnit model);
+    public abstract BattleUnitRenderer addUnitRenderer(int row, int col, Unit model);
     public abstract void addAreaRenderer(Area area);
-    public abstract void removeUnitRenderer(IUnit model);
+    public abstract void removeUnitRenderer(Unit model);
     public abstract void removeAreaRenderer(Area model);
-    protected abstract boolean isUnitRendererCreated(IUnit model);
+    protected abstract boolean isUnitRendererCreated(Unit model);
     protected abstract boolean isAreaRendererCreated(Area model);
-    protected abstract void removeAreaRenderersAssociatedWith(IUnit model);
+    protected abstract void removeAreaRenderersAssociatedWith(Unit model);
 
 
     protected abstract boolean isCurrentTaskCompleted();
@@ -73,9 +73,9 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
     @Override
     public final void getNotification(Observable sender, Object data) {
-        if (data instanceof IUnit) {
+        if (data instanceof Unit) {
 
-            removeUnitRenderer((IUnit) data);
+            removeUnitRenderer((Unit) data);
         } else if(data instanceof Data.Weather){
 
             this.renderedWeather = (Data.Weather) data;

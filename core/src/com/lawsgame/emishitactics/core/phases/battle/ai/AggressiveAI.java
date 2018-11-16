@@ -2,7 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.ai;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.interfaces.IUnit;
+import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
@@ -23,7 +23,7 @@ public class AggressiveAI extends PassiveAI {
 
             int rowEndTile = actorPos[0];
             int colEndTile = actorPos[1];
-            IUnit actor = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
+            Unit actor = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
             boolean attackPerformed = false;
             AttackCommand attackCommand = new AttackCommand(bfr, scheduler, playerInventory);
             WalkCommand walkCommand = new WalkCommand(bfr, scheduler, playerInventory);
