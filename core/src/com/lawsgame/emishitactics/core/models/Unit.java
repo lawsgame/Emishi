@@ -20,19 +20,18 @@ import java.util.Stack;
 
 public class Unit extends Model {
 
-    protected String name;
+    protected final String name;
     protected int level;
-    protected UnitTemplate template;
-    protected WeaponType weaponType;
-    protected boolean character;
+    protected final UnitTemplate template;
+    protected final WeaponType weaponType;
     protected boolean shielbearer;
     protected boolean horseman;
     protected boolean horsemanUponPromotion;
 
+    protected boolean rightHanded = true;
     protected Array<Weapon> weapons;
     protected int experience = 0;
     protected int commandmentExperience = 0;
-    protected boolean rightHanded = true;
     private MilitaryForce army = null;
 
     protected int mobility;
@@ -94,7 +93,6 @@ public class Unit extends Model {
             UnitTemplate template,
             int level,
             WeaponType weaponType,
-            boolean character,
             boolean shielbearer,
             boolean horseman,
             boolean horsemanUponPromotion,
@@ -103,7 +101,6 @@ public class Unit extends Model {
         this.name = name;
         this.template = template;
         this.level = template.getStartingLevel();
-        this.character = character;
         this.weaponType = weaponType;
         this.horseman = horseman;
         this.horsemanUponPromotion = horsemanUponPromotion;
@@ -141,8 +138,8 @@ public class Unit extends Model {
         resetActionPoints();
     }
 
-    public Unit(String name){
-        this(name, Data.UnitTemplate.getStandard(), 10, WeaponType.SWORD, false, false, false, false, true);
+    public Unit(String name, UnitTemplate template, WeaponType weaponType){
+        this(name, template, template.getStartingLevel(), weaponType, false, false, false, true);
     }
 
    public static Unit createGenericUnit(
@@ -154,7 +151,7 @@ public class Unit extends Model {
            boolean horseman,
            boolean horsemanUponPromotion,
            boolean homogeneousLevelsup){
-        return new Unit(name, template, level, weaponType, false, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
+        return new Unit(name, template, level, weaponType, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
    }
 
     public static Unit createCharacterUnit(
@@ -166,40 +163,17 @@ public class Unit extends Model {
             boolean shielbearer,
             boolean horseman,
             boolean horsemanUponPromotion){
-        return new CharacterUnit(name, title, template, level, weaponType, false, shielbearer, horseman, horsemanUponPromotion, true);
+        return new CharacterUnit(name, title, template, level, weaponType, shielbearer, horseman, horsemanUponPromotion, true);
     }
 
-     
+
+    //------------------------- PROCESSING -------------------------
+
     public String getName(I18NBundle bundle) {
         return bundle.get(name);
     }
 
-     
-    public String getName() {
-        return name;
-    }
 
-     
-    public void setName(String namekey) {
-        this.name = namekey;
-    }
-
-     
-    public Data.UnitTemplate getTemplate() {
-        return template;
-    }
-
-     
-    public Data.WeaponType getWeaponType() {
-        return weaponType;
-    }
-
-     
-    public int getLevel() {
-        return level;
-    }
-
-     
     public int[] levelup() {
         int mob = 0;
         int cha = 0;
@@ -370,63 +344,16 @@ public class Unit extends Model {
 
     }
 
-     
+
     public boolean isPromoted() {
         return Data.PROMOTION_LEVEL <= level ;
     }
 
-     
-    public boolean isRightHanded() {
-        return rightHanded;
-    }
-
-     
-    public boolean setRightHanded(boolean righthanded) {
-        return this.rightHanded = righthanded;
-    }
-
-     
-    public boolean isCharacter() {
-        return character;
-    }
-
-     
-    public boolean isStandardBearer() {
-        return isWarChief();
-    }
-
-     
-    public boolean isHorseman() {
-        return horseman;
-    }
-
-     
-    public boolean isShielbearer() { return shielbearer; }
-
-     
-    public void setHorseman(boolean horseman) { this.horseman = horseman; }
-
-     
-    public boolean isHorsemanUponPromotion() { return horsemanUponPromotion; }
-
-     
-    public void setHorsemanUponPromotion(boolean horseman) {
-        this.horsemanUponPromotion = horseman;
-        if(isPromoted())
-            this.horseman = horseman;
-    }
-
-     
-    public Banner getBanner() {
-        return banner;
-    }
-
-     
     public String getTitle(I18NBundle bundle) {
         return template.getName(bundle);
     }
 
-     
+
     public boolean addWeapon(Weapon weapon) {
         boolean weaponAdded = false;
         if(weapon.getTemplate().getWeaponType() == weaponType) {
@@ -441,7 +368,7 @@ public class Unit extends Model {
         return weaponAdded;
     }
 
-     
+
     public Weapon removeWeapon(int index) {
         Weapon weaponToreturn = null;
         if(0 <= index && index < weapons.size) {
@@ -452,7 +379,7 @@ public class Unit extends Model {
         return weaponToreturn;
     }
 
-     
+
     public Weapon replace(int index, Weapon weapon) {
         Weapon weaponToreturn = null;
         if(weapon.getTemplate().getWeaponType() == this.weaponType){
@@ -464,7 +391,7 @@ public class Unit extends Model {
         return weaponToreturn;
     }
 
-     
+
     public Array<Weapon> removeAllWeapons() {
         Array<Weapon> removedWeapons = weapons;
         weapons = new Array<Weapon>();
@@ -473,17 +400,10 @@ public class Unit extends Model {
         return removedWeapons;
     }
 
-     
-    public Array<Weapon> getWeapons() {
-        return weapons;
-    }
-
-     
     public Weapon getCurrentWeapon() {
         return weapons.get(0);
     }
 
-     
     public boolean switchWeapon(int index) {
         if (0 < index && index < weapons.size) {
             weapons.swap(0, index);
@@ -492,7 +412,7 @@ public class Unit extends Model {
         return false;
     }
 
-     
+
     public Weapon getWeapon(int index) {
         Weapon weapon = null;
         if (0 < index && index < weapons.size) {
@@ -501,87 +421,30 @@ public class Unit extends Model {
         return weapon;
     }
 
-     
-    public int getBaseHitpoints() {
-        return hitPoints;
+    public boolean isStandardBearer() {
+        return isWarChief();
     }
 
-     
     public int getAppHitpoints() {
         return hitPoints;
     }
 
-     
+
     public float getAppGrHitpoints() {
         return  (isPromoted()) ? template.getGetProGrowthHP() : template.getGrowthHP();
     }
 
-     
-    public int getCurrentHP() {
-        return currentHitPoints;
-    }
-
-     
-    public void setCurrentHitPoints(int hitPoints) {
-        if(0<= hitPoints && hitPoints <= getAppHitpoints()){
-            this.currentHitPoints = hitPoints;
-            if(this.currentMoral > this.currentHitPoints)
-                this.currentMoral = currentHitPoints;
-        }
-    }
-
-     
     public void resetCurrentMoral() {
         this.currentMoral = getAppMoral();
         if(this.currentMoral > this.currentHitPoints)
             this.currentMoral = currentHitPoints;
     }
 
-     
+
     public int getAppMoral() {
         return getAppBravery();
     }
 
-     
-    public int getCurrentMoral() {
-        return currentMoral;
-    }
-
-     
-    public void setCurrentMoral(int moral) {
-        if(0 <= moral){
-            this.currentMoral = ( moral > getAppMoral())? getAppMoral() : moral;
-        }
-    }
-
-     
-    public int getExperience() {
-        return experience;
-    }
-
-    /**
-     *
-     * @param experience
-     * @return an array of exp gained between each level up
-     */
-     
-    public int[] setExperience(int experience) {
-        // get the number of lvl gained and the resulting exp array
-        int levelsGained = experience / Data.EXP_REQUIRED_LD_LEVEL_UP;
-        int[] exps = new int[ 1 + levelsGained];
-
-        // fill the exps array
-        for(int i = 0; i < exps.length; i++)
-            exps[i] = Data.EXP_REQUIRED_LD_LEVEL_UP;
-        exps[exps.length - 1] = experience % Data.EXP_REQUIRED_LEVEL_UP;
-
-        // set the new experience value
-        this.experience = exps[exps.length - 1];
-
-        return exps;
-    }
-
-     
     public Stack<int[]> addExpPoints(int exp) {
         Stack<int[]> gainLvl = new Stack<int[]>();
 
@@ -596,84 +459,43 @@ public class Unit extends Model {
         return gainLvl;
     }
 
-     
-    public int getLeadershipExperience() {
-        return commandmentExperience;
-    }
-
-     
-    public void setLeadershipExperience(int experience) {
-        this.commandmentExperience = experience % Data.EXP_REQUIRED_LD_LEVEL_UP;
-    }
-
-     
-    public boolean addLdExpPoints(int exp) {
+    public int addLdExpPoints(int exp) {
+        int ldLevelGained = 0;
         this.commandmentExperience += exp;
         if(commandmentExperience > Data.EXP_REQUIRED_LD_LEVEL_UP){
-            this.setLeadership(this.leadership + commandmentExperience / Data.EXP_REQUIRED_LD_LEVEL_UP);
+            ldLevelGained = commandmentExperience / Data.EXP_REQUIRED_LD_LEVEL_UP;
+            this.setLeadership(this.leadership + ldLevelGained);
             this.commandmentExperience = this.commandmentExperience % Data.EXP_REQUIRED_LD_LEVEL_UP;
-            return true;
         }
-        return false;
+        return ldLevelGained;
     }
 
-     
-    public int getBaseCharisma() {
-        return charisma;
-    }
 
-     
     public int getAppCharisma() {
         return charisma;
     }
 
-     
     public float getAppGrCharisma() {
         return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
     }
 
-     
-    public int getBaseLeadership() {
-        return leadership;
-    }
 
-     
     public int getAppLeadership() {
         return leadership;
     }
 
-     
-    public int getBaseStrength() {
-        return strength;
-    }
-
-     
     public int getAppStrength() {
         return strength;
     }
 
-     
     public float getAppGrStrength() {
         return (isPromoted()) ? template.getProGrowthStr() : template.getGrowthStr();
     }
 
-     
-    public int getBaseArmor(Data.DamageType damageType) {
-        int armor = 0;
-        switch(damageType){
-            case BLUNT: armor = bluntArmor; break;
-            case EDGED: armor = edgedArmor; break;
-            case PIERCING: armor = piercinfArmor;break;
-        }
-        return armor;
-    }
-
-     
     public int getAppArmor(Data.DamageType damageType) {
-        return getBaseArmor(damageType);
+        return getArmor(damageType);
     }
 
-     
     public float getAppGrArmor(DamageType damageType) {
         float growthrate = 0;
         switch(damageType){
@@ -684,82 +506,48 @@ public class Unit extends Model {
         return growthrate;
     }
 
-     
-    public int getBaseAgility() {
-        return agility;
-    }
-
-     
     public int getAppAgility() {
         return agility;
     }
 
-     
     public float getAppGrAgility() {
         return (isPromoted()) ? template.getProGrowthAg() : template.getGrowthAg();
     }
 
-     
-    public int getBaseDexterity() {
-        return dexterity;
-    }
-
-     
     public int getAppDexterity() {
         return dexterity;
     }
 
-     
     public float getAppGrDexterity() {
         return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
     }
 
-     
-    public int getBaseSkill() {
-        return skill;
-    }
-
-     
     public int getAppSkill() {
         return skill;
     }
 
-     
     public float getAppGrSkill() {
         return (isPromoted()) ? template.getProGrowthSk() : template.getGrowthSk();
     }
 
-     
-    public int getBaseBravery() {
-        return bravery;
-    }
-
-     
     public int getAppBravery() {
         return bravery;
     }
 
-     
+
     public float getAppGrBravery() {
         return (isPromoted()) ? template.getProGrowthBr() : template.getGrowthBr();
     }
 
-     
-    public int getBaseMobility() {
-        return mobility;
-    }
-
-     
     public int getAppMobility() {
         return mobility;
     }
 
-     
-    public void addNativeAbility(Data.Ability guard) {
 
+    public void addNativeAbility(Data.Ability ability) {
+        nativeAbilities.add(ability);
     }
 
-     
     public boolean has(Data.Ability ability) {
         boolean hasAbility = false;
         for(int i = 0; i < equipments.size; i++){
@@ -787,7 +575,7 @@ public class Unit extends Model {
         return hasAbility;
     }
 
-     
+
     public Array<Data.Ability> getAbilities() {
         Array<Data.Ability> abilities = new Array<Data.Ability>();
         Data.Ability ability;
@@ -813,12 +601,11 @@ public class Unit extends Model {
         return abilities;
     }
 
-     
     public boolean has(Equipment item) {
         return equipments.contains(item, true);
     }
 
-     
+
     public boolean addEquipment(Equipment item) {
         boolean itemAdded = false;
         if(!equipments.contains(item, true) && equipments.size < ((isPromoted()) ? Data.MAX_ITEM_CARRIED_UPON_PROMOTION: Data.MAX_ITEM_CARRIED)){
@@ -828,19 +615,13 @@ public class Unit extends Model {
         return itemAdded;
     }
 
-     
+
     public Array<Equipment> disequipAllEquipment() {
         Array<Equipment> removedItems = equipments;
         this.equipments = new Array<Equipment>();
         return removedItems;
     }
 
-     
-    public Array<Equipment> getEquipments() {
-        return equipments;
-    }
-
-     
     public Equipment removeEquipment(int index) {
         Equipment item = null;
         if(0 <= index && index < equipments.size ){
@@ -849,7 +630,7 @@ public class Unit extends Model {
         return item;
     }
 
-     
+
     public Equipment replaceEquipment(int index, Equipment item) {
         Equipment olditem = null;
         if(0 <= index && index < equipments.size ){
@@ -859,12 +640,6 @@ public class Unit extends Model {
         return olditem;
     }
 
-
-
-
-    // --------------- LOOT & STEAL ----------------------
-
-     
     public boolean isStealable() {
         boolean stealable = false;
         if(!has(Data.Ability.VIGILANT)) {
@@ -886,12 +661,12 @@ public class Unit extends Model {
         return stealable;
     }
 
-     
+
     public Item getRandomlyStealableItem() {
         return getStealableItems().random();
     }
 
-     
+
     public Item getRandomlyDroppableItem() {
         Item droppedItem = null;
 
@@ -922,7 +697,7 @@ public class Unit extends Model {
         return droppedItem;
     }
 
-     
+
     public Array<Item> getStealableItems() {
         Array<Item> stealableItems = new Array<Item>();
         for(int i =0; i < weapons.size; i++){
@@ -938,22 +713,22 @@ public class Unit extends Model {
         return stealableItems;
     }
 
-     
+
     public int getAppWeaponRangeMin() {
         return getCurrentWeapon().getTemplate().getRangeMin();
     }
 
-     
+
     public int getAppWeaponRangeMax() {
         return getCurrentWeapon().getTemplate().getRangeMax();
     }
 
-     
+
     public int getCurrentWeaponRangeMin(int rowUnit, int colUnit, Battlefield battlefield) {
         return getCurrentWeapon().getTemplate().getRangeMin();
     }
 
-     
+
     public int getCurrentWeaponRangeMax(int rowUnit, int colUnit, Battlefield battlefield) {
         int rangeMax = getCurrentWeapon().getTemplate().getRangeMax();
         if(battlefield.isTileExisted(rowUnit, colUnit)){
@@ -965,37 +740,29 @@ public class Unit extends Model {
         return rangeMax;
     }
 
-     
+
     public int getAppAttackAccuracy() {
         return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + Data.WC_CHARISMA_BONUS_ATT_ACC* getChiefCharisma();
     }
 
-     
+
     public int[] getAppAttackMight() {
         return new int[]{getCurrentWeapon().getTemplate().getDamageMin() + getAppStrength(), getCurrentWeapon().getTemplate().getDamageMax() + getAppStrength()};
     }
 
-     
-    public int getAppDefense(DamageType damageType) {
+    public int getAppDefense(DamageType damageType){
         return getAppArmor(damageType);
     }
 
-     
+
     public int getAppAvoidance() {
         return Data.DEX_FACTOR_AVO * getAppAgility();
     }
 
-     
-    public void setActionPoints(int ap) {
-        this.actionPoints = (ap > 0) ? ap : 0;
-    }
-
-     
     public void resetActionPoints() {
         this.actionPoints = getAppSkill();
     }
 
-     
     public void addActionPoints(int points) {
         this.actionPoints += points;
         if(actionPoints < 0 )
@@ -1003,29 +770,21 @@ public class Unit extends Model {
 
     }
 
-     
-    public int getCurrentActionPoints() {
-        return this.actionPoints;
-    }
-
-
-
-     
     public boolean isMobilized() {
         return (army != null) && getArmy().isUnitMobilized(this);
     }
 
-     
+
     public boolean isWarChief() {
         return isMobilized() && army.getWarChiefs().contains(this, true);
     }
 
-     
+
     public boolean isWarlord() {
         return isMobilized() && this == army.getWarlord();
     }
 
-     
+
     public int getMaxSoldiersAs(boolean warlord) {
         int maxSoldiers;
         if(warlord){
@@ -1042,7 +801,6 @@ public class Unit extends Model {
         return maxSoldiers;
     }
 
-     
     public int getMaxWarChiefs() {
         int maxWC = this.leadership / 6;
         if(maxWC > 3 )
@@ -1051,27 +809,15 @@ public class Unit extends Model {
     }
 
 
-     
-    public void setArmy(MilitaryForce army) {
-        this.army = army;
-    }
-
-     
     public boolean isAllyWith(Data.Affiliation affiliation) {
         return (army != null) && army.getAffiliation() == affiliation;
     }
 
-     
+
     public Array<Unit> getSquad(boolean stillFighting) {
         return (army != null) ? army.getSquad(this, stillFighting) : new Array<Unit>();
     }
 
-     
-    public MilitaryForce getArmy() {
-        return army;
-    }
-
-     
     public boolean sameSquadAs(Unit unit) {
         if(army != null){
             Array<Unit> squad =  army.getSquad(unit, false);
@@ -1085,24 +831,18 @@ public class Unit extends Model {
         return false;
     }
 
-     
+
     public boolean sameArmyAs(Unit unit) {
         return army != null && unit.getArmy() != null && this.army == unit.getArmy();
     }
 
-     
-    public void setLeadership(int leadership) {
-        this.leadership = leadership;
-    }
-
-     
     public Unit getWarchief() {
         if(isMobilized())
             return army.getWarchief(this);
         return null;
     }
 
-     
+
     public int getChiefCharisma() {
         int chiefCharisma = 0;
         if(isMobilized() && !army.getWarchief(this).isOutOfAction()){
@@ -1113,7 +853,7 @@ public class Unit extends Model {
         return chiefCharisma;
     }
 
-     
+
     public void replenishMoral(boolean turnBeginning) {
         if(turnBeginning) {
             if(!this.isOutOfAction()) {
@@ -1124,7 +864,7 @@ public class Unit extends Model {
         }
     }
 
-     
+
     public int getSquadIndex() {
         int squadIndex = -1;
         if(isMobilized()){
@@ -1143,100 +883,27 @@ public class Unit extends Model {
         return squadIndex;
     }
 
-     
-    public void setOrientation(Data.Orientation orientation) {
-        this.orientation = orientation;
-    }
-
-     
-    public void setOrientation(Orientation orientation, boolean notifyObservers) {
-        setOrientation(orientation);
-        if(notifyObservers)
-            notifyAllObservers(orientation);
-
-    }
-
-     
-    public Data.Orientation getOrientation() {
-        return orientation;
-    }
-
-     
-    public void setBehaviour(Data.Behaviour behaviour) {
-        this.behaviour = behaviour;
-    }
-
-     
-    public Data.Behaviour getBehaviour() {
-        return behaviour;
-    }
-
-
-     
-    public boolean hasActed() {
-        return acted;
-    }
-
-     
-    public boolean hasMoved() {
-        return moved;
-    }
-
-     
     public boolean isWounded() {
         return currentHitPoints < getAppHitpoints();
     }
 
-     
     public boolean isOutOfAction() {
         return currentMoral == 0 || currentHitPoints == 0;
     }
 
-     
     public boolean isDead() {
         return currentHitPoints == 0;
     }
 
-     
-    public void setActed(boolean acted) {
-        this.acted = acted;
-    }
-
-     
-    public void setMoved(boolean moved) {
-        this.moved = moved;
-    }
-
-     
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-     
-    public void setDisabled(boolean disabled, boolean notifyObservers)  {
-        this.disabled = disabled;
-        if(notifyObservers)
-            notifyAllObservers(Notification.Disabled.get(disabled));
-    }
-
-     
-    public boolean isCrippled() {
-        return crippled;
-    }
-
-     
-    public void setCrippled(boolean crippled, boolean notifyObservers) {
-        this.crippled = crippled;
-        if(notifyObservers)
-            notifyAllObservers(Notification.Crippled.get(crippled));
-    }
-
-     
     public boolean isDone() {
         return acted && moved;
     }
 
-     
+    public boolean isCharacter(){
+        return this instanceof CharacterUnit;
+    }
+
+
     public int getRecoveredHitPoints(int healPower) {
         int recoveredHP ;
         if(healPower + hitPoints > getAppHitpoints()){
@@ -1247,7 +914,7 @@ public class Unit extends Model {
         return recoveredHP;
     }
 
-     
+
     public int getRecoveredMoralPoints(int healPower) {
         int recoveredMoralPoints;
         if(healPower + hitPoints > getAppMoral()){
@@ -1258,7 +925,7 @@ public class Unit extends Model {
         return recoveredMoralPoints;
     }
 
-     
+
     public boolean treated(int healPower) {
         if(isWounded()) {
             if (healPower + hitPoints > getAppHitpoints()) {
@@ -1277,7 +944,7 @@ public class Unit extends Model {
         return false;
     }
 
-     
+
     public TakeDamage takeDamage(int damageDealt, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralModifier){
         TakeDamage.State state = TakeDamage.State.UNDAMAGED;
         int lifeDamageTaken = 0;
@@ -1311,6 +978,244 @@ public class Unit extends Model {
         return new TakeDamage(this, ignorePhysicalDamage, ignoreMoralDamage, damageDealt, lifeDamageTaken, state);
     }
 
+
+
+
+
+    //------------------------- GETTERS & SETTERS --------------------
+
+
+    public String getName() {
+        return name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+     
+    public Data.UnitTemplate getTemplate() {
+        return template;
+    }
+     
+    public Data.WeaponType getWeaponType() {
+        return weaponType;
+    }
+
+    public boolean isShielbearer() { return shielbearer; }
+
+    public boolean isHorseman() {
+        return horseman;
+    }
+
+    public void setHorseman(boolean horseman) { this.horseman = horseman; }
+
+    public boolean isHorsemanUponPromotion() { return horsemanUponPromotion; }
+
+
+    public void setHorsemanUponPromotion(boolean horseman) {
+        this.horsemanUponPromotion = horseman;
+        if(isPromoted())
+            this.horseman = horseman;
+    }
+
+    public boolean isRightHanded() {
+        return rightHanded;
+    }
+     
+    public boolean setRightHanded(boolean righthanded) {
+        return this.rightHanded = righthanded;
+    }
+     
+
+    public Array<Weapon> getWeapons() {
+        return weapons;
+    }
+     
+    public int getExperience() {
+        return experience;
+    }
+
+    /**
+     *
+     * @param experience
+     * @return an array of exp gained between each level up (ex: 255 = [100, 100, 55]
+     */
+     
+    public int[] setExperience(int experience) {
+        // get the number of lvl gained and the resulting exp array
+        int levelsGained = experience / Data.EXP_REQUIRED_LD_LEVEL_UP;
+        int[] exps = new int[ 1 + levelsGained];
+
+        // fill the exps array
+        for(int i = 0; i < exps.length; i++)
+            exps[i] = Data.EXP_REQUIRED_LD_LEVEL_UP;
+        exps[exps.length - 1] = experience % Data.EXP_REQUIRED_LEVEL_UP;
+
+        // set the new experience value
+        this.experience = exps[exps.length - 1];
+
+        return exps;
+    }
+
+     
+    public int getLeadershipExperience() {
+        return commandmentExperience;
+    }
+
+
+    public void setLeadershipExperience(int experience) {
+        this.commandmentExperience = experience % Data.EXP_REQUIRED_LD_LEVEL_UP;
+    }
+
+    public MilitaryForce getArmy() {
+        return army;
+    }
+
+    public void setArmy(MilitaryForce army) {
+        this.army = army;
+    }
+
+
+    public int getMobility() {
+        return mobility;
+    }
+
+    public int getCharisma() {
+        return charisma;
+    }
+
+    public int getLeadership() {
+        return leadership;
+    }
+
+    public void setLeadership(int leadership) {
+        this.leadership = leadership;
+    }
+
+    public int getHitpoints() {
+        return hitPoints;
+    }
+     
+    public int getStrength() {
+        return strength;
+    }
+
+    public int getArmor(Data.DamageType damageType) {
+        int armor = 0;
+        switch(damageType){
+            case BLUNT: armor = bluntArmor; break;
+            case EDGED: armor = edgedArmor; break;
+            case PIERCING: armor = piercinfArmor;break;
+        }
+        return armor;
+    }
+
+    public int getDexterity() {
+        return dexterity;
+    }
+     
+    public int getAgility() {
+        return agility;
+    }
+
+    public int getSkill() {
+        return skill;
+    }
+
+    public int getBravery() {
+        return bravery;
+    }
+
+    public int getCurrentHitPoints() {
+        return currentHitPoints;
+    }
+
+    public void setCurrentHitPoints(int hitPoints) {
+        if(0 <= hitPoints){
+            this.currentHitPoints = ( hitPoints > getAppHitpoints())? getAppHitpoints() : hitPoints;
+        }
+    }
+
+
+    public int getCurrentMoral() {
+        return currentMoral;
+    }
+
+
+    public void setCurrentMoral(int moral) {
+        if(0 <= moral){
+            this.currentMoral = ( moral > getAppMoral())? getAppMoral() : moral;
+        }
+    }
+
+    public void setActionPoints(int ap) {
+        this.actionPoints = (ap > 0) ? ap : 0;
+    }
+
+    public int getActionPoints() {
+        return this.actionPoints;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled)  {
+        this.disabled = disabled;
+    }
+
+    public boolean isCrippled() {
+        return crippled;
+    }
+
+
+    public void setCrippled(boolean crippled) {
+        this.crippled = crippled;
+    }
+
+    public Array<Equipment> getEquipments() {
+        return equipments;
+    }
+
+    public Banner getBanner() {
+        return banner;
+    }
+
+    public Orientation getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(Orientation orientation) {
+        this.orientation = orientation;
+    }
+
+    public void setBehaviour(Data.Behaviour behaviour) {
+        this.behaviour = behaviour;
+    }
+
+     
+    public Behaviour getBehaviour() {
+        return behaviour;
+    }
+
+    public boolean isActed() {
+        return acted;
+    }
+
+     
+    public boolean isMoved() {
+        return moved;
+    }
+
+    public void setActed(boolean acted) {
+        this.acted = acted;
+    }
+
+     
+    public void setMoved(boolean moved) {
+        this.moved = moved;
+    }
+
      
     public String toString() {
         return getName();
@@ -1320,27 +1225,27 @@ public class Unit extends Model {
         String str = "\nname : "+getName();
 
         str +="\nhitpoints  : ";
-        str += (apparent) ? getAppHitpoints() : getBaseHitpoints();
+        str += (apparent) ? getAppHitpoints() : getHitpoints();
         str +="\nbravery    : ";
-        str += (apparent) ? getAppBravery() : getBaseBravery();
+        str += (apparent) ? getAppBravery() : getBravery();
         str +="\ncharisma   : ";
-        str += (apparent) ? getAppCharisma() : getBaseCharisma();
+        str += (apparent) ? getAppCharisma() : getCharisma();
         str +="\ndexterity: : ";
-        str += (apparent) ? getAppDexterity() : getBaseDexterity();
+        str += (apparent) ? getAppDexterity() : getDexterity();
         str +="\nskill      : ";
-        str += (apparent) ? getAppSkill() : getBaseSkill();
+        str += (apparent) ? getAppSkill() : getSkill();
         str +="\n_________________: ";
         str += "\nstrength  : ";
-        str += (apparent) ? getAppStrength() : getBaseStrength();
+        str += (apparent) ? getAppStrength() : getStrength();
         str +="\ndefense    ";
         str +="\n   piercing : ";
-        str += (apparent) ? getAppArmor(DamageType.PIERCING) : getBaseArmor(DamageType.PIERCING);
+        str += (apparent) ? getAppArmor(DamageType.PIERCING) : getArmor(DamageType.PIERCING);
         str +="\n   blunt    : ";
-        str += (apparent) ? getAppArmor(DamageType.BLUNT) : getBaseArmor(DamageType.BLUNT);
+        str += (apparent) ? getAppArmor(DamageType.BLUNT) : getArmor(DamageType.BLUNT);
         str +="\n   edged : ";
-        str += (apparent) ? getAppArmor(DamageType.EDGED) : getBaseArmor(DamageType.EDGED);
+        str += (apparent) ? getAppArmor(DamageType.EDGED) : getArmor(DamageType.EDGED);
         str +="\nagility    : ";
-        str += (apparent) ? getAppAgility() : getBaseAgility();
+        str += (apparent) ? getAppAgility() : getAgility();
 
         return str;
     }
@@ -1350,11 +1255,16 @@ public class Unit extends Model {
     static class CharacterUnit extends Unit{
         private String title;
 
-        public CharacterUnit(String name, String title, UnitTemplate template, int level, WeaponType weaponType, boolean character, boolean shielbearer, boolean horseman, boolean horsemanUponPromotion, boolean homogeneousLevelsup) {
-            super(name, template, level, weaponType, character, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
+        public CharacterUnit(String name, String title, UnitTemplate template, int level, WeaponType weaponType, boolean shielbearer, boolean horseman, boolean horsemanUponPromotion, boolean homogeneousLevelsup) {
+            super(name, template, level, weaponType, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
             this.title = title;
         }
 
+        public CharacterUnit(String name, UnitTemplate template, WeaponType weaponType){
+            super(name, template, weaponType);
+            this.title = "no title";
+
+        }
          
         public String getTitle(I18NBundle bundle) {
             return bundle.get(title);

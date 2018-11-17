@@ -15,7 +15,7 @@ public class BannerTest {
 
     @Before
     public void before(){
-        unit = new Unit("Elo");
+        unit = new Unit("Elo", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
         unit.setLeadership(15);
         banner = new Banner(unit);
 

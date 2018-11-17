@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands;
 
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -19,7 +20,7 @@ public class OutcomeTest {
     public void before(){
         outcome = new ActorCommand.Outcome(new Inventory());
         outcome1 = new ActorCommand.Outcome(new Inventory());
-        unit1 = new Unit("jin");
+        unit1 = new Unit("jin", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);
     }
 
     @Test

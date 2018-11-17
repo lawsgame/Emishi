@@ -144,7 +144,7 @@ public class BattlefieldLoader {
 
                 for(Weather weather : Weather.values()){
                     if(battleElt.get("weather").equals(weather.name())){
-                        bf.setWeather(weather, false);
+                        bf.setWeather(weather);
                         break;
                     }
                 }

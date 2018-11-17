@@ -58,9 +58,9 @@ public class LongUnitPanel extends UnitPanel {
                 builder.append("\nPosition : soldier");
             }
         }
-        builder.append("\nHit points: " + unit.getCurrentHP() + "/"+unit.getAppHitpoints());
+        builder.append("\nHit points: " + unit.getCurrentHitPoints() + "/"+unit.getAppHitpoints());
         builder.append("\nMoral: " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-        builder.append("\nAction Points : " + unit.getCurrentActionPoints());
+        builder.append("\nAction Points : " + unit.getActionPoints());
         builder.append("\nExperience : "+unit.getExperience());
 
         if (unit.isMobilized()) {
@@ -114,19 +114,19 @@ public class LongUnitPanel extends UnitPanel {
         builder.setLength(0);
 
         builder.append("    STATISTICS\n");
-        builder.append("\nHPT  :" + unit.getCurrentHP() +" ("+ unit.getBaseHitpoints()+")");
-        builder.append("\nSTR  :" + unit.getAppStrength() +" ("+ unit.getBaseStrength()+")");
-        builder.append("\nDEX  :" + unit.getAppDexterity() +" ("+ unit.getBaseDexterity()+")");
-        builder.append("\nSKI  :" + unit.getAppSkill() +" ("+ unit.getBaseSkill()+")");
+        builder.append("\nHPT  :" + unit.getCurrentHitPoints() +" ("+ unit.getHitpoints()+")");
+        builder.append("\nSTR  :" + unit.getAppStrength() +" ("+ unit.getStrength()+")");
+        builder.append("\nDEX  :" + unit.getAppDexterity() +" ("+ unit.getDexterity()+")");
+        builder.append("\nSKI  :" + unit.getAppSkill() +" ("+ unit.getSkill()+")");
         builder.append("\nDEF  : ");
         builder.append("\n  against piercing : "+unit.getAppArmor(Data.DamageType.PIERCING));
         builder.append("\n  against edged    : "+unit.getAppArmor(Data.DamageType.EDGED));
         builder.append("\n  against blunt    : "+unit.getAppArmor(Data.DamageType.BLUNT));
-        builder.append("\nAGI  : "+ unit.getAppAgility() +" ("+ unit.getBaseAgility()+")");
-        builder.append("\nBRA  : "+unit.getAppBravery() +" ("+ unit.getBaseBravery()+")");
-        builder.append("\nCHA  : "+unit.getAppCharisma() +" ("+ unit.getBaseCharisma()+")");
-        builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getBaseLeadership()+")");
-        builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getBaseMobility()+")");
+        builder.append("\nAGI  : "+ unit.getAppAgility() +" ("+ unit.getAgility()+")");
+        builder.append("\nBRA  : "+unit.getAppBravery() +" ("+ unit.getBravery()+")");
+        builder.append("\nCHA  : "+unit.getAppCharisma() +" ("+ unit.getCharisma()+")");
+        builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getLeadership()+")");
+        builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getMobility()+")");
 
         builder.append("\n\nattack might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
         builder.append("\nattack accuracy : "+unit.getAppAttackAccuracy());

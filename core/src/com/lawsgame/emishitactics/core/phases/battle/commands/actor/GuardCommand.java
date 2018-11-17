@@ -31,7 +31,7 @@ public class GuardCommand extends SelfInflitedCommand {
 
         // update model
         UnitArea area = Area.createGuardedArea(bfr.getModel(), rowActor, colActor, getInitiator());
-        bfr.getModel().addUnitArea(area, false);
+        bfr.getModel().addUnitArea(area);
 
 
         // push render task

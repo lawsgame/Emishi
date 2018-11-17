@@ -140,7 +140,7 @@ public abstract class BattleCommand extends Observable implements Observer {
             report.OOACoords.add(bfr.getModel().getUnitPos(OOAUnits.get(i)));
         }
 
-        bfr.getModel().removeOOAUnits(false);
+        bfr.getModel().removeOOAUnits();
 
         StandardTask removeOOAUnitTask = new StandardTask();
         for(int i = 0; i < OOAUnits.size; i++)

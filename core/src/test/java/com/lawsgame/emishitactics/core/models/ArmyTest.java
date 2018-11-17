@@ -21,16 +21,16 @@ public class ArmyTest {
     public void before(){
         army1 = new Army(Data.Affiliation.ALLY);
         army2 = new Army(Data.Affiliation.ENEMY_0);
-        phillipe = new Unit("phillipe");
+        phillipe = new Unit("phillipe", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
         phillipe.setLeadership(20);
-        eric = new Unit("eric");
+        eric = new Unit("eric", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
         eric.setLeadership(20);
-        louis = new Unit("charles");
+        louis = new Unit("charles", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
         louis.setLeadership(20);
-        charles = new Unit("charles");
-        claude = new Unit("claude");
-        herald = new Unit("herald");
-        richard = new Unit("Richard");
+        charles = new Unit("charles", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
+        claude = new Unit("claude", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
+        herald = new Unit("herald", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
+        richard = new Unit("Richard", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
     }
 
     @Test

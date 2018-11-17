@@ -37,6 +37,8 @@ public class Battlefield extends Model {
     private Weather weather;
     private Environment environment;
 
+
+
     private int turn;
     public LinkedList<MilitaryForce> armyTurnOrder;
     private BattleSolver solver;
@@ -51,7 +53,7 @@ public class Battlefield extends Model {
         this.deploymentAreas.add(new Area(this, Data.AreaType.DEPLOYMENT_AREA));
         this.unitAreas = new Array<UnitArea>();
         this.environment = env;
-        setWeather(weather, true);
+        setWeather(weather);
 
         setSolver(solver);
         this.armyTurnOrder = new LinkedList<MilitaryForce>();
@@ -62,6 +64,44 @@ public class Battlefield extends Model {
         this(nbRows, nbCols, Data.Weather.getStandard(), Environment.getStandard(), new BattleSolver.KillAll());
     }
 
+
+    //------------------ GETTERS & SETTERS ---------------------------------
+
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public Array<Area> getDeploymentAreas() {
+        return deploymentAreas;
+    }
+
+    public Data.Weather getWeather() {
+        return weather;
+    }
+
+    public void setWeather(Data.Weather weather) {
+        this.weather = weather;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
+
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+
     public BattleSolver getSolver(){
         return this.solver;
     }
@@ -70,6 +110,13 @@ public class Battlefield extends Model {
         this.solver = battleSolver;
         this.solver.setBattlefield(this);
     }
+
+
+
+
+
+
+    // --------------- DIMENSION GETTERS -----------------------------------
 
     public int getNbRows() {
         if(getTiles() != null)
@@ -229,6 +276,7 @@ public class Battlefield extends Model {
         return null;
     }
 
+    /*
     public Array<int[]> getNeighbourTiles(int row, int col) {
         Array<int[]> tiles = new Array<int[]>();
         if(isTileExisted(row + 1 , col)) tiles.add(new int[]{row + 1 , col});
@@ -237,25 +285,14 @@ public class Battlefield extends Model {
         if(isTileExisted(row , col - 1)) tiles.add(new int[]{row , col - 1});
         return tiles;
     }
-
-    public boolean plunderTile(int r, int c, boolean notifyObservers){
-        if(isTilePlunderable(r,c)){
-            setTile(r, c, TileType.RUINS, notifyObservers);
-            return true;
-        }
-        return false;
-    }
-
+    */
 
 
     //------------------ AREAS MAGEMETNS --------------------------------------
 
-    public void addUnitArea(UnitArea area, boolean notifyObservers){
+    public void addUnitArea(UnitArea area){
         if(area != null && area.getActor() != null && !isUnitAreaExisted(area)) {
             unitAreas.add(area);
-            if(notifyObservers) {
-                notifyAllObservers(area);
-            }
         }
     }
 
@@ -273,29 +310,23 @@ public class Battlefield extends Model {
         return removedAreas;
     }
 
-    public Array<UnitArea> removeAllAttachedArea(Unit actor, boolean moved, boolean notifyObservers){
+    public Array<UnitArea> removeAllAttachedArea(Unit actor, boolean moved){
         Array<UnitArea> removedAreas = new Array<UnitArea>();
         for(int i = 0; i < unitAreas.size; i++){
             if(unitAreas.get(i).getActor() == actor && (!moved || unitAreas.get(i).isRemovedUponMovingUnit())){
                 removedAreas.add(unitAreas.removeIndex(i));
                 i--;
-                if(notifyObservers) {
-                    notifyAllObservers(removedAreas.peek());
-                }
             }
         }
         return removedAreas;
     }
 
-    public Array<UnitArea> removeAllAreaType(AreaType type, boolean notifyObservers){
+    public Array<UnitArea> removeAllAreaType(AreaType type){
         Array<UnitArea> removedAreas = new Array<UnitArea>();
         for(int i = 0; i < unitAreas.size; i++){
             if(unitAreas.get(i).getType() == type){
                 removedAreas.add(unitAreas.removeIndex(i));
                 i--;
-                if(notifyObservers) {
-                    notifyAllObservers(removedAreas.peek());
-                }
             }
         }
         return removedAreas;
@@ -334,20 +365,6 @@ public class Battlefield extends Model {
             }
         }
         return guardians;
-    }
-
-    public Unit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance){
-        Array<Unit> guardians = getAvailableGuardian(row, col , alleageance);
-        Unit electedGuardian = null;
-        if(guardians.size > 0) {
-            electedGuardian = guardians.get(0);
-            for (int i = 1; i < guardians.size; i++) {
-                if (guardians.get(i).getLevel() > electedGuardian.getLevel()) {
-                    electedGuardian = guardians.get(i);
-                }
-            }
-        }
-        return electedGuardian;
     }
 
     public Unit getStrongestAvailableGuardian(int row, int col, Affiliation alleageance, Array<Unit> alreadyAffectedGuardian){
@@ -584,8 +601,8 @@ public class Battlefield extends Model {
             Unit unit1 = getUnit(rowUnit1, colUnit1);
             Unit unit2 = getUnit(rowUnit2, colUnit2);
             if(isTileReachable(rowUnit1, colUnit1, unit2.has(Data.Ability.PATHFINDER) && isTileReachable(rowUnit2, colUnit2, unit1.has(Data.Ability.PATHFINDER)))){
-                removeAllAttachedArea(unit1,  true,false);
-                removeAllAttachedArea(unit2, true, false);
+                removeAllAttachedArea(unit1,  true);
+                removeAllAttachedArea(unit2, true);
                 this.units[rowUnit2][colUnit2] = unit1;
                 this.units[rowUnit1][colUnit1] = unit2;
 
@@ -598,7 +615,7 @@ public class Battlefield extends Model {
         if(isTileOccupied(rowI, colI)) {
             Unit unit = getUnit(rowI, colI);
             if(isTileAvailable(rowf, colf, unit.has(Data.Ability.PATHFINDER))){
-                removeAllAttachedArea(unit,true,  notifyObservers);
+                removeAllAttachedArea(unit,true);
                 this.units[rowf][colf] = unit;
                 this.units[rowI][colI] = null;
                 if(notifyObservers) {
@@ -676,23 +693,23 @@ public class Battlefield extends Model {
     }
 
 
-    public Unit removeUnit(int row, int col, boolean notifyObservers){
+    public Unit removeUnit(int row, int col){
         Unit unit = this.units[row][col];
         this.units[row][col] = null;
-        removeAllAttachedArea(unit, false, notifyObservers);
-        if(notifyObservers)
-            notifyAllObservers(getUnit(row, col));
+        removeAllAttachedArea(unit, false);
         return unit;
     }
 
-    public void removeOOAUnits(boolean notifyObservers) {
+    public Array<Unit> removeOOAUnits() {
+        Array<Unit> units = new Array<Unit>();
         for(int r= 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileOccupied(r, c) && getUnit(r, c).isOutOfAction()){
-                    removeUnit(r, c, notifyObservers);
+                    units.add(removeUnit(r, c));
                 }
             }
         }
+        return units;
     }
 
     public Array<Unit> getOOAUnits() {
@@ -1217,30 +1234,6 @@ public class Battlefield extends Model {
         return res;
     }
 
-
-
-
-    //-------------------GETTERS & SETTERS -------------------------
-
-
-
-
-    public Tile[][] getTiles() {
-        return tiles;
-    }
-
-    public int getWidth() {
-        return getNbColumns();
-    }
-
-    public int getHeight() {
-        return getNbRows();
-    }
-
-    public Array<Area> getDeploymentAreas() {
-        return deploymentAreas;
-    }
-
     public Area getDeploymentArea(int areaIndex) {
         if(0 <= areaIndex && areaIndex < deploymentAreas.size)
             return deploymentAreas.get(areaIndex);
@@ -1251,37 +1244,14 @@ public class Battlefield extends Model {
         return deploymentAreas.size;
     }
 
-    public void setWeather(Data.Weather weather, boolean notifyObservers) {
-        this.weather = weather;
-        if(notifyObservers){
-            notifyAllObservers(weather);
-        }
-    }
-
-    public Data.Weather getWeather() {
-        return weather;
-    }
-
-    public Environment getEnvironment() {
-        return environment;
-    }
-
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
-
-
-    public int getTurn() {
-        return turn;
-    }
-
-    public void setTurn(int turn) {
-        this.turn = turn;
-    }
 
     public void incrementTurn(){
         this.turn++;
     }
+
+
+
+    //--------------------------- TO STRING -------------------------------------------
 
     @Override
     public String toString() {

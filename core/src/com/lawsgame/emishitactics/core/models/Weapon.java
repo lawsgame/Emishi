@@ -30,7 +30,7 @@ public class Weapon extends Observable implements Item{
     // --------------- PROCESS ----------------------------------------
 
     public String getName(I18NBundle bundle){
-        return (bundle.get(template.name()) != null) ? bundle.get(template.name()) : template.name().toLowerCase();
+        return bundle.get(template.name());
     }
 
 

@@ -53,6 +53,11 @@ public abstract class Model extends Observable{
         return triggers.size > 0;
     }
 
+
+
+
+    //------------------- GETTERS & SETTERS ---------------------
+
     public String triggerToString(){
         String str = toString();
         str +=  "\n     registered TRIGGERS : ";
@@ -83,6 +88,9 @@ public abstract class Model extends Observable{
             this.active = true;
         }
 
+
+        //-------------------- PROCESS -------------------------------
+
         public abstract boolean isTriggered(Object data);
 
         /**
@@ -108,17 +116,19 @@ public abstract class Model extends Observable{
             return tasks;
         }
 
-        void setActive(boolean active){
-            this.active = active;
+
+        boolean isEmpty(){
+            return eventCommands.size == 0;
         }
 
         public void addEvent(BattleCommand event){
             this.eventCommands.add(event);
         }
 
-        boolean isEmpty(){
-            return eventCommands.size == 0;
-        }
+
+
+
+        // --------------------- SETTERS & GETTERS -----------------------------------
 
         boolean isUseOnce(){
             return useOnce;
@@ -126,6 +136,10 @@ public abstract class Model extends Observable{
 
         boolean isActive(){
             return active;
+        }
+
+        void setActive(boolean active){
+            this.active = active;
         }
 
         public void setTag(String tag){

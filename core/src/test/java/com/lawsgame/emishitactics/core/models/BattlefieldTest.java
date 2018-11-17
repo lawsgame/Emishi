@@ -45,8 +45,8 @@ public class BattlefieldTest {
         assertTrue(battlefield.armyTurnOrder.size() == 4);
         assertTrue(battlefield.getSolver().isBattleOver());
 
-        Unit phillipe = new Unit("Phillipe");
-        Unit debby = new Unit("Debby");
+        Unit phillipe = new Unit("Phillipe", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);
+        Unit debby = new Unit("Debby", Data.UnitTemplate.SOLAIRE, Data.WeaponType.SWORD);
         army1.add(phillipe);
         army3.add(debby);
         battlefield.randomlyDeploy(army1);

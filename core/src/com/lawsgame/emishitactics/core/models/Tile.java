@@ -19,6 +19,28 @@ public class Tile extends Model{
         this.fragile = false;
     }
 
+
+
+    //--------------- PROCESS -------------------------------
+
+    public boolean collapse(){
+        return isFragile() && MathUtils.random() <= Data.CHANCE_OF_COLLAPSING;
+    }
+
+    public boolean isLooted() {
+        return true;
+    }
+
+    public boolean isFragile() {
+        return type.isDestructible() && fragile;
+    }
+
+
+
+
+
+    //--------------- GETTERS & SETTERS ---------------------
+
     public TileType getType() {
         return type;
     }
@@ -27,25 +49,18 @@ public class Tile extends Model{
         this.type = type;
     }
 
-    public boolean isLooted() {
-        return true;
+    public void setFragile(boolean fragile) {
+        this.fragile = fragile;
     }
 
     public String toString(){
         return type.name();
     }
 
-    public boolean isFragile() {
-        return type.isDestructible() && fragile;
-    }
 
-    public boolean collapse(){
-        return isFragile() && MathUtils.random() <= Data.CHANCE_OF_COLLAPSING;
-    }
 
-    public void setFragile(boolean fragile) {
-        this.fragile = fragile;
-    }
+
+
 
     //------------- SUB CLASS ---------------------
 

@@ -222,26 +222,15 @@ public abstract class ActorCommand extends BattleCommand{
      */
     public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator){
 
-        System.out.println(              "initiator : "+initiator);
-        System.out.println("            deployed ? "+bfr.getModel().isUnitDeployed(initiator));
-
         boolean valid = false;
         if(bfr.getModel().isUnitDeployed(initiator)){
-
-
-
             if(!initiator.isOutOfAction()) {
-                if (free || choice.getCost(rowActor, colActor, initiator, bfr.getModel()) <= initiator.getCurrentActionPoints()) {
-
-                    System.out.println("OK");
-
+                if (free || choice.getCost(rowActor, colActor, initiator, bfr.getModel()) <= initiator.getActionPoints()) {
                     if (choice.isActedBased()) {
-                        valid = (free || !initiator.hasActed()) && !initiator.isDisabled();
+                        valid = (free || !initiator.isActed()) && !initiator.isDisabled();
                     } else {
-                        valid = (free || !initiator.hasMoved()) && !initiator.isCrippled();
+                        valid = (free || !initiator.isMoved()) && !initiator.isCrippled();
                     }
-
-                    System.out.println("valid ? "+valid);
                 }
             }
         }

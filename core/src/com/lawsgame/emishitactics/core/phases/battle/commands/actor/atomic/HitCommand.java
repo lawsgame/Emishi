@@ -182,8 +182,8 @@ public class HitCommand extends ActorCommand{
                 notif.disabled = disablingTarget;
                 notif.backstab = getInitiator().getOrientation() == data.defenderRenderer.getModel().getOrientation();
                 notif.fleeingOrientation = getInitiator().getOrientation();
-                data.defenderRenderer.getModel().setCrippled(cripplingTarget, false);
-                data.defenderRenderer.getModel().setDisabled(disablingTarget, false);
+                data.defenderRenderer.getModel().setCrippled(cripplingTarget);
+                data.defenderRenderer.getModel().setDisabled(disablingTarget);
                 registerAction = !repeatableOnKill || !data.defenderRenderer.getModel().isOutOfAction();
 
 

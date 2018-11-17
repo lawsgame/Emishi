@@ -33,11 +33,6 @@ public class TempoExperiencePanel extends ExperiencePanel {
     }
 
     @Override
-    public void interrupt() {
-
-    }
-
-    @Override
     public void set(I18NBundle bundle, int initialExperience, int experienceGained) {
         description = "+"+experienceGained+" exp";
     }

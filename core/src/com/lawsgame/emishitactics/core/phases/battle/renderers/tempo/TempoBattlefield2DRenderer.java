@@ -251,7 +251,7 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void setGameCamParameters(CameraManager cameraManager) {
-        cameraManager.setCameraBoundaries(getModel().getWidth(), getModel().getHeight());
+        cameraManager.setCameraBoundaries(getModel().getNbColumns(), getModel().getNbRows());
         cameraManager.setCameraVelocity(CAM_VELOCITY);
     }
 

@@ -31,7 +31,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     protected Array<Sprite> spriteSet;
 
 
-    // MODEL DELAYED ATTRIBUTES
+    // MODEL SNAPHSOT ATTRIBUTES
 
     protected WeaponType weaponType;
     protected Orientation orientation;

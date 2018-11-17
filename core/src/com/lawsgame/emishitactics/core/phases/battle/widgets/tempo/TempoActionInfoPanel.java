@@ -162,7 +162,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                 builder.append("\nMoral / HP : ");
                 builder.append(data.defenderRenderer.getModel().getCurrentMoral());
                 builder.append(" - ");
-                builder.append(data.defenderRenderer.getModel().getCurrentHP());
+                builder.append(data.defenderRenderer.getModel().getCurrentHitPoints());
                 builder.append("\nDamage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
                 builder.append("\nHit rate : " + data.hitrate+"%");
                 builder.append("\nLoot rate : " + data.lootRate+"%");
@@ -185,7 +185,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                         builder.append("\nMoral / HP : ");
                         builder.append(data.defenderRenderer.getModel().getCurrentMoral());
                         builder.append(" - ");
-                        builder.append(data.defenderRenderer.getModel().getCurrentHP());
+                        builder.append(data.defenderRenderer.getModel().getCurrentHitPoints());
                         builder.append("\nDamage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
                         builder.append("\nHit rate : " + data.hitrate+"%");
                         builder.append("\nLoot rate : " + data.lootRate+"%");
@@ -213,7 +213,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                 Unit target = currentCommand.getTarget();
                 builder = new StringBuilder();
                 builder.append(command.getInitiator().getName()+" => "+command.getTarget().getName());
-                builder.append("\nHP : "+target.getCurrentHP()+" -> "+currentCommand.getRecoveredHitPoints());
+                builder.append("\nHP : "+target.getCurrentHitPoints()+" -> "+currentCommand.getRecoveredHitPoints());
                 builder.append("\nMP : "+target.getCurrentMoral()+" -> "+currentCommand.getRecoveredMoralPoints());
             }
         }

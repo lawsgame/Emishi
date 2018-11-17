@@ -14,21 +14,21 @@ public class UnitTest {
 
     @Before
     public void before(){
-        unit = new Unit("rodo");
+        unit = new Unit("rodo", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);
     }
 
     @Test
     public void testJob(){
         Array<Unit> units = new Array<Unit>();
         for(int i = 0; i < 1000; i++){
-            units.add(new Unit(""+i, Data.UnitTemplate.SOLAIRE, 25, Data.WeaponType.SWORD, false, false, false, false, false));
+            units.add(new Unit(""+i, Data.UnitTemplate.SOLAIRE, 25, Data.WeaponType.SWORD, false, false, false, false));
         }
 
         Unit unit;
         float[] array = new float[units.size];
         for(int i = 0; i < array.length; i++){
             unit = units.get(i);
-            array[i] = unit.getBaseAgility();
+            array[i] = unit.getAgility();
         }
     }
 

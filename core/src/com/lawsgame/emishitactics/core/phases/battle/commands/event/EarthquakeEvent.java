@@ -67,7 +67,7 @@ public class EarthquakeEvent extends BattleCommand {
                         victim = bf.getUnit(r,c);
                         if(!victim.isOutOfAction()){
                             notif = victim.takeDamage(3, false, false, 1f);
-                            victim.setCrippled(true, false);
+                            victim.setCrippled(true);
                             notif.critical = false;
                             notif.crippled = true;
                             notif.disabled = false;

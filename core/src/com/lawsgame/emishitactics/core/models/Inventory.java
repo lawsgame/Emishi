@@ -10,6 +10,9 @@ public class Inventory {
         storedItems = new Array<Item>();
     }
 
+
+    //------------------ PROCESS --------------------------------
+
     public void storeItem(Item item){
         storedItems.add(item);
     }
@@ -17,6 +20,9 @@ public class Inventory {
     public void clearInventory(){
         storedItems.clear();
     }
+
+
+    // ---------------- GETTERS & SETTERS ----------------------
 
     public Array<Item> getStoredItems() {
         return storedItems;

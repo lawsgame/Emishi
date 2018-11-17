@@ -13,12 +13,12 @@ public class Player {
     public static Player create(){
         Army playerArmy = Army.createPlayerArmyTemplate();
 
-        Unit warlord = new Unit("Aterui", Data.UnitTemplate.SOLAIRE, 6, Data.WeaponType.BOW, true, false, false, false, false);
+        Unit warlord = new Unit.CharacterUnit("Aterui", "Emishi lord", Data.UnitTemplate.SOLAIRE, 6, Data.WeaponType.BOW, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         warlord.setLeadership(19);
-        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 8, Data.WeaponType.SWORD, false, false, false, false, false);
+        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 8, Data.WeaponType.SWORD, false, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
 
         /*
@@ -43,6 +43,9 @@ public class Player {
 
         return new Player(new Inventory(), playerArmy);
     }
+
+
+    //---------------------- GETTERS & SETTERS ------------------------------
 
 
     public Army getArmy() {

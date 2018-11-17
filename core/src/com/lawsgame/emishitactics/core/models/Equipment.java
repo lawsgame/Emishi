@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
+import com.lawsgame.emishitactics.core.models.Data.EquipmentTemplate;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 public class Equipment extends Observable implements Item{
@@ -18,35 +19,49 @@ public class Equipment extends Observable implements Item{
         this(template, true);
     }
 
-    public Data.EquipmentTemplate getTemplate() {
-        return template;
-    }
 
-    public void setStealable(boolean stealable){
-        this.stealable = stealable;
-    }
+    //----------------------- PROCESS --------------------------------------------
 
     @Override
-    public boolean isStealable() {
-        return stealable;
+    public String getName(I18NBundle bundle) {
+        return bundle.get(template.name());
     }
 
-    @Override
-    public boolean isDroppable() { return droppable; }
 
     @Override
     public int getDropRate() {
         return template.getDropRate();
     }
 
+
+
+
+    //------------------ GETTERS & SETTERS --------------------------------------
+
+
+    public EquipmentTemplate getTemplate() {
+        return template;
+    }
+
+
+    @Override
+    public boolean isStealable() {
+        return stealable;
+    }
+
+
+    public void setStealable(boolean stealable){
+        this.stealable = stealable;
+    }
+
+    @Override
+    public boolean isDroppable() { return droppable; }
+
+
     public void setDroppable(boolean droppable) {
         this.droppable = droppable;
     }
 
-    @Override
-    public String getName(I18NBundle bundle) {
-        return bundle.get(template.name());
-    }
 
     @Override
     public String toString() {

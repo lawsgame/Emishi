@@ -10,6 +10,5 @@ public abstract class ExperiencePanel extends Panel{
     }
 
     public abstract boolean isExecuting();
-    public abstract void interrupt();
     public abstract void set(I18NBundle bundle, int initialExperience, int experienceGained);
 }

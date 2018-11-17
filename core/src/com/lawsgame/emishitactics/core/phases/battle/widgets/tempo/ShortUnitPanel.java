@@ -51,9 +51,9 @@ public class ShortUnitPanel extends UnitPanel {
             }
         }
 
-        builder.append("\nHit points  : " + unit.getCurrentHP() + "/" + unit.getAppHitpoints());
+        builder.append("\nHit points  : " + unit.getCurrentHitPoints() + "/" + unit.getAppHitpoints());
         builder.append("\nMoral  : " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-        builder.append("\nAction Points  : " + unit.getCurrentActionPoints());
+        builder.append("\nAction Points  : " + unit.getActionPoints());
         builder.append("\nCurrent weapon : " + unit.getCurrentWeapon().toString() + " ");
 
     }
