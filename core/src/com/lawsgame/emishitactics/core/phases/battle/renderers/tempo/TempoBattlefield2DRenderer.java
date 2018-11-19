@@ -7,14 +7,12 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Notification.Build;
 import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.CameraManager;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
 /*
@@ -87,7 +85,6 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
-        super.update(dt);
         countDown.update(dt);
         if(countDown.isFinished()) {
             countDown.reset();
@@ -102,29 +99,25 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
     }
 
     @Override
-    public boolean isCurrentTaskCompleted(){
-        return !countDown.isRunning();
+    public boolean isIdling() {
+        return false;
     }
 
     @Override
-    protected void setBuildTask(final Build notif) {
-        offerTask(new SimpleCommand() {
-            @Override
-            public void apply() {
-                countDown.run();
-                TextureRegion tr = sprite2DPool.getBuildInConstructionSprite(notif.tile.getType());
-                if(tr != null)
-                    tileRenderers [notif.row][notif.col] = tr;
-                notif.builder.notifyAllObservers(Data.AnimId.BUILD);
-            }
-        });
-        offerTask(new SimpleCommand() {
-            @Override
-            public void apply() {
-                addTileRenderer(notif.row, notif.col, notif.tile);
-            }
-        });
+    protected void displayBuilding(final int rowTile, final int colTile, final Tile buildingTile) {
+
     }
+
+    @Override
+    protected void displayCollapsing(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile) {
+
+    }
+
+    @Override
+    protected void displayPlundering(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile) {
+
+    }
+
 
     public void addTileRenderer(int r, int c, Tile tile){
         try{

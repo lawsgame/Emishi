@@ -383,7 +383,7 @@ public abstract class ActorCommand extends BattleCommand{
 
     //------------------- HELPER METHODS -----------------------------
 
-    protected final boolean isTargetAllyValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired, boolean canMove){
+    protected final boolean isTargetAllyValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0, boolean woundedRequired, boolean targetMustBeAbleToMove){
         boolean valid = false;
         if(initiator != null && choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC){
 
@@ -396,8 +396,8 @@ public abstract class ActorCommand extends BattleCommand{
                 for(int i = 0; i < impactArea.size; i++) {
 
                     if(bfr.getModel().isTileOccupiedByAlly(impactArea.get(i)[0], impactArea.get(i)[1], initiator)
-                            && (!woundedRequired || bfr.getModel().getUnit(impactArea.get(i)[0], impactArea.get(i)[1]).isWounded())
-                            && (!canMove || !initiator.isCrippled())) {
+                            && (!woundedRequired || bfr.getModel().getUnit(impactArea.get(i)[0], impactArea.get(i)[1]).isWounded(true, true))
+                            && (!targetMustBeAbleToMove || !initiator.isCrippled())) {
                         valid = true;
                     }
                 }
@@ -428,7 +428,7 @@ public abstract class ActorCommand extends BattleCommand{
         return valid;
     }
 
-    protected final Array<int[]> getAlliesAtRange(int row, int col, Unit initiator, boolean woundedRequired, boolean canMove){
+    protected final Array<int[]> getAlliesAtRange(int row, int col, Unit initiator, boolean woundedRequired, boolean targetMustBeAbleToMove){
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
 
@@ -440,7 +440,7 @@ public abstract class ActorCommand extends BattleCommand{
 
                     dist = Utils.dist(row, col, r, c);
                     if(rangeMin <= dist && dist <= rangeMax){
-                        targetsAtRange.addAll(getTargetedAllies(row, col, r, c, initiator, woundedRequired, canMove));
+                        targetsAtRange.addAll(getTargetedAllies(row, col, r, c, initiator, woundedRequired, targetMustBeAbleToMove));
                     }
                 }
             }
@@ -470,15 +470,16 @@ public abstract class ActorCommand extends BattleCommand{
         return Utils.arrayRemoveClones(targetsAtRange);
     }
 
-    protected final Array<int[]> getTargetedAllies(int rowActor, int colActor, int rowTarget, int colTarget, Unit initiator, boolean woundedRequired, boolean canMove){
+
+    protected final Array<int[]> getTargetedAllies(int rowActor, int colActor, int rowTarget, int colTarget, Unit initiator, boolean woundedRequired, boolean targetMustBeAbleToMove){
         Array<int[]> targets = getImpactArea(rowActor, colActor, rowTarget, colTarget);
         if(initiator == null){
             targets.clear();
         }else {
             for (int i = 0; i < targets.size; i++) {
                 if (!bfr.getModel().isTileOccupiedByAlly(targets.get(i)[0], targets.get(i)[1], initiator)
-                        || (woundedRequired && !bfr.getModel().getUnit(targets.get(i)[0], targets.get(i)[1]).isWounded())
-                        || (canMove && initiator.isCrippled())) {
+                        || (woundedRequired && !bfr.getModel().getUnit(targets.get(i)[0], targets.get(i)[1]).isWounded(true, true))
+                        || (targetMustBeAbleToMove && initiator.isCrippled())) {
 
                     targets.removeIndex(i);
                     i--;
@@ -487,6 +488,7 @@ public abstract class ActorCommand extends BattleCommand{
         }
         return targets;
     }
+
     protected final Array<int[]> getTargetedFoes(int rowActor, int colActor, int rowTarget, int colTarget, Unit initiator, boolean stealableRequired){
         Array<int[]> targets = getImpactArea(rowActor, colActor, rowTarget, colTarget);
         if(initiator == null) {
@@ -502,6 +504,7 @@ public abstract class ActorCommand extends BattleCommand{
         }
         return targets;
     }
+
 
 
     //------------------ GETTERS & SETTERS ---------------------------

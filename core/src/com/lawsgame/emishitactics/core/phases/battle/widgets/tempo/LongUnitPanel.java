@@ -21,7 +21,7 @@ public class LongUnitPanel extends UnitPanel {
     private static float X_TEXT_OFFSET_3_COL = 408f;
     private static float Y_TEXT_OFFSET = 8f;
     private static float PANEL_WIDTH = 650f;
-    private static float PANEL_HEIGHT = 400;
+    private static float PANEL_HEIGHT = 450;
 
     private String mainDescription;
     private String equipDescription;
@@ -74,7 +74,7 @@ public class LongUnitPanel extends UnitPanel {
             builder.append("\nBanner");
             builder.append("\n  | mode        : "+banner.getMode().name().toLowerCase());
             builder.append("\n  | points        : "+banner.getRemainingPoints()+"/"+banner.getMaxPoints());
-            builder.append("\n  | strength      : "+banner.getValue(Data.BannerBonus.STRENGTH, false));
+            builder.append("\n  | strength      : "+banner.getValue(Data.BannerBonus.ATTACK_MIGHT, false));
             builder.append("\n  | range         : "+banner.getValue(Data.BannerBonus.RANGE, false));
             builder.append("\n  | loot          : "+banner.getValue(Data.BannerBonus.LOOT_RATE, false)+"%");
             builder.append("\n  | AP reduc cost : "+banner.getValue(Data.BannerBonus.AP_COST, false));

@@ -12,8 +12,6 @@ import java.util.Random;
 public class Data {
 
 
-    //public static final float GAME_PORT_WIDTH = 15f;
-
     //MODEL parameters
     public static final int MOBILITY_BONUS_PROMOTED = 1;
     public static final int PROMOTION_LEVEL = 10;
@@ -43,7 +41,7 @@ public class Data {
         public static final float SPEED_TEMPO_PUSHED = 8f;
     public static final float SPEED_WALK = 1.5f;
     public static final float SPEED_PUSHED = 1.9f;
-    public static final float ANIMATION_NORMAL_SPEED = 0.55f;
+    public static final float ANIMATION_NORMAL_SPEED = 0.35f;
     public static final float ANIMATION_FLEE_SPEED = 0.09f;
     public static final float ANIMATION_WALK_SPEED = 0.25f;
     public static final float BLINK_PERIOD_TARGET = 1.0f * MathUtils.PI;
@@ -79,9 +77,9 @@ public class Data {
     }
 
     public enum BannerBonus {
-        STRENGTH    (1,     new float[]{1, 3, 5},       BBMode.OFFENSIVE),
+        ATTACK_MIGHT(1,     new float[]{1, 3, 5},       BBMode.OFFENSIVE),
         MORAL_SHIELD(0.1f,  new float[]{1, 2, 3, 4, 5}, BBMode.DEFENSIVE),
-        LOOT_RATE   (1,     new float[]{1, 2, 3, 4, 5}, BBMode.ALL),
+        LOOT_RATE   (2,     new float[]{1, 2, 3, 4, 5}, BBMode.ALL),
         AP_COST     (1,     new float[]{3, 6},          BBMode.OFFENSIVE),
         RANGE       (1,     new float[]{6},             BBMode.ALL);
 
@@ -246,15 +244,17 @@ public class Data {
 
         MOVE                (0, 0, true, false, 0, 0, false, new int[][]{{0, 0}}),
         WALK                (0, 0, true, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
-        ATTACK              (3, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
+        ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
         SWITCH_POSITION     (0, 0, true, false, 1, 1, false, new int[][]{{0, 0}}),
         PUSH                (0, 0, false, true, 1, 1, false, new int[][]{{0, 0}}),
         SWITCH_WEAPON       (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}}),
         CHOOSE_ORIENTATION  (0, 0, false, true, 0, 0, true, new int[][]{{0, 0}}),
-        HEAL                (3, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        GUARD               (3, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
-        STEAL               (3, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        BUILD               (5, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        HEAL                (1, 10, false, true, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
+        GUARD               (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
+        STEAL               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        BUILD               (3, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
+        PLUNDER             (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
+        COVER_AREA          (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
         END_TURN            (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
@@ -298,7 +298,13 @@ public class Data {
         }
 
         public int getCost(int rowActor, int colActor, Unit actor, Battlefield battlefield) {
-            return cost;
+            int costBannerBonus = 0;
+            if(battlefield.isStandardBearerAtRange(actor, rowActor, colActor)){
+                costBannerBonus -= (int) actor.getArmy().getSquadBanner(actor, true).getValue(BannerBonus.AP_COST, true);
+            }
+            if(costBannerBonus > cost)
+                costBannerBonus = cost;
+            return cost + costBannerBonus;
         }
 
         public int getExperience() {
@@ -891,12 +897,12 @@ public class Data {
 
     public enum UnitTemplate {
         SOLAIRE(1, 4, 5, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.HEAL},
-                3, 5, 7, 4, 7, 9, 3, 33, 6, 4, 3,
+                3, 7, 7, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
                 0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
                 0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f),
         SOLAR_KNIGHT(1, 4, 5, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.GUARD},
-                3, 6, 7, 4, 7, 9, 3, 33, 6, 4, 3,
+                3, 7, 7, 4, 7, 9, 3, 33, 6, 4, 3,
                 0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
                 0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
                 0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f);

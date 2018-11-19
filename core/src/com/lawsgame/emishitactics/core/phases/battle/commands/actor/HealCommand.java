@@ -5,17 +5,51 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
+import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class HealCommand extends ActorCommand {
+public class HealCommand extends SelfInflitedCommand {
+    private final boolean boostHP = true;
+    private final boolean boostMoral = true;
+    private int healPower;
+    private Unit[] patients;
+    private int[] recoveredHP;
+    private int[] recoveredMoral;
 
     public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, ActionChoice.HEAL, scheduler, playerInventory, false);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        healPower = 0;
+        recoveredHP = new int[0];
+        recoveredMoral = new int[0];
+        patients = new Unit[0];
+
+    }
+
+    @Override
+    protected void provideActionPanelInfos() {
+        super.provideActionPanelInfos();
+
+        healPower = Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, getInitiator(), getTarget(), bfr.getModel());
+        Array<int[]> targets = getTargetsFromImpactArea();
+        patients = new Unit[targets.size];
+        recoveredHP = new int[targets.size];
+        recoveredMoral = new int[targets.size];
+        for(int i = 0; i < targets.size; i++){
+            patients[i] = bfr.getModel().getUnit(targets.get(i)[0], targets.get(i)[1]);
+            recoveredHP[i] = (boostHP) ? patients[i].getRecoveredHitPoints(healPower) : 0;
+            recoveredMoral[i] = (boostMoral) ? patients[i].getRecoveredMoralPoints(healPower) : 0;
+        }
+
     }
 
     @Override
@@ -26,52 +60,46 @@ public class HealCommand extends ActorCommand {
     @Override
     protected void execute() {
 
-        // update model
-        int healPower = Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, getInitiator(), getTarget(), bfr.getModel());
-        boolean treated = getTarget().treated(healPower);
+
+
+        StandardTask task = new StandardTask();
+        task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
+
+        for(int i = 0; i < patients.length; i++) {
+            if(patients[i].improveCondition(healPower, boostMoral, boostHP)) {
+                System.out.println("renderer registered");
+                task.addThread(new RendererThread(bfr.getUnitRenderer(patients[i]), new Notification.Treated(healPower)));
+            }
+        }
 
         // push render task
-        StandardTask task = new StandardTask();
-        if(treated) task.addThread(new RendererThread(bfr.getUnitRenderer(getTarget()), getTarget(), healPower));
-        task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
         scheduleRenderTask(task);
 
         // set outcome
         outcome.add(getInitiator(), choice.getExperience());
 
-
-    }
-
-    @Override
-    public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
-        return isTargetAllyValid(initiator, rowActor0, colActor0, rowTarget0, colTarget0, true, false);
+        // handle events
+        handleEvents(null);
     }
 
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
-        return getAlliesAtRange(row, col, actor, true, false);
+        return getAlliesAtRange(row, col, actor, true, false );
     }
-
 
 
     //-------------------- GETTERS & SETTERS ----------------------
 
-    public int getHealPower(){
-        return Formulas.getHealPower(rowActor, colActor, rowTarget, colTarget, getInitiator(), getTarget(), bfr.getModel());
+    public Unit[] getPatients(){
+        return patients;
     }
 
-    public int getRecoveredHitPoints(){
-        int treatedHP = 0;
-        if(bfr.getModel().isTileOccupied(rowTarget, colTarget))
-            treatedHP = bfr.getModel().getUnit(rowTarget, colTarget).getRecoveredHitPoints(getHealPower());
-        return treatedHP;
+    public int[] getRecoveredHitPoints(){
+        return recoveredHP;
     }
 
-    public int getRecoveredMoralPoints(){
-        int moralPoints = 0;
-        if(bfr.getModel().isTileOccupied(rowTarget, colTarget))
-            moralPoints = bfr.getModel().getUnit(rowTarget, colTarget).getRecoveredMoralPoints(getHealPower());
-        return moralPoints;
+    public int[] getRecoveredMoralPoints(){
+        return recoveredMoral;
     }
 
 

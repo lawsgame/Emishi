@@ -176,7 +176,7 @@ public class HitCommand extends ActorCommand{
 
                 int[] dealDamageRange = Formulas.getDealtDamageRange(rowActor, colActor, data.rowInitTarget, data.colInitTarget, getInitiator(),data.defenderRenderer.getModel(), bfr.getModel());
                 int appliedDamage = Formulas.getRandomDamageInput(dealDamageRange);
-                TakeDamage notif = data.defenderRenderer.getModel().takeDamage(appliedDamage, ignorePhysicalDamage, ignoreMoralDamage, 1f);
+                TakeDamage notif = data.defenderRenderer.getModel().takeDamage(appliedDamage, ignorePhysicalDamage, ignoreMoralDamage, data.moralModifier);
                 notif.critical = false;
                 notif.crippled = cripplingTarget;
                 notif.disabled = disablingTarget;
@@ -215,7 +215,7 @@ public class HitCommand extends ActorCommand{
             for(int i = 0; i < notifs.size; i++){
                 healValue += notifs.get(i).lifeDamageTaken;
             }
-            boolean treated = getInitiator().treated(healValue);
+            boolean treated = getInitiator().improveCondition(healValue, true, true);
             if(treated)
                 attackNotif.lifeDrained = healValue;
         }
@@ -309,7 +309,8 @@ public class HitCommand extends ActorCommand{
                         targetsPos.get(i)[1],
                         defenderPos[0],
                         defenderPos[1],
-                        bfr.getModel()));
+                        bfr.getModel(),
+                        choice));
             }
         }
 
@@ -333,8 +334,8 @@ public class HitCommand extends ActorCommand{
         return defendersData;
     }
 
-    public int getLootRate(){
-        return Formulas.getLootRate(getInitiator());
+    protected int getLootRate(){
+        return Formulas.getLootRate(getInitiator(), rowActor, colActor, bfr.getModel());
     }
 
     public void setRetaliation(boolean retaliation) {
@@ -388,7 +389,9 @@ public class HitCommand extends ActorCommand{
         public final int colInitDefender;
         public final int hitrate;
         public final int[] damageDealt;
+        public final float moralModifier;
         public final int lootRate;
+        public final int APCost;
 
 
         public DefenderData(
@@ -403,7 +406,8 @@ public class HitCommand extends ActorCommand{
                 int colInitTarget,
                 int rowInitDefender,
                 int colInitDefender,
-                Battlefield bf) {
+                Battlefield bf,
+                Data.ActionChoice choice) {
 
             this.attacker = attacker;
             this.targetRenderer = targetRenderer;
@@ -416,7 +420,9 @@ public class HitCommand extends ActorCommand{
             this.colInitDefender = colInitDefender;
             this.hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
             this.damageDealt = Formulas.getDealtDamageRange(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
-            this.lootRate = Formulas.getLootRate(attacker);
+            this.moralModifier = Formulas.getMoralModifier(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
+            this.lootRate = Formulas.getLootRate(attacker, rowAttacker, colAttacker, bf);
+            this.APCost = choice.getCost(rowAttacker, colAttacker, attacker, bf);
         }
 
         public boolean isTargetGuarded(){

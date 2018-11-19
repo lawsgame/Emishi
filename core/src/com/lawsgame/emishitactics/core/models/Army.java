@@ -255,9 +255,9 @@ public class Army extends MilitaryForce {
     public Banner getSquadBanner(Unit Unit, boolean stillFighting){
         if(Unit != null) {
             Array<Unit> squad = getSquad(Unit, stillFighting);
-            for (Unit squadMember : squad) {
-                if (squadMember.isStandardBearer()) {
-                    return squadMember.getBanner();
+            for (int i = 0; i < squad.size; i++) {
+                if (squad.get(i).isStandardBearer()) {
+                    return squad.get(i).getBanner();
                 }
             }
         }
@@ -465,7 +465,7 @@ public class Army extends MilitaryForce {
                 }
             } else {
             /*
-            the squadID and the unitID are those of a mere soldier, the request can then be treated here.
+            the squadID and the unitID are those of a mere soldier, the request can then be improveCondition here.
             IF:  the squad ID is invalid =>  the request is canceled
              */
                 if (0 <= squadID && squadID < getNbOfSquads()) {

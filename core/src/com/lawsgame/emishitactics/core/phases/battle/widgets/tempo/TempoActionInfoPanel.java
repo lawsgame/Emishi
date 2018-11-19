@@ -124,8 +124,8 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
             initiatorAsAttacker.clear();
             initiatorAsTarget.clear();
 
-            if(command != null && command instanceof AttackCommand && command.isApplicable()) {
-                setHeight(220);
+            if(command instanceof AttackCommand && command.isApplicable()) {
+                setHeight(300);
 
                 AttackCommand currentCommand = (AttackCommand)command;
 
@@ -163,8 +163,10 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                 builder.append(data.defenderRenderer.getModel().getCurrentMoral());
                 builder.append(" - ");
                 builder.append(data.defenderRenderer.getModel().getCurrentHitPoints());
-                builder.append("\nDamage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
+                builder.append("\nPhysical damage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
+                builder.append("\nMoral damage : " + data.damageDealt[0]*data.moralModifier+" - "+ data.damageDealt[1]*data.moralModifier);
                 builder.append("\nHit rate : " + data.hitrate+"%");
+                builder.append("\nAP cost : " + data.APCost);
                 builder.append("\nLoot rate : " + data.lootRate+"%");
 
 
@@ -186,8 +188,10 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                         builder.append(data.defenderRenderer.getModel().getCurrentMoral());
                         builder.append(" - ");
                         builder.append(data.defenderRenderer.getModel().getCurrentHitPoints());
-                        builder.append("\nDamage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
+                        builder.append("\nPhysical damage : " + data.damageDealt[0]+" - "+ data.damageDealt[1]);
+                        builder.append("\nMoral damage : " + data.damageDealt[0]*data.moralModifier+" - "+ data.damageDealt[1]*data.moralModifier);
                         builder.append("\nHit rate : " + data.hitrate+"%");
+                        builder.append("\nAP cost : " + data.APCost);
                         builder.append("\nLoot rate : " + data.lootRate+"%");
 
                         break;

@@ -17,14 +17,93 @@ import java.util.LinkedList;
 
 public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
-    private LinkedList<SimpleCommand> notificationQueue;
+    private LinkedList<Object> notificationQueue;
     protected Data.Weather renderedWeather;
 
     public BattlefieldRenderer(Battlefield model) {
 
         super(model);
-        this.notificationQueue = new LinkedList<SimpleCommand>();
+        this.notificationQueue = new LinkedList<Object>();
     }
+
+    protected void launchNextAnimation(){
+
+        if(isIdling() && notificationQueue.size() > 0) {
+            Object data = notificationQueue.pop();
+
+            if (data instanceof Unit) {
+
+                removeUnitRenderer((Unit) data);
+            } else if(data instanceof Data.Weather){
+
+                this.renderedWeather = (Data.Weather) data;
+            } else if(data instanceof Notification.SetTile){
+
+                Notification.SetTile notif = (Notification.SetTile)data;
+                switch (notif.type){
+                    case PLUNDERED:
+                        displayPlundering(notif.row, notif.col, notif.newTile, notif.oldTile);
+                        break;
+                    case COLLAPSED:
+                        displayCollapsing(notif.row, notif.col, notif.newTile, notif.oldTile);
+                        break;
+                    case BUILT:
+                        displayBuilding(notif.row, notif.col, notif.newTile);
+                        break;
+                    case INSTANTANEOUSLY:
+                        addTileRenderer(notif.row, notif.col, notif.newTile);
+                        break;
+                }
+            }else if(data instanceof Notification.SetUnit){
+
+                final Notification.SetUnit notif = (Notification.SetUnit)data;
+                if (isUnitRendererCreated(notif.unitModel)) {
+                    final BattleUnitRenderer bur = getUnitRenderer(notif.unitModel);
+                    notif.unitModel.notifyAllObservers(new SimpleCommand() {
+
+                        @Override
+                        public void apply() {
+                            bur.setPos(notif.row, notif.col);
+                            removeAreaRenderersAssociatedWith(bur.getModel());
+                        }
+                    });
+                }else{
+                    addUnitRenderer(notif.row, notif.col, notif.unitModel);
+                }
+            } else if(data instanceof Notification.Walk){
+
+                final Notification.Walk notif = (Notification.Walk)data;
+                final BattleUnitRenderer bur = getUnitRenderer(notif.unit);
+                notif.unit.notifyAllObservers(new SimpleCommand() {
+                    @Override
+                    public void apply() {
+                        bur.displayWalk(notif.path, notif.reveal);
+                        removeAreaRenderersAssociatedWith(bur.getModel());
+                    }
+                });
+            }else if(data instanceof Area){
+
+                Area area = (Area)data;
+                if(isAreaRendererCreated(area)){
+                    removeAreaRenderer(area);
+                }else{
+                    addAreaRenderer(area);
+                }
+            }
+            launchNextAnimation();
+        }
+    }
+
+    public abstract boolean isIdling();
+    protected abstract void displayBuilding(int rowTile, int colTile, Tile buildingTile);
+    protected abstract void displayCollapsing(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile);
+    protected abstract void displayPlundering(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile);
+
+    @Override
+    public boolean isExecuting() {
+        return !isIdling() || notificationQueue.size() > 0;
+    }
+
 
     public abstract void prerender();
     public abstract void render(SpriteBatch batch);
@@ -46,11 +125,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     protected abstract boolean isAreaRendererCreated(Area model);
     protected abstract void removeAreaRenderersAssociatedWith(Unit model);
 
-
-    protected abstract boolean isCurrentTaskCompleted();
-    protected abstract void setBuildTask(Notification.Build build);
-
-
     public void displayDeploymentAreas(boolean visible) {
         Array<Area> deploymentArea = getModel().getDeploymentAreas();
         for(int i = 0; i< deploymentArea.size; i++){
@@ -58,74 +132,11 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }
     }
 
-    public final void offerTask(SimpleCommand command){
-        if(command != null)
-            notificationQueue.offer(command);
-    }
-
-    @Override
-    public void update(float dt) {
-        if(!isCurrentTaskCompleted() && ! notificationQueue.isEmpty()){
-            notificationQueue.pop().apply();
-        }
-    }
-
 
     @Override
     public final void getNotification(Observable sender, Object data) {
-        if (data instanceof Unit) {
-
-            removeUnitRenderer((Unit) data);
-        } else if(data instanceof Data.Weather){
-
-            this.renderedWeather = (Data.Weather) data;
-        } else if(data instanceof Notification.SetTile){
-
-            if(data instanceof Notification.Build){
-
-                final Notification.Build notif= (Notification.Build)data;
-                setBuildTask(notif);
-            }else {
-
-                Notification.SetTile notif = (Notification.SetTile)data;
-                addTileRenderer(notif.row, notif.col, notif.tile);
-            }
-        }else if(data instanceof Notification.SetUnit){
-
-            final Notification.SetUnit notif = (Notification.SetUnit)data;
-            if (isUnitRendererCreated(notif.unitModel)) {
-                final BattleUnitRenderer bur = getUnitRenderer(notif.unitModel);
-                notif.unitModel.notifyAllObservers(new SimpleCommand() {
-
-                    @Override
-                    public void apply() {
-                        bur.setPos(notif.row, notif.col);
-                        removeAreaRenderersAssociatedWith(bur.getModel());
-                    }
-                });
-            }else{
-                addUnitRenderer(notif.row, notif.col, notif.unitModel);
-            }
-        } else if(data instanceof Notification.Walk){
-
-            final Notification.Walk notif = (Notification.Walk)data;
-            final BattleUnitRenderer bur = getUnitRenderer(notif.unit);
-            notif.unit.notifyAllObservers(new SimpleCommand() {
-                @Override
-                public void apply() {
-                    bur.displayWalk(notif.path, notif.reveal);
-                    removeAreaRenderersAssociatedWith(bur.getModel());
-                }
-            });
-        }else if(data instanceof Area){
-
-            Area area = (Area)data;
-            if(isAreaRendererCreated(area)){
-                removeAreaRenderer(area);
-            }else{
-                addAreaRenderer(area);
-            }
-        }
+        notificationQueue.add(data);
+        launchNextAnimation();
     }
 
     public String toLongShort(){
@@ -138,4 +149,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
             super(msg);
         }
     }
+
+
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -150,7 +151,6 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
-        super.update(dt);
         for(int i = 0; i < unitRenderers.size; i++){
             for(int j = 0; j < tileRenderers.get(i).size; j++){
                 tileRenderers.get(i).get(j).update(dt);
@@ -205,7 +205,7 @@ public class IsoBFR extends BattlefieldRenderer {
             int renderIndex  = 2*row + 2*col;
             for(int i = 0; i < tileRenderers.get(renderIndex).size; i++){
                 if(tileRenderers.get(renderIndex).get(i).row == row && tileRenderers.get(renderIndex).get(i).col == col){
-                    model.detach(tileRenderers.get(renderIndex).get(i));
+                    tileRenderers.get(renderIndex).get(i).getModel().detach(tileRenderers.get(renderIndex).get(i));
                     tileRenderers.get(renderIndex).removeIndex(i);
                 }
             }
@@ -382,25 +382,23 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    protected boolean isCurrentTaskCompleted() {
-        return false;
+    protected void displayBuilding(int rowTile, int colTile, Tile buildingTile) {
+        addTileRenderer(rowTile, colTile, buildingTile);
     }
 
     @Override
-    protected void setBuildTask(Notification.Build build) {
-        //TODO:
-        addTileRenderer(build.row, build.col, build.tile);
-
-
-
-
-
-
+    protected void displayCollapsing(int rowTile, int colTile, Tile newbuildingTile, Tile oldbuildingTile) {
+        addTileRenderer(rowTile, colTile, newbuildingTile);
     }
 
     @Override
-    public boolean isExecuting() {
-        return false;
+    protected void displayPlundering(int rowTile, int colTile, Tile newbuildingTile, Tile oldbuildingTile) {
+        addTileRenderer(rowTile, colTile, newbuildingTile);
+    }
+
+    @Override
+    public boolean isIdling() {
+        return true;
     }
 
     @Override

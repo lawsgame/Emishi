@@ -29,17 +29,17 @@ public class ReinforcementEvent extends BattleCommand {
     }
 
     public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, final MilitaryForce currentArmy){
+        ReinforcementEvent event = new ReinforcementEvent(bfr, scheduler, playerInventory);
 
-        Model.Trigger trigger = new Model.Trigger( true, true) {
+        Model.Trigger trigger = new Model.Trigger( true, event) {
 
             @Override
-            public boolean isTriggered(Object data) {
+            public boolean isTriggerable(Object data) {
                 return data instanceof Notification.BeginArmyTurn && bfr.getModel().getCurrentArmy() == currentArmy && turn <= bfr.getModel().getTurn();
             }
         };
 
-        ReinforcementEvent event = new ReinforcementEvent(bfr, scheduler, playerInventory);
-        trigger.addEvent(event);
+
         bfr.getModel().add(trigger);
         return event;
     }

@@ -24,8 +24,6 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
      *  recurvise method which keep calling itself to iterate through the notificationQueue
      *  until the renderer is not idle any more or the notification queue gets empty.
      */
-
-    int nb = 0;
     protected void launchNextAnimation(){
 
         if(isIdling() && notificationQueue.size() > 0) {
@@ -40,8 +38,8 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
                 setDone(((Notification.Done) query).done);
             } else if (query instanceof Notification.Blink) {
                 setTargeted(((Notification.Blink) query).targeted);
-            } else if (query instanceof Integer) {
-                displayTreated((Integer) query);
+            } else if (query instanceof Notification.Treated) {
+                displayTreated(((Notification.Treated) query).healPower);
             } else if (query instanceof Data.AnimId) {
                 display((Data.AnimId) query);
             } else if (query instanceof Notification.Pushed) {
@@ -78,7 +76,6 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
 
             launchNextAnimation();
         }
-        nb = 0;
     }
 
 

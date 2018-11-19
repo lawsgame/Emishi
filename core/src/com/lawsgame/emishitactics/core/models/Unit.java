@@ -545,7 +545,8 @@ public class Unit extends Model {
 
 
     public void addNativeAbility(Data.Ability ability) {
-        nativeAbilities.add(ability);
+        if(!nativeAbilities.contains(ability, true))
+            nativeAbilities.add(ability);
     }
 
     public boolean has(Data.Ability ability) {
@@ -735,6 +736,9 @@ public class Unit extends Model {
             if(rangeMax > 1) {
                 TileType tileType = battlefield.getTile(rowUnit, colUnit).getType();
                 if(tileType.enhanceRange()) rangeMax++;
+                if(battlefield.isStandardBearerAtRange(this, rowUnit, colUnit)){
+                    rangeMax += getArmy().getSquadBanner(this, true).getValue(Data.BannerBonus.RANGE, true);
+                }
             }
         }
         return rangeMax;
@@ -883,8 +887,8 @@ public class Unit extends Model {
         return squadIndex;
     }
 
-    public boolean isWounded() {
-        return currentHitPoints < getAppHitpoints();
+    public boolean isWounded(boolean morally, boolean physically) {
+        return (currentHitPoints < getAppHitpoints() && physically) || (currentMoral  < getAppMoral() && morally);
     }
 
     public boolean isOutOfAction() {
@@ -926,18 +930,22 @@ public class Unit extends Model {
     }
 
 
-    public boolean treated(int healPower) {
-        if(isWounded()) {
-            if (healPower + hitPoints > getAppHitpoints()) {
-                this.currentHitPoints = getAppHitpoints();
-            }else{
-                this.currentHitPoints += getAppHitpoints();
+    public boolean improveCondition(int healPower, boolean boostMoral, boolean boostPhysicalCondition) {
+        if(isWounded(boostMoral, boostPhysicalCondition)) {
+            if(boostPhysicalCondition) {
+                if (healPower + hitPoints > getAppHitpoints()) {
+                    this.currentHitPoints = getAppHitpoints();
+                } else {
+                    this.currentHitPoints += getAppHitpoints();
+                }
             }
 
-            if(healPower + currentMoral > getAppMoral()){
-                this.currentMoral = getAppMoral();
-            }else{
-                this.currentMoral += healPower;
+            if(boostMoral) {
+                if (healPower + currentMoral > getAppMoral()) {
+                    this.currentMoral = getAppMoral();
+                } else {
+                    this.currentMoral += healPower;
+                }
             }
             return true;
         }
@@ -950,7 +958,7 @@ public class Unit extends Model {
         int lifeDamageTaken = 0;
 
         // moral damaga
-        if (!has(Data.Ability.UNBREAKABLE) || !ignoreMoralDamage) {
+        if (!has(Data.Ability.UNBREAKABLE) && !ignoreMoralDamage) {
             if(this.currentMoral > damageDealt * moralModifier) {
                 state = TakeDamage.State.WOUNDED;
                 this.currentMoral -= damageDealt * moralModifier;

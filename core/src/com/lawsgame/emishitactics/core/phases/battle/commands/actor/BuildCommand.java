@@ -3,10 +3,11 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data.Ability;
+import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.Notification.Build;
+import com.lawsgame.emishitactics.core.models.Notification.SetTile;
+import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -25,10 +26,19 @@ public class BuildCommand extends ActorCommand {
     protected void execute() {
 
         // update model
+        Tile oldTile = bfr.getModel().getTile(rowTarget, colTarget);
         bfr.getModel().setTile(rowTarget, colTarget, buildingType, false);
+        Data.Orientation  builderOrientation = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
+        getInitiator().setOrientation(builderOrientation);
 
         // push render task
-        scheduleRenderTask(new StandardTask(bfr, new Build(rowTarget, colTarget, bfr.getModel().getTile(rowTarget, colTarget), getInitiator())));
+        StandardTask task = new StandardTask();
+        task.addThread(new StandardTask.RendererThread(bfr, new SetTile(rowTarget, colTarget, bfr.getModel().getTile(rowTarget, colTarget), oldTile, SetTile.TransformationType.BUILT)));
+        StandardTask.RendererThread builderThread = new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()));
+        builderThread.addQuery(builderOrientation);
+        builderThread.addQuery(Data.AnimId.BUILD);
+        task.addThread(builderThread);
+        scheduleRenderTask(task);
 
         // set outcome
         outcome.add(getInitiator(), choice.getExperience());

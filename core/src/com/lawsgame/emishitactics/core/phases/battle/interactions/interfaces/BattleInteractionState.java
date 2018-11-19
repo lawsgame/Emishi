@@ -50,7 +50,7 @@ public abstract class BattleInteractionState extends InteractionState {
     public void dispose() { }
 
     public void end(){
-        bim.removeTileHighlighting(false);
+        bim.removeTileHighlighting(false, false);
     }
 
     public abstract boolean handleTouchInput(int row, int col);

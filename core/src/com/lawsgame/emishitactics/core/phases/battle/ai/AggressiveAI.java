@@ -29,7 +29,7 @@ public class AggressiveAI extends PassiveAI {
             WalkCommand walkCommand = new WalkCommand(bfr, scheduler, playerInventory);
             EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory);
 
-            System.out.println("\n____________________________________________________________________");
+            System.out.println("\n____________________________ UNIT AI TURN BEGIN ____________________________");
             System.out.println("      > AggressiveAI.setCommandBundle() with ACTOR : "+actor.getName());
 
             // foe at range without moving
@@ -96,6 +96,7 @@ public class AggressiveAI extends PassiveAI {
 
             System.out.println("\n         > AggresiveAI.setCommandBundle() : result:");
             System.out.println(bundle.toString());
+            System.out.println("\n__________________________________________________________________________");
         }
     }
 }

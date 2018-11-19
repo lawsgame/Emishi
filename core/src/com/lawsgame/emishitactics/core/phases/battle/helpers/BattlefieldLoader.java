@@ -25,7 +25,6 @@ import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 
 import java.io.IOException;
@@ -291,7 +290,7 @@ public class BattlefieldLoader {
 
                 int bonusBanner = attributeElt.getInt("strength");
                 for(int i = 0; i < bonusBanner; i++)
-                    unit.getBanner().increment(Data.BannerBonus.STRENGTH);
+                    unit.getBanner().increment(Data.BannerBonus.ATTACK_MIGHT);
                 bonusBanner = attributeElt.getInt("range");
                 for(int i = 0; i < bonusBanner; i++)
                     unit.getBanner().increment(Data.BannerBonus.RANGE);

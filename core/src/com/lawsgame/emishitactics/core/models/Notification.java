@@ -107,6 +107,14 @@ public class Notification {
     }
 
 
+    public static class Treated{
+        public final int healPower;
+
+        public Treated(int healPower) {
+            this.healPower = healPower;
+        }
+    }
+
     public static class Pushed {
         public final Data.Orientation orientation;
 
@@ -160,23 +168,29 @@ public class Notification {
     }
 
     public static class SetTile {
-        public int row;
-        public int col;
-        public Tile tile;
+        public final int row;
+        public final int col;
+        public final Tile newTile;
+        public final Tile oldTile;
+        public final TransformationType type;
 
-        public SetTile(int row, int col, Tile tile){
+        public enum TransformationType{
+            PLUNDERED,
+            COLLAPSED,
+            BUILT,
+            INSTANTANEOUSLY
+        }
+
+        public SetTile(int row, int col, Tile newTile, Tile oldTile, TransformationType type){
             this.row = row;
             this.col = col;
-            this.tile = tile;
+            this.newTile = newTile;
+            this.oldTile = oldTile;
+            this.type = type;
         }
-    }
 
-    public static class Build extends  SetTile{
-        public Unit builder;
-
-        public Build(int row, int col, Tile tile, Unit builder){
-            super(row, col, tile);
-            this.builder = builder;
+        public SetTile(int row, int col, Tile newTile){
+            this(row, col, newTile, null, TransformationType.INSTANTANEOUSLY);
         }
     }
 
@@ -303,7 +317,4 @@ public class Notification {
 
 
     }
-
-
-
 }

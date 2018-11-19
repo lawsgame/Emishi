@@ -755,19 +755,21 @@ public class Battlefield extends Model {
      * @param unit
      * @param row
      * @param col
-     * @return whether or not there is a standard bearer at range if the given unit is standing on the given buildingType = {row, col}
+     * @return true if  there is a standard bearer at range if the given unit is standing on the given buildingType = {row, col}
      */
     public boolean  isStandardBearerAtRange(Unit unit, int row, int col){
         int dist;
-        if(isTileExisted(row, col)&& unit.isMobilized()) {
+        if(unit.isMobilized()) {
             int bannerRange = unit.getArmy().getBannerRange(unit);
+
             for (int r = row - bannerRange; r <= row + bannerRange; r++) {
                 for (int c = col - bannerRange; c <= col + bannerRange; c++) {
                     dist = Utils.dist(row, col, r, c);
+
                     if (checkIndexes(r, c )
                             && dist > 0
                             && dist <= bannerRange
-                            && isTileOccupiedByAnotherSquadMember(r, c, getUnit(r, c))
+                            && isTileOccupiedByAnotherSquadMember(r, c, unit)
                             && getUnit(r, c).isStandardBearer()) {
                         return true;
                     }

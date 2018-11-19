@@ -71,7 +71,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
                 currentCommand.apply();
                 historic.push(currentCommand);
                 bim.bfr.getAreaRenderer(actionArea).setVisible(false);
-                bim.removeTileHighlighting(false);
+                bim.removeTileHighlighting(false, false);
             }else{
 
                 bim.replace(new ValidateTargetBIS(bim, currentCommand, historic));

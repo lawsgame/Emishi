@@ -1,8 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.models.Data.BannerBonus;
+import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 import java.util.HashMap;
 
@@ -63,8 +62,8 @@ public class Banner extends Model  {
         return false;
     }
 
-    public float getValue(BannerBonus bb, boolean inFight){
-        return (bb.getMode() == mode || bb.getMode() == Data.BBMode.ALL || !inFight) ? bonuses.get(bb) * bb.getBaseValue() : 0;
+    public float getValue(BannerBonus bb, boolean takeModeIntoAccount){
+        return (bb.getMode() == mode || bb.getMode() == Data.BBMode.ALL || !takeModeIntoAccount) ? bonuses.get(bb) * bb.getBaseValue() : 0;
     }
 
     public void setMode(Data.BBMode mode) {

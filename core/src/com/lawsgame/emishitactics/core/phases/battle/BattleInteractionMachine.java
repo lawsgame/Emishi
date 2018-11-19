@@ -160,10 +160,10 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      * @param highligthSquad :      if true and the tile is occupied by a unit, his whole squad is also highlighted
      * @param displayPanels :       if true, the short info panels are displayed
      * @param targetIsSelected :    govern each area type / color is used to highlight the focused tile
-     * @param resetMemory :         the method keep in memory which tile has been focused on the last time it was called to only updated short info panels which require to be updated, if true, this memory is erased.
+     * @param eraseMemory :         the method keep in memory which tile has been focused on the last time it was called to only updated short info panels which require to be updated, if true, this memory is erased.
      */
-    public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean highligthSquad, boolean displayPanels, boolean targetIsSelected, boolean resetMemory){
-        if(resetMemory){
+    public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean highligthSquad, boolean displayPanels, boolean targetIsSelected, boolean eraseMemory){
+        if(eraseMemory){
             rowFocus = -1;
             colFocus = -1;
             focusUnit = null;
@@ -171,7 +171,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         if(battlefield.isTileExisted(rowTarget, colTarget)) {
             moveCamera(rowTarget, colTarget, moveCamSmoothly);
-            highlight(rowTarget, colTarget, highligthSquad, targetIsSelected);
+            highlight(rowTarget, colTarget, highligthSquad, targetIsSelected, false);
+
             if(displayPanels) {
 
                 if(rowTarget != rowFocus || colTarget != colFocus || shortTilePanel.isHiding()) {
@@ -196,43 +197,78 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         }
     }
 
-    protected void moveCamera(int rowTile, int colTile, boolean smoothly){
+    private void moveCamera(int rowTile, int colTile, boolean smoothly){
         gcm.focusOn(bfr.getCenterX(rowTile, colTile), bfr.getCenterY(rowTile, colTile) , smoothly);
     }
 
-    protected void highlight(int row, int col, boolean bannerShown, boolean selected){
-        removeTileHighlighting(true);
+    private int rowSelectedTile = -1, colSelectedTile = -1;
+    /**
+     *
+     * @param row : row of tile to highlight
+     * @param col : col of tile to highlight
+     * @param squadInfoShown : show banner range of the WC if still fighting
+     * @param updateSelectedTile : update {rowSelectedTile, colSeletectedTIle}
+     */
+    private void highlight(int row, int col, final boolean squadInfoShown, boolean updateSelectedTile, boolean eraseMemory){
 
-        // touch feed back
-        touchedTile.setTiles(row, col, true);
-        bfr.getAreaRenderer(touchedTile).setVisible(true);
-
-        // set selected tile
-        if(selected){
-            selectedTile.setTiles(row, col, true);
-            bfr.getAreaRenderer(selectedTile).setVisible(true);
+        if(eraseMemory){
+            rowSelectedTile = -1;
+            colSelectedTile = -1;
         }
 
-        // show warchief positon and his banner covered area
-        if(bannerShown && battlefield.isTileOccupied(row, col)) {
-            Unit warchief = battlefield.getUnit(row, col).getWarchief();
-            if (warchief != battlefield.getUnit(row, col)) {
-                if(bfr.getModel().isUnitDeployed(warchief) && !warchief.isOutOfAction()) {
+        if(bfr.getModel().checkIndexes(row, col)) {
+
+            // touch feed back
+            touchedTile.setTiles(row, col, true);
+            bfr.getAreaRenderer(touchedTile).setVisible(true);
+
+            // update selected tile coords in memory
+            if(updateSelectedTile){
+                rowSelectedTile = row;
+                colSelectedTile = col;
+            }
+
+            // show the current selected tile if the last touched tile highlighted was a different one.
+            if(row != rowSelectedTile || col != colSelectedTile){
+                selectedTile.setTiles(rowSelectedTile, colSelectedTile, true);
+                bfr.getAreaRenderer(selectedTile).setVisible(true);
+            } else if(bfr.getModel().checkIndexes(rowSelectedTile, colSelectedTile)){
+                bfr.getAreaRenderer(selectedTile).setVisible(false);
+            }
+
+            // show warchief positon and his banner covered area
+            boolean SquadActuallyShown = false;
+            if (squadInfoShown && battlefield.isTileOccupied(row, col)) {
+                Unit warchief = battlefield.getUnit(row, col).getWarchief();
+                if (warchief != battlefield.getUnit(row, col)
+                        && bfr.getModel().isUnitDeployed(warchief)
+                        && !warchief.isOutOfAction()) {
+
+                    SquadActuallyShown = true;
                     warchiefBannerCoveredArea.setTiles(bfr.getUnitRenderer(warchief).getCurrentRow(), bfr.getUnitRenderer(warchief).getCurrentCol(), 0, warchief.getArmy().getBannerRange(warchief), true);
                     bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(true);
+
                 }
             }
+
+            if(!SquadActuallyShown){
+                bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(false);
+            }
+
         }
-
-
 
     }
 
-    public void removeTileHighlighting(boolean exceptSelectedTile){
+    public void removeTileHighlighting(boolean exceptSelectedTile, boolean eraseMemory){
+
+        if(eraseMemory){
+            rowSelectedTile = -1;
+            colSelectedTile = -1;
+        }
+
         bfr.getAreaRenderer(touchedTile).setVisible(false);
         bfr.getAreaRenderer(warchiefBannerCoveredArea).setVisible(false);
         if(!exceptSelectedTile) bfr.getAreaRenderer(selectedTile).setVisible(false);
-
     }
 
 
@@ -255,6 +291,13 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public void dispose() {
         assetProvider.dispose();
     }
+
+
+
+
+
+
+
 
 
 
@@ -344,5 +387,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
             foes.clear();
         }
     }
+
+
 
 }

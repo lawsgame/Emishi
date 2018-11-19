@@ -24,9 +24,8 @@ public abstract class Model extends Observable{
     }
 
     public boolean isAnyEventTriggerable(Object data){
-
         for(int i =0; i < triggers.size; i++){
-            if(triggers.get(i).isActive() && triggers.get(i).isTriggered(data)){
+            if(triggers.get(i).isActive() && triggers.get(i).isTriggerable(data)){
                 return true;
             }
         }
@@ -35,11 +34,10 @@ public abstract class Model extends Observable{
 
     public Array<Task> performEvents(Object data, final ActorCommand.Outcome callerOutcome){
         Array<Task> tasks = new Array<Task>();
-
         for(int i = 0; i < triggers.size; i++){
-            if(triggers.get(i).isActive() && triggers.get(i).isTriggered(data)) {
+            if(triggers.get(i).isTriggered(data)) {
                 tasks.addAll(triggers.get(i).performEvent(callerOutcome));
-                if (triggers.get(i).isEmpty() || triggers.get(i).isUseOnce()) {
+                if (triggers.get(i).isUseOnce()) {
                     remove(triggers.get(i));
                     i--;
                 }
@@ -56,6 +54,7 @@ public abstract class Model extends Observable{
 
 
 
+
     //------------------- GETTERS & SETTERS ---------------------
 
     public String triggerToString(){
@@ -63,35 +62,41 @@ public abstract class Model extends Observable{
         str +=  "\n     registered TRIGGERS : ";
         for (int i = 0; i < triggers.size; i++) {
             str += "\n      trigger " + i + " : " + triggers.get(i);
-            for (int j = 0; j < triggers.get(i).eventCommands.size; j++)
-                str += "\n          event "+j+" : " + triggers.get(i).eventCommands.get(j).toString();
+            str += "\n          event : " + triggers.get(i).getEventCommand().toString();
         }
         return str;
     }
 
 
 
+
     // ---------------------- TRIGGER ----------------------------------------------
 
     public static abstract class Trigger {
-        protected final Array<BattleCommand> eventCommands;
-        private boolean sleepAfterOnce;
+        private BattleCommand eventCommand;
         private boolean useOnce;
         private boolean active;
         private String tag;
 
-        public Trigger(boolean useOnce, boolean sleepAfterOnce){
+        public Trigger(boolean useOnce, BattleCommand eventCommand){
             this.useOnce = useOnce;
-            this.sleepAfterOnce = sleepAfterOnce;
-            this.eventCommands = new Array<BattleCommand>();
             this.tag = "";
             this.active = true;
+            this.eventCommand = eventCommand;
+            this.eventCommand.setDecoupled(true);
         }
+
+
 
 
         //-------------------- PROCESS -------------------------------
 
-        public abstract boolean isTriggered(Object data);
+
+        protected abstract boolean isTriggerable(Object data);
+
+        protected  boolean isTriggered(Object data){
+            return isActive() && isTriggerable(data)  && eventCommand.isApplicable();
+        }
 
         /**
          *
@@ -101,34 +106,28 @@ public abstract class Model extends Observable{
         Array<Task> performEvent(ActorCommand.Outcome callerOutcome){
             Array<Task> tasks = new Array<Task>();
 
-            for(int i = 0; i < eventCommands.size; i++){
-                eventCommands.get(i).setDecoupled(true);
-                if(eventCommands.get(i).apply()){
-                    callerOutcome.merge( eventCommands.get(i).getOutcome());
-                    tasks.addAll(eventCommands.get(i).confiscateTasks());
-                }
-            }
 
-            if(sleepAfterOnce){
-                active = false;
+            if(eventCommand.apply()){
+                callerOutcome.merge( eventCommand.getOutcome());
+                tasks.addAll(eventCommand.confiscateTasks());
             }
 
             return tasks;
         }
 
 
-        boolean isEmpty(){
-            return eventCommands.size == 0;
-        }
-
-        public void addEvent(BattleCommand event){
-            this.eventCommands.add(event);
-        }
-
-
 
 
         // --------------------- SETTERS & GETTERS -----------------------------------
+
+        public void setEvent(BattleCommand event){
+            this.eventCommand = event;
+            this.eventCommand.setDecoupled(true);
+        }
+
+        public BattleCommand getEventCommand(){
+            return eventCommand;
+        }
 
         boolean isUseOnce(){
             return useOnce;

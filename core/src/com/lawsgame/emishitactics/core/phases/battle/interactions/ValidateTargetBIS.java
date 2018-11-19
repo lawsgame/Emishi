@@ -96,7 +96,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
                 if(bim.app.isPanelAvailable(currentCommand))
                     bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
                 bim.bfr.getAreaRenderer(impactArea).setVisible(false);
-                bim.removeTileHighlighting(false);
+                bim.removeTileHighlighting(false, false);
                 currentCommand.highlightTargets(false);
 
                 // await for  the command to notify its completion

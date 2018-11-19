@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.models;
 import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 
 public class Formulas {
 
@@ -40,8 +41,22 @@ public class Formulas {
 
     public static int[] getCurrentAttackMightRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         int[] attackMight = attacker.getAppAttackMight();
+
+        // BANNER PRE CALCULUS
+        int  bannerAMBonus = 0;
+        boolean bannerAtrange = battlefield.isStandardBearerAtRange(attacker, rowAttacker0, colAttacker0);
+        if(bannerAtrange){
+            MilitaryForce attackerArmy = attacker.getArmy();
+            Banner attackerbanner = attackerArmy.getSquadBanner(attacker, true);
+            bannerAMBonus = (int) attackerbanner.getValue(Data.BannerBonus.ATTACK_MIGHT, true);
+        }
+
         for(int i =0; i < attackMight.length; i++) {
             attackMight[i] += battlefield.getTile(rowAttacker0, colAttacker0).getType().getAttackMightBonus();
+            if(bannerAtrange){
+                attackMight[i] += bannerAMBonus;
+            }
+
         }
         return attackMight;
     }
@@ -81,41 +96,24 @@ public class Formulas {
         return (int)expGained;
     }
 
-
-    /*
-    public static int getGainedExperienceFoeEachSquadMember(Unit attacker, Array<Unit> targetedSquad){
-        int expPerSquadMember = 0;
-        if(attacker.isMobilized()) {
-
-            // calculate the mean of the squad members' level
-            int levelmean = 0;
-            Array<Unit> victoriousSquad = attacker.getSquad(true);
-            for (int i = 0; i < victoriousSquad.size; i++) {
-                levelmean = victoriousSquad.get(i).getLevel();
-            }
-            if(victoriousSquad.size > 0)
-                levelmean /= victoriousSquad.size;
-
-            // get the sum of the exp gain for the fallen untis
-            int sum = 0;
-            for(int i = 0 ; i < targetedSquad.size; i++){
-                sum += getGainedExperience(levelmean, targetedSquad.get(i).getLevel(), !targetedSquad.get(i).isOutOfAction());
-            }
-            expPerSquadMember = 1 + sum/victoriousSquad.size;
-            if(expPerSquadMember > 100) expPerSquadMember = 100;
-        }
-        return expPerSquadMember;
-    }
-    */
-
-    public static int getLootRate(Unit attacker){
+    public static int getLootRate(Unit attacker, int rowActor, int colActor, Battlefield bf){
         int lootRate = 0;
-        if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled())
-            lootRate = Data.BASE_DROP_RATE + attacker.getAppDexterity()/2 + attacker.getChiefCharisma()/2;
+        if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled()) {
+            lootRate += Data.BASE_DROP_RATE + attacker.getAppDexterity() / 2 + attacker.getChiefCharisma() / 2;
+            if(bf.isStandardBearerAtRange(attacker, rowActor, colActor)){
+                lootRate += (int) attacker.getArmy().getSquadBanner(attacker, true).getValue(Data.BannerBonus.LOOT_RATE, true);
+            }
+        }
         return lootRate;
     }
 
-
+    public static float getMoralModifier(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
+        float moralModifier = 1f;
+        if(battlefield.isStandardBearerAtRange(defender, rowDefender0, colDefender0)){
+            moralModifier -= defender.getArmy().getSquadBanner(defender, true).getValue(Data.BannerBonus.MORAL_SHIELD, true);
+        }
+        return moralModifier;
+    }
 
     public static int getStealRate(int rowRobber, int colRobber, int rowStolen, int colStolen, Unit stealer, Unit stolen, Battlefield battlefield){
         int stealRate = 0;
@@ -128,7 +126,7 @@ public class Formulas {
         return stealRate;
     }
 
-    public static int getHealPower(int rowActor, int colActor, int rowTarget, int colTarget, Unit healer, Unit patient, Battlefield battlefield) {
+    public static int getHealPower(int rowAHealer, int colHealer, int rowTarget, int colTarget, Unit healer, Unit patient, Battlefield battlefield) {
         return Data.HEAL_BASE_POWER + healer.getLevel()/2;
     }
 }

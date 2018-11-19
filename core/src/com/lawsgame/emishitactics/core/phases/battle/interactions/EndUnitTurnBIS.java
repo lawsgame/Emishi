@@ -15,7 +15,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePa
 
 public class EndUnitTurnBIS extends BattleInteractionState {
     private Unit actor;
-    EndUnitTurnCommand endUnitTurnCommand;
+    private EndUnitTurnCommand endUnitTurnCommand;
     private ChoicePanel orientationChoicePanel;
 
     public EndUnitTurnBIS(BattleInteractionMachine bim, Unit actor) {

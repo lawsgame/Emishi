@@ -24,8 +24,7 @@ public class EndUnitTurnCommand extends SelfInflitedCommand {
         getInitiator().setMoved(true);
         getInitiator().setActed(true);
 
-        StandardTask doneTask = new StandardTask(bfr.getUnitRenderer(getInitiator()), Notification.Done.get(true));
-        this.scheduleRenderTask(doneTask);
+        this.scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), Notification.Done.get(true)));
 
     }
 

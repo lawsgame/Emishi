@@ -4,27 +4,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PlunderCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.trigger.UponDisappearingTrigger;
-import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
@@ -56,7 +52,11 @@ public class TestBIS extends BattleInteractionState implements Observer{
         super(bim, true, true, true, true, false);
 
         sltdUnit = bim.player.getArmy().getWarlord();
-        sltdUnit.takeDamage(0, false, false, 1f);
+        sltdUnit.addNativeAbility(Data.Ability.BUILD);
+        sltdUnit.addNativeAbility(Data.Ability.HEAL);
+        bim.player.getArmy().getSquad(sltdUnit, true).get(1).takeDamage(0, false, false, 1f);
+
+        // ANIMATION TEST
 
         sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
@@ -69,40 +69,11 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         // TEST CUSTOMED COMMAND
 
-        //customedCommand = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-
-        /*
-        HitCommand hitCommand = new HitCommand(bim.bfr, Data.ActionChoice.TEST_CHOICE, bim.scheduler, bim.player.getInventory());
-        sltdUnit.setActionPoints(100);
-        hitCommand.setFree(true);
-        //hitCommand.setRepeatableOnKill(true);
-        hitCommand.setResetOrientation(true);
-        hitCommand.setSpecialmove(true);
-        //hitCommand.setIgnorePhysicalDamage(true);
-        //hitCommand.setHealingFromDamage(true);
-        //hitCommand.setRetaliation(true);
-        customedCommand = hitCommand;
-        */
-
-        customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand = new HealCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
-
-        /*
-        moveCommand = new MoveCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        bim.bfr.getUnitRenderer(sltdUnit).setVisible(false);
-        */
 
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         walkCommand.setFree(true);
-
-        /*
-        reinforcementEvent = new ReinforcementEvent(bim.bfr, bim.scheduler);
-        Unit unit = new Unit("marco");
-        bim.player.getArmy().add(unit);
-       bim.player.getArmy().appointSoldier(unit, 0);
-        reinforcementEvent.addStiffeners(unit, 0, 7, 3, 7);
-        */
-
 
         ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
         ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
@@ -119,23 +90,15 @@ public class TestBIS extends BattleInteractionState implements Observer{
         guardCommand.setFree(true);
         if(!guardCommand.apply(randomFoePos[0], randomFoePos[1])){ }
 
-        /*
-        randomFoe = bim.battlefield.getUnit(12,9);
-        randomFoe.addNativeAbility(Data.Ability.GUARD);
-        randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
-        guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        guardCommand.setFree(true);
-        guardCommand.apply(randomFoePos[0], randomFoePos[1]);
-        */
 
+        // EVENT !!
 
         Model.Trigger trigger;
         for(int r = 0; r < bim.battlefield.getNbRows(); r++){
             for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
                 if(bim.battlefield.isTileOccupied(r, c)){
                     final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.battlefield.getUnit(r, c));
-                    trigger = new UponDisappearingTrigger(true, woundedRenderer.getModel());
-                    trigger.addEvent(new BattleCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) {
+                    trigger = new Model.Trigger(true, new BattleCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) {
 
                         @Override
                         protected void execute() {
@@ -156,7 +119,14 @@ public class TestBIS extends BattleInteractionState implements Observer{
                         public boolean isUndoable() {
                             return false;
                         }
-                    });
+                    }) {
+
+
+                        @Override
+                        public boolean isTriggerable(Object data) {
+                            return woundedRenderer.getModel().isOutOfAction();
+                        }
+                    };
                     woundedRenderer.getModel().add(trigger);
 
                     if(woundedRenderer.getModel().isWarlord() && woundedRenderer.getModel().getArmy().getAffiliation() == Data.Affiliation.ENEMY_0){
@@ -166,10 +136,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
         }
 
-        //TRAP EVENT
-
-
-        TrapEvent.addTrigger(11, 4, 3, bim.bfr, bim.scheduler, bim.player.getInventory());
+        TrapEvent.addTrigger(bim, 11, 4, 3);
 
         for(int r = 0; r < bim.battlefield.getNbRows(); r++){
             for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
@@ -179,7 +146,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
         }
 
-        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.gcm, 0);
+        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.shortUnitPanel, bim.gcm, 0);
 
 
 
@@ -222,7 +189,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         */
 
 
-
+        /*
         if(!bim.battlefield.isTileOccupied(row, col)) {
             if (!walkCommand.apply(actorPos[0], actorPos[1], row, col)) {
                 System.out.println("command failed to be applied");
@@ -230,10 +197,11 @@ public class TestBIS extends BattleInteractionState implements Observer{
                 System.out.println("    target ?    : " + walkCommand.isTargetValid());
             }
         }
+        */
 
         // TEST CUSTOMED COMMAND
 
-        /*
+
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
             if(bim.battlefield.isTileOccupied(row, col)){
@@ -249,9 +217,9 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
         }else{
             customedCommand.setInitiator(actorPos[0], actorPos[1]);
-            customedCommand.setFree(true);
+            //customedCommand.setFree(true);
             if(customedCommand.isInitiatorValid()) {
-                customedCommand.setFree(false);
+                //customedCommand.setFree(false);
                 Array<int[]> impact = customedCommand.getImpactArea(actorPos[0], actorPos[1], row, col);
                 ccImpactArea.setTiles(impact, true);
                 ccActionArea.setTiles(customedCommand.getActionArea(), true);
@@ -259,48 +227,6 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
             }
         }
-        /*
-
-
-        // TEST FINAL
-
-        /*
-        if(switchmode && bim.battlefield.isTileOccupiedByAlly(row, col, Data.Affiliation.ALLY)) {
-            sltdUnit = bim.battlefield.getUnit(row, col);
-        }else{
-            if(bim.battlefield.isTileOccupied(row, col)){
-
-                switch (index){
-
-                    case 1 : command = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
-                    case 2 : command = new HealCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
-                    case 3 : command = new PushCommand(bim.bfr, bim.scheduler, bim.player.getInventory()); break;
-                    case 4 : command = new SwitchPositionCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
-                    case 5 : command = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory()); break;
-                    case 6 : command = new StealCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
-                    case 7 : command =  new SwitchWeaponCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), 1); break;
-                    case 8 : command = new ChooseOrientationCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), Data.Orientation.NORTH);break;
-                    case 9 : command = new EndUnitTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());break;
-                    default: command = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-                }
-            } else {
-                command = (index != 9) ? new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) : new BuildCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), Data.TileType.BRIDGE);
-
-            }
-
-            int[] unitPos = bim.battlefield.getUnitPos( sltdUnit);
-            if (command.setInitiator(unitPos[0], unitPos[1])) {
-                command.setDecoupled(true);
-                command.attach(this);
-
-                command.setTarget(row, col);
-                if (command.isTargetValid()) {
-                    command.apply();
-                    historic.offer(command);
-                }
-            }
-        }
-        */
 
 
         return false;
@@ -311,9 +237,12 @@ public class TestBIS extends BattleInteractionState implements Observer{
         animation.update(dt);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
-            //EarthquakeEvent earthquakeEvent = new EarthquakeEvent(bim.bfr, bim.scheduler, 4f, bim.gcm);
-            //earthquakeEvent.apply();
-            event.apply();
+            event.setDecoupled(false);
+            if(!event.apply()){
+                System.out.println("fail to be applied "+event.isApplicable());
+            }else{
+                System.out.println("applied");
+            }
 
         }
 

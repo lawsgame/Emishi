@@ -101,8 +101,6 @@ public class BattleCommandManager {
             }
         }
 
-        System.out.println("");
-
         return choices;
     }
 

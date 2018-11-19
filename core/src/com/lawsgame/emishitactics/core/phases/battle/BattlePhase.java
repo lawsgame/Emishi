@@ -75,30 +75,24 @@ public class BattlePhase extends GamePhase {
     }
 
     public BattlePhase(GPM gsm, Player player, int chapterId ){
-        super(gsm, getPixelPerfectGamePortWidth(128));
+        super(gsm, getPixelPerfectGamePortWidth(196));
+        System.out.println("game port width : " +getPixelPerfectGamePortWidth(196));
 
-        System.out.println("game port width : " +getPixelPerfectGamePortWidth(128));
-
-        // load assets
         loadRequiredAssets();
 
-        // load the battlefield
         Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
         battlefield.randomlyDeploy(player.getArmy());
+        battlefield.pushPlayerArmyTurnForward();
 
-        // build up sprite pool and battlefield renderer
         setFontParams();
         TempoSpritePool.get().set(asm);
-        //BattlefieldRenderer bfr = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
         AssetProvider assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
         assetProvider.set(battlefield, asm);
+
+        //BattlefieldRenderer bfr = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
         BattlefieldRenderer bfr = new IsoBFR(battlefield, assetProvider);
         bfr.setGameCamParameters(this.getGameCM());
 
-
-        battlefield.pushPlayerArmyTurnForward();
-
-        //lauch initial BIS
         this.bim = new BattleInteractionMachine(bfr, gameCM, asm, stageUI, player, assetProvider);
         //BattleInteractionState initBIS = new TestBIS(bim);
         BattleInteractionState initBIS = new SceneBIS(bim);
