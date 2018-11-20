@@ -43,6 +43,9 @@ public class BuildCommand extends ActorCommand {
         // set outcome
         outcome.add(getInitiator(), choice.getExperience());
 
+        // set event
+        handleEvents(this);
+
     }
 
     @Override

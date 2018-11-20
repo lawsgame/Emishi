@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -47,7 +48,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
         super.init();
         bim.bfr.addAreaRenderer(impactArea);
-        bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, true, false);
+        bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
         currentCommand.highlightTargets(true);
 
         //set the new orientation
@@ -91,20 +92,14 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
             if (row == currentCommand.getRowTarget() && col == currentCommand.getColTarget()) {
                 //ACTION VALIDATE
 
-
-                // clear the HUD before hand
                 if(bim.app.isPanelAvailable(currentCommand))
                     bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
-                bim.bfr.getAreaRenderer(impactArea).setVisible(false);
-                bim.removeTileHighlighting(false, false);
-                currentCommand.highlightTargets(false);
 
-                // await for  the command to notify its completion
                 currentCommand.attach(this);
-
+                currentCommand.highlightTargets(false);
                 currentCommand.apply();
-
-                // update the historic
+                bim.bfr.getAreaRenderer(impactArea).setVisible(false);
+                bim.thl.removeTileHighlighting(false, false);
                 historic.push(currentCommand);
 
             } else {

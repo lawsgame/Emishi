@@ -15,6 +15,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
 public class DeploymentBIS extends BattleInteractionState {
@@ -32,7 +33,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
         this.sltdUnit = bim.player.getArmy().getWarlord();
         int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
-        bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, false, false);
+        bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, TileHighlighter.SltdUpdateMode.ERASE_SLTD_TILE_MEMORY, false);
 
         startButton = StartButton.create(bim.asm, bim.uiStage.getViewport());
         startButton.addListener(new ChangeListener() {
@@ -60,7 +61,7 @@ public class DeploymentBIS extends BattleInteractionState {
             bim.bfr.addAreaRenderer(moveArea);
 
             this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
-            bim.focusOn(rowUnit, colUnit, true, true, true, true, false);
+            bim.focusOn(rowUnit, colUnit, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
         }
     }
 

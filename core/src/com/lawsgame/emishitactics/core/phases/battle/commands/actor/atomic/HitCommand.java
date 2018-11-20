@@ -206,9 +206,7 @@ public class HitCommand extends ActorCommand{
             }
 
             updateOutcome(getInitiator(), notifs);
-
         }
-
 
         if(healingFromDamage){
             int healValue = 0;
@@ -219,7 +217,6 @@ public class HitCommand extends ActorCommand{
             if(treated)
                 attackNotif.lifeDrained = healValue;
         }
-
 
         task.addThread(initiatorThread);
         for(int i = 0; i < defenderThreads.size; i++)

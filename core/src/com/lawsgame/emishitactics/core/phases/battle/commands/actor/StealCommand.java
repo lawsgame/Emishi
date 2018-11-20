@@ -50,12 +50,13 @@ public class StealCommand extends ActorCommand {
         task.addThread(stealerRendererThread);
         scheduleRenderTask(task);
 
-        // setTiles outoome
+        // se outoome
         if(stealSuccessful){
             outcome.add(stealer, choice.getExperience());
             outcome.add(stoleItem, stealer.isMobilized() && stealer.getArmy().isPlayerControlled());
         }
 
+        handleEvents(this);
     }
 
     @Override

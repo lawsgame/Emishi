@@ -34,6 +34,7 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
             scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
         }
 
+        handleEvents(this);
 
     }
 

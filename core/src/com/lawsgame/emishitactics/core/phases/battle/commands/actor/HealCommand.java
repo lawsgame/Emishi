@@ -79,7 +79,7 @@ public class HealCommand extends SelfInflitedCommand {
         outcome.add(getInitiator(), choice.getExperience());
 
         // handle events
-        handleEvents(null);
+        handleEvents(this);
     }
 
     @Override

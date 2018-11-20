@@ -11,17 +11,20 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoCommandChoicePanel;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
 
 public class SelectActionBIS extends BattleInteractionState {
-    int rowSltdUnit;
-    int colSltdUnit;
-    Stack<ActorCommand> historic;
+    private int rowSltdUnit;
+    private int colSltdUnit;
+    private Stack<ActorCommand> historic;
     private ChoicePanel choicePanel;
     private ChoicePanel commandPanel;
 
@@ -45,15 +48,11 @@ public class SelectActionBIS extends BattleInteractionState {
         System.out.println("SELECT ACTION : "+bim.battlefield.getUnit(rowSltdUnit, colSltdUnit).getName());
 
         super.init();
-        resetChoicePanel();
-        bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, true);
-
-    }
-
-    private void resetChoicePanel(){
         choicePanel.build(new ActionButtonHandler(this));
         choicePanel.setVisible(true);
         bim.uiStage.addActor(choicePanel);
+        bim.focusOn(rowSltdUnit, colSltdUnit, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
+
     }
 
     @Override
@@ -65,7 +64,7 @@ public class SelectActionBIS extends BattleInteractionState {
     }
 
     @Override
-    public boolean handleTouchInput(int row, int col) {
+    public boolean handleTouchInput(final int row, final int col) {
         choicePanel.setVisible(false);
         commandPanel.remove();
 
@@ -79,34 +78,40 @@ public class SelectActionBIS extends BattleInteractionState {
 
                 Utils.undoCommands(historic);
                 if(historic.size() > 0){
+
                     rowSltdUnit = historic.peek().getRowActor();
                     colSltdUnit = historic.peek().getColActor();
-                    bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, false);
-                    resetChoicePanel();
+                    bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                        @Override
+                        public void apply() {
+                            bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
+                        }
+                    }, 0f));
+                    choicePanel.build(new ActionButtonHandler(this));
+                    choicePanel.setVisible(true);
                     return true;
                 }else{
                     if(!touchedUnit.isDone()){
+
                         bim.replace(new SelectActionBIS(bim, touchedUnit));
                         return true;
                     }else{
-                        bim.replace(new SelectActionBIS(bim, selectedUnit));
+
+                        int[] actorPos = bim.bfr.getModel().getUnitPos(selectedUnit);
+                        this.rowSltdUnit = actorPos[0];
+                        this.colSltdUnit = actorPos[1];
+                        this.bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
+                            @Override
+                            public void apply() {
+                                bim.focusOn(row, col, true, true, false, rowSltdUnit, colSltdUnit, true);
+                            }
+                        }, 0f));
+                        choicePanel.build(new ActionButtonHandler(this));
                         return true;
+
+
                     }
                 }
-
-                /*
-                if (Utils.undoCommands(historic) && !touchedUnit.isDone()) {
-                    bim.replace(new SelectActionBIS(bim, touchedUnit));
-                    return true;
-                } else {
-                    // if not all commands are undoable, all the undoable ones are disabled, the unit is updated and a new choice panel is provided
-                    rowSltdUnit = historic.peek().getRowActor();
-                    colSltdUnit = historic.peek().getColActor();
-                    bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, true, false);
-                    resetChoicePanel();
-                    return true;
-                }
-                */
             }
         }
         return false;

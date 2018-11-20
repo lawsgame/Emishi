@@ -29,7 +29,7 @@ import java.util.Stack;
 public class BattleCommandManager {
     private final Array<Array<ActorCommand>> commandPool;
 
-    public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
+    public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, TileHighlighter thl){
         commandPool = new Array<Array<ActorCommand>>();
 
         setChoice(new WalkCommand(bfr, scheduler, playerInventory));
@@ -57,7 +57,7 @@ public class BattleCommandManager {
         setChoice(new GuardCommand(bfr, scheduler, playerInventory));
         setChoice(new HealCommand(bfr, scheduler, playerInventory));
         setChoice(new StealCommand(bfr, scheduler, playerInventory));
-        setChoice(new EndUnitTurnCommand(bfr, scheduler, playerInventory));
+        setChoice(new EndUnitTurnCommand(bfr, scheduler, playerInventory, thl));
 
     }
 

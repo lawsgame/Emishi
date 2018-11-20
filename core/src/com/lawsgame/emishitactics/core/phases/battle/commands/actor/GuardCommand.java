@@ -57,6 +57,8 @@ public class GuardCommand extends SelfInflitedCommand {
 
         //outcome
         outcome.add(getInitiator(), choice.getExperience());
+
+        handleEvents(this);
     }
 
     @Override

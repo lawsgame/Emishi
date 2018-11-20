@@ -32,6 +32,9 @@ public class PlunderCommand extends SelfInflitedCommand {
 
         // set outcome
         outcome.add(getInitiator(), choice.getExperience());
+
+        handleEvents(this);
+
     }
 
     @Override

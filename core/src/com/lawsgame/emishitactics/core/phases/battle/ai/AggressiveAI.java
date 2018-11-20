@@ -8,12 +8,15 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnC
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class AggressiveAI extends PassiveAI {
 
-    public AggressiveAI(BattlefieldRenderer bfr, AnimationScheduler scheduler, ActionPanelPool app, Inventory playerInventory) {
-        super(bfr, scheduler, app, playerInventory);
+
+    public AggressiveAI(BattlefieldRenderer bfr, AnimationScheduler scheduler, ActionPanelPool app, Inventory playerInventory, TileHighlighter thl) {
+        super(bfr, scheduler, app, playerInventory, thl);
+
     }
 
     @Override
@@ -27,7 +30,7 @@ public class AggressiveAI extends PassiveAI {
             boolean attackPerformed = false;
             AttackCommand attackCommand = new AttackCommand(bfr, scheduler, playerInventory);
             WalkCommand walkCommand = new WalkCommand(bfr, scheduler, playerInventory);
-            EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory);
+            EndUnitTurnCommand endUnitTurnCommand = new EndUnitTurnCommand(bfr, scheduler, playerInventory, thl);
 
             System.out.println("\n____________________________ UNIT AI TURN BEGIN ____________________________");
             System.out.println("      > AggressiveAI.setCommandBundle() with ACTOR : "+actor.getName());

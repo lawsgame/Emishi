@@ -9,6 +9,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
@@ -22,7 +23,7 @@ public class EndUnitTurnBIS extends BattleInteractionState {
         super(bim, true, true, true, false, true);
         this.actor = actor;
         this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
-        this.endUnitTurnCommand = new EndUnitTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        this.endUnitTurnCommand = new EndUnitTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.thl);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class EndUnitTurnBIS extends BattleInteractionState {
 
             if(bim.battlefield.isUnitDeployed(actor)) {
                 int[] actorPos = bim.battlefield.getUnitPos(actor);
-                bim.focusOn(actorPos[0], actorPos[1], true, false, false, true, false);
+                bim.focusOn(actorPos[0], actorPos[1], true, true, true, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
             }
         }
     }

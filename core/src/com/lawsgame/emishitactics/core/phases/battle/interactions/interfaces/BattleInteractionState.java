@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.InfoBIS;
 import com.lawsgame.emishitactics.engine.inputs.InteractionState;
 
@@ -38,7 +39,7 @@ public abstract class BattleInteractionState extends InteractionState {
     @Override
     public void init() {
         if(clearFAA)
-            bim.ffa.clear();
+            bim.thl.ffa.clear();
     }
 
     @Override
@@ -50,7 +51,7 @@ public abstract class BattleInteractionState extends InteractionState {
     public void dispose() { }
 
     public void end(){
-        bim.removeTileHighlighting(false, false);
+        bim.thl.removeTileHighlighting(false, false);
     }
 
     public abstract boolean handleTouchInput(int row, int col);
@@ -81,10 +82,10 @@ public abstract class BattleInteractionState extends InteractionState {
             colTouch = bim.bfr.getCol(gameX, gameY);
             if (!handleTouchInput(rowTouch, colTouch) && bim.battlefield.isTileExisted(rowTouch, colTouch)) {
 
-                bim.focusOn(rowTouch, colTouch, true, true, true, false, false);
+                bim.focusOn(rowTouch, colTouch, true, true, false, TileHighlighter.SltdUpdateMode.UNCHANGED, true);
                 if (FAAUpdatable && bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, bim.player.getArmy().getAffiliation())) {
 
-                    bim.ffa.update(rowTouch, colTouch);
+                    bim.thl.ffa.update(rowTouch, colTouch);
                 }
             }
         }

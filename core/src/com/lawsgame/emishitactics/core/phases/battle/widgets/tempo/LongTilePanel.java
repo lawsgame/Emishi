@@ -37,13 +37,13 @@ public class LongTilePanel extends TilePanel {
         if(tileType.isReachable(false)) builder.append("reachable ");
         else if(tileType.isReachable(true)) builder.append("reachable only by pathfinder");
         else builder.append("unreachable ");
-        builder.append("buildingType");
+        builder.append("type");
 
         builder.append("\n\nHeal / turn : "+tileType.getHealPower());
         builder.append("\nStrength bonus : "+tileType.getAttackMightBonus());
         builder.append("\nDefense bonus : "+ tileType.getDefenseBonus());
         builder.append("\nAvoidance bonus : "+tileType.getAvoidBonus());
-        builder.append("\nREGULAR_ATTACK accuracy bonus : "+tileType.getAttackAccBonus());
+        builder.append("\nAttack accuracy bonus : "+tileType.getAttackAccBonus());
         builder.append("\nRange enhanced : "+tileType.enhanceRange());
 
         description = builder.toString();

@@ -5,11 +5,12 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine.FocusOn;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand.Outcome;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS.HandleOutcomeTask.HOTType;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
@@ -18,7 +19,6 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperien
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS.HandleOutcomeTask.HOTType;
 
 import java.util.LinkedList;
 import java.util.Stack;
@@ -99,7 +99,6 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
 
                         HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
-                        experienceTask.addThread(new StandardTask.CommandThread(new FocusOn(bim, rowReceiver, colReceiver), 0f));
                         experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(rowReceiver, colReceiver, holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, experience), 0f));
                         tasks.add(experienceTask);
 
@@ -234,7 +233,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
         @Override
         public void apply() {
-            bim.focusOn(rowReceiver, colReceiver, true, false, false, true, false);
+            bim.focusOn(rowReceiver, colReceiver, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
             experiencePanel.set(bim.mainI18nBundle, receiver.getExperience(), experience);
             experiencePanel.show();
             levelUpPanel.hide();

@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -37,7 +38,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
         super.init();
         bim.bfr.addAreaRenderer(actionArea);
-        bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, true, true, false);
+        bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
 
         if(currentCommand.getActionChoice().isActorIsTarget()){
             currentCommand.setTarget(currentCommand.getRowActor(), currentCommand.getColActor());
@@ -66,12 +67,14 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         int col = currentCommand.getColTarget();
         if(currentCommand.isTargetValid()){
             if(currentCommand.isUndoable()){
+                // ACTION PERFORM
+
                 currentCommand.attach(this);
                 currentCommand.highlightTargets(false);
                 currentCommand.apply();
                 historic.push(currentCommand);
                 bim.bfr.getAreaRenderer(actionArea).setVisible(false);
-                bim.removeTileHighlighting(false, false);
+                bim.thl.removeTileHighlighting(false, false);
             }else{
 
                 bim.replace(new ValidateTargetBIS(bim, currentCommand, historic));

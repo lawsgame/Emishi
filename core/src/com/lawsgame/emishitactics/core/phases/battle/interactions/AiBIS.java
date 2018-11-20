@@ -7,6 +7,7 @@ import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -22,7 +23,7 @@ import java.util.Stack;
  * HOW IT WORKS :
  *
  * the AI which runs on a other thread provide asynchronously all the already applied commmands performed the AI controlled units
- * AIBIS task is to handle the visual feedback od the AI controlled units actions
+ * AIBIS task is to handle the visual feedback of the AI-controlled units' actions
  *
  *
  */
@@ -37,7 +38,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
     public AiBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false, true, false);
 
-        this.ai = new AggressiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory());
+        this.ai = new AggressiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory(), bim.thl);
         this.threadAI = new Thread(ai, "AI Thread");
         this.bundleQueue = new LinkedList<AI.CommandBundle>();
         this.trackrecord = new Stack<ActorCommand>();
@@ -185,7 +186,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
                     commandThread.addQuery(new SimpleCommand() {
                         @Override
                         public void apply() {
-                            bim.focusOn(actorCommand.getRowActor(), actorCommand.getColActor(), true, false, false, true, false);
+                            bim.focusOn(actorCommand.getRowActor(), actorCommand.getColActor(), true, false, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, false);
                             if (panel != null) {
                                 bim.uiStage.addActor(panel);
                                 panel.show();
