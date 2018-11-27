@@ -5,9 +5,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.TilePanel;
 
-public class LongTilePanel extends TilePanel {
+public class TempoLongTilePanel extends TilePanel {
 
     private static float X_TEXT_OFFSET = 8f;
     private static float Y_TEXT_OFFSET = 8f;
@@ -17,7 +17,7 @@ public class LongTilePanel extends TilePanel {
     private String description;
     private StringBuilder builder;
 
-    public LongTilePanel(Viewport stageViewport) {
+    public TempoLongTilePanel(Viewport stageViewport) {
         super(stageViewport);
         setWidth(PANEL_WIDTH);
         setHeight(PANEL_HEIGHT);

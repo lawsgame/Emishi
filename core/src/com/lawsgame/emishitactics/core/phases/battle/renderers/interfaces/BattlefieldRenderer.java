@@ -19,11 +19,16 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
     private LinkedList<Object> notificationQueue;
     protected Data.Weather renderedWeather;
+    protected CameraManager gcm;
 
-    public BattlefieldRenderer(Battlefield model) {
+    public BattlefieldRenderer(Battlefield model, CameraManager gcm) {
 
         super(model);
         this.notificationQueue = new LinkedList<Object>();
+        this.gcm = gcm;
+        if(gcm != null) {
+            setGameCamParameters();
+        }
     }
 
     protected void launchNextAnimation(){
@@ -112,8 +117,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract int getCol(float gameX, float gameY);
     public abstract float getCenterX(int row, int col);
     public abstract float getCenterY(int row, int col);
-    public abstract void setGameCamParameters(CameraManager cameraManager);
-
     public abstract BattleUnitRenderer getUnitRenderer(Unit model);
     public abstract AreaRenderer getAreaRenderer(Area area);
     public abstract void addTileRenderer(int row, int col, Tile model);
@@ -143,6 +146,24 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         return toString();
     }
 
+
+
+    //------------------ CAMERA MANAGEMENT -----------------------------
+
+    public abstract void setGameCamParameters();
+
+    public void moveTo(int rowTarget, int colTarget, boolean smoothly){
+        gcm.moveTo(getCenterX(rowTarget, colTarget), getCenterY(rowTarget, colTarget) , smoothly);
+    }
+
+    public CameraManager getGCM(){
+        return gcm;
+    }
+
+
+
+
+    //----------------- EXCEPTION DECLARATION ---------------------------
 
     public static class BFRendererException extends Exception{
         public BFRendererException(String msg){

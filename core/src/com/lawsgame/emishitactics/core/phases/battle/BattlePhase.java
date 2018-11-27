@@ -12,6 +12,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -74,9 +75,9 @@ public class BattlePhase extends GamePhase {
         return Gdx.app.getGraphics().getWidth() * IsoBFR.SPRITE_STD_SIZE/ spritePixelWidth;
     }
 
-    public BattlePhase(GPM gsm, Player player, int chapterId ){
-        super(gsm, getPixelPerfectGamePortWidth(196));
-        System.out.println("game port width : " +getPixelPerfectGamePortWidth(196));
+    public BattlePhase(GPM gpm, Player player, int chapterId ){
+        super(gpm, getPixelPerfectGamePortWidth(192));
+        System.out.println("game port width : " +getPixelPerfectGamePortWidth(192));
 
         loadRequiredAssets();
 
@@ -89,11 +90,9 @@ public class BattlePhase extends GamePhase {
         AssetProvider assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
         assetProvider.set(battlefield, asm);
 
-        //BattlefieldRenderer bfr = new TempoBattlefield2DRenderer(battlefield, TempoSpritePool.get());
-        BattlefieldRenderer bfr = new IsoBFR(battlefield, assetProvider);
-        bfr.setGameCamParameters(this.getGameCM());
+        BattlefieldRenderer bfr = new IsoBFR(battlefield, gameCM, assetProvider);
 
-        this.bim = new BattleInteractionMachine(bfr, gameCM, asm, stageUI, player, assetProvider);
+        this.bim = new BattleInteractionMachine(bfr, asm, stageUI, player, assetProvider);
         //BattleInteractionState initBIS = new TestBIS(bim);
         BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);

@@ -60,14 +60,13 @@ public abstract class GamePhase implements State, GameElement {
 		this.stageUI = new Stage(uiCM.getPort());
 	}
 
-	public GamePhase (GPM gsm, float gamePortWidth, float worldWidth, float worldHeight){
-		this(gsm, new AssetManager(), gamePortWidth, worldWidth, worldHeight);
-	}
-
-	public GamePhase (GPM gsm, AssetManager asm, float gamePortWidth){
-		this(gsm, asm, gamePortWidth, gamePortWidth, gamePortWidth*getAspRatio());
-	}
-
+	/**
+	 * Constructor of GP for Level fully contained inside the device's screen.
+	 * therefore the GameCamera is not supposed to move unless for special effects like shaking.
+	 *
+	 * @param gsm :
+	 * @param gamePortWidth :
+	 */
 	public GamePhase (GPM gsm, float gamePortWidth){
 		this(gsm, new AssetManager(), gamePortWidth, gamePortWidth, gamePortWidth*getAspRatio());
 	}

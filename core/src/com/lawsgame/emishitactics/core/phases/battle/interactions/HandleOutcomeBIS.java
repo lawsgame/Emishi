@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -12,26 +11,15 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS.HandleOutcomeTask.HOTType;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.LinkedList;
 import java.util.Stack;
 
 public class HandleOutcomeBIS extends BattleInteractionState{
+
     private Stack<ActorCommand> historic;
     private Outcome outcome;
-
-    private static Outcome emptyOutcome;
-
-    private ExperiencePanel experiencePanel;
-    private LevelUpPanel levelUpPanel;
-    private LootPanel lootPanel;
 
     private LinkedList<HandleOutcomeTask> tasks;
     private boolean aiTurn;
@@ -40,16 +28,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         super(bim, true, false, false, false, false);
 
         this.historic = historic;
-        if(emptyOutcome == null) emptyOutcome = new Outcome(bim.player.getInventory());
-        this.outcome = (historic.size() > 0) ? historic.peek().getOutcome() : emptyOutcome;
-        this.experiencePanel = new TempoExperiencePanel(bim.uiStage.getViewport());
-        this.levelUpPanel = new TempoLevelUpPanel(bim.uiStage.getViewport());
-        this.lootPanel = new TempoLootPanel(bim.uiStage.getViewport());
-
-        bim.uiStage.addActor(experiencePanel);
-        bim.uiStage.addActor(levelUpPanel);
-        bim.uiStage.addActor(lootPanel);
-
+        this.outcome = historic.peek().getOutcome();
         this.tasks = new LinkedList<HandleOutcomeTask>();
         this.aiTurn = aiTurn;
 
@@ -69,12 +48,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
          */
 
         super.init();
-        if(outcome.isHandled()){
-
-            if(tasks.isEmpty()) {
-                proceed();
-            }
-        }else {
+        if(outcome != null && !outcome.isHandled()){
             int[] expLvls;
             int experience;
             float xReceiverBUR;
@@ -99,7 +73,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
 
                         HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
-                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(rowReceiver, colReceiver, holder.receiver, bim, experiencePanel, levelUpPanel, lootPanel, experience), 0f));
+                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(rowReceiver, colReceiver, holder.receiver, experience, bim), 0f));
                         tasks.add(experienceTask);
 
                         if(expLvls.length > 1){
@@ -107,7 +81,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                             HandleOutcomeTask levelUpTask = new HandleOutcomeTask(HOTType.LEVELUP);
                             levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
                             if (holder.receiver.isMobilized() || holder.receiver.getArmy().isPlayerControlled()) {
-                                levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(holder.receiver, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel, expLvls), 0f));
+                                levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(holder.receiver, expLvls, bim), 0f));
                             }
                             tasks.add(levelUpTask);
                         }
@@ -118,22 +92,17 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                 }else {
                     ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
                     HandleOutcomeTask lootTask = new HandleOutcomeTask(HOTType.LOOT);
-                    lootTask.addThread(new StandardTask.CommandThread(new DisplayLootPanel(holder.droppedItem, bim.mainI18nBundle, experiencePanel, levelUpPanel, lootPanel), 0f));
+                    lootTask.addThread(new StandardTask.CommandThread(new DisplayLootPanel(holder.droppedItem, bim), 0f));
                     tasks.offer(lootTask);
                 }
             }
         }
 
-        if(!tasks.isEmpty())
+        if(!tasks.isEmpty()) {
             bim.scheduler.addTask(tasks.pop());
-    }
-
-    @Override
-    public void end() {
-        super.end();
-        experiencePanel.remove();
-        levelUpPanel.remove();
-        lootPanel.remove();
+        }else{
+            proceed();
+        }
     }
 
     private void proceed(){
@@ -142,14 +111,14 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         indeed, it checks if the BIS is called by AIBIS before checking if the battle is over.
 
         Here is the explanation :
-        Technically the condition :im.battlefield.getSolver().isBattleOver() can be true way before all the outcomes of the actions
+        Technically the condition :im.bfr.getModel().getSolver().isBattleOver() can be true way before all the outcomes of the actions
         taken by the AI are displayed since it check the condition model wise and not render wise.
         Therefore, it needs to handle the battle is over condition indepedently within the AIBIS class.
         (cf AIBIS.proceed())
          */
         if(aiTurn) {
              bim.rollback();
-         }else if(bim.battlefield.getSolver().isBattleOver()) {
+         }else if(bim.bfr.getModel().getSolver().isBattleOver()) {
             bim.replace(new BattleOverBIS(bim));
         }else{
             if(!historic.isEmpty()&& historic.peek().getInitiator() != null) {
@@ -214,19 +183,13 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         private int rowReceiver;
         private int colReceiver;
         private BattleInteractionMachine bim;
-        private ExperiencePanel experiencePanel;
-        private LevelUpPanel levelUpPanel;
-        private LootPanel lootPanel;
         private int experience;
 
-        public DisplayExperiencePanel(int rowReceiver, int colReceiver, Unit receiver, BattleInteractionMachine bim, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int experience) {
+        public DisplayExperiencePanel(int rowReceiver, int colReceiver, Unit receiver, int experience, BattleInteractionMachine bim) {
             this.bim = bim;
             this.receiver = receiver;
             this.rowReceiver= rowReceiver;
             this.colReceiver = colReceiver;
-            this.experiencePanel = experiencePanel;
-            this.levelUpPanel = levelUpPanel;
-            this.lootPanel = lootPanel;
             this.experience = experience;
 
         }
@@ -234,61 +197,49 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         @Override
         public void apply() {
             bim.focusOn(rowReceiver, colReceiver, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
-            experiencePanel.set(bim.mainI18nBundle, receiver.getExperience(), experience);
-            experiencePanel.show();
-            levelUpPanel.hide();
-            lootPanel.hide();
+            bim.pp.experiencePanel.set(bim.localization, receiver.getExperience(), experience);
+            bim.pp.experiencePanel.show();
+            bim.pp.levelUpPanel.hide();
+            bim.pp.lootPanel.hide();
         }
 
     }
 
     static class DisplayLevelupPanel extends SimpleCommand{
         private Unit receiver;
-        private I18NBundle bundle;
-        private ExperiencePanel experiencePanel;
-        private LevelUpPanel levelUpPanel;
-        private LootPanel lootPanel;
         private int[] statGain;
+        private BattleInteractionMachine bim;
 
-        public DisplayLevelupPanel(Unit receiver, I18NBundle bundle, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel, int[] statGain) {
+        public DisplayLevelupPanel(Unit receiver, int[] statGain, BattleInteractionMachine bim) {
             this.receiver = receiver;
-            this.bundle = bundle;
-            this.experiencePanel = experiencePanel;
-            this.levelUpPanel = levelUpPanel;
-            this.lootPanel = lootPanel;
             this.statGain = statGain;
+            this.bim = bim;
         }
 
         @Override
         public void apply() {
-            experiencePanel.hide();
-            levelUpPanel.set(bundle, receiver, statGain);
-            levelUpPanel.show();
-            lootPanel.hide();
+            bim.pp.experiencePanel.hide();
+            bim.pp.levelUpPanel.set(bim.localization, receiver, statGain);
+            bim.pp.levelUpPanel.show();
+            bim.pp.lootPanel.hide();
         }
     }
 
     static class DisplayLootPanel extends SimpleCommand{
         private Item droppedItem;
-        private I18NBundle bundle;
-        private ExperiencePanel experiencePanel;
-        private LevelUpPanel levelUpPanel;
-        private LootPanel lootPanel;
+        private BattleInteractionMachine bim;
 
-        public DisplayLootPanel(Item droppedItem, I18NBundle bundle, ExperiencePanel experiencePanel, LevelUpPanel levelUpPanel, LootPanel lootPanel) {
+        public DisplayLootPanel(Item droppedItem, BattleInteractionMachine bim) {
             this.droppedItem = droppedItem;
-            this.bundle = bundle;
-            this.experiencePanel = experiencePanel;
-            this.levelUpPanel = levelUpPanel;
-            this.lootPanel = lootPanel;
+            this.bim = bim;
         }
 
         @Override
         public void apply() {
-            experiencePanel.hide();
-            levelUpPanel.hide();
-            lootPanel.set(droppedItem, bundle);
-            lootPanel.show();
+            bim.pp.experiencePanel.hide();
+            bim.pp.levelUpPanel.hide();
+            bim.pp.lootPanel.set(droppedItem, bim.localization);
+            bim.pp.lootPanel.show();
         }
     }
 

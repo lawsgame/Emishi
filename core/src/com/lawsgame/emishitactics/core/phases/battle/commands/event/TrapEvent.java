@@ -14,7 +14,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.UnitPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 public class TrapEvent extends BattleCommand{
@@ -24,7 +24,7 @@ public class TrapEvent extends BattleCommand{
     private UnitPanel shortUnitPanel;
 
     public TrapEvent(BattleInteractionMachine bim, int damage, int row, int col) {
-        this(bim.bfr, bim.scheduler, bim.player.getInventory(), damage, row, col, bim.shortUnitPanel);
+        this(bim.bfr, bim.scheduler, bim.player.getInventory(), damage, row, col, bim.pp.shortUnitPanel);
     }
 
     private TrapEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, int damage, int row, int col, UnitPanel unitPanel){
@@ -36,7 +36,7 @@ public class TrapEvent extends BattleCommand{
     }
 
     public static TrapEvent addTrigger(BattleInteractionMachine bim, int rowTile, int colTile, int damage){
-        return addTrigger(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.bfr.getModel().getTile(rowTile, colTile), rowTile, colTile, damage, bim.shortUnitPanel);
+        return addTrigger(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.bfr.getModel().getTile(rowTile, colTile), rowTile, colTile, damage, bim.pp.shortUnitPanel);
     }
 
     private static TrapEvent addTrigger(BattlefieldRenderer bfr,

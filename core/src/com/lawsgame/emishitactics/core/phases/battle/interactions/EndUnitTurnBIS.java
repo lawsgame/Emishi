@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrient
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
 
 public class EndUnitTurnBIS extends BattleInteractionState {
@@ -36,12 +36,12 @@ public class EndUnitTurnBIS extends BattleInteractionState {
             proceed();
         }else {
 
-            this.orientationChoicePanel.build(new OrientationButtonHandler(this));
+            this.orientationChoicePanel.set(new OrientationButtonHandler(this));
             this.orientationChoicePanel.setVisible(true);
-            bim.uiStage.addActor(orientationChoicePanel);
+            bim.pp.uiStage.addActor(orientationChoicePanel);
 
-            if(bim.battlefield.isUnitDeployed(actor)) {
-                int[] actorPos = bim.battlefield.getUnitPos(actor);
+            if(bim.bfr.getModel().isUnitDeployed(actor)) {
+                int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
                 bim.focusOn(actorPos[0], actorPos[1], true, true, true, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
             }
         }
@@ -62,11 +62,11 @@ public class EndUnitTurnBIS extends BattleInteractionState {
         if(actor.isMobilized()){
 
             if(!actor.isOutOfAction()){
-                int[] actorPos = bim.battlefield.getUnitPos(actor);
+                int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
                 this.endUnitTurnCommand.apply(actorPos[0], actorPos[1]);
             }
 
-            if (bim.battlefield.getCurrentArmy().isDone()) {
+            if (bim.bfr.getModel().getCurrentArmy().isDone()) {
 
                 bim.replace(new EndArmyTurnBIS(bim));
             } else {
@@ -100,9 +100,9 @@ public class EndUnitTurnBIS extends BattleInteractionState {
         private TextButton createButton (final Data.Orientation orientation, TextButton.TextButtonStyle style){
             TextButton button = null;
 
-            if (bis.bim.battlefield.isUnitDeployed(bis.actor)) {
-                final int[] actorPos = bis.bim.battlefield.getUnitPos(bis.actor);
-                button = new TextButton(orientation.getName(bis.bim.mainI18nBundle), style);
+            if (bis.bim.bfr.getModel().isUnitDeployed(bis.actor)) {
+                final int[] actorPos = bis.bim.bfr.getModel().getUnitPos(bis.actor);
+                button = new TextButton(orientation.getName(bis.bim.localization), style);
                 button.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {

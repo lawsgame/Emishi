@@ -3,7 +3,6 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.ai.AggressiveAI;
-import com.lawsgame.emishitactics.core.phases.battle.ai.PassiveAI;
 import com.lawsgame.emishitactics.core.phases.battle.ai.interfaces.AI;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
@@ -11,7 +10,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -38,7 +37,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
     public AiBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false, true, false);
 
-        this.ai = new AggressiveAI(bim.bfr, bim.scheduler, bim.app, bim.player.getInventory(), bim.thl);
+        this.ai = new AggressiveAI(bim.bfr, bim.scheduler, bim.pp, bim.player.getInventory(), bim.thl);
         this.threadAI = new Thread(ai, "AI Thread");
         this.bundleQueue = new LinkedList<AI.CommandBundle>();
         this.trackrecord = new Stack<ActorCommand>();
@@ -96,7 +95,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
 
     private void proceed(){
-        if(bim.battlefield.getSolver().isBattleOver()){
+        if(bim.bfr.getModel().getSolver().isBattleOver()){
             bim.replace(new BattleOverBIS(bim));
         }else{
             bim.replace(new EndArmyTurnBIS(bim));
@@ -188,7 +187,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
                         public void apply() {
                             bim.focusOn(actorCommand.getRowActor(), actorCommand.getColActor(), true, false, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, false);
                             if (panel != null) {
-                                bim.uiStage.addActor(panel);
+                                bim.pp.uiStage.addActor(panel);
                                 panel.show();
                             }
                             actorCommand.highlightTargets(true);

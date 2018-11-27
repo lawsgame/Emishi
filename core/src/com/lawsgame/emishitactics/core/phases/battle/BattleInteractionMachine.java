@@ -9,85 +9,40 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.LongTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.LongUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.ShortTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.ShortUnitPanel;
-import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
     public final Player player;
-    public final Battlefield battlefield;
     public final BattlefieldRenderer bfr;
     public final BattleCommandManager bcm;
-    public final CameraManager gcm;
     public final AssetManager asm;
-    public final ActionPanelPool app;
+    public final AssetProvider provider;
     public final TileHighlighter thl;
-    public final AssetProvider assetProvider;
+    public final PanelPool pp;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
-    public final I18NBundle mainI18nBundle;
-
-    public Stage uiStage;
-    public final TilePanel shortTilePanel;
-    public final TilePanel longTilePanel;
-    public final UnitPanel shortUnitPanel;
-    public final UnitPanel longUnitPanel;
-
-    public SimpleCommand showSTP;
-    public SimpleCommand showSUP;
-    public SimpleCommand hideSTP;
-    public SimpleCommand hideSUP;
+    public final I18NBundle localization;
 
 
-    public BattleInteractionMachine(BattlefieldRenderer bfr, CameraManager gcm, AssetManager asm, Stage stageUI, Player player, AssetProvider assetProvider) {
-        this.battlefield = bfr.getModel();
+    public BattleInteractionMachine(BattlefieldRenderer bfr, AssetManager asm, Stage stageUI, Player player, AssetProvider provider) {
         this.bfr = bfr;
-        this.gcm = gcm;
         this.asm = asm;
         this.player = player;
-        this.assetProvider = assetProvider;
-        this.app = new ActionPanelPool(stageUI.getViewport());
+        this.provider = provider;
         this.scheduler = new AnimationScheduler();
         this.thl = new TileHighlighter(bfr);
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
         this.multiplexer = new InputMultiplexer();
-        this.mainI18nBundle = asm.get(Assets.STRING_BUNDLE_MAIN);
-
-
-
-        // UI
-        this.uiStage = stageUI;
-        this.shortTilePanel = new ShortTilePanel(stageUI.getViewport());
-        this.shortUnitPanel = new ShortUnitPanel(stageUI.getViewport());
-        this.longUnitPanel = new LongUnitPanel(stageUI.getViewport(), mainI18nBundle);
-        this.longTilePanel = new LongTilePanel(stageUI.getViewport());
-
-        stageUI.addActor(shortTilePanel);
-        stageUI.addActor(shortUnitPanel);
-        stageUI.addActor(longUnitPanel);
-        stageUI.addActor(longTilePanel);
-
-        showSTP = new ShowPanel(shortTilePanel);
-        showSUP = new ShowPanel(shortUnitPanel);
-        hideSTP = new HidePanel(shortTilePanel);
-        hideSUP = new HidePanel(shortUnitPanel);
-
+        this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
+        this.pp = new PanelPool(stageUI, asm, provider, localization);
 
     }
 
@@ -109,7 +64,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     private void updateInputHandler(){
         multiplexer.clear();
-        multiplexer.addProcessor(uiStage);
+        multiplexer.addProcessor(pp.uiStage);
         multiplexer.addProcessor(new GestureDetector(getCurrentState()));
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -117,12 +72,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     // -------------------- SHARED METHOD -----------------------------
 
-    /**
-     * rowFocus : row of the tile on which the camera focus on
-     * colFocus : col of the tile on which the camera focus on
-     */
-    private int rowFocus = -1, colFocus = -1;
-    private Unit focusUnit = null;
+
     /**
      * convient method which
      *  - move the camera at the relevant location
@@ -142,8 +92,9 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      */
     public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean displayPanels, boolean erasePanelMemory, int rowSelectedTile, int colSelectedTile, boolean highligthSquad){
 
-            moveCamera(rowTarget, colTarget, moveCamSmoothly);
-            updateShortPanels(rowTarget, colTarget, displayPanels, erasePanelMemory);
+            bfr.moveTo(rowTarget, colTarget, moveCamSmoothly);
+            if(displayPanels)
+                pp.updateShortPanels(bfr, rowTarget, colTarget, erasePanelMemory);
             thl.highlight(rowTarget, colTarget, highligthSquad, rowSelectedTile, colSelectedTile);
     }
 
@@ -165,47 +116,12 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      */
     public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean displayPanels, boolean erasePanelMemory, TileHighlighter.SltdUpdateMode mode, boolean highligthSquad){
 
-        moveCamera(rowTarget, colTarget, moveCamSmoothly);
-        updateShortPanels(rowTarget, colTarget, displayPanels, erasePanelMemory);
+        bfr.moveTo(rowTarget, colTarget, moveCamSmoothly);
+        if(displayPanels)
+            pp.updateShortPanels(bfr, rowTarget, colTarget, erasePanelMemory);
         thl.highlight(rowTarget, colTarget, highligthSquad, mode);
 
     }
-
-    public void updateShortPanels(int rowTarget, int colTarget, boolean displayPanels, boolean erasePanelMemory){
-        if(erasePanelMemory){
-            rowFocus = -1;
-            colFocus = -1;
-            focusUnit = null;
-        }
-
-        if(bfr.getModel().isTileExisted(rowTarget, colTarget) && displayPanels){
-            if(rowTarget != rowFocus || colTarget != colFocus || shortTilePanel.isHiding()) {
-                rowFocus = rowTarget;
-                colFocus = colTarget;
-                shortTilePanel.hide();
-                shortTilePanel.set(battlefield.getTile(rowTarget, colTarget).getType());
-                shortTilePanel.show();
-            }
-
-            if (battlefield.isTileOccupied(rowTarget, colTarget)) {
-                if (focusUnit == null || focusUnit != battlefield.getUnit(rowTarget, colTarget) || shortUnitPanel.isHiding()) {
-                    focusUnit = battlefield.getUnit(rowTarget, colTarget);
-                    shortUnitPanel.hide();
-                    shortUnitPanel.set(battlefield.getUnit(rowTarget, colTarget));
-                    shortUnitPanel.show();
-                }
-            } else {
-                shortUnitPanel.hide();
-            }
-        }
-
-    }
-
-    public void moveCamera(int rowTarget, int colTarget, boolean smoothly){
-        gcm.focusOn(bfr.getCenterX(rowTarget, colTarget), bfr.getCenterY(rowTarget, colTarget) , smoothly);
-    }
-
-
 
 
     // --------------------- GETTES & SETTERS ----------------------------
@@ -221,38 +137,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     @Override
     public void dispose() {
-        assetProvider.dispose();
+        provider.dispose();
     }
 
-
-
-
-
-    // ----------- UTILITY CLASS -----------------------------
-
-    public static class ShowPanel extends SimpleCommand{
-        private Panel panel;
-
-        public ShowPanel(Panel panel) {
-            this.panel = panel;
-        }
-
-        @Override
-        public void apply() {
-            panel.show();
-        }
-    }
-
-    public static class HidePanel extends SimpleCommand{
-        private Panel panel;
-
-        public HidePanel(Panel panel) {
-            this.panel = panel;
-        }
-
-        @Override
-        public void apply() {
-            panel.hide();
-        }
-    }
 }

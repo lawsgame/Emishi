@@ -17,22 +17,22 @@ public class InfoBIS extends BattleInteractionState{
     public void init() {
 
         super.init();
-        bim.shortUnitPanel.hide();
-        bim.shortTilePanel.hide();
-        if(bim.battlefield.isTileOccupied(row, col)) {
-            bim.longUnitPanel.set(bim.battlefield.getUnit(row, col));
-            bim.longUnitPanel.show();
+        bim.pp.shortUnitPanel.hide();
+        bim.pp.shortTilePanel.hide();
+        if(bim.bfr.getModel().isTileOccupied(row, col)) {
+            bim.pp.longUnitPanel.set(bim.bfr.getModel().getUnit(row, col));
+            bim.pp.longUnitPanel.show();
         }else{
-            bim.longTilePanel.set(bim.battlefield.getTile(row, col).getType());
-            bim.longTilePanel.show();
+            bim.pp.longTilePanel.set(bim.bfr.getModel().getTile(row, col).getType());
+            bim.pp.longTilePanel.show();
         }
     }
 
     @Override
     public void end() {
         super.end();
-        bim.longTilePanel.hide();
-        bim.longUnitPanel.hide();
+        bim.pp.longTilePanel.hide();
+        bim.pp.longUnitPanel.hide();
     }
 
     @Override

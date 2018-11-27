@@ -30,8 +30,8 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
 
     protected CountDown countDown = new CountDown(2f);
 
-    public TempoBattlefield2DRenderer(Battlefield battlefield, TempoSpritePool spritePool) {
-        super(battlefield);
+    public TempoBattlefield2DRenderer(Battlefield battlefield, CameraManager gcm, TempoSpritePool spritePool) {
+        super(battlefield, gcm);
         this.unitRenderers = new Array<BattleUnitRenderer>();
         this.areaRenderers = new Array<AreaRenderer>();
 
@@ -241,11 +241,9 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         return row + 0.5f;
     }
 
-
-    @Override
-    public void setGameCamParameters(CameraManager cameraManager) {
-        cameraManager.setCameraBoundaries(getModel().getNbColumns(), getModel().getNbRows());
-        cameraManager.setCameraVelocity(CAM_VELOCITY);
+    public void setGameCamParameters() {
+        getGCM().setCameraBoundaries(getModel().getNbColumns(), getModel().getNbRows());
+        getGCM().setCameraVelocity(CAM_VELOCITY);
     }
 
     @Override

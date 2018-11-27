@@ -6,16 +6,16 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class AggressiveAI extends PassiveAI {
 
 
-    public AggressiveAI(BattlefieldRenderer bfr, AnimationScheduler scheduler, ActionPanelPool app, Inventory playerInventory, TileHighlighter thl) {
-        super(bfr, scheduler, app, playerInventory, thl);
+    public AggressiveAI(BattlefieldRenderer bfr, AnimationScheduler scheduler, PanelPool ph, Inventory playerInventory, TileHighlighter thl) {
+        super(bfr, scheduler, ph, playerInventory, thl);
 
     }
 

@@ -26,7 +26,7 @@ public abstract class BattleInteractionState extends InteractionState {
                                   boolean mapSlidable,
                                   boolean clearFAA,
                                   boolean FAAUpdatable) {
-        super(bim.gcm.getCamera());
+        super(bim.bfr.getGCM().getCamera());
         this.bim = bim;
 
         this.battlefieldDisplayed = BFDisplayable;
@@ -68,7 +68,7 @@ public abstract class BattleInteractionState extends InteractionState {
      *
      * First, it check wether the input is handled by BIS.handleTouchInput()
      * If not (aka. return false), the input is handled generically by using:
-     *      1) BIM.focusOn()
+     *      1) BIM.moveTo()
      *      2) (optional) updating FFA if the given tile is occupied by a foe.
      *
      * @param gameX
@@ -76,14 +76,14 @@ public abstract class BattleInteractionState extends InteractionState {
      */
     @Override
     public void onTouch(float gameX, float gameY) {
-        if(!bim.gcm.isCameraMoving()) {
+        if(!bim.bfr.getGCM().isCameraMoving()) {
 
             rowTouch = bim.bfr.getRow(gameX, gameY);
             colTouch = bim.bfr.getCol(gameX, gameY);
-            if (!handleTouchInput(rowTouch, colTouch) && bim.battlefield.isTileExisted(rowTouch, colTouch)) {
+            if (!handleTouchInput(rowTouch, colTouch) && bim.bfr.getModel().isTileExisted(rowTouch, colTouch)) {
 
                 bim.focusOn(rowTouch, colTouch, true, true, false, TileHighlighter.SltdUpdateMode.UNCHANGED, true);
-                if (FAAUpdatable && bim.battlefield.isTileOccupiedByFoe(rowTouch, colTouch, bim.player.getArmy().getAffiliation())) {
+                if (FAAUpdatable && bim.bfr.getModel().isTileOccupiedByFoe(rowTouch, colTouch, bim.player.getArmy().getAffiliation())) {
 
                     bim.thl.ffa.update(rowTouch, colTouch);
                 }
@@ -93,15 +93,15 @@ public abstract class BattleInteractionState extends InteractionState {
 
     @Override
     public void onLongTouch(float gameX, float gameY) {
-        if(longPanelDisplayable && !bim.gcm.isCameraMoving()){
+        if(longPanelDisplayable && !bim.bfr.getGCM().isCameraMoving()){
             bim.push(new InfoBIS(bim, bim.bfr.getRow(gameX, gameY), bim.bfr.getCol(gameX, gameY)));
         }
     }
 
     @Override
     public void pan(float gameDX, float gameDY) {
-        if(mapSlidable && !bim.gcm.isCameraMoving()) {
-            bim.gcm.translateCam(gameDX, gameDY);
+        if(mapSlidable && !bim.bfr.getGCM().isCameraMoving()) {
+            bim.bfr.getGCM().translateCam(gameDX, gameDY);
         }
     }
 

@@ -25,7 +25,6 @@ public class IsoBFR extends BattlefieldRenderer {
     private static float X_CAM_BOUNDS_OFFSET = 1f;
     private static float Y_CAM_BOUNDS_OFFSET = RATIO;
 
-    private CameraManager gcm;
     private boolean visible;
     protected AssetProvider assetProvider;
     private Array<Array<IsoTileRenderer>> tileRenderers;
@@ -35,12 +34,12 @@ public class IsoBFR extends BattlefieldRenderer {
     private ShapeRenderer backkgroundRenderer;
 
 
-    public IsoBFR(Battlefield battlefield, AssetProvider assetProvider){
-        this(battlefield, assetProvider,false);
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider){
+        this(battlefield, gcm, assetProvider,false);
     }
 
-    public IsoBFR(Battlefield battlefield, AssetProvider assetProvider, boolean test) {
-        super(battlefield);
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider, boolean test) {
+        super(battlefield, gcm);
         int depth = 2*(battlefield.getNbRows() + battlefield.getNbColumns()) - 3;
         this.tileRenderers = new Array<Array<IsoTileRenderer>> ();
         this.unitRenderers = new Array<Array<BattleUnitRenderer>>();
@@ -77,7 +76,7 @@ public class IsoBFR extends BattlefieldRenderer {
                 }
             }
 
-            // build up area renderers
+            // set up area renderers
             for (int i = 0; i < getModel().getUnitAreas().size ; i++) {
                 addAreaRenderer(getModel().getUnitAreas().get(i));
             }
@@ -85,18 +84,18 @@ public class IsoBFR extends BattlefieldRenderer {
                 addAreaRenderer(battlefield.getDeploymentAreas().get(i));
             }
 
-            //build weather renderer
+            //set weather renderer
             this.renderedWeather = getModel().getWeather();
         }
     }
 
     @Override
-    public void setGameCamParameters(CameraManager cameraManager) {
+    public void setGameCamParameters() {
         float width = 2*X_CAM_BOUNDS_OFFSET + (getModel().getNbRows() + getModel().getNbColumns()) / 2.0f;
         float height = 2*Y_CAM_BOUNDS_OFFSET + (getModel().getNbRows() + getModel().getNbColumns()) * RATIO / 2.0f;
-        cameraManager.setCameraBoundaries(width, height);
-        cameraManager.setCameraVelocity(CAM_VELOCITY);
-        this.gcm = cameraManager;
+
+        gcm.setCameraBoundaries(width, height);
+        gcm.setCameraVelocity(CAM_VELOCITY);
     }
 
     @Override

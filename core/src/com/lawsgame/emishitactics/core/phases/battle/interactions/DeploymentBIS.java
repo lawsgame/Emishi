@@ -32,10 +32,10 @@ public class DeploymentBIS extends BattleInteractionState {
         this.initialized = false;
 
         this.sltdUnit = bim.player.getArmy().getWarlord();
-        int[] warlordPos = bim.battlefield.getUnitPos(sltdUnit);
+        int[] warlordPos = bim.bfr.getModel().getUnitPos(sltdUnit);
         bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, TileHighlighter.SltdUpdateMode.ERASE_SLTD_TILE_MEMORY, false);
 
-        startButton = StartButton.create(bim.asm, bim.uiStage.getViewport());
+        startButton = StartButton.create(bim.asm, bim.pp.uiStage.getViewport());
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -48,7 +48,7 @@ public class DeploymentBIS extends BattleInteractionState {
     @Override
     public void init() {
         super.init();
-        bim.uiStage.addActor(startButton);
+        bim.pp.uiStage.addActor(startButton);
         bim.bfr.displayDeploymentAreas(true);
         updateSltdUnit();
     }
@@ -57,18 +57,18 @@ public class DeploymentBIS extends BattleInteractionState {
         if(initialized) {
             //update model area
             bim.bfr.removeAreaRenderer(moveArea);
-            this.moveArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA, bim.battlefield.getMoveArea(rowUnit, colUnit));
+            this.moveArea = new Area(bim.bfr.getModel(), Data.AreaType.MOVE_AREA, bim.bfr.getModel().getMoveArea(rowUnit, colUnit));
             bim.bfr.addAreaRenderer(moveArea);
 
-            this.sltdUnit = bim.battlefield.getUnit(rowUnit, colUnit);
+            this.sltdUnit = bim.bfr.getModel().getUnit(rowUnit, colUnit);
             bim.focusOn(rowUnit, colUnit, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
         }
     }
 
     @Override
     public boolean handleTouchInput(int row, int col) {
-        if(bim.battlefield.isTileOccupiedByAlly(row, col, bim.player.getArmy().getAffiliation())){
-            Unit touchedUnit = bim.battlefield.getUnit(row, col);
+        if(bim.bfr.getModel().isTileOccupiedByAlly(row, col, bim.player.getArmy().getAffiliation())){
+            Unit touchedUnit = bim.bfr.getModel().getUnit(row, col);
             if (touchedUnit != sltdUnit || !initialized) {
 
                 //touchedUnit become the selected unit
@@ -80,12 +80,12 @@ public class DeploymentBIS extends BattleInteractionState {
             }
         }else if(initialized
                 && sltdUnit.getArmy().isPlayerControlled()
-                && bim.battlefield.isTileAvailable(row, col, sltdUnit.has(Data.Ability.PATHFINDER))){
+                && bim.bfr.getModel().isTileAvailable(row, col, sltdUnit.has(Data.Ability.PATHFINDER))){
 
             // if the selected unit belongs to the player's army adn the target tile is available
             if(isUnitRedeployingWithinTheSameArea(row, col, sltdUnit)) {
 
-                bim.battlefield.moveUnit(rowUnit, colUnit, row, col, true);
+                bim.bfr.getModel().moveUnit(rowUnit, colUnit, row, col, true);
                 this.rowUnit = row;
                 this.colUnit = col;
                 updateSltdUnit();
@@ -111,22 +111,22 @@ public class DeploymentBIS extends BattleInteractionState {
         int r;
         int c;
         Array<Unit> squadmembers = new Array<Unit>();
-        Array<int[]> tiles = bim.battlefield.getDeploymentArea(areaUnitIndex).getTiles();
+        Array<int[]> tiles = bim.bfr.getModel().getDeploymentArea(areaUnitIndex).getTiles();
         for(int i = 0; i < tiles.size; i++){
             r = tiles.get(i)[0];
             c = tiles.get(i)[1];
-            if(bim.battlefield.isTileOccupiedByAnotherSquadMember(r, c, sltdUnit)){
-                squadmembers.add(bim.battlefield.removeUnit(r, c));
+            if(bim.bfr.getModel().isTileOccupiedByAnotherSquadMember(r, c, sltdUnit)){
+                squadmembers.add(bim.bfr.getModel().removeUnit(r, c));
             }
         }
 
         // update sltd unit position
-        bim.battlefield.moveUnit(rowUnit, colUnit, row, col, true);
+        bim.bfr.getModel().moveUnit(rowUnit, colUnit, row, col, true);
         this.rowUnit = row;
         this.colUnit = col;
 
         // redeploy the other squad members in the new deployment area
-        bim.battlefield.randomlyDeploy(squadmembers, areaTargetIndex);
+        bim.bfr.getModel().randomlyDeploy(squadmembers, areaTargetIndex);
 
         // update cam pos and UI
         updateSltdUnit();
@@ -134,15 +134,15 @@ public class DeploymentBIS extends BattleInteractionState {
 
 
     private boolean isUnitRedeployingWithinTheSameArea(int rowTarget, int colTarget, Unit unit){
-        int[] unitPos = bim.battlefield.getUnitPos(unit);
+        int[] unitPos = bim.bfr.getModel().getUnitPos(unit);
         int areaTargetIndex = getDeploymentAreaIndex(rowTarget, colTarget);
         int areaUnitIndex = getDeploymentAreaIndex(unitPos[0], unitPos[1]);
         return  areaTargetIndex != -1 && areaUnitIndex != -1 && areaTargetIndex == areaUnitIndex;
     }
 
     private int getDeploymentAreaIndex(int rowTile, int colTile){
-        for(int i = 0; i < bim.battlefield.getDeploymentAreas().size; i++){
-            if(bim.battlefield.getDeploymentArea(i).contains(rowTile, colTile))
+        for(int i = 0; i < bim.bfr.getModel().getDeploymentAreas().size; i++){
+            if(bim.bfr.getModel().getDeploymentArea(i).contains(rowTile, colTile))
                 return i;
         }
         return -1;
@@ -152,11 +152,11 @@ public class DeploymentBIS extends BattleInteractionState {
         boolean res = false;
         if(0 == areaIndex){
             res = true;
-        }else if(0 < areaIndex && areaIndex < bim.battlefield.getNumberOfDeploymentAreas()){
+        }else if(0 < areaIndex && areaIndex < bim.bfr.getModel().getNumberOfDeploymentAreas()){
             res =  true;
-            Array<int[]> targetArea = bim.battlefield.getDeploymentArea(areaIndex).getTiles();
+            Array<int[]> targetArea = bim.bfr.getModel().getDeploymentArea(areaIndex).getTiles();
             for(int i = 0; i < targetArea.size; i++){
-                if(bim.battlefield.isTileOccupied(targetArea.get(i)[0], targetArea.get(i)[1])){
+                if(bim.bfr.getModel().isTileOccupied(targetArea.get(i)[0], targetArea.get(i)[1])){
                     res = false;
                 }
             }
@@ -175,8 +175,8 @@ public class DeploymentBIS extends BattleInteractionState {
         super.end();
         bim.bfr.removeAreaRenderer(moveArea);
         bim.bfr.displayDeploymentAreas(false);
-        bim.shortTilePanel.hide();
-        bim.shortUnitPanel.hide();
+        bim.pp.shortTilePanel.hide();
+        bim.pp.shortUnitPanel.hide();
         startButton.remove();
     }
 

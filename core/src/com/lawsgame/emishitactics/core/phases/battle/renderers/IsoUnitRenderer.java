@@ -471,7 +471,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
         if(updatedSet != null) {
 
-            // build animation , sprites, ids and rendering coords fitting
+            // set animation , sprites, ids and rendering coords fitting
             state = animId;
             spriteSet = updatedSet;
             updateSpritePos();

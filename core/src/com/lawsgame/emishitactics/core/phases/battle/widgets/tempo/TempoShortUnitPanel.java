@@ -6,11 +6,11 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.UnitPanel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 
-public class ShortUnitPanel extends UnitPanel {
+public class TempoShortUnitPanel extends UnitPanel {
 
     private static float X_OFFSET = 15f;
     private static float Y_OFFSET = 15f;
@@ -23,7 +23,7 @@ public class ShortUnitPanel extends UnitPanel {
     private float slideDuration;
     StringBuilder builder = new StringBuilder("");
 
-    public ShortUnitPanel(Viewport stageViewport){
+    public TempoShortUnitPanel(Viewport stageViewport){
         super(stageViewport);
         setWidth(PANEL_WIDTH);
         setHeight(PANEL_HEIGHT);

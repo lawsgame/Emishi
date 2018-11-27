@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.LinkedList;

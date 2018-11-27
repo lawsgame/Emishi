@@ -1,8 +1,9 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels;
 
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
 
 public abstract class ActionInfoPanel extends Panel {
     protected ActionChoice choice;

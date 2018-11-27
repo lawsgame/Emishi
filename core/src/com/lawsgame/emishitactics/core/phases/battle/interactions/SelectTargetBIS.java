@@ -5,7 +5,6 @@ import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
@@ -28,13 +27,13 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         Data.AreaType type = (currentCommand.getActionChoice().getRangedType() == RangedBasedType.MOVE) ?
             Data.AreaType.MOVE_AREA :
             Data.AreaType.ACTION_AREA;
-        this.actionArea = new Area(bim.battlefield, type, currentCommand.getActionArea());
+        this.actionArea = new Area(bim.bfr.getModel(), type, currentCommand.getActionArea());
 
     }
 
     @Override
     public void init() {
-        System.out.println("SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.mainI18nBundle));
+        System.out.println("SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.localization));
 
         super.init();
         bim.bfr.addAreaRenderer(actionArea);

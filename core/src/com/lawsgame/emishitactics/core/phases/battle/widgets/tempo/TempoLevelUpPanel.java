@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LevelUpPanel;
 
 public class TempoLevelUpPanel extends LevelUpPanel {
     private static float X_TEXT_OFFSET = 8f;

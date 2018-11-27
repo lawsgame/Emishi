@@ -5,12 +5,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.TilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.TilePanel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 
 
-public class ShortTilePanel extends TilePanel {
+public class TempoShortTilePanel extends TilePanel {
 
 
 
@@ -27,7 +27,7 @@ public class ShortTilePanel extends TilePanel {
     private float slideDuration;
 
 
-    public ShortTilePanel(Viewport stageViewport){
+    public TempoShortTilePanel(Viewport stageViewport){
         super(stageViewport);
         setWidth(PANEL_WIDTH);
         setHeight(PANEL_HEIGHT);

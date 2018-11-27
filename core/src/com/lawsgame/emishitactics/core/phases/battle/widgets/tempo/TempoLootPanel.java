@@ -7,7 +7,7 @@ import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LootPanel;
 
 public class TempoLootPanel extends LootPanel {
     private static float X_TEXT_OFFSET = 8f;

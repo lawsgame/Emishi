@@ -5,13 +5,13 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -36,7 +36,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
         Data.AreaType type = (currentCommand.getActionChoice().getRangedType() == Data.RangedBasedType.MOVE) ?
                 Data.AreaType.MOVE_AREA :
                 Data.AreaType.ACTION_AREA;
-        this.impactArea = new Area(bim.battlefield, type, currentCommand.getImpactArea());
+        this.impactArea = new Area(bim.bfr.getModel(), type, currentCommand.getImpactArea());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
         System.out.println("VALIDATE TARGET : "
                 +currentCommand.getInitiator().getName()+" => "
                 +((currentCommand.getTarget() != null) ? currentCommand.getTarget().getName() : "("+currentCommand.getRowTarget()+", "+currentCommand.getColTarget()+")")+" : "
-                +currentCommand.getName(bim.mainI18nBundle));
+                +currentCommand.getName(bim.localization));
 
         super.init();
         bim.bfr.addAreaRenderer(impactArea);
@@ -65,15 +65,15 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
         //schedule the panels dance
         StandardTask hideShortPanelTask = new StandardTask();
-        hideShortPanelTask.addThread(new CommandThread(bim.hideSTP, 0));
-        hideShortPanelTask.addThread(new CommandThread(bim.hideSUP, 0));
+        hideShortPanelTask.addThread(new CommandThread(bim.pp.hideSTP, 0));
+        hideShortPanelTask.addThread(new CommandThread(bim.pp.hideSUP, 0));
         bim.scheduler.addTask(hideShortPanelTask);
-        if(bim.app.isPanelAvailable(currentCommand)) {
+        if(bim.pp.isActionPanelAvailable(currentCommand.getActionChoice())) {
 
-            final ActionInfoPanel actionInfoPanel = bim.app.getPanel(currentCommand);
-            bim.scheduler.addTask(new StandardTask(new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.SHOW), 0));
-            hideActionPanelCommand = new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.HIDE);
-            removeActionPanelCommand = new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.REMOVE);
+            final ActionInfoPanel actionInfoPanel = bim.pp.getActionPanel(currentCommand);
+            bim.scheduler.addTask(new StandardTask(new ManageActionPanel(bim.pp.uiStage, actionInfoPanel, ManageActionPanel.Request.SHOW), 0));
+            hideActionPanelCommand = new ManageActionPanel(bim.pp.uiStage, actionInfoPanel, ManageActionPanel.Request.HIDE);
+            removeActionPanelCommand = new ManageActionPanel(bim.pp.uiStage, actionInfoPanel, ManageActionPanel.Request.REMOVE);
             hidingTime = actionInfoPanel.getHidingTime();
         }
     }
@@ -92,7 +92,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
             if (row == currentCommand.getRowTarget() && col == currentCommand.getColTarget()) {
                 //ACTION VALIDATE
 
-                if(bim.app.isPanelAvailable(currentCommand))
+                if(bim.pp.isActionPanelAvailable(currentCommand.getActionChoice()))
                     bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, 0));
 
                 currentCommand.attach(this);
@@ -113,7 +113,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
                 currentCommand.highlightTargets(false);
 
                 // hide action panel before removing it
-                if(bim.app.isPanelAvailable(currentCommand)) {
+                if(bim.pp.isActionPanelAvailable(currentCommand.getActionChoice())) {
                     bim.scheduler.addTask(new StandardTask(hideActionPanelCommand, hidingTime));
                     bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
                 }
@@ -130,7 +130,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
     public void getNotification(Observable sender, Object data) {
         if(data instanceof ActorCommand && data == currentCommand){
             currentCommand.detach(this);
-            if(bim.app.isPanelAvailable(currentCommand))
+            if(bim.pp.isActionPanelAvailable(currentCommand.getActionChoice()))
                 bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
             bim.replace(new HandleOutcomeBIS(bim, historic, false));
         }

@@ -85,7 +85,7 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.worldHeight = h;
     }
 
-    public void focusOn(float xTargetTile, float yTargetTile, boolean smoothly) {
+    public void moveTo(float xTargetTile, float yTargetTile, boolean smoothly) {
         if(xTargetTile != camera.position.x || yTargetTile != camera.position.y){
             if(smoothly){
                 moveTo(xTargetTile, yTargetTile);

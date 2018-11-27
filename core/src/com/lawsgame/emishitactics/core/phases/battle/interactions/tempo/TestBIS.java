@@ -14,7 +14,6 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PlunderCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
@@ -58,7 +57,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         // ANIMATION TEST
 
-        sprites = bim.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
+        sprites = bim.provider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
             sprites.get(i).setPosition(1, 1);
             sprites.get(i).setSize(1, 2);
@@ -75,15 +74,15 @@ public class TestBIS extends BattleInteractionState implements Observer{
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         walkCommand.setFree(true);
 
-        ccActionArea = new Area(bim.battlefield, Data.AreaType.MOVE_AREA);
-        ccImpactArea = new Area(bim.battlefield, Data.AreaType.FOE_ACTION_AREA);
-        ccTargets = new Area(bim.battlefield, Data.AreaType.DEPLOYMENT_AREA);
+        ccActionArea = new Area(bim.bfr.getModel(), Data.AreaType.MOVE_AREA);
+        ccImpactArea = new Area(bim.bfr.getModel(), Data.AreaType.FOE_ACTION_AREA);
+        ccTargets = new Area(bim.bfr.getModel(), Data.AreaType.DEPLOYMENT_AREA);
         bim.bfr.addAreaRenderer(ccImpactArea);
         bim.bfr.addAreaRenderer(ccActionArea);
         bim.bfr.addAreaRenderer(ccTargets);
 
 
-        Unit randomFoe = bim.battlefield.getUnit(13,8);
+        Unit randomFoe = bim.bfr.getModel().getUnit(13,8);
         randomFoe.addNativeAbility(Data.Ability.GUARD);
         int[] randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
         GuardCommand guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -94,10 +93,10 @@ public class TestBIS extends BattleInteractionState implements Observer{
         // EVENT !!
 
         Model.Trigger trigger;
-        for(int r = 0; r < bim.battlefield.getNbRows(); r++){
-            for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
-                if(bim.battlefield.isTileOccupied(r, c)){
-                    final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.battlefield.getUnit(r, c));
+        for(int r = 0; r < bim.bfr.getModel().getNbRows(); r++){
+            for(int c = 0; c < bim.bfr.getModel().getNbColumns(); c++){
+                if(bim.bfr.getModel().isTileOccupied(r, c)){
+                    final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.bfr.getModel().getUnit(r, c));
                     trigger = new Model.Trigger(true, new BattleCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) {
 
                         @Override
@@ -138,15 +137,15 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         TrapEvent.addTrigger(bim, 11, 4, 3);
 
-        for(int r = 0; r < bim.battlefield.getNbRows(); r++){
-            for(int c = 0; c < bim.battlefield.getNbColumns(); c++){
-                if(bim.battlefield.getTile(r,c).getType().isUrbanArea()){
-                    bim.battlefield.getTile(r,c).setFragile(true);
+        for(int r = 0; r < bim.bfr.getModel().getNbRows(); r++){
+            for(int c = 0; c < bim.bfr.getModel().getNbColumns(); c++){
+                if(bim.bfr.getModel().getTile(r,c).getType().isUrbanArea()){
+                    bim.bfr.getModel().getTile(r,c).setFragile(true);
                 }
             }
         }
 
-        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.shortUnitPanel, bim.gcm, 0);
+        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.pp.shortUnitPanel, bim.bfr.getGCM(), 0);
 
 
 
@@ -166,18 +165,18 @@ public class TestBIS extends BattleInteractionState implements Observer{
     public boolean handleTouchInput(int row, int col) {
 
         System.out.println("input : "+row+" "+col);
-        int[] actorPos = bim.battlefield.getUnitPos(sltdUnit);
-        //bim.moveCamera(row, col, true);
+        int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
+        //bim.moveTo(row, col, true);
 
         // EVENT
 
         //WALK UNIT
 
-        //bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
+        //bim.bfr.getModel().moveUnit(actorPos[0], actorPos[1], row, col, true);
 
         /*
-        if(!bim.battlefield.isTileOccupied(row, col)){
-            moveCommand.setPath(bim.battlefield.getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation()));
+        if(!bim.bfr.getModel().isTileOccupied(row, col)){
+            moveCommand.setPath(bim.bfr.getModel().getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation()));
             moveCommand.setReveal(false);
             if(!moveCommand.apply(actorPos[0], actorPos[1])){
                 System.out.println("command failed to be applied");
@@ -190,7 +189,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
 
         /*
-        if(!bim.battlefield.isTileOccupied(row, col)) {
+        if(!bim.bfr.getModel().isTileOccupied(row, col)) {
             if (!walkCommand.apply(actorPos[0], actorPos[1], row, col)) {
                 System.out.println("command failed to be applied");
                 System.out.println("    initiator ? : " + walkCommand.isInitiatorValid());
@@ -204,10 +203,10 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
-            if(bim.battlefield.isTileOccupied(row, col)){
-                sltdUnit = bim.battlefield.getUnit(row, col);
+            if(bim.bfr.getModel().isTileOccupied(row, col)){
+                sltdUnit = bim.bfr.getModel().getUnit(row, col);
             }else{
-                bim.battlefield.moveUnit(actorPos[0], actorPos[1], row, col, true);
+                bim.bfr.getModel().moveUnit(actorPos[0], actorPos[1], row, col, true);
             }
         }else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
             if(!customedCommand.apply(actorPos[0], actorPos[1], row, col)){

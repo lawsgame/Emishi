@@ -2,16 +2,14 @@ package com.lawsgame.emishitactics.core.phases.battle.ai.interfaces;
 
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.ActionPanelPool;
+import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.LinkedList;
@@ -20,19 +18,19 @@ public abstract class AI extends Observable implements Runnable {
 
     protected BattlefieldRenderer bfr;
     protected AnimationScheduler scheduler;
-    protected ActionPanelPool app;
+    protected PanelPool ph;
     protected Inventory playerInventory;
     protected MilitaryForce army;
 
     public AI(
             BattlefieldRenderer bfr,
             AnimationScheduler scheduler,
-            ActionPanelPool app,
+            PanelPool ph,
             Inventory playerInventory,
             MilitaryForce army) {
         this.bfr = bfr;
         this.scheduler = scheduler;
-        this.app = app;
+        this.ph = ph;
         this.playerInventory = playerInventory;
         this.army = army;
     }
@@ -88,7 +86,7 @@ public abstract class AI extends Observable implements Runnable {
     protected boolean checkApplyAndStore(final ActorCommand command, int rowTarget, int colTarget, final CommandBundle bundle){
         command.setTarget(rowTarget, colTarget);
         command.setDecoupled(true);
-        ActionInfoPanel panel = app.getPanel(command);
+        ActionInfoPanel panel = ph.getActionPanel(command);
         if(command.apply()){
             bundle.offer(command, panel);
             return true;

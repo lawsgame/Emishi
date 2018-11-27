@@ -31,11 +31,11 @@ public class SelectActorBIS extends BattleInteractionState {
 
         super.init();
         int[] activeUnitPos = new int[2];
-        if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(rowInit, colInit)){
+        if(bim.bfr.getModel().isTileOccupiedByPlayerControlledUnit(rowInit, colInit)){
             activeUnitPos[0] = rowInit;
             activeUnitPos[1] = colInit;
         }else{
-            activeUnitPos = bim.battlefield.getRandomlyStillActiveUnitsCoords(bim.player.getArmy().getId());
+            activeUnitPos = bim.bfr.getModel().getRandomlyStillActiveUnitsCoords(bim.player.getArmy().getId());
         }
 
         if(activeUnitPos != null){
@@ -51,8 +51,8 @@ public class SelectActorBIS extends BattleInteractionState {
 
     @Override
     public boolean handleTouchInput(int row, int col) {
-        if(bim.battlefield.isTileOccupiedByPlayerControlledUnit(row, col)){
-            Unit selectedUnit = bim.battlefield.getUnit(row, col);
+        if(bim.bfr.getModel().isTileOccupiedByPlayerControlledUnit(row, col)){
+            Unit selectedUnit = bim.bfr.getModel().getUnit(row, col);
             if(!selectedUnit.isDone()) {
                 bim.replace(new SelectActionBIS(bim, selectedUnit));
                 return true;

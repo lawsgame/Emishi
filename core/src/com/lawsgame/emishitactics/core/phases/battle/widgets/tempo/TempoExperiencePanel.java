@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ExperiencePanel;
 
 public class TempoExperiencePanel extends ExperiencePanel {
 
@@ -33,7 +33,7 @@ public class TempoExperiencePanel extends ExperiencePanel {
     }
 
     @Override
-    public void set(I18NBundle bundle, int initialExperience, int experienceGained) {
+    public void set(I18NBundle localization, int initialExperience, int experienceGained) {
         description = "+"+experienceGained+" exp";
     }
 

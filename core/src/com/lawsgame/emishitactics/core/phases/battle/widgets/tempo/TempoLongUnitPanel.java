@@ -12,9 +12,9 @@ import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.UnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.UnitPanel;
 
-public class LongUnitPanel extends UnitPanel {
+public class TempoLongUnitPanel extends UnitPanel {
 
     private static float X_TEXT_OFFSET_1_COL = 8f;
     private static float X_TEXT_OFFSET_2_COL = 208f;
@@ -29,7 +29,7 @@ public class LongUnitPanel extends UnitPanel {
     private StringBuilder builder;
     private I18NBundle bundle;
 
-    public LongUnitPanel(Viewport stageViewport, I18NBundle bundle) {
+    public TempoLongUnitPanel(Viewport stageViewport, I18NBundle bundle) {
         super(stageViewport);
         setWidth(PANEL_WIDTH);
         setHeight(PANEL_HEIGHT);

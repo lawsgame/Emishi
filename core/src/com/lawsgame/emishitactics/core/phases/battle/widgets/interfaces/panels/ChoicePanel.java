@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels;
 
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 public abstract class ChoicePanel extends Table {
     protected TextButton.TextButtonStyle style;
 
-    public void build(ButtonHandler handler){
+    public void set(ButtonHandler handler){
         clear();
         setTouchable(Touchable.childrenOnly);
         Array<TextButton> buttons = handler.getButtons(style);

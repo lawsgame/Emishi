@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
 
 public class TempoChoicePanel extends ChoicePanel {
 

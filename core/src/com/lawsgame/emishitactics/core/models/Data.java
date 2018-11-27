@@ -178,6 +178,8 @@ public class Data {
         GUARD(          AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         IDLE(           AnimSpriteSetId.REST, AnimSpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
         REGULAR_ATTACK( AnimSpriteSetId.ATTACK),
+        PLUNDER(        AnimSpriteSetId.ATTACK),
+        COVER(          AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         DODGE(          AnimSpriteSetId.DODGE),
         DIE(            AnimSpriteSetId.DIE),
         GUARDED(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),

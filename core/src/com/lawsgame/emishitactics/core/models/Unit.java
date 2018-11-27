@@ -69,7 +69,7 @@ public class Unit extends Model {
     /**
      * GENERIC UNIT constructor
      *
-     * Can be build as well:
+     * Can be set as well:
      * - weapons
      * - battle and leadership experience
      * - right handed
