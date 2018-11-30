@@ -7,28 +7,32 @@ import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 
 public class Assets {
 
-    // STRING
+    // ---***$$$  STRING  $$$***----
 
     public static final String STRING_BUNDLE_MAIN = "string/MainBundle";
 
-    //XML
+
+    // ---***$$$  XML  $$$***----
 
     public static final String XML_NAME_DB = "xml/name_db.xml";
     public static final String XML_BATTLE_PARAMS = "xml/battle_params.xml";
 
 
-    //SKIN
+    //  ---***$$$  SKIN  $$$***----
 
-    public static final String SKIN_UI = "skin/ui_skin.json";
+    public static final String SKIN_UI = "skin/uiskin.json";
 
 
-    //TEXTURES
+    //  ---***$$$  TEXTURE  $$$***----
 
     // atlases
 
+    // TEMPO
     public static final String ATLAS_TEMPO_UNITS = "textures/tempo/unit_sprites.pack";
     public static final String ATLAS_TEMPO_UI = "textures/tempo/ui_skin.pack";
     public static final String ATLAS_TEMPO_TILES = "textures/tempo/tiles.pack";
+
+
     public static final String ATLAS_MAPS = "textures/maps.pack";
     public static final String TILE_SPRITES_DIR = "textures/tiles";
     public static final String UNIT_SPRITES_DIR = "textures/units";
@@ -37,6 +41,8 @@ public class Assets {
 
     // regions
 
+    // TEMPO
+
     public static String getRegionMap(int id) {
         return "map"+id;
     }
@@ -44,29 +50,22 @@ public class Assets {
     public static String getTileHighlighted(AreaType id){
         return id.name().toLowerCase();
     }
-
-    public static String getRegionUnitAction(AnimSpriteSetId id, boolean east){
-        return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south");
-    }
-
+    public static String getRegionUnitAction(AnimSpriteSetId id, boolean east){ return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south"); }
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";
     public static final String REGION_TEMPO_UNIT_SPRITES = "unit_sprites_tempo";
     public static final String REGION_UNIT_PORTRAIT = "portrait";
     public static final String REGION_UNIT_GUARD_ICON = "guard_icon";
     public static final String REGION_UNIT_SHADOW = "shadow";
-
     public static final String UI_BLACK_BACKGROUND = "black_background";
     public static final String UI_BUTTON_UP = "button_up";
     public static final String UI_BUTTON_DOWN = "button_down";
 
 
-    //FONT
+    //  ---***$$$  FONT  $$$***----
 
-    public static final String FONT_MAIN = "fonts/main_text_font.fnt";
-    public static final String FONT_ITALIC_MAIN = "fonts/italic_main_text_font.fnt";
-    public static final String FONT_GREEN_MAIN = "fonts/green_text_font.fnt";
-    public static final String FONT_UI = "fonts/ui_font.fnt";
+    public static final String FONT_MAIN = "fonts/default_font.fnt";
+    public static final String FONT_UI = "fonts/defaut_font_ui.fnt";
 
 
-    //SHADERS
+    //  ---***$$$  SHADER  $$$***----
 }

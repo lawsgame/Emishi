@@ -1,42 +1,20 @@
 package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.LinkedList;
 
-/**
- * y
- * ^
- * |
- * |
- * |
- * |
- * (0,0)-----------> x
- *
- *
- * features added:
- *  - use a queue to handle actions one after another
- *  - allow to setTiles the position of the widget without knowing the UI viewport dimensions
- *
- *
- */
+public abstract class Panel<C> extends Table implements IPanel<C>{
 
-public abstract class Panel extends Actor {
+
     protected LinkedList<Action> awaitingActions = new LinkedList<Action>();
     protected Viewport stageViewport;
 
-    public Panel(Viewport stageViewport){
-        this.stageViewport = stageViewport;
+    public Panel(Viewport stageUIViewport){
+        this.stageViewport = stageUIViewport;
     }
-
-    public abstract void show();
-    public abstract void hide();
-    public abstract boolean isHiding();
-    public abstract float getHidingTime();
-    public abstract float getShowingTime();
-
 
     @Override
     public void act(float delta) {
@@ -46,40 +24,29 @@ public abstract class Panel extends Actor {
         }
     }
 
+    //---------------- METHODS ------------------------
 
 
-    //---------- CONVIENT METHOD -----------------------------
 
-    public void setX(float x, boolean fromLeft){
-        if(fromLeft){
-            super.setX(x);
-        }else{
-            super.setX(stageViewport.getWorldWidth() - x);
-        }
+    @Override
+    public void update(final C content) {
+        awaitingActions.add(new Action() {
+            @Override
+            public boolean act(float delta) {
+                Panel p = (Panel) getActor();
+                p.setContent(content);
+                return true;
+            }
+        });
     }
 
-    public void setY(float y, boolean fromDown){
-        if(fromDown){
-            super.setY(y);
-        }else{
-            super.setY(stageViewport.getWorldHeight() - y);
-        }
-    }
+    protected abstract void setContent(C content);
 
-    public void setPosition(float x, float y, boolean fromLeft, boolean fromdown){
-        setX(x, fromLeft);
-        setY(y, fromdown);
-    }
 
-    public void setPositionAndDimension(float x, float y , float width, float height, boolean fromLeft, boolean fromdown){
-        setX(x, fromLeft);
-        setY(y, fromdown);
-        setWidth(width);
-        setHeight(height);
-    }
-
-    public void center(){
+    @Override
+    public void centerPanel() {
         setX(stageViewport.getWorldWidth()/2f - getWidth()/2f);
         setY(stageViewport.getWorldHeight()/2f - getHeight()/2f);
     }
+
 }

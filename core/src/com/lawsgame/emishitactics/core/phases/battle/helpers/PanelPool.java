@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -9,22 +10,22 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LootPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.TilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.UnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLongTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLongUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoShortTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoShortUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.TilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.UnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLongTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoShortTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoShortUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLootPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.HashMap;
@@ -33,8 +34,7 @@ import java.util.HashMap;
  *
  */
 public class PanelPool implements Disposable {
-
-    public final Stage uiStage;
+    private Group panelGroup;
 
     public final TilePanel shortTilePanel;
     public final TilePanel longTilePanel;
@@ -54,7 +54,8 @@ public class PanelPool implements Disposable {
     private HashMap<Data.ActionChoice, ActionInfoPanel> panels;
 
     public PanelPool(Stage uiStage, AssetManager asm, AssetProvider provider, I18NBundle localization){
-        this.uiStage = uiStage;
+        this.panelGroup = new Group();
+        uiStage.addActor(panelGroup);
 
         // main panels imp
         this.shortTilePanel = new TempoShortTilePanel(uiStage.getViewport());
@@ -67,14 +68,14 @@ public class PanelPool implements Disposable {
         this.lootPanel = new TempoLootPanel(uiStage.getViewport());
         this.choicePanel = new TempoChoicePanel(asm);
 
-        uiStage.addActor(shortTilePanel);
-        uiStage.addActor(shortUnitPanel);
-        uiStage.addActor(longUnitPanel);
-        uiStage.addActor(longTilePanel);
-        uiStage.addActor(experiencePanel);
-        uiStage.addActor(levelUpPanel);
-        uiStage.addActor(lootPanel);
-        uiStage.addActor(choicePanel);
+        panelGroup.addActor(shortTilePanel);
+        panelGroup.addActor(shortUnitPanel);
+        panelGroup.addActor(longUnitPanel);
+        panelGroup.addActor(longTilePanel);
+        panelGroup.addActor(experiencePanel);
+        panelGroup.addActor(levelUpPanel);
+        panelGroup.addActor(lootPanel);
+        panelGroup.addActor(choicePanel);
 
 
         // panel action choice imp
@@ -92,11 +93,11 @@ public class PanelPool implements Disposable {
         panels.put(Data.ActionChoice.STEAL, stealAIP);
         panels.put(Data.ActionChoice.BUILD, buildAIP);
 
-        uiStage.addActor(attackAIP);
-        uiStage.addActor(healAIP);
-        uiStage.addActor(switchWeaponAIP);
-        uiStage.addActor(stealAIP);
-        uiStage.addActor(buildAIP);
+        panelGroup.addActor(attackAIP);
+        panelGroup.addActor(healAIP);
+        panelGroup.addActor(switchWeaponAIP);
+        panelGroup.addActor(stealAIP);
+        panelGroup.addActor(buildAIP);
 
 
         // utility command for scheduler
@@ -184,14 +185,7 @@ public class PanelPool implements Disposable {
 
     @Override
     public void dispose() {
-        shortTilePanel.remove();
-        shortUnitPanel.remove();
-        longTilePanel.remove();
-        longUnitPanel.remove();
-        lootPanel.remove();
-        experiencePanel.remove();
-        levelUpPanel.remove();
-        choicePanel.remove();
-
+        panelGroup.clear();
+        panelGroup.remove();
     }
 }

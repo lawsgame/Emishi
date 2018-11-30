@@ -7,4 +7,5 @@ public interface Item {
     boolean isDroppable();
     int getDropRate();
     String getName(I18NBundle bundle);
+    String getName();
 }

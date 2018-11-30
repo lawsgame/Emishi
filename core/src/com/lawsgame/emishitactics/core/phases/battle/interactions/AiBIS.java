@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -187,7 +187,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
                         public void apply() {
                             bim.focusOn(actorCommand.getRowActor(), actorCommand.getColActor(), true, false, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, false);
                             if (panel != null) {
-                                bim.pp.uiStage.addActor(panel);
+                                bim.uiStage.addActor(panel);
                                 panel.show();
                             }
                             actorCommand.highlightTargets(true);

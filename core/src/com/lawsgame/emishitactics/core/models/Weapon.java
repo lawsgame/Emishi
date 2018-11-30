@@ -33,6 +33,10 @@ public class Weapon extends Observable implements Item{
         return bundle.get(template.name());
     }
 
+    @Override
+    public String getName() {
+        return template.name().toLowerCase();
+    }
 
 
     //------------- GETTERS & SETTERS --------------------------

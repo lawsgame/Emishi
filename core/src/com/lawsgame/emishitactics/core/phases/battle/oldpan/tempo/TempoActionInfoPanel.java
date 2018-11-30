@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -20,7 +20,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ActionInfoPanel;
 
 import java.util.LinkedList;
 

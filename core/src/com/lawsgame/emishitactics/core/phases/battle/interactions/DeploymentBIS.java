@@ -35,7 +35,7 @@ public class DeploymentBIS extends BattleInteractionState {
         int[] warlordPos = bim.bfr.getModel().getUnitPos(sltdUnit);
         bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, TileHighlighter.SltdUpdateMode.ERASE_SLTD_TILE_MEMORY, false);
 
-        startButton = StartButton.create(bim.asm, bim.pp.uiStage.getViewport());
+        startButton = StartButton.create(bim.asm, bim.uiStage.getViewport());
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -48,7 +48,7 @@ public class DeploymentBIS extends BattleInteractionState {
     @Override
     public void init() {
         super.init();
-        bim.pp.uiStage.addActor(startButton);
+        bim.uiStage.addActor(startButton);
         bim.bfr.displayDeploymentAreas(true);
         updateSltdUnit();
     }

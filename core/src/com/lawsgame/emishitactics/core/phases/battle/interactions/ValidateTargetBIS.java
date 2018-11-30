@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -71,9 +71,9 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
         if(bim.pp.isActionPanelAvailable(currentCommand.getActionChoice())) {
 
             final ActionInfoPanel actionInfoPanel = bim.pp.getActionPanel(currentCommand);
-            bim.scheduler.addTask(new StandardTask(new ManageActionPanel(bim.pp.uiStage, actionInfoPanel, ManageActionPanel.Request.SHOW), 0));
-            hideActionPanelCommand = new ManageActionPanel(bim.pp.uiStage, actionInfoPanel, ManageActionPanel.Request.HIDE);
-            removeActionPanelCommand = new ManageActionPanel(bim.pp.uiStage, actionInfoPanel, ManageActionPanel.Request.REMOVE);
+            bim.scheduler.addTask(new StandardTask(new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.SHOW), 0));
+            hideActionPanelCommand = new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.HIDE);
+            removeActionPanelCommand = new ManageActionPanel(bim.uiStage, actionInfoPanel, ManageActionPanel.Request.REMOVE);
             hidingTime = actionInfoPanel.getHidingTime();
         }
     }

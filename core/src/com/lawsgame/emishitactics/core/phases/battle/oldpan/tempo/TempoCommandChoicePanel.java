@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Align;

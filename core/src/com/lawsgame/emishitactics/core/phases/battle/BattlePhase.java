@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
@@ -34,39 +35,42 @@ public class BattlePhase extends GamePhase {
         asm.load(Assets.ATLAS_TEMPO_UI, TextureAtlas.class);
         asm.load(Assets.ATLAS_TEMPO_UNITS, TextureAtlas.class);
         asm.load(Assets.ATLAS_TEMPO_TILES, TextureAtlas.class);
-        asm.load(Assets.FONT_MAIN, BitmapFont.class);
-        asm.load(Assets.FONT_UI, BitmapFont.class);
 
+        //FINAL
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
+        asm.load(Assets.SKIN_UI, Skin.class);
         asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class); //, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
         asm.finishLoading();
 
     }
 
-    public void setFontParams(){
+    public void setFontParams(boolean clean){
         //TEST
-        testFont = asm.get(Assets.FONT_MAIN);
+        Skin skin = asm.get(Assets.SKIN_UI);
+        testFont = skin.getFont("default-font");
 
-        float requiredSize = 18f;
-        float scale = 1f;
-        float lineSpacingFactor = 0.95f;
-        float charSpacingFactor = 1.05f;
-        // prevent LIBGDX to replace ghyph to fit the pîxel canvas, leading to a slight misalignment of the rendered glyphs
-        testFont.setUseIntegerPositions(false);
-        // apply linear filtering on the underlying texture to smoothe the glyph on screen
-        testFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        //add character spacing to avoid overlapping causing by the addition of outline of glyph
-        for(int i = 0; i< testFont.getData().glyphs.length; i ++){
-            if(testFont.getData().glyphs[i] != null) {
-                for (int j = 0; j < testFont.getData().glyphs[i].length; j++) {
-                    if (testFont.getData().glyphs[i][j] != null) {
-                        testFont.getData().glyphs[i][j].xadvance *= charSpacingFactor;
+        if(clean) {
+            float requiredSize = 18f;
+            // float scale = 1f;
+            float lineSpacingFactor = 0.95f;
+            float charSpacingFactor = 1.05f;
+            // prevent LIBGDX to replace ghyph to fit the pîxel canvas, leading to a slight misalignment of the rendered glyphs
+            testFont.setUseIntegerPositions(false);
+            // apply linear filtering on the underlying texture to smoothe the glyph on screen
+            testFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            //add character spacing to avoid overlapping causing by the addition of outline of glyph
+            for (int i = 0; i < testFont.getData().glyphs.length; i++) {
+                if (testFont.getData().glyphs[i] != null) {
+                    for (int j = 0; j < testFont.getData().glyphs[i].length; j++) {
+                        if (testFont.getData().glyphs[i][j] != null) {
+                            testFont.getData().glyphs[i][j].xadvance *= charSpacingFactor;
+                        }
                     }
                 }
             }
+            testFont.getData().setLineHeight(testFont.getData().lineHeight * lineSpacingFactor);
+            testFont.getData().setScale(requiredSize / testFont.getData().lineHeight);
         }
-        testFont.getData().setLineHeight(testFont.getData().lineHeight * lineSpacingFactor);
-        testFont.getData().setScale(requiredSize/testFont.getData().lineHeight);
 
     }
 
@@ -85,7 +89,7 @@ public class BattlePhase extends GamePhase {
         battlefield.randomlyDeploy(player.getArmy());
         battlefield.pushPlayerArmyTurnForward();
 
-        setFontParams();
+        setFontParams(true);
         TempoSpritePool.get().set(asm);
         AssetProvider assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
         assetProvider.set(battlefield, asm);
@@ -93,8 +97,8 @@ public class BattlePhase extends GamePhase {
         BattlefieldRenderer bfr = new IsoBFR(battlefield, gameCM, assetProvider);
 
         this.bim = new BattleInteractionMachine(bfr, asm, stageUI, player, assetProvider);
-        //BattleInteractionState initBIS = new TestBIS(bim);
-        BattleInteractionState initBIS = new SceneBIS(bim);
+        BattleInteractionState initBIS = new TestBIS(bim);
+        //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

@@ -11,8 +11,8 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrient
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoChoicePanel;
 
 public class EndUnitTurnBIS extends BattleInteractionState {
     private Unit actor;
@@ -38,7 +38,7 @@ public class EndUnitTurnBIS extends BattleInteractionState {
 
             this.orientationChoicePanel.set(new OrientationButtonHandler(this));
             this.orientationChoicePanel.setVisible(true);
-            bim.pp.uiStage.addActor(orientationChoicePanel);
+            bim.uiStage.addActor(orientationChoicePanel);
 
             if(bim.bfr.getModel().isUnitDeployed(actor)) {
                 int[] actorPos = bim.bfr.getModel().getUnitPos(actor);

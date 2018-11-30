@@ -1,0 +1,47 @@
+
+battle_icons.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+guard_icon
+  rotate: false
+  xy: 0, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+guard_icon
+  rotate: false
+  xy: 64, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+guard_icon
+  rotate: false
+  xy: 128, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+guard_icon
+  rotate: false
+  xy: 192, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+guard_icon
+  rotate: false
+  xy: 256, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 4
+shadow
+  rotate: false
+  xy: 320, 32
+  size: 64, 32
+  orig: 64, 32
+  offset: 0, 0
+  index: -1

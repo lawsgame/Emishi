@@ -34,7 +34,7 @@ public class ArmyTest {
     }
 
     @Test
-    public void test1(){
+    public void testArmy(){
         army1.add(phillipe);
         army1.add(eric);
         army1.add(claude);

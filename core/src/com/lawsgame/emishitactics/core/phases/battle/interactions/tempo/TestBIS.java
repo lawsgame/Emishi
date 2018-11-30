@@ -4,10 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
@@ -20,6 +23,10 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEv
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.TilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoSTP;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
@@ -45,6 +52,8 @@ public class TestBIS extends BattleInteractionState implements Observer{
     Area ccActionArea;
     Area ccImpactArea;
     Area ccTargets;
+
+    Panel panel;
 
 
     public TestBIS(BattleInteractionMachine bim) {
@@ -149,6 +158,10 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
 
 
+        Skin skin = bim.asm.get(Assets.SKIN_UI);
+        this.panel = TempoLP.create(bim.uiStage.getViewport(), skin);
+        bim.uiStage.addActor(panel);
+
     }
 
     @Override
@@ -168,7 +181,12 @@ public class TestBIS extends BattleInteractionState implements Observer{
         int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
         //bim.moveTo(row, col, true);
 
-        // EVENT
+        // PANEL
+
+        panel.hide();
+        panel.update(new Weapon(Data.WeaponTemplate.SHORTSWORD, false, false));
+        panel.show();
+
 
         //WALK UNIT
 
@@ -200,7 +218,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
         // TEST CUSTOMED COMMAND
 
-
+        /*
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
             if(bim.bfr.getModel().isTileOccupied(row, col)){
@@ -226,9 +244,12 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
             }
         }
+        */
 
 
-        return false;
+
+
+        return true;
     }
 
     @Override
@@ -244,6 +265,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
 
         }
+
 
     }
 

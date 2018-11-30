@@ -1,39 +1,40 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
-import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ExperiencePanel;
 
-public class TempoLootPanel extends LootPanel {
+public class TempoExperiencePanel extends ExperiencePanel {
+
     private static float X_TEXT_OFFSET = 8f;
     private static float Y_TEXT_OFFSET = 8f;
-    private static float PANEL_WIDTH = 210f;
+    private static float PANEL_WIDTH = 90f;
     private static float PANEL_HEIGHT = 30;
 
     private String description;
+    private StringBuilder builder;
 
-    public TempoLootPanel(Viewport stageViewport) {
+    public TempoExperiencePanel(Viewport stageViewport) {
         super(stageViewport);
         setWidth(PANEL_WIDTH);
         setHeight(PANEL_HEIGHT);
         center();
+        setY(stageViewport.getWorldHeight()/4, true);
         hide();
         this.description = "";
     }
 
     @Override
-    public void set(Item item, I18NBundle bundle) {
-        description = "looted item : "+item.getName(bundle);
+    public boolean isExecuting() {
+        return false;
     }
 
     @Override
-    public void set(Item item, I18NBundle bundle, Player player) {
-        set(item, bundle);
+    public void set(I18NBundle localization, int initialExperience, int experienceGained) {
+        description = "+"+experienceGained+" exp";
     }
 
     @Override

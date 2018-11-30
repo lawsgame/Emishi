@@ -30,6 +30,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle localization;
+    public final Stage uiStage;
 
 
     public BattleInteractionMachine(BattlefieldRenderer bfr, AssetManager asm, Stage stageUI, Player player, AssetProvider provider) {
@@ -42,6 +43,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
         this.multiplexer = new InputMultiplexer();
         this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
+        this.uiStage = stageUI;
         this.pp = new PanelPool(stageUI, asm, provider, localization);
 
     }
@@ -64,7 +66,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     private void updateInputHandler(){
         multiplexer.clear();
-        multiplexer.addProcessor(pp.uiStage);
+        multiplexer.addProcessor(uiStage);
         multiplexer.addProcessor(new GestureDetector(getCurrentState()));
         Gdx.input.setInputProcessor(multiplexer);
 

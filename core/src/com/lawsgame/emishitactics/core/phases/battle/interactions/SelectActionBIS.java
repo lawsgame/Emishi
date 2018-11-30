@@ -13,9 +13,9 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoCommandChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoCommandChoicePanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
@@ -49,7 +49,7 @@ public class SelectActionBIS extends BattleInteractionState {
         super.init();
         choicePanel.set(new ActionButtonHandler(this));
         choicePanel.setVisible(true);
-        bim.pp.uiStage.addActor(choicePanel);
+        bim.uiStage.addActor(choicePanel);
         bim.focusOn(rowSltdUnit, colSltdUnit, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
 
     }
@@ -156,7 +156,7 @@ public class SelectActionBIS extends BattleInteractionState {
                                 bis.commandPanel = new TempoCommandChoicePanel(bis.bim.asm, buttonIndex);
                                 bis.commandPanel.set(new CommandChoiceButtonHandler(bis, choice));
                                 bis.commandPanel.setVisible(true);
-                                bis.bim.pp.uiStage.addActor(bis.commandPanel);
+                                bis.bim.uiStage.addActor(bis.commandPanel);
                             }else{
 
                                 try {

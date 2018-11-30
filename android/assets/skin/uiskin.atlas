@@ -1,0 +1,54 @@
+
+uiskin.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+arrow_north_active
+  rotate: false
+  xy: 0, 0
+  size: 64, 32
+  orig: 64, 32
+  offset: 0, 0
+  index: 0
+arrow_north_inactive
+  rotate: false
+  xy: 64, 0
+  size: 64, 32
+  orig: 64, 32
+  offset: 0, 0
+  index: 0
+arrow_west_active
+  rotate: false
+  xy: 128, 0
+  size: 64, 32
+  orig: 64, 32
+  offset: 0, 0
+  index: 0
+arrow_west_inactive
+  rotate: false
+  xy: 192, 0
+  size: 64, 32
+  orig: 64, 32
+  offset: 0, 0
+  index: 0
+button_down
+  rotate: false
+  xy: 256, 8
+  size: 60, 24
+  orig: 60, 24
+  offset: 0, 0
+  index: -1
+button_up
+  rotate: false
+  xy: 316, 8
+  size: 60, 24
+  orig: 60, 24
+  offset: 0, 0
+  index: -1
+black_background
+  rotate: false
+  xy: 376, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
