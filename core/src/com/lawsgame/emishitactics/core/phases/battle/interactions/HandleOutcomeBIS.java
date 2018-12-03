@@ -73,7 +73,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
 
                         HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
-                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(rowReceiver, colReceiver, holder.receiver, experience, bim), 0f));
+                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(rowReceiver, colReceiver, experience, bim), 0f));
                         tasks.add(experienceTask);
 
                         if(expLvls.length > 1){
@@ -92,7 +92,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                 }else {
                     ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
                     HandleOutcomeTask lootTask = new HandleOutcomeTask(HOTType.LOOT);
-                    lootTask.addThread(new StandardTask.CommandThread(new DisplayLootPanel(holder.droppedItem, bim), 0f));
+                    lootTask.addThread(new StandardTask.CommandThread(new DisplayLootPanel(holder.droppedItem, !aiTurn, bim), 0f));
                     tasks.offer(lootTask);
                 }
             }
@@ -162,6 +162,9 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
     //----------------- HELPER CLASS ---------------------------------------
 
+    /**
+     * render task wrapper which holds useful informations to be processed later by the HandleOutcomeBIS
+     */
     static class HandleOutcomeTask extends StandardTask{
         public enum HOTType{
             EXPERIENCE,
@@ -179,15 +182,13 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
 
     static class DisplayExperiencePanel extends SimpleCommand {
-        private Unit receiver;
         private int rowReceiver;
         private int colReceiver;
-        private BattleInteractionMachine bim;
         private int experience;
+        private BattleInteractionMachine bim;
 
-        public DisplayExperiencePanel(int rowReceiver, int colReceiver, Unit receiver, int experience, BattleInteractionMachine bim) {
+        public DisplayExperiencePanel(int rowReceiver, int colReceiver, int experience, BattleInteractionMachine bim) {
             this.bim = bim;
-            this.receiver = receiver;
             this.rowReceiver= rowReceiver;
             this.colReceiver = colReceiver;
             this.experience = experience;
@@ -197,7 +198,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         @Override
         public void apply() {
             bim.focusOn(rowReceiver, colReceiver, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
-            bim.pp.experiencePanel.set(bim.localization, receiver.getExperience(), experience);
+            bim.pp.experiencePanel.update(experience);
             bim.pp.experiencePanel.show();
             bim.pp.levelUpPanel.hide();
             bim.pp.lootPanel.hide();
@@ -219,7 +220,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         @Override
         public void apply() {
             bim.pp.experiencePanel.hide();
-            bim.pp.levelUpPanel.set(bim.localization, receiver, statGain);
+            bim.pp.levelUpPanel.update(receiver, statGain);
             bim.pp.levelUpPanel.show();
             bim.pp.lootPanel.hide();
         }
@@ -227,10 +228,12 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
     static class DisplayLootPanel extends SimpleCommand{
         private Item droppedItem;
+        private boolean forThePlayer;
         private BattleInteractionMachine bim;
 
-        public DisplayLootPanel(Item droppedItem, BattleInteractionMachine bim) {
+        public DisplayLootPanel(Item droppedItem, boolean playerTurn, BattleInteractionMachine bim) {
             this.droppedItem = droppedItem;
+            this.forThePlayer = playerTurn;
             this.bim = bim;
         }
 
@@ -238,7 +241,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         public void apply() {
             bim.pp.experiencePanel.hide();
             bim.pp.levelUpPanel.hide();
-            bim.pp.lootPanel.set(droppedItem, bim.localization);
+            bim.pp.lootPanel.update(droppedItem, forThePlayer);
             bim.pp.lootPanel.show();
         }
     }

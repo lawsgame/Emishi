@@ -209,17 +209,20 @@ public class Utils {
         return false;
     }
 
-    public static void arrayRemove(Array<int[]> intArray, int r, int c) {
+    public static int arrayRemove(Array<int[]> intArray, int r, int c) {
+        int removedIndex = -1;
         if(intArray != null) {
             for (int i = 0; i < intArray.size; i++) {
                 if(intArray.get(i).length >= 2) {
                     if (r == intArray.get(i)[0] && c == intArray.get(i)[1]) {
                         intArray.removeIndex(i);
+                        removedIndex = i;
                         i--;
                     }
                 }
             }
         }
+        return removedIndex;
     }
 
     public static Array<int[]> arrayRemoveClones(Array<int[]> array) {

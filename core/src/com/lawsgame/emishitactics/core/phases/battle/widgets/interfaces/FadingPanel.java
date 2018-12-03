@@ -3,7 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public abstract class FadingPanel<C> extends Panel<C> {
+public abstract class FadingPanel extends Panel {
     protected float fadingDuration;
 
     public FadingPanel(Viewport stageUIViewport, float fadingDuration, int x, int y,  int width, int height) {
@@ -16,6 +16,7 @@ public abstract class FadingPanel<C> extends Panel<C> {
         super(stageUIViewport);
         this.fadingDuration = fadingDuration;
         this.setSize(width, height);
+        this.getColor().a = 0;
         this.centerPanel();
     }
 

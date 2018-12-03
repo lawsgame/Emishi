@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
@@ -16,7 +17,6 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
@@ -44,7 +44,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.multiplexer = new InputMultiplexer();
         this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
         this.uiStage = stageUI;
-        this.pp = new PanelPool(stageUI, asm, provider, localization);
+        Skin uiSkin = asm.get(Assets.SKIN_UI, Skin.class);
+        this.pp = new PanelPool(stageUI, uiSkin, localization);
 
     }
 
@@ -94,7 +95,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      */
     public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean displayPanels, boolean erasePanelMemory, int rowSelectedTile, int colSelectedTile, boolean highligthSquad){
 
-            bfr.moveTo(rowTarget, colTarget, moveCamSmoothly);
+            bfr.moveCameraTo(rowTarget, colTarget, moveCamSmoothly);
             if(displayPanels)
                 pp.updateShortPanels(bfr, rowTarget, colTarget, erasePanelMemory);
             thl.highlight(rowTarget, colTarget, highligthSquad, rowSelectedTile, colSelectedTile);
@@ -118,7 +119,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
      */
     public void focusOn(int rowTarget, int colTarget, boolean moveCamSmoothly, boolean displayPanels, boolean erasePanelMemory, TileHighlighter.SltdUpdateMode mode, boolean highligthSquad){
 
-        bfr.moveTo(rowTarget, colTarget, moveCamSmoothly);
+        bfr.moveCameraTo(rowTarget, colTarget, moveCamSmoothly);
         if(displayPanels)
             pp.updateShortPanels(bfr, rowTarget, colTarget, erasePanelMemory);
         thl.highlight(rowTarget, colTarget, highligthSquad, mode);

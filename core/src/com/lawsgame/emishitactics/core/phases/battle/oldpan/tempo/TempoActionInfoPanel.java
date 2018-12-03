@@ -129,6 +129,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
 
                 AttackCommand currentCommand = (AttackCommand)command;
 
+                /*
                 for(int i = 0; i < currentCommand.getInitialBlow().getDefenderData().size; i++){
                     initiatorAsAttacker.offer(currentCommand.getInitialBlow().getDefenderData().get(i));
                 }
@@ -137,6 +138,7 @@ public abstract class TempoActionInfoPanel extends ActionInfoPanel {
                         initiatorAsTarget.add(currentCommand.getRetalationBlows().get(i).getDefenderData().get(0));
                     }
                 }
+                */
 
                 next();
 

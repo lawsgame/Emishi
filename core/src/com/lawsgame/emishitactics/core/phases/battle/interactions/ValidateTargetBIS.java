@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -48,19 +48,19 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
         super.init();
         bim.bfr.addAreaRenderer(impactArea);
-        bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
+        bim.focusOn(currentCommand.getRowinitiator(), currentCommand.getColInitiator(), true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
         currentCommand.highlightTargets(true);
 
         //set the new orientation
         if(!currentCommand.getActionChoice().isActorIsTarget()) {
             Data.Orientation actorOrientation = Utils.getOrientationFromCoords(
-                    currentCommand.getRowActor(),
-                    currentCommand.getColActor(),
+                    currentCommand.getRowinitiator(),
+                    currentCommand.getColInitiator(),
                     currentCommand.getRowTarget(),
                     currentCommand.getColTarget());
             orientationCommand = new ChooseOrientationCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), actorOrientation);
             orientationCommand.setFree(true);
-            orientationCommand.apply(currentCommand.getRowActor(), currentCommand.getColActor());
+            orientationCommand.apply(currentCommand.getRowinitiator(), currentCommand.getColInitiator());
         }
 
         //schedule the panels dance

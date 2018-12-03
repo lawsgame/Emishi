@@ -1,16 +1,14 @@
 package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.TilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ShortTilePanel;
 
 
-public class TempoSTP extends TilePanel {
+public class TempoSTP extends ShortTilePanel {
 
     private static final float SLIDE_DURATION = 0.5f;
     private static final int X_SHOWING_PADDING = 15;
@@ -29,7 +27,7 @@ public class TempoSTP extends TilePanel {
 
     public static TempoSTP create(Viewport stageUIViewport, Skin skin){
         LabelStyle style = skin.get("default", LabelStyle.class);
-        Label label = new Label("BLANK", style);
+        Label label = new Label("TILE TYPE", style);
         TempoSTP panel = new TempoSTP(stageUIViewport, SLIDE_DURATION, X_SHOWING_PADDING, Y_PADDING, WIDTH, HEIGHT, TOP, LEFT, label);
         panel.setBackground(skin.getDrawable("black_background"));
         panel.add(label).expand();

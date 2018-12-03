@@ -39,22 +39,22 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
  *
  *  ActionChoice choice = ...;
  *  ActorCommand command = new ActorCommand( choice, ...);
- *  if(command.setInitiator(...)){
- *      command.setTarget(...);
- *      if(command.apply()){
+ *  command.setInitiator(...);
+ *  command.setTarget(...);
+ *  if(command.apply()){
  *
  *          // the command has been applied successfully
- *      }else{
+ *  }else{
  *
  *          // the command failed to be applied
- *      }
  *  }
+ *
  *
  *  II - battle command flow
  *
  *  1 - get the command
- *  2 - setTiles initiator and target
- *  3 - call isTargetValid
+ *  2 - set initiator and target
+ *  3 - (optional) display action pan
  *  4 - execute the command
  *
  * no need to put back the command in the BCM
@@ -522,11 +522,11 @@ public abstract class ActorCommand extends BattleCommand{
         return initiator;
     }
 
-    public final int getRowActor() {
+    public final int getRowinitiator() {
         return rowActor;
     }
 
-    public final int getColActor() {
+    public final int getColInitiator() {
         return colActor;
     }
 

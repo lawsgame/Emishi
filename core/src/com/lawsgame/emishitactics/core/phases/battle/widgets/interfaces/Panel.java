@@ -6,14 +6,32 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.LinkedList;
 
-public abstract class Panel<C> extends Table implements IPanel<C>{
+public abstract class Panel extends Table {
+
 
 
     protected LinkedList<Action> awaitingActions = new LinkedList<Action>();
-    protected Viewport stageViewport;
+    protected Viewport uiport;
 
-    public Panel(Viewport stageUIViewport){
-        this.stageViewport = stageUIViewport;
+    public Panel(Viewport uiport){
+        this.uiport = uiport;
+    }
+
+    public abstract void show();
+    public abstract void hide();
+    public abstract boolean isHiding();
+    public abstract float getHidingTime();
+    public abstract float getShowingTime();
+
+    public void removeAsAction(){
+        final Panel p = this;
+        awaitingActions.add(new Action() {
+            @Override
+            public boolean act(float delta) {
+                p.remove();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -27,26 +45,27 @@ public abstract class Panel<C> extends Table implements IPanel<C>{
     //---------------- METHODS ------------------------
 
 
-
-    @Override
-    public void update(final C content) {
-        awaitingActions.add(new Action() {
-            @Override
-            public boolean act(float delta) {
-                Panel p = (Panel) getActor();
-                p.setContent(content);
-                return true;
-            }
-        });
+    public void centerPanel() {
+        setX(uiport.getWorldWidth()/2f - getWidth()/2f);
+        setY(uiport.getWorldHeight()/2f - getHeight()/2f);
     }
 
-    protected abstract void setContent(C content);
+    protected void setX(float xPadding, boolean left) {
+        setX((left) ? xPadding : uiport.getWorldWidth() - xPadding - getWidth());
+    }
+
+    protected void setY(float yPadding, boolean top) {
+        setY((top) ? uiport.getWorldHeight() - yPadding - getHeight() : yPadding);
+    }
 
 
-    @Override
-    public void centerPanel() {
-        setX(stageViewport.getWorldWidth()/2f - getWidth()/2f);
-        setY(stageViewport.getWorldHeight()/2f - getHeight()/2f);
+
+    //--------------- EXCEPTION --------------------
+
+    public static class PanelException extends Exception{
+        public PanelException(String s) {
+            super(s);
+        }
     }
 
 }

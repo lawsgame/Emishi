@@ -13,6 +13,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.UnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ShortUnitPanel;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -20,18 +21,16 @@ import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 public class EarthquakeEvent extends BattleCommand {
     private float earthquakeDuration;
     private final CameraManager gcm;
-    private final UnitPanel shortUnitPanel;
 
-    public EarthquakeEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, UnitPanel shortUnitPanel, float earthquakeDuration) {
+    public EarthquakeEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, float earthquakeDuration) {
         super(bfr, scheduler, playerInventory);
         this.earthquakeDuration = earthquakeDuration;
         this.gcm = gcm;
-        this.shortUnitPanel = shortUnitPanel;
     }
 
 
-    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, UnitPanel shortUnitPanel, CameraManager gcm, final int turn){
-        EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, playerInventory, gcm, shortUnitPanel, Data.EARTHQUAKE_DURATION);
+    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, final int turn){
+        EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, playerInventory, gcm, Data.EARTHQUAKE_DURATION);
 
         Model.Trigger trigger = new Model.Trigger(true, event) {
 

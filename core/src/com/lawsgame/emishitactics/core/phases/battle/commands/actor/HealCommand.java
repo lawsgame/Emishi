@@ -67,7 +67,6 @@ public class HealCommand extends SelfInflitedCommand {
 
         for(int i = 0; i < patients.length; i++) {
             if(patients[i].improveCondition(healPower, boostMoral, boostHP)) {
-                System.out.println("renderer registered");
                 task.addThread(new RendererThread(bfr.getUnitRenderer(patients[i]), new Notification.Treated(healPower)));
             }
         }
@@ -86,6 +85,8 @@ public class HealCommand extends SelfInflitedCommand {
     public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
         return getAlliesAtRange(row, col, actor, true, false );
     }
+
+
 
 
     //-------------------- GETTERS & SETTERS ----------------------

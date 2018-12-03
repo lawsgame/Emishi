@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 
-public abstract class SlidingPanel<C> extends Panel<C> {
+public abstract class SlidingPanel extends Panel {
 
     protected Viewport stageUIViewport;
     protected float xHiding;
@@ -24,7 +24,7 @@ public abstract class SlidingPanel<C> extends Panel<C> {
      * @param top :  if true, apply yPadding from the top, else form the bottom
      * @param left : true if hide in the left side of the screen
      */
-    public SlidingPanel(Viewport stageUIViewport, float slidingDuration, int xShowingPadding, int yPadding, int width, int height, boolean top, boolean left) {
+    public SlidingPanel(Viewport stageUIViewport, float slidingDuration, float xShowingPadding, float yPadding, int width, int height, boolean top, boolean left) {
         super(stageUIViewport);
         this.stageUIViewport = stageUIViewport;
         this.slidingDuration = slidingDuration;
@@ -32,7 +32,8 @@ public abstract class SlidingPanel<C> extends Panel<C> {
         this.xHiding = (left) ? -width: stageUIViewport.getWorldWidth();
         this.top = top;
         this.yPadding = yPadding;
-        this.setSize(width, height);
+        this.setWidth(width);
+        this.setHeight(height);
         this.setX(xHiding);
         this.setY((top) ? stageUIViewport.getWorldWidth() - yPadding - getHeight(): yPadding);
 

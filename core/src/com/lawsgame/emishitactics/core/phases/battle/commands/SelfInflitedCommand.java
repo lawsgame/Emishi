@@ -27,4 +27,5 @@ public abstract class SelfInflitedCommand extends ActorCommand {
         return target;
     }
 
+
 }

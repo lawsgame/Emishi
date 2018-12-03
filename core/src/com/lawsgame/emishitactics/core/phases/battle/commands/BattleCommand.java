@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.OOAReport;
 import com.lawsgame.emishitactics.core.models.Player;
@@ -19,8 +20,8 @@ import java.util.Stack;
 
 public abstract class BattleCommand extends Observable implements Observer {
     protected final BattlefieldRenderer bfr;
-
     protected final AnimationScheduler scheduler;
+
     private boolean decoupled;
     private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is bundlesSent / completed AND usefull for decoupling view and model updates
     private boolean tasksScheduled;
@@ -302,6 +303,10 @@ public abstract class BattleCommand extends Observable implements Observer {
         return outcome;
     }
 
+    public BattlefieldRenderer getBFR(){
+        return bfr;
+    }
+
     public static class Outcome {
         public Array<ExperiencePointsHolder> expHolders;
         public Array<DroppedItemHolder> droppedItemHolders;
@@ -402,11 +407,14 @@ public abstract class BattleCommand extends Observable implements Observer {
 
     public static class ExperiencePointsHolder {
         public final Unit receiver;
-        public int experience;
+        public final int initialEXP;
+        int experience;
+        public int[] experiences;
         private Stack<int[]> statGained; // the 12 first entries are statistic inscreased while the last entry is experience gained before leveling up
 
         public ExperiencePointsHolder(Unit receiver, int experience){
             this.receiver = receiver;
+            this.initialEXP = receiver.getExperience();
             this.experience = experience;
             this.statGained = new Stack<int[]>();
         }

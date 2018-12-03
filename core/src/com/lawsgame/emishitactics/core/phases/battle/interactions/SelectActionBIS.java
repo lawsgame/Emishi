@@ -78,8 +78,8 @@ public class SelectActionBIS extends BattleInteractionState {
                 Utils.undoCommands(historic);
                 if(historic.size() > 0){
 
-                    rowSltdUnit = historic.peek().getRowActor();
-                    colSltdUnit = historic.peek().getColActor();
+                    rowSltdUnit = historic.peek().getRowinitiator();
+                    colSltdUnit = historic.peek().getColInitiator();
                     bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
                         @Override
                         public void apply() {

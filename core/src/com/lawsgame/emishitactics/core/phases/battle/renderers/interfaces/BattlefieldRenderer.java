@@ -152,7 +152,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
     public abstract void setGameCamParameters();
 
-    public void moveTo(int rowTarget, int colTarget, boolean smoothly){
+    public void moveCameraTo(int rowTarget, int colTarget, boolean smoothly){
         gcm.moveTo(getCenterX(rowTarget, colTarget), getCenterY(rowTarget, colTarget) , smoothly);
     }
 

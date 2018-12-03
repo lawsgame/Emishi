@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -13,7 +14,6 @@ import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.math.functions.Function;
-import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
@@ -303,8 +303,8 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
 
 
-    private Vector dl = new Vector();
-    private Vector checkingdl = new Vector();
+    private Vector2 dl = new Vector2();
+    private Vector2 checkingdl = new Vector2();
     private boolean pushed = false;
     private float[] vgoal = new float[2];
     private int[] previousGoal = new int[2]; //x, y
@@ -329,7 +329,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             goal[0] = bfr.getRow(vgoal[0], vgoal[1]);
             goal[1] = bfr.getCol(vgoal[0], vgoal[1]);
 
-            if (dl.length() > 0 && MathUtils.isZero(Vector.vectprod(checkingdl, dl), VECTPROD_ERROR_MARGIN) && Vector.scalprod(checkingdl, dl) > 0) {
+            if (dl.len2() > 0 && checkingdl.isCollinear(dl, 0.01f)) {
 
                 setCenterX(getCenterX() + dl.x*dt, false);
                 setCenterY(getCenterY() + dl.y*dt, false);
@@ -338,8 +338,8 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
                 previousGoal[0] = bfr.getRow(vpreviousGoal[0], vpreviousGoal[1]);
                 previousGoal[1] = bfr.getCol(vpreviousGoal[0], vpreviousGoal[1]);
 
-                checkingdl.normalize();
-                checkingdl.multiply((pushed) ? Data.SPEED_PUSHED : Data.SPEED_WALK);
+                checkingdl.nor();
+                checkingdl.scl((pushed) ? Data.SPEED_PUSHED : Data.SPEED_WALK);
                 dl.x = checkingdl.x;
                 dl.y = checkingdl.y;
                 setCenterX(vpreviousGoal[0] , false);

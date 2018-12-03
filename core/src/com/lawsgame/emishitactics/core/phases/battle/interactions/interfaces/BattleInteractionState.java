@@ -68,7 +68,7 @@ public abstract class BattleInteractionState extends InteractionState {
      *
      * First, it check wether the input is handled by BIS.handleTouchInput()
      * If not (aka. return false), the input is handled generically by using:
-     *      1) BIM.moveTo()
+     *      1) BIM.moveCameraTo()
      *      2) (optional) updating FFA if the given tile is occupied by a foe.
      *
      * @param gameX

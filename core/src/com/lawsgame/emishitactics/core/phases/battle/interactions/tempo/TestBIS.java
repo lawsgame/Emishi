@@ -5,28 +5,28 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.Panel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.TilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoSTP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoAIP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionChoicePanel;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
@@ -53,7 +53,8 @@ public class TestBIS extends BattleInteractionState implements Observer{
     Area ccImpactArea;
     Area ccTargets;
 
-    Panel panel;
+    ActionInfoPanel panel;
+    ChoicePanel choicePanel;
 
 
     public TestBIS(BattleInteractionMachine bim) {
@@ -63,6 +64,10 @@ public class TestBIS extends BattleInteractionState implements Observer{
         sltdUnit.addNativeAbility(Data.Ability.BUILD);
         sltdUnit.addNativeAbility(Data.Ability.HEAL);
         bim.player.getArmy().getSquad(sltdUnit, true).get(1).takeDamage(0, false, false, 1f);
+
+
+
+
 
         // ANIMATION TEST
 
@@ -75,9 +80,13 @@ public class TestBIS extends BattleInteractionState implements Observer{
         animation.play();
 
 
+
+
+
+
         // TEST CUSTOMED COMMAND
 
-        customedCommand = new HealCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
 
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -90,13 +99,31 @@ public class TestBIS extends BattleInteractionState implements Observer{
         bim.bfr.addAreaRenderer(ccActionArea);
         bim.bfr.addAreaRenderer(ccTargets);
 
-
+        // set guarded area
         Unit randomFoe = bim.bfr.getModel().getUnit(13,8);
         randomFoe.addNativeAbility(Data.Ability.GUARD);
         int[] randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
         GuardCommand guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         guardCommand.setFree(true);
         if(!guardCommand.apply(randomFoePos[0], randomFoePos[1])){ }
+
+        // initiate action panel
+        Skin skin = bim.asm.get(Assets.SKIN_UI);
+        panel = ActionInfoPanel.create(bim.uiStage.getViewport(), skin, bim.bfr, TempoAIP.class);
+
+        /*
+        SwitchWeaponCommand command = new SwitchWeaponCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), 1);
+        int[] sltdPos = bim.bfr.getModel().getUnitPos(sltdUnit);
+        command.setInitiator(sltdPos[0], sltdPos[1]);
+        command.setTarget(sltdPos[0], sltdPos[1]);
+        panel.setContent(command);
+        */
+
+        bim.uiStage.addActor(panel);
+        //panel.show();
+
+
+
 
 
         // EVENT !!
@@ -154,13 +181,25 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
         }
 
-        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.pp.shortUnitPanel, bim.bfr.getGCM(), 0);
+        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.bfr.getGCM(), 0);
 
 
+        choicePanel = new TempoActionChoicePanel(bim.uiStage.getViewport(), skin);
+        choicePanel.setContent(new ChoicePanel.ButtonHandler() {
+            @Override
+            public Array<TextButton> getButtons(Skin skin) {
+                Array<TextButton> buttons = new Array<TextButton>();
+                buttons.add(new TextButton("button 1", skin, "default"));
+                buttons.add(new TextButton("button 2", skin, "default"));
+                buttons.add(new TextButton("button 3", skin, "default"));
+                buttons.add(new TextButton("button 4", skin, "default"));
+                return buttons;
+            }
+        });
+        choicePanel.show();
+        bim.uiStage.addActor(choicePanel);
 
-        Skin skin = bim.asm.get(Assets.SKIN_UI);
-        this.panel = TempoLP.create(bim.uiStage.getViewport(), skin);
-        bim.uiStage.addActor(panel);
+
 
     }
 
@@ -172,20 +211,17 @@ public class TestBIS extends BattleInteractionState implements Observer{
     @Override
     public void renderAhead(SpriteBatch batch) {
         //sprites.get(animation.getCurrentFrame()).draw(batch);
+        choicePanel.getX();
     }
+
 
     @Override
     public boolean handleTouchInput(int row, int col) {
 
         System.out.println("input : "+row+" "+col);
         int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
-        //bim.moveTo(row, col, true);
+        //bim.moveCameraTo(row, col, true);
 
-        // PANEL
-
-        panel.hide();
-        panel.update(new Weapon(Data.WeaponTemplate.SHORTSWORD, false, false));
-        panel.show();
 
 
         //WALK UNIT
@@ -216,23 +252,47 @@ public class TestBIS extends BattleInteractionState implements Observer{
         }
         */
 
+
+
+
         // TEST CUSTOMED COMMAND
 
         /*
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
+
+            // MOVE SLTD UNIT
+
             if(bim.bfr.getModel().isTileOccupied(row, col)){
                 sltdUnit = bim.bfr.getModel().getUnit(row, col);
             }else{
                 bim.bfr.getModel().moveUnit(actorPos[0], actorPos[1], row, col, true);
             }
         }else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
-            if(!customedCommand.apply(actorPos[0], actorPos[1], row, col)){
+
+            // APPLY CUSTOMED COMMAND
+
+            // set parameters
+            customedCommand.setInitiator(actorPos[0], actorPos[1]);
+            customedCommand.setTarget(row, col);
+
+            // update and display action pan
+            if(bim.pp.isActionPanelAvailable(customedCommand.getActionChoice())) {
+                panel.hide();
+                panel.setContent(customedCommand);
+                panel.show();
+            }
+
+            // apply command
+            if(!customedCommand.apply()){
                 System.out.println("command failed to be applied");
                 System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
                 System.out.println("    target ?    : "+customedCommand.isTargetValid());
             }
         }else{
+
+            // SHOW INFO ABOUT COMMAND
+
             customedCommand.setInitiator(actorPos[0], actorPos[1]);
             //customedCommand.setFree(true);
             if(customedCommand.isInitiatorValid()) {
@@ -245,6 +305,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
             }
         }
         */
+
 
 
 

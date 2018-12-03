@@ -2,11 +2,11 @@ package com.lawsgame.emishitactics.engine;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.engine.math.functions.Function;
 import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
-import com.lawsgame.emishitactics.engine.math.geometry.Vector;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import static com.lawsgame.emishitactics.engine.GamePhase.getAspRatio;
@@ -28,9 +28,9 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
 
     private boolean cameraMovingToTarget;
     private float cameraVelocity;
-    private Vector vTarget;
-    private Vector vSpeedFactor;
-    private  Vector dl;
+    private Vector2 vTarget;
+    private Vector2 vSpeedFactor;
+    private  Vector2 dl;
 
     private boolean cameraMoving;
     private VectorialFunction dp;
@@ -59,9 +59,9 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
         this.camera.setToOrtho(false, portWidth, gamePortHeight);
         this.camera.update();
 
-        this.vTarget = new Vector(0,0);
-        this.vSpeedFactor = new Vector(0,0);
-        this.dl = new Vector(0,0);
+        this.vTarget = new Vector2(0,0);
+        this.vSpeedFactor = new Vector2(0,0);
+        this.dl = new Vector2(0,0);
         this.duration = 0;
         this.time = 0f;
         this.cameraMovingToTarget = false;
@@ -113,12 +113,12 @@ public class CameraManager extends Observable implements GameUpdatableEntity {
 
             //--***$$$ MODEL $$$***----
 
-            Vector journey = new Vector(vTarget.x - camera.position.x, vTarget.y - camera.position.y);
+            Vector2 journey = new Vector2(vTarget.x - camera.position.x, vTarget.y - camera.position.y);
 
             time = 0;
-            duration = (float) (2*Math.sqrt(journey.length()/cameraVelocity));
-            vSpeedFactor.x = cameraVelocity * journey.x / journey.length();
-            vSpeedFactor.y = cameraVelocity * journey.y / journey.length();
+            duration = (float) (2*Math.sqrt(journey.len()/cameraVelocity));
+            vSpeedFactor.x = cameraVelocity * journey.x / journey.len();
+            vSpeedFactor.y = cameraVelocity * journey.y / journey.len();
 
 
         }

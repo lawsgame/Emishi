@@ -14,11 +14,10 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public class AttackCommand extends HitCommand {
 
-    protected Array<HitCommand> retalationBlows;
+    protected HitCommand retalationBlow;
 
     public AttackCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, Data.ActionChoice.ATTACK, scheduler, playerInventory);
-        this.retalationBlows = new Array<HitCommand>();
         this.setFree(false);
 
     }
@@ -27,11 +26,9 @@ public class AttackCommand extends HitCommand {
     protected void execute() {
         super.execute();
 
-        for(int i = 0; i < retalationBlows.size; i++){
-            if(retalationBlows.get(i).apply()){
-                outcome.merge(retalationBlows.get(i).getOutcome());
-                scheduleMultipleRenderTasks(retalationBlows.get(i).confiscateTasks());
-            }
+        if(retalationBlow.apply()){
+            outcome.merge(retalationBlow.getOutcome());
+            scheduleMultipleRenderTasks(retalationBlow.confiscateTasks());
         }
 
         scheduleRenderTask(resetOrientation());
@@ -42,24 +39,14 @@ public class AttackCommand extends HitCommand {
     protected void provideActionPanelInfos() {
         super.provideActionPanelInfos();
 
-        retalationBlows.clear();
-        HitCommand blow;
-        Array<int[]> targets = getTargetsFromImpactArea();
-        for (int i = 0; i < targets.size; i++) {
+        retalationBlow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, outcome.playerInventory);
+        retalationBlow.setFree(true);
+        retalationBlow.setDecoupled(true);
+        retalationBlow.setRetaliation(true);
 
-            blow = new HitCommand(bfr, ActionChoice.ATTACK, scheduler, outcome.playerInventory);
-            blow.setFree(true);
-            blow.setDecoupled(true);
-            blow.setRetaliation(true);
-
-            blow.init();
-            blow.setInitiator(targets.get(i)[0], targets.get(i)[1]);
-            blow.setTarget(rowActor, colActor);
-            if (blow.isApplicable())
-                retalationBlows.add(blow);
-        }
-
-
+        retalationBlow.init();
+        retalationBlow.setInitiator(rowTarget, colTarget);
+        retalationBlow.setTarget(rowActor, colActor);
     }
 
     // -------------------- COMODITY BATTLE PANEL METHODS ------------------
@@ -69,8 +56,8 @@ public class AttackCommand extends HitCommand {
         return this;
     }
 
-    public Array<HitCommand> getRetalationBlows(){
-        return retalationBlows;
+    public HitCommand getRetalationBlow(){
+        return retalationBlow;
     }
 
 

@@ -1,31 +1,31 @@
 package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.lawsgame.emishitactics.core.helpers.AssetProvider;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.LevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.LootPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.TilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.UnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLongTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLongUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoShortTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoShortUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoLootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LongTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ShortTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ShortUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoAIP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoEP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLUP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLongTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoSTP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoSUP;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.HashMap;
@@ -34,12 +34,14 @@ import java.util.HashMap;
  *
  */
 public class PanelPool implements Disposable {
+    private Skin uiskin;
+    private Viewport uiport;
     private Group panelGroup;
 
-    public final TilePanel shortTilePanel;
-    public final TilePanel longTilePanel;
-    public final UnitPanel shortUnitPanel;
-    public final UnitPanel longUnitPanel;
+    public final ShortTilePanel shortTilePanel;
+    public final LongTilePanel longTilePanel;
+    public final ShortUnitPanel shortUnitPanel;
+    public final LongUnitPanel longUnitPanel;
 
     public final SimpleCommand showSTP;
     public final SimpleCommand hideSTP;
@@ -49,24 +51,26 @@ public class PanelPool implements Disposable {
     public final ExperiencePanel experiencePanel;
     public final LevelUpPanel levelUpPanel;
     public final LootPanel lootPanel;
-    public final ChoicePanel choicePanel;
+    //public final ChoicePanel choicePanel;
 
-    private HashMap<Data.ActionChoice, ActionInfoPanel> panels;
+    private HashMap<Data.ActionChoice, Class<? extends ActionInfoPanel>> actionPanelTypes;
 
-    public PanelPool(Stage uiStage, AssetManager asm, AssetProvider provider, I18NBundle localization){
+    public PanelPool(Stage uiStage, Skin uiskin, I18NBundle localization){
+        this.uiskin = uiskin;
+        this.uiport = uiStage.getViewport();
         this.panelGroup = new Group();
         uiStage.addActor(panelGroup);
 
         // main panels imp
-        this.shortTilePanel = new TempoShortTilePanel(uiStage.getViewport());
-        this.shortUnitPanel = new TempoShortUnitPanel(uiStage.getViewport());
-        this.longUnitPanel = new TempoLongUnitPanel(uiStage.getViewport(), localization);
-        this.longTilePanel = new TempoLongTilePanel(uiStage.getViewport());
+        this.shortTilePanel = TempoSTP.create(uiport, this.uiskin);
+        this.shortUnitPanel = TempoSUP.create(uiport, this.uiskin);
+        this.longUnitPanel = TempoLongUnitPanel.create(uiport, this.uiskin);
+        this.longTilePanel = TempoLongTilePanel.create(uiport, this.uiskin);
 
-        this.experiencePanel = new TempoExperiencePanel(uiStage.getViewport());
-        this.levelUpPanel = new TempoLevelUpPanel(uiStage.getViewport());
-        this.lootPanel = new TempoLootPanel(uiStage.getViewport());
-        this.choicePanel = new TempoChoicePanel(asm);
+        this.experiencePanel = TempoEP.create(uiport, uiskin);
+        this.levelUpPanel = TempoLUP.create(uiport, uiskin);
+        this.lootPanel = TempoLP.create(uiport, uiskin);
+        //this.choicePanel = null;
 
         panelGroup.addActor(shortTilePanel);
         panelGroup.addActor(shortUnitPanel);
@@ -75,29 +79,16 @@ public class PanelPool implements Disposable {
         panelGroup.addActor(experiencePanel);
         panelGroup.addActor(levelUpPanel);
         panelGroup.addActor(lootPanel);
-        panelGroup.addActor(choicePanel);
+        //panelGroup.addActor(choicePanel);
 
 
         // panel action choice imp
-        panels = new HashMap<Data.ActionChoice, ActionInfoPanel>();
-
-        ActionInfoPanel attackAIP = new TempoActionInfoPanel.AttackInfoPanel(uiStage.getViewport());
-        ActionInfoPanel healAIP = new TempoActionInfoPanel.HealInfoPanel(uiStage.getViewport());
-        ActionInfoPanel switchWeaponAIP = new TempoActionInfoPanel.SwitchWeaponInfoPanel(uiStage.getViewport());
-        ActionInfoPanel stealAIP = new TempoActionInfoPanel.StealInfoPanel(uiStage.getViewport());
-        ActionInfoPanel buildAIP = new TempoActionInfoPanel.BuildInfoPanel(uiStage.getViewport());
-
-        panels.put(Data.ActionChoice.ATTACK, attackAIP);
-        panels.put(Data.ActionChoice.HEAL, healAIP);
-        panels.put(Data.ActionChoice.SWITCH_WEAPON, switchWeaponAIP);
-        panels.put(Data.ActionChoice.STEAL, stealAIP);
-        panels.put(Data.ActionChoice.BUILD, buildAIP);
-
-        panelGroup.addActor(attackAIP);
-        panelGroup.addActor(healAIP);
-        panelGroup.addActor(switchWeaponAIP);
-        panelGroup.addActor(stealAIP);
-        panelGroup.addActor(buildAIP);
+        actionPanelTypes = new HashMap<Data.ActionChoice, Class<? extends ActionInfoPanel>>();
+        actionPanelTypes.put(Data.ActionChoice.ATTACK, TempoAIP.class);
+        actionPanelTypes.put(Data.ActionChoice.HEAL, TempoAIP.class);
+        actionPanelTypes.put(Data.ActionChoice.SWITCH_WEAPON, TempoAIP.class);
+        actionPanelTypes.put(Data.ActionChoice.STEAL, TempoAIP.class);
+        actionPanelTypes.put(Data.ActionChoice.BUILD, TempoAIP.class);
 
 
         // utility command for scheduler
@@ -148,7 +139,7 @@ public class PanelPool implements Disposable {
                 rowFocus = rowTarget;
                 colFocus = colTarget;
                 shortTilePanel.hide();
-                shortTilePanel.set(bfr.getModel().getTile(rowTarget, colTarget).getType());
+                shortTilePanel.update(bfr.getModel().getTile(rowTarget, colTarget).getType());
                 shortTilePanel.show();
             }
 
@@ -156,7 +147,7 @@ public class PanelPool implements Disposable {
                 if (focusUnit == null || focusUnit != bfr.getModel().getUnit(rowTarget, colTarget) || shortUnitPanel.isHiding()) {
                     focusUnit = bfr.getModel().getUnit(rowTarget, colTarget);
                     shortUnitPanel.hide();
-                    shortUnitPanel.set(bfr.getModel().getUnit(rowTarget, colTarget));
+                    shortUnitPanel.update(bfr.getModel().getUnit(rowTarget, colTarget));
                     shortUnitPanel.show();
                 }
             } else {
@@ -170,13 +161,21 @@ public class PanelPool implements Disposable {
     //----------------------- ACTION PAN MGMT -----------------------------------
 
     public boolean isActionPanelAvailable(Data.ActionChoice choice){
-        return panels.get(choice) != null;
+        return actionPanelTypes.get(choice) != null;
     }
 
+    /**
+     * Two important remarks:
+     *  1) getActionPanel MUST BE called right before applying the associated command (the BFR state must be the same)
+     *  2) the action info panel is automatically attached to the stage and must be removed manually
+     *
+     */
     public ActionInfoPanel getActionPanel(ActorCommand command){
-        ActionInfoPanel panel = panels.get(command.getActionChoice());
-        if(panel != null) {
-            panel.set(command);
+        ActionInfoPanel panel = null;
+        if(command != null) {
+            panel = ActionInfoPanel.create(uiport, uiskin, command.getBFR(), actionPanelTypes.get(command.getActionChoice()));
+            panel.setContent(command);
+            panelGroup.addActor(panel);
         }
         return panel;
     }

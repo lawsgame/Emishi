@@ -910,8 +910,8 @@ public class Unit extends Model {
 
     public int getRecoveredHitPoints(int healPower) {
         int recoveredHP ;
-        if(healPower + hitPoints > getAppHitpoints()){
-            recoveredHP = getAppHitpoints();
+        if(healPower + currentHitPoints > getAppHitpoints()){
+            recoveredHP = getAppHitpoints() - currentHitPoints;
         }else{
             recoveredHP = healPower;
         }
@@ -921,8 +921,8 @@ public class Unit extends Model {
 
     public int getRecoveredMoralPoints(int healPower) {
         int recoveredMoralPoints;
-        if(healPower + hitPoints > getAppMoral()){
-            recoveredMoralPoints = getAppMoral();
+        if(healPower + currentMoral > getAppMoral()){
+            recoveredMoralPoints = getAppMoral() - currentMoral;
         }else{
             recoveredMoralPoints = healPower;
         }

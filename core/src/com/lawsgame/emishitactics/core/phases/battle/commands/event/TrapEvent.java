@@ -14,20 +14,20 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.UnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ShortUnitPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 public class TrapEvent extends BattleCommand{
     private int damage;
     private int row;
     private int col;
-    private UnitPanel shortUnitPanel;
+    private ShortUnitPanel shortUnitPanel;
 
     public TrapEvent(BattleInteractionMachine bim, int damage, int row, int col) {
         this(bim.bfr, bim.scheduler, bim.player.getInventory(), damage, row, col, bim.pp.shortUnitPanel);
     }
 
-    private TrapEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, int damage, int row, int col, UnitPanel unitPanel){
+    private TrapEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, int damage, int row, int col, ShortUnitPanel unitPanel){
         super(bfr, scheduler, playerInventory);
         this.damage = damage;
         this.row = row;
@@ -43,7 +43,7 @@ public class TrapEvent extends BattleCommand{
                                         AnimationScheduler scheduler,
                                         Inventory playerInventory,
                                         Tile tile, final int rowTile, final int colTile, int damage,
-                                        UnitPanel shortUnitPanel){
+                                        ShortUnitPanel shortUnitPanel){
 
         TrapEvent event = new TrapEvent(bfr, scheduler, playerInventory, damage, rowTile, colTile, shortUnitPanel);
         if(bfr.getModel().isTileExisted(rowTile, colTile) && tile != null) {
@@ -78,7 +78,7 @@ public class TrapEvent extends BattleCommand{
             @Override
             public void apply() {
                 shortUnitPanel.hide();
-                shortUnitPanel.set(victim);
+                shortUnitPanel.update(victim);
                 shortUnitPanel.show();
             }
         }, 0f));

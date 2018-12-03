@@ -10,7 +10,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -185,9 +185,8 @@ public class AiBIS extends BattleInteractionState implements Observer {
                     commandThread.addQuery(new SimpleCommand() {
                         @Override
                         public void apply() {
-                            bim.focusOn(actorCommand.getRowActor(), actorCommand.getColActor(), true, false, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, false);
+                            bim.focusOn(actorCommand.getRowinitiator(), actorCommand.getColInitiator(), true, false, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, false);
                             if (panel != null) {
-                                bim.uiStage.addActor(panel);
                                 panel.show();
                             }
                             actorCommand.highlightTargets(true);
@@ -209,7 +208,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
                             /*
                             Normally, applying the command would remove the highlighting.
                             But in the AI case, the command has been applied BEFORE the highlighting has been triggered.
-                            Therefore, the blinking should be shut off manually here
+                            Therefore, the blinking should be turn off manually here
                              */
                             actorCommand.highlightTargets(false);
                             if(panel != null)

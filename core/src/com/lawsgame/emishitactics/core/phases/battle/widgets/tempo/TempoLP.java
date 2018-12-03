@@ -32,7 +32,7 @@ public class TempoLP extends LootPanel {
     }
 
     @Override
-    protected void setContent(Item content) {
+    protected void setContent(Item content, boolean forThePlayer) {
         label.setText(content.getName());
     }
 }

@@ -37,10 +37,10 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
         super.init();
         bim.bfr.addAreaRenderer(actionArea);
-        bim.focusOn(currentCommand.getRowActor(), currentCommand.getColActor(), true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
+        bim.focusOn(currentCommand.getRowinitiator(), currentCommand.getColInitiator(), true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
 
         if(currentCommand.getActionChoice().isActorIsTarget()){
-            currentCommand.setTarget(currentCommand.getRowActor(), currentCommand.getColActor());
+            currentCommand.setTarget(currentCommand.getRowinitiator(), currentCommand.getColInitiator());
             triggerCurrentCommand();
         }
     }
