@@ -393,6 +393,10 @@ public class Data {
         public String getName(I18NBundle mainI18nBundle) {
             return mainI18nBundle.get(name());
         }
+
+        public String getName(){
+            return name().toLowerCase();
+        }
     }
 
     public enum AreaColor {

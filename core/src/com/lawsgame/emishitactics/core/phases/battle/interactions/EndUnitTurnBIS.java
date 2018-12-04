@@ -11,8 +11,6 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrient
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.interfaces.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.oldpan.tempo.TempoChoicePanel;
 
 public class EndUnitTurnBIS extends BattleInteractionState {
     private Unit actor;

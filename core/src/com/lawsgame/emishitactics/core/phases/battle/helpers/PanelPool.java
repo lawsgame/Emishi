@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -10,7 +11,10 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.CommandPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ExperiencePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LevelUpPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LongTilePanel;
@@ -19,6 +23,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.L
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ShortTilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ShortUnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoAIP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoEP;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLP;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoLUP;
@@ -51,9 +56,11 @@ public class PanelPool implements Disposable {
     public final ExperiencePanel experiencePanel;
     public final LevelUpPanel levelUpPanel;
     public final LootPanel lootPanel;
-    //public final ChoicePanel choicePanel;
+    public final ActionChoicePanel actionChoicePanel;
+
 
     private HashMap<Data.ActionChoice, Class<? extends ActionInfoPanel>> actionPanelTypes;
+
 
     public PanelPool(Stage uiStage, Skin uiskin, I18NBundle localization){
         this.uiskin = uiskin;
@@ -70,7 +77,7 @@ public class PanelPool implements Disposable {
         this.experiencePanel = TempoEP.create(uiport, uiskin);
         this.levelUpPanel = TempoLUP.create(uiport, uiskin);
         this.lootPanel = TempoLP.create(uiport, uiskin);
-        //this.choicePanel = null;
+        this.actionChoicePanel = new TempoActionChoicePanel(uiport, uiskin, localization);
 
         panelGroup.addActor(shortTilePanel);
         panelGroup.addActor(shortUnitPanel);
@@ -79,7 +86,7 @@ public class PanelPool implements Disposable {
         panelGroup.addActor(experiencePanel);
         panelGroup.addActor(levelUpPanel);
         panelGroup.addActor(lootPanel);
-        //panelGroup.addActor(choicePanel);
+        panelGroup.addActor(actionChoicePanel);
 
 
         // panel action choice imp
@@ -180,6 +187,14 @@ public class PanelPool implements Disposable {
         return panel;
     }
 
+    public boolean isCommandPanelAvailable(){
+        return false;
+    }
+
+    public CommandPanel getCommandPanel(Data.ActionChoice id, int buttonIndex){
+        return null;
+    }
+
 
 
     @Override
@@ -187,4 +202,6 @@ public class PanelPool implements Disposable {
         panelGroup.clear();
         panelGroup.remove();
     }
+
+
 }
