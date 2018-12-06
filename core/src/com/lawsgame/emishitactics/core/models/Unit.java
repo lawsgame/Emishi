@@ -415,7 +415,7 @@ public class Unit extends Model {
 
     public Weapon getWeapon(int index) {
         Weapon weapon = null;
-        if (0 < index && index < weapons.size) {
+        if (0 <= index && index < weapons.size) {
             weapon = weapons.get(index);
         }
         return weapon;

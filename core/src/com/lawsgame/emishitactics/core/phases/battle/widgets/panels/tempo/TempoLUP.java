@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo;
 
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LevelUpPanel;
 
 public class TempoLUP extends LevelUpPanel {
     private static int WIDTH = 200;

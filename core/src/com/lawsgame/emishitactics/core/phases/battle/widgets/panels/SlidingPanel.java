@@ -1,12 +1,12 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 
 public abstract class SlidingPanel extends Panel {
 
-    protected Viewport stageUIViewport;
     protected float xHiding;
     protected float xShowing;
     protected boolean top;
@@ -16,7 +16,7 @@ public abstract class SlidingPanel extends Panel {
 
     /**
      *
-     * @param stageUIViewport : viewport of the stage UI
+     * @param uiport : viewport of the stage UI
      * @param slidingDuration : duration of the sliding in and out of the screen
      * @param xShowingPadding :
      * @param yPadding :
@@ -24,20 +24,16 @@ public abstract class SlidingPanel extends Panel {
      * @param top :  if true, apply yPadding from the top, else form the bottom
      * @param left : true if hide in the left side of the screen
      */
-    public SlidingPanel(Viewport stageUIViewport, float slidingDuration, float xShowingPadding, float yPadding, int width, int height, boolean top, boolean left) {
-        super(stageUIViewport);
-        this.stageUIViewport = stageUIViewport;
+    public SlidingPanel(Viewport uiport, float slidingDuration, float xShowingPadding, float yPadding, int width, int height, boolean top, boolean left) {
+        super(uiport);
         this.slidingDuration = slidingDuration;
-        this.xShowing = (left) ? xShowingPadding : stageUIViewport.getWorldWidth() - width - xShowingPadding;
-        this.xHiding = (left) ? -width: stageUIViewport.getWorldWidth();
+        this.xShowing = (left) ? xShowingPadding : uiport.getWorldWidth() - width - xShowingPadding;
+        this.xHiding = (left) ? -width: uiport.getWorldWidth();
         this.top = top;
         this.yPadding = yPadding;
-        this.setWidth(width);
-        this.setHeight(height);
+        this.setSize(width, height);
         this.setX(xHiding);
-        this.setY((top) ? stageUIViewport.getWorldWidth() - yPadding - getHeight(): yPadding);
-
-
+        this.updateY();
     }
 
     @Override
@@ -63,6 +59,14 @@ public abstract class SlidingPanel extends Panel {
     @Override
     public float getShowingTime() {
         return slidingDuration;
+    }
+
+    /**
+     *
+     * update Y according to {@link SlidingPanel#yPadding} and {@link Actor#getHeight()}
+     */
+    public void updateY(){
+        this.setY((top) ? uiport.getWorldHeight() - yPadding - getHeight(): yPadding);
     }
 
 }

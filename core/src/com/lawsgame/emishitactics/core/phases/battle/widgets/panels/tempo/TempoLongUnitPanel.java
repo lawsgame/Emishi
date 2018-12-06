@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongUnitPanel;
 
 public class TempoLongUnitPanel extends LongUnitPanel {
     private static int WIDTH = 650;

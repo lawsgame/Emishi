@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -19,7 +19,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 
 public class TempoAIP extends ActionInfoPanel {
     private static float X_PADDING = 15f;
@@ -219,7 +219,7 @@ public class TempoAIP extends ActionInfoPanel {
                 SwitchWeaponCommand swc = (SwitchWeaponCommand)command;
 
                 Weapon cw = command.getInitiator().getCurrentWeapon();
-                Weapon nw = swc.getInitiator().getWeapon(swc.getWeaponIndex());
+                Weapon nw = swc.getNewWeapon();
                 StringBuilder builder = new StringBuilder();
                 builder.append(command.getInitiator().getName());
                 builder.append("\nName        : "+cw+" => "+nw);

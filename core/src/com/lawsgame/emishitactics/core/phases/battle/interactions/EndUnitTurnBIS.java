@@ -1,13 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -15,12 +9,12 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.Bat
 public class EndUnitTurnBIS extends BattleInteractionState {
     private Unit actor;
     private EndUnitTurnCommand endUnitTurnCommand;
-    private ChoicePanel orientationChoicePanel;
+    //private ChoicePanel orientationChoicePanel;
 
     public EndUnitTurnBIS(BattleInteractionMachine bim, Unit actor) {
         super(bim, true, true, true, false, true);
         this.actor = actor;
-        this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
+        //this.orientationChoicePanel = new TempoChoicePanel(bim.asm);
         this.endUnitTurnCommand = new EndUnitTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.thl);
     }
 
@@ -34,21 +28,25 @@ public class EndUnitTurnBIS extends BattleInteractionState {
             proceed();
         }else {
 
+            /*
             this.orientationChoicePanel.set(new OrientationButtonHandler(this));
             this.orientationChoicePanel.setVisible(true);
             bim.uiStage.addActor(orientationChoicePanel);
+
 
             if(bim.bfr.getModel().isUnitDeployed(actor)) {
                 int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
                 bim.focusOn(actorPos[0], actorPos[1], true, true, true, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
             }
+            */
         }
     }
 
     @Override
     public void end() {
         super.end();
-        this.orientationChoicePanel.remove();
+
+        //this.orientationChoicePanel.remove();
     }
 
     @Override
@@ -74,6 +72,7 @@ public class EndUnitTurnBIS extends BattleInteractionState {
         }
     }
 
+    /*
     static class OrientationButtonHandler implements ChoicePanel.ButtonHandler{
         private EndUnitTurnBIS bis;
 
@@ -118,4 +117,5 @@ public class EndUnitTurnBIS extends BattleInteractionState {
         }
 
     }
+    */
 }

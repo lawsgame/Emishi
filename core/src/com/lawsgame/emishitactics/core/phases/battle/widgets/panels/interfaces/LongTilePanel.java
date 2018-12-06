@@ -1,9 +1,9 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.FadingPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.FadingPanel;
 
 public abstract class LongTilePanel extends FadingPanel {
     public LongTilePanel(Viewport stageUIViewport, float fadingDuration, int width, int height) {

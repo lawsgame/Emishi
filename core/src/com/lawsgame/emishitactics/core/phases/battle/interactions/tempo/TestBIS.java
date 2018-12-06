@@ -4,17 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
@@ -22,18 +23,24 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveC
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoAIP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.tempo.TempoActionChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.FadingPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.Panel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.SlidingPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoActionCP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoCommandCP;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.LinkedList;
+import java.util.Stack;
 
-public class TestBIS extends BattleInteractionState implements Observer{
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
+
+public class TestBIS extends BattleInteractionState implements Observer, ChoicePanel.CommandReceiver {
 
     Unit sltdUnit;
     Unit foeWL;
@@ -54,7 +61,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
     Area ccTargets;
 
     ActionInfoPanel panel;
-    ChoicePanel choicePanel;
+    ChoicePanel.CommandChoicePanel ccp;
 
 
     public TestBIS(BattleInteractionMachine bim) {
@@ -69,7 +76,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
 
 
-        // ANIMATION TEST
+        // -------***<<< ANIMATION tests >>>***------------------------
 
         sprites = bim.provider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
@@ -84,7 +91,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
 
 
-        // TEST CUSTOMED COMMAND
+        // -------***<<< CUSTOMED COMMAND related tests >>>***------------------------
 
         customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
@@ -108,7 +115,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
         if(!guardCommand.apply(randomFoePos[0], randomFoePos[1])){ }
 
         // initiate action panel
-        Skin skin = bim.asm.get(Assets.SKIN_UI);
+        final Skin skin = bim.asm.get(Assets.SKIN_UI);
         panel = ActionInfoPanel.create(bim.uiStage.getViewport(), skin, bim.bfr, TempoAIP.class);
 
         /*
@@ -126,50 +133,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
 
 
 
-        // EVENT !!
-
-        Model.Trigger trigger;
-        for(int r = 0; r < bim.bfr.getModel().getNbRows(); r++){
-            for(int c = 0; c < bim.bfr.getModel().getNbColumns(); c++){
-                if(bim.bfr.getModel().isTileOccupied(r, c)){
-                    final BattleUnitRenderer woundedRenderer = bim.bfr.getUnitRenderer(bim.bfr.getModel().getUnit(r, c));
-                    trigger = new Model.Trigger(true, new BattleCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) {
-
-                        @Override
-                        protected void execute() {
-                            System.out.println("Remember the name of the one you killed that day : "+woundedRenderer.getModel().getName());
-                        }
-
-                        @Override
-                        protected void unexecute() {
-
-                        }
-
-                        @Override
-                        public boolean isApplicable() {
-                            return true;
-                        }
-
-                        @Override
-                        public boolean isUndoable() {
-                            return false;
-                        }
-                    }) {
-
-
-                        @Override
-                        public boolean isTriggerable(Object data) {
-                            return woundedRenderer.getModel().isOutOfAction();
-                        }
-                    };
-                    woundedRenderer.getModel().add(trigger);
-
-                    if(woundedRenderer.getModel().isWarlord() && woundedRenderer.getModel().getArmy().getAffiliation() == Data.Affiliation.ENEMY_0){
-                        foeWL = woundedRenderer.getModel();
-                    }
-                }
-            }
-        }
+        // -------***<<< EVENT related tests >>>***------------------------
 
         TrapEvent.addTrigger(bim, 11, 4, 3);
 
@@ -184,22 +148,60 @@ public class TestBIS extends BattleInteractionState implements Observer{
         event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.bfr.getGCM(), 0);
 
 
-        choicePanel = new TempoActionChoicePanel(bim.uiStage.getViewport(), skin);
-        choicePanel.setContent(new ChoicePanel.ButtonHandler() {
-            @Override
-            public Array<TextButton> getButtons(Skin skin) {
-                Array<TextButton> buttons = new Array<TextButton>();
-                buttons.add(new TextButton("button 1", skin, "default"));
-                buttons.add(new TextButton("button 2", skin, "default"));
-                buttons.add(new TextButton("button 3", skin, "default"));
-                buttons.add(new TextButton("button 4", skin, "default"));
-                return buttons;
-            }
-        });
-        choicePanel.show();
-        bim.uiStage.addActor(choicePanel);
 
 
+
+
+
+
+        // -------***<<< ACP and CCP tests >>>***------------------------
+
+        int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
+
+        // TEST 0
+
+
+        for(Data.Ability a : sltdUnit.getAbilities())
+            System.out.println(a.name());
+
+        bim.pp.choicePanel.attach(this);
+        bim.pp.choicePanel.setContent(actorPos[0], actorPos[1], bim.bcm, new Stack<ActorCommand>());
+        bim.pp.choicePanel.show();
+
+
+        //TEST 1
+
+
+        /*
+        ccp = new TempoCommandCP(bim.uiStage.getViewport(),skin);
+
+        //SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 0,0 ,0 , 0, true, true) {};
+        //SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 10,0 ,0 , 0, true, true) {};
+        //SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 10,10 ,0 , 0, true, true) {};
+        SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 10,10 ,150 , 0, true, true) {};
+        //SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 10,10 ,150 , 0, true, false) {};
+        //SlidingPanel gp = new TempoActionCP(bim.uiStage.getViewport(), skin);
+        bim.uiStage.addActor(gp);
+        gp.addActor(ccp);
+
+        //bim.uiStage.addActor(ccp);
+        //ccp.attach(this);
+
+        //choicePanel.addActor(ccp);
+        //ccp.attach(choicePanel);
+
+        ccp.setButtonIndex(0);
+        ccp.setContent(actorPos[0], actorPos[1], bim.bcm, Data.ActionChoice.BUILD);
+        ccp.show();
+
+
+        System.out.println(bim.uiStage.getViewport().getWorldHeight());
+        System.out.println(ccp.getY());
+        */
+
+
+        bim.uiStage.addActor(new TextButton("au revoir", skin));
+        bim.uiStage.addActor(new TextButton("bonjour", skin));
 
     }
 
@@ -211,7 +213,7 @@ public class TestBIS extends BattleInteractionState implements Observer{
     @Override
     public void renderAhead(SpriteBatch batch) {
         //sprites.get(animation.getCurrentFrame()).draw(batch);
-        choicePanel.getX();
+        //System.out.println(ccp.getX());
     }
 
 
@@ -222,6 +224,13 @@ public class TestBIS extends BattleInteractionState implements Observer{
         int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
         //bim.moveCameraTo(row, col, true);
 
+
+        // PANEL
+
+        if(bim.pp.choicePanel.isHiding()){
+            bim.pp.choicePanel.show();
+        }else
+            bim.pp.choicePanel.resetPanel(true);
 
 
         //WALK UNIT
@@ -340,5 +349,10 @@ public class TestBIS extends BattleInteractionState implements Observer{
     public void getNotification(Observable sender, Object data) {
         if(sender == data)
             sender.detach(this);
+    }
+
+    @Override
+    public void getChoicePanelNotification(ActorCommand choice) {
+        System.out.println(choice.toShortString());
     }
 }

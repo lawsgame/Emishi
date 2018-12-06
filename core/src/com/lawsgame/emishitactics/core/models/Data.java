@@ -244,25 +244,26 @@ public class Data {
     public enum ActionChoice{
         //TEST_CHOICE         (0, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}, {0, 1}, {0, -1}}),
 
-        MOVE                (0, 0, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        WALK                (0, 0, true, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
-        ATTACK              (1, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
-        SWITCH_POSITION     (0, 0, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        PUSH                (0, 0, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        SWITCH_WEAPON       (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}}),
-        CHOOSE_ORIENTATION  (0, 0, false, true, 0, 0, true, new int[][]{{0, 0}}),
-        HEAL                (1, 10, false, true, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
-        GUARD               (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
-        STEAL               (1, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        BUILD               (3, 10, false, true, 1, 1, false, new int[][]{{0, 0}}),
-        PLUNDER             (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
-        COVER_AREA          (1, 10, false, true, 0, 0, false, new int[][]{{0, 0}}),
-        END_TURN            (0, 0, false, true, 0, 0, false, new int[][]{{0, 0}});
+        MOVE                (0, 0, true, false, false, 0, 0, false, new int[][]{{0, 0}}),
+        WALK                (0, 0, true, false, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
+        ATTACK              (1, 0, false, true, false, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
+        SWITCH_POSITION     (0, 0, true, false, false, 1, 1, false, new int[][]{{0, 0}}),
+        PUSH                (0, 0, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        SWITCH_WEAPON       (0, 0, false, true, true, 0, 0, false, new int[][]{{0, 0}}),
+        CHOOSE_ORIENTATION  (0, 0, false, true, false, 0, 0, true, new int[][]{{0, 0}}),
+        HEAL                (1, 10, false, true, false, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
+        GUARD               (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        STEAL               (1, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        BUILD               (3, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        PLUNDER             (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        COVER_AREA          (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
         private int experience;
-        private  boolean undoable;
+        private boolean undoable;
         private  boolean actedBased;
+        private boolean infinitlyDoable;
         private int rangeMin;
         private int rangeMax;                  // if true, command that turn actedBased to true is executed, moved otherwise.
         private RangedBasedType rangedBasedType;
@@ -278,12 +279,13 @@ public class Data {
          */
         protected Array<int[]> impactArea;
 
-        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, int rangeMin, int rangeMax, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea) {
+        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, int rangeMin, int rangeMax, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea) {
             this.cost = cost;
             this.experience = experience;
             this.rangeMin = rangeMin;
             this.rangeMax = rangeMax;
             this.undoable = undoable;
+            this.infinitlyDoable = infinitlyDoable;
             this.actedBased = actedBased;
             this.rangedBasedType = rangedBasedType;
             this.endTurnActionOnly = endTurnActionOnly;
@@ -291,12 +293,12 @@ public class Data {
             this.impactArea.addAll(impactArea);
         }
 
-        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, int rangeMin, int rangeMax, boolean endTurnActionOnly, int[][] impactArea){
-            this(cost, experience, undoable, actedBased, rangeMin, rangeMax, RangedBasedType.SPECIFIC, endTurnActionOnly, impactArea);
+        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, int rangeMin, int rangeMax, boolean endTurnActionOnly, int[][] impactArea){
+            this(cost, experience, undoable, actedBased, infinitlyDoable, rangeMin, rangeMax, RangedBasedType.SPECIFIC, endTurnActionOnly, impactArea);
         }
 
-        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea){
-            this(cost, experience, undoable, actedBased, -1, -1, rangedBasedType, endTurnActionOnly, impactArea);
+        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea){
+            this(cost, experience, undoable, actedBased, infinitlyDoable, -1, -1, rangedBasedType, endTurnActionOnly, impactArea);
         }
 
         public int getCost(int rowActor, int colActor, Unit actor, Battlefield battlefield) {
@@ -320,6 +322,8 @@ public class Data {
         public boolean isActedBased() {
             return actedBased;
         }
+
+        public boolean isInfinitlyDoable() { return infinitlyDoable; }
 
         public int getRangeMin() {
             return rangeMin;
@@ -498,9 +502,9 @@ public class Data {
         WOODS(          "woods", 10, 158, 57,                       false, false, true, true,      0, 0, 0, 15, 0, false,    TileSpriteSetId.PLAIN, TileSpriteSetId.WOODS),
         SWAMP(          "swamp", 112, 155, 80,                      false, false, true, true,      0, 0, 0, 0, -15, false,   TileSpriteSetId.SWAMP, null),
         PLAIN(          "plain", 17, 215, 80,                       false, false, true, true,      0, 0, 0, 0, 0, false,     TileSpriteSetId.PLAIN, null),
-        BRIDGE(         "wooden bridge", 85, 96, 134,               false, false, true, true,      0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BRIDGE),
-        BROKEN_BRIDGE(  "broken wooden bridge", 95, 101, 124,       false, false, false, false,    0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BROKEN_BRIDGE),
-        WATCH_TOWER(    "future bridge", 193, 26, 137,              true, true, true, true,        3, 0, 1, 0, 0, true,      TileSpriteSetId.PLAIN, TileSpriteSetId.WATCH_TOWER),
+        BRIDGE(         "bridge", 85, 96, 134,               false, false, true, true,      0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BRIDGE),
+        BROKEN_BRIDGE(  "broken bridge", 95, 101, 124,       false, false, false, false,    0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BROKEN_BRIDGE),
+        WATCH_TOWER(    "watch tower", 193, 26, 137,              true, true, true, true,        3, 0, 1, 0, 0, true,      TileSpriteSetId.PLAIN, TileSpriteSetId.WATCH_TOWER),
         TRAP(           "trap", 99, 26, 137,                        true, true, true, true,        3, 0, 1, 0, 0, true,      TileSpriteSetId.TRAP, null);
 
         private String name;

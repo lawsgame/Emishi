@@ -42,13 +42,23 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
 
     @Override
     public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
-        return super.isInitiatorValid(rowActor, colActor, initiator) && weaponIndex < initiator.getWeapons().size;
+        return super.isInitiatorValid(rowActor, colActor, initiator)
+                && weaponIndex < initiator.getWeapons().size
+                && initiator.getWeapons().size > 1;
     }
 
     //------------ GETTERS -------------------------------------
 
     public int getWeaponIndex() {
         return weaponIndex;
+    }
+
+    public Weapon getNewWeapon(){
+        Weapon nw = null;
+        if(getInitiator() != null){
+            nw = getInitiator().getWeapon(weaponIndex);
+        }
+        return nw;
     }
 
     @Override

@@ -1,11 +1,11 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LongTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongTilePanel;
 
 public class TempoLongTilePanel extends LongTilePanel {
     private static int WIDTH = 350;

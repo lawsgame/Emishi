@@ -1,25 +1,18 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.ChoicePanel.ButtonHandler;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.Stack;
 
-public class SelectActionBIS extends BattleInteractionState {
+public class SelectActionBIS extends BattleInteractionState implements ChoicePanel.CommandReceiver {
     private int rowSltdUnit;
     private int colSltdUnit;
     private Stack<ActorCommand> historic;
@@ -42,8 +35,9 @@ public class SelectActionBIS extends BattleInteractionState {
         System.out.println("SELECT ACTION : "+bim.bfr.getModel().getUnit(rowSltdUnit, colSltdUnit).getName());
 
         super.init();
-        bim.pp.actionChoicePanel.setContent(new ActionButtonHandler(this));
-        bim.pp.actionChoicePanel.show();
+        bim.pp.choicePanel.attach(this);
+        bim.pp.choicePanel.setContent(rowSltdUnit, colSltdUnit, bim.bcm, historic);
+        bim.pp.choicePanel.show();
         bim.focusOn(rowSltdUnit, colSltdUnit, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
 
     }
@@ -51,22 +45,26 @@ public class SelectActionBIS extends BattleInteractionState {
     @Override
     public void end() {
         super.end();
-        bim.pp.releaseActionChoicePanel();
+        bim.pp.choicePanel.detach(this);
+        bim.pp.choicePanel.resetPanel(true);
 
     }
 
     @Override
+    public void getChoicePanelNotification(ActorCommand choice) {
+        choice.setInitiator(rowSltdUnit, colSltdUnit);
+        bim.replace(new SelectTargetBIS(bim, historic, choice));
+    }
+
+
+    @Override
     public boolean handleTouchInput(final int row, final int col) {
-        choicePanel.setVisible(false);
-        commandPanel.remove();
 
         if(bim.bfr.getModel().isTileOccupiedByPlayerControlledUnit(row, col)){
 
             Unit touchedUnit = bim.bfr.getModel().getUnit(row, col);
             Unit selectedUnit = bim.bfr.getModel().getUnit(rowSltdUnit, colSltdUnit);
-            if(touchedUnit == selectedUnit) {
-                choicePanel.setVisible(true);
-            }else{
+            if(touchedUnit != selectedUnit) {
 
                 Utils.undoCommands(historic);
                 if(historic.size() > 0){
@@ -77,10 +75,11 @@ public class SelectActionBIS extends BattleInteractionState {
                         @Override
                         public void apply() {
                             bim.focusOn(rowSltdUnit, colSltdUnit, true, true, true, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
+                            bim.pp.choicePanel.setContent(rowSltdUnit, colSltdUnit, bim.bcm, historic);
+                            bim.pp.choicePanel.show();
                         }
                     }, 0f));
-                    choicePanel.set(new ActionButtonHandler(this));
-                    choicePanel.setVisible(true);
+
                     return true;
                 }else{
                     if(!touchedUnit.isDone()){
@@ -96,108 +95,22 @@ public class SelectActionBIS extends BattleInteractionState {
                             @Override
                             public void apply() {
                                 bim.focusOn(row, col, true, true, false, rowSltdUnit, colSltdUnit, true);
+                                bim.pp.choicePanel.setContent(rowSltdUnit, colSltdUnit, bim.bcm, historic);
+                                bim.pp.choicePanel.show();
                             }
                         }, 0f));
-                        choicePanel.set(new ActionButtonHandler(this));
                         return true;
 
 
                     }
                 }
             }
+        }else{
+            bim.pp.choicePanel.resetPanel(false);
         }
+
         return false;
     }
 
 
-    public static class ActionButtonHandler implements ButtonHandler{
-        private SelectActionBIS bis;
-
-        public ActionButtonHandler(SelectActionBIS bis){
-            this.bis = bis;
-        }
-
-        public Array<TextButton> getButtons() {
-            Array<TextButton> buttons = new Array<TextButton>();
-
-            if (bis.bim.bfr.getModel().isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
-
-                final Array<ActionChoice> choices = bis.bim.bcm.getAvailableChoices(bis.rowSltdUnit, bis.colSltdUnit, bis.historic);
-                for (int i = 0; i < choices.size; i++) {
-
-                    final ActionChoice choice = choices.get(i);
-                    final TextButton button = bis.bim.pp.actionChoicePanel.getButtonInstance(choice);
-                    final int buttonIndex = i;
-                    button.addListener(new ChangeListener() {
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor) {
-
-                            Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(bis.rowSltdUnit, bis.colSltdUnit, choice, true);
-
-                            if(flavors.size == 1){
-                                flavors.get(0).setInitiator(bis.rowSltdUnit, bis.colSltdUnit);
-                                if(flavors.get(0).isInitiatorValid()) {
-                                    bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, flavors.get(0)));
-                                }
-                            }else if(flavors.size > 1){
-
-                                /*
-                                bis.bim.pp.actionChoicePanel.setTouchable(Touchable.disabled);
-                                bis.bim.pp.commandPanel = new TempoCommandChoicePanel(bis.bim.asm, buttonIndex);
-                                bis.commandPanel.set(new CommandChoiceButtonHandler(bis, choice));
-                                bis.commandPanel.setVisible(true);
-                                bis.bim.uiStage.addActor(bis.commandPanel);
-                                */
-                            }else{
-
-                                try {
-                                    throw new BISException("Battle command manager found no command available for the following available action choice : "+choice.getName(bis.bim.localization));
-                                } catch (BISException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                        }
-                    });
-                    buttons.add(button);
-                }
-            }
-            return buttons;
-        }
-    }
-
-
-    public static class CommandChoiceButtonHandler implements ButtonHandler{
-        private SelectActionBIS bis;
-        private ActionChoice actionChoice;
-
-        public CommandChoiceButtonHandler(SelectActionBIS bis, ActionChoice actionChoice) {
-            this.bis = bis;
-            this.actionChoice = actionChoice;
-        }
-
-        public Array<TextButton> getButtons(Skin skin){
-            Array<TextButton> buttons = new Array<TextButton>();
-            if (bis.bim.bfr.getModel().isTileOccupied(bis.rowSltdUnit, bis.colSltdUnit)) {
-
-                Array<ActorCommand> flavors = bis.bim.bcm.getAvailableCommands(bis.rowSltdUnit, bis.colSltdUnit, actionChoice, true);
-                for (int i = 0; i < flavors.size; i++) {
-
-                    final ActorCommand actorCommand = flavors.get(i);
-                    actorCommand.setInitiator(bis.rowSltdUnit, bis.colSltdUnit);
-                    if(actorCommand.isInitiatorValid()) {
-                        TextButton button = new TextButton(actorCommand.getName(bis.bim.localization), skin, "commandpan");
-                        button.addListener(new ChangeListener() {
-                            @Override
-                            public void changed(ChangeEvent event, Actor actor) {
-                                bis.bim.replace(new SelectTargetBIS(bis.bim, bis.historic, actorCommand));
-                            }
-                        });
-                        buttons.add(button);
-                    }
-                }
-            }
-            return buttons;
-        }
-    }
 }

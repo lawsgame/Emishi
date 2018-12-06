@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -52,10 +52,6 @@ public abstract class Panel extends Table {
 
     protected void setX(float xPadding, boolean left) {
         setX((left) ? xPadding : uiport.getWorldWidth() - xPadding - getWidth());
-    }
-
-    protected void setY(float yPadding, boolean top) {
-        setY((top) ? uiport.getWorldHeight() - yPadding - getHeight() : yPadding);
     }
 
 

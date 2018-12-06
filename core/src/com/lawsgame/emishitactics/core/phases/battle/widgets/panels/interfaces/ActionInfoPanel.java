@@ -1,11 +1,11 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.SlidingPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.SlidingPanel;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

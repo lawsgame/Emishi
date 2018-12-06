@@ -97,8 +97,8 @@ public class BattlePhase extends GamePhase {
         BattlefieldRenderer bfr = new IsoBFR(battlefield, gameCM, assetProvider);
 
         this.bim = new BattleInteractionMachine(bfr, asm, stageUI, player, assetProvider);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

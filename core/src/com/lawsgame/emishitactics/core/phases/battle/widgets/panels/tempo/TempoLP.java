@@ -1,11 +1,11 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.tempo;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo;
 
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.interfaces.panels.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LootPanel;
 
 public class TempoLP extends LootPanel {
     private static int WIDTH = 120;
