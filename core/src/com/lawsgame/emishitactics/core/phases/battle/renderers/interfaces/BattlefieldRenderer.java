@@ -127,6 +127,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     protected abstract boolean isUnitRendererCreated(Unit model);
     protected abstract boolean isAreaRendererCreated(Area model);
     protected abstract void removeAreaRenderersAssociatedWith(Unit model);
+    public abstract Data.Orientation getOrientationFromPos(float xCenter, float yCenter, float xTarget, float yTarget);
 
     public void displayDeploymentAreas(boolean visible) {
         Array<Area> deploymentArea = getModel().getDeploymentAreas();

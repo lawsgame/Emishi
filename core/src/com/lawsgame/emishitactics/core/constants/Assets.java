@@ -32,8 +32,8 @@ public class Assets {
     public static final String ATLAS_TEMPO_UI = "textures/tempo/ui_skin.pack";
     public static final String ATLAS_TEMPO_TILES = "textures/tempo/tiles.pack";
 
-
     public static final String ATLAS_MAPS = "textures/maps.pack";
+    public static final String ATLAS_BATTLE_ICONS = "textures/battle_icons.pack";
     public static final String TILE_SPRITES_DIR = "textures/tiles";
     public static final String UNIT_SPRITES_DIR = "textures/units";
     public static final String AREA_SPRITES_DIR = "textures/areas";
@@ -41,7 +41,8 @@ public class Assets {
 
     // regions
 
-    // TEMPO
+    //TEMPO
+    public static final String REGION_TEMPO_UNIT_SPRITES = "unit_sprites_tempo";
 
     public static String getRegionMap(int id) {
         return "map"+id;
@@ -51,8 +52,8 @@ public class Assets {
         return id.name().toLowerCase();
     }
     public static String getRegionUnitAction(AnimSpriteSetId id, boolean east){ return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south"); }
+    public static String getWindroseArrowTexture(boolean active, boolean north){ return String.format("arrow_%s_%s", (north) ? "north": "west", (active) ? "active": "inactive"); }
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";
-    public static final String REGION_TEMPO_UNIT_SPRITES = "unit_sprites_tempo";
     public static final String REGION_UNIT_PORTRAIT = "portrait";
     public static final String REGION_UNIT_GUARD_ICON = "guard_icon";
     public static final String REGION_UNIT_SHADOW = "shadow";

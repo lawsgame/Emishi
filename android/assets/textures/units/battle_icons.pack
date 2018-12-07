@@ -1,7 +1,7 @@
 
 battle_icons.png
 format: RGBA8888
-filter: Linear,Linear
+filter: Nearest,Nearest
 repeat: none
 guard_icon
   rotate: false

@@ -94,6 +94,7 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
     public abstract void setDisabled(boolean disabled);
     public abstract void setCrippled(boolean crippled);
     public abstract void setOrientation(Data.Orientation or);
+    public abstract Data.Orientation getOrientation();
     public abstract void setWeaponType(Data.WeaponType type);
     public abstract void setHorseman(boolean horseman);
     public abstract boolean isIdling();
@@ -125,4 +126,5 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
             launchNextAnimation();
         }
     }
+
 }

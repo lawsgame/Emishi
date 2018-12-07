@@ -17,6 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.Windrose;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
@@ -27,6 +28,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final AssetProvider provider;
     public final TileHighlighter thl;
     public final PanelPool pp;
+    public final Windrose windrose;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle localization;
@@ -46,6 +48,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.uiStage = stageUI;
         Skin uiSkin = asm.get(Assets.SKIN_UI, Skin.class);
         this.pp = new PanelPool(stageUI, uiSkin, localization);
+        this.windrose = new Windrose(bfr, asm);
 
     }
 

@@ -54,6 +54,8 @@ public abstract class BattleInteractionState extends InteractionState {
         bim.thl.removeTileHighlighting(false, false);
     }
 
+    public boolean handleTouchInput(float xTouch, float yTouch){return false;}
+
     public abstract boolean handleTouchInput(int row, int col);
     public void update1(float dt) {}
     public void update3(float dt) {}
@@ -66,26 +68,26 @@ public abstract class BattleInteractionState extends InteractionState {
      *
      * player input are taken into account only if the camera does not move.
      *
-     * First, it check wether the input is handled by BIS.handleTouchInput()
-     * If not (aka. return false), the input is handled generically by using:
+     * First, it check wether the input is handled by BIS.handleTouchInput( x, y)
+     * f not (aka. return false) then BIS.handleTouchInput( row, col) is called
+     * if not yet handled (aka. return false), the input is handled generically by using:
      *      1) BIM.moveCameraTo()
      *      2) (optional) updating FFA if the given tile is occupied by a foe.
      *
-     * @param gameX
-     * @param gameY
+     * @param gameX : x in the game port coordinate system
+     * @param gameY : y in the game port coordinate system
      */
     @Override
     public void onTouch(float gameX, float gameY) {
         if(!bim.bfr.getGCM().isCameraMoving()) {
-
             rowTouch = bim.bfr.getRow(gameX, gameY);
             colTouch = bim.bfr.getCol(gameX, gameY);
-            if (!handleTouchInput(rowTouch, colTouch) && bim.bfr.getModel().isTileExisted(rowTouch, colTouch)) {
-
-                bim.focusOn(rowTouch, colTouch, true, true, false, TileHighlighter.SltdUpdateMode.UNCHANGED, true);
-                if (FAAUpdatable && bim.bfr.getModel().isTileOccupiedByFoe(rowTouch, colTouch, bim.player.getArmy().getAffiliation())) {
-
-                    bim.thl.ffa.update(rowTouch, colTouch);
+            if(!handleTouchInput(gameX, gameY)) {
+                if (!handleTouchInput(rowTouch, colTouch) && bim.bfr.getModel().isTileExisted(rowTouch, colTouch)) {
+                    bim.focusOn(rowTouch, colTouch, true, true, false, TileHighlighter.SltdUpdateMode.UNCHANGED, true);
+                    if (FAAUpdatable && bim.bfr.getModel().isTileOccupiedByFoe(rowTouch, colTouch, bim.player.getArmy().getAffiliation())) {
+                        bim.thl.ffa.update(rowTouch, colTouch);
+                    }
                 }
             }
         }

@@ -4,11 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
@@ -23,22 +20,14 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveC
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.FadingPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.Panel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.SlidingPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoActionCP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoCommandCP;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.LinkedList;
-import java.util.Stack;
-
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 
 public class TestBIS extends BattleInteractionState implements Observer, ChoicePanel.CommandReceiver {
 
@@ -62,6 +51,9 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     ActionInfoPanel panel;
     ChoicePanel.CommandChoicePanel ccp;
+
+
+    Array<TextureAtlas.AtlasRegion> regions = null;
 
 
     public TestBIS(BattleInteractionMachine bim) {
@@ -160,14 +152,14 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // TEST 0
 
-
+        /*
         for(Data.Ability a : sltdUnit.getAbilities())
             System.out.println(a.name());
 
         bim.pp.choicePanel.attach(this);
         bim.pp.choicePanel.setContent(actorPos[0], actorPos[1], bim.bcm, new Stack<ActorCommand>());
         bim.pp.choicePanel.show();
-
+        */
 
         //TEST 1
 
@@ -200,10 +192,22 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         */
 
 
-        bim.uiStage.addActor(new TextButton("au revoir", skin));
-        bim.uiStage.addActor(new TextButton("bonjour", skin));
+
+        // -------***<<< WINDROSE >>>***------------------------
+
+        bim.windrose.initialize(bim.bfr.getUnitRenderer(sltdUnit));
+
+        /*
+        TextureAtlas atlas = bim.asm.get(Assets.ATLAS_BATTLE_ICONS);
+        regions = atlas.findRegions(Assets.getWindroseArrowTexture(true, true));
+        //regions = atlas.findRegions("arrow_north_active");
+        System.out.println("  region size : "+regions.size);
+        animation = new Animation(regions.size, 0.2f, true, true, false);
+        animation.play();
+        */
 
     }
+
 
     @Override
     public void end() {
@@ -212,10 +216,16 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        //sprites.get(animation.getCurrentFrame()).draw(batch);
-        //System.out.println(ccp.getX());
+        bim.windrose.render(batch);
+        if(regions != null && regions.size > 0)
+            batch.draw(regions.get(animation.getCurrentFrame()), 1, 1, 1, 0.5f);
     }
 
+
+    @Override
+    public boolean handleTouchInput(float xTouch, float yTouch) {
+        return bim.windrose.handleInput(xTouch, yTouch);
+    }
 
     @Override
     public boolean handleTouchInput(int row, int col) {
@@ -227,10 +237,13 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // PANEL
 
+        /*
         if(bim.pp.choicePanel.isHiding()){
             bim.pp.choicePanel.show();
-        }else
+        }else {
             bim.pp.choicePanel.resetPanel(true);
+        }
+        */
 
 
         //WALK UNIT
@@ -325,6 +338,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     @Override
     public void update60(float dt) {
         animation.update(dt);
+        bim.windrose.update(dt);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
             event.setDecoupled(false);
@@ -347,8 +361,11 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     @Override
     public void getNotification(Observable sender, Object data) {
-        if(sender == data)
+        if(sender == data) {
             sender.detach(this);
+        }else if(data instanceof Data.Orientation){
+            System.out.println(data);
+        }
     }
 
     @Override

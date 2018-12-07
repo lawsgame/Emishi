@@ -21,11 +21,8 @@ import static com.lawsgame.emishitactics.core.models.Data.AnimId.IDLE;
 
 public class IsoUnitRenderer extends BattleUnitRenderer  {
 
-    private static final float VECTPROD_ERROR_MARGIN = 0.01f;
-
     protected IsoBFR bfr;
-    private float cx; // center X
-    private float cy; // center Y
+    private Vector2 pos;
     protected AnimId state;
     protected Animation animation;
     protected Array<Sprite> spriteSet;
@@ -66,12 +63,9 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     public IsoUnitRenderer(int row, int col, Unit model, IsoBFR bfr) {
         super(model);
-
         this.bfr = bfr;
+        this.pos = new Vector2();
         this.animation = new Animation(1,1,false,false, false);
-
-        setVisible(true);
-
         this.weaponType = model.getWeaponType();
         this.orientation = model.getOrientation();
         this.horseman = model.isHorseman();
@@ -81,7 +75,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         this.blinkPeriod = new TargetPeriod();
         setCrippled(model.isCrippled());
         setDisabled(model.isDisabled());
-
+        setVisible(true);
         display(IDLE);
         setPos(row, col);
     }
@@ -152,14 +146,14 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     }
 
     public void setCenterX(float centerX, boolean updateRenderCall) {
-        this.cx = centerX;
+        this.pos.x = centerX;
         updateSpritePos();
         if(updateRenderCall)
             bfr.updateBURRenderCall(this);
     }
 
     public void setCenterY(float centerY, boolean updateRenderCall) {
-        this.cy = centerY;
+        this.pos.y = centerY;
         updateSpritePos();
         if(updateRenderCall)
             bfr.updateBURRenderCall(this);
@@ -185,12 +179,12 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     @Override
     public float getCenterX() {
-        return cx;
+        return pos.x;
     }
 
     @Override
     public float getCenterY() {
-        return cy;
+        return pos.y;
     }
 
     @Override
@@ -415,20 +409,20 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         float[] targetCenter = new float[2];
         switch (pushedTowards){
             case WEST:
-                targetCenter[0]= bfr.getCenterX(bfr.getRow(cx, cy), bfr.getCol(cx, cy) - 1);
-                targetCenter[1]= bfr.getCenterY(bfr.getRow(cx, cy), bfr.getCol(cx, cy) - 1);
+                targetCenter[0]= bfr.getCenterX(bfr.getRow(pos.x, pos.y), bfr.getCol(pos.x, pos.y) - 1);
+                targetCenter[1]= bfr.getCenterY(bfr.getRow(pos.x, pos.y), bfr.getCol(pos.x, pos.y) - 1);
                 break;
             case NORTH:
-                targetCenter[0]= bfr.getCenterX(bfr.getRow(cx, cy) + 1, bfr.getCol(cx, cy));
-                targetCenter[1]= bfr.getCenterY(bfr.getRow(cx, cy) + 1, bfr.getCol(cx, cy));
+                targetCenter[0]= bfr.getCenterX(bfr.getRow(pos.x, pos.y) + 1, bfr.getCol(pos.x, pos.y));
+                targetCenter[1]= bfr.getCenterY(bfr.getRow(pos.x, pos.y) + 1, bfr.getCol(pos.x, pos.y));
                 break;
             case SOUTH:
-                targetCenter[0]= bfr.getCenterX(bfr.getRow(cx, cy) - 1, bfr.getCol(cx, cy));
-                targetCenter[1]= bfr.getCenterY(bfr.getRow(cx, cy) - 1, bfr.getCol(cx, cy));
+                targetCenter[0]= bfr.getCenterX(bfr.getRow(pos.x, pos.y) - 1, bfr.getCol(pos.x, pos.y));
+                targetCenter[1]= bfr.getCenterY(bfr.getRow(pos.x, pos.y) - 1, bfr.getCol(pos.x, pos.y));
                 break;
             case EAST:
-                targetCenter[0]= bfr.getCenterX(bfr.getRow(cx, cy), bfr.getCol(cx, cy) + 1);
-                targetCenter[1]= bfr.getCenterY(bfr.getRow(cx, cy), bfr.getCol(cx, cy) + 1);
+                targetCenter[0]= bfr.getCenterX(bfr.getRow(pos.x, pos.y), bfr.getCol(pos.x, pos.y) + 1);
+                targetCenter[1]= bfr.getCenterY(bfr.getRow(pos.x, pos.y), bfr.getCol(pos.x, pos.y) + 1);
                 break;
         }
         this.remainingPath.add(new float[]{targetCenter[0], targetCenter[1]});
@@ -487,12 +481,18 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         }
     }
 
+    /**
+     *
+     * to be called whenever the unit renderer change of position.
+     *
+     *
+     */
     private void updateSpritePos(){
         float xSprite;
         for(int i = 0; i < spriteSet.size; i++){
-            xSprite = cx - IsoBFR.SPRITE_STD_SIZE*((spriteSet.get(i).getWidth() == spriteSet.get(i).getHeight()) ? 0.5f : 0.25f );
+            xSprite = pos.x - IsoBFR.SPRITE_STD_SIZE*((spriteSet.get(i).getWidth() == spriteSet.get(i).getHeight()) ? 0.5f : 0.25f );
             spriteSet.get(i).setX(xSprite);
-            spriteSet.get(i).setY(cy - IsoBFR.SPRITE_STD_SIZE*IsoBFR.RATIO*0.5f);
+            spriteSet.get(i).setY(pos.y - IsoBFR.SPRITE_STD_SIZE*IsoBFR.RATIO*0.5f);
         }
     }
 
@@ -501,7 +501,13 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         this.visible = visible;
     }
 
+    public Vector2 getPos() {
+        return pos;
+    }
 
+    public Orientation getOrientation() {
+        return orientation;
+    }
 
     //------------------ HELPER CLASS--------------------------------
 

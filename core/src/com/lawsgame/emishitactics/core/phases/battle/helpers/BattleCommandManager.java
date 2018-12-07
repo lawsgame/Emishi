@@ -31,7 +31,6 @@ public class BattleCommandManager {
 
     public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, TileHighlighter thl){
         commandPool = new Array<Array<ActorCommand>>();
-
         setChoice(new WalkCommand(bfr, scheduler, playerInventory));
         setChoice(new AttackCommand(bfr, scheduler, playerInventory));
         setChoice(new PushCommand(bfr, scheduler, playerInventory));
@@ -39,16 +38,12 @@ public class BattleCommandManager {
         setChoice(new GuardCommand(bfr, scheduler, playerInventory));
         setChoice(new HealCommand(bfr, scheduler, playerInventory));
         setChoice(new StealCommand(bfr, scheduler, playerInventory));
-
-
         Array<ActorCommand>  commands = new Array<ActorCommand>();
         for(int i = 0; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
             commands.add(new SwitchWeaponCommand(bfr, scheduler, playerInventory, i));
         }
         if(commands.size > 0 && commands.get(0) != null)
             commandPool.add(commands);
-
-
         setChoice(new ActorCommand[]{
                 new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.NORTH),
                 new ChooseOrientationCommand(bfr, scheduler, playerInventory, Data.Orientation.SOUTH),
@@ -59,8 +54,6 @@ public class BattleCommandManager {
                 new BuildCommand(bfr, scheduler, playerInventory, Data.TileType.WATCH_TOWER),
                 new BuildCommand(bfr, scheduler, playerInventory, Data.TileType.BRIDGE)
         });
-
-
         setChoice(new EndUnitTurnCommand(bfr, scheduler, playerInventory, thl));
 
     }
@@ -87,7 +80,6 @@ public class BattleCommandManager {
     public Array<ActionChoice> getAvailableChoices(int rowActor, int colActor, Stack<ActorCommand> history){
         Array<ActionChoice> choices = new Array<ActionChoice>();
         ActionChoice choice;
-
         if(history != null){
             for (int  i = 0; i < commandPool.size; i++) {
                 if(commandPool.get(i).size > 0) {
@@ -105,12 +97,6 @@ public class BattleCommandManager {
                 }
             }
         }
-
-        System.out.println("            CHOICES : ");
-        for(ActionChoice choice1 : choices){
-            System.out.println("                "+choice1.name().toLowerCase());
-        }
-
         return choices;
     }
 

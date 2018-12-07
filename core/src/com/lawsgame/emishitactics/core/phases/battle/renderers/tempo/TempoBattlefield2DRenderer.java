@@ -162,6 +162,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         }
     }
 
+    @Override
+    public Data.Orientation getOrientationFromPos(float xCenter, float yCenter, float xTarget, float yTarget) {
+        return Data.Orientation.SOUTH;
+    }
+
     public BattleUnitRenderer addUnitRenderer(int r, int c, Unit unit) {
         if(!isUnitRendererCreated(unit)) {
             BattleUnitRenderer bur = new TempoUnitRenderer(r, c, unit);

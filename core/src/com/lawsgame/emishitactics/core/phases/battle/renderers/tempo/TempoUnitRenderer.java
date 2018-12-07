@@ -336,6 +336,11 @@ public class TempoUnitRenderer extends BattleUnitRenderer {
     }
 
     @Override
+    public Data.Orientation getOrientation() {
+        return getModel().getOrientation();
+    }
+
+    @Override
     public void setWeaponType(Data.WeaponType type) {
         weapontTexture = TempoSpritePool.get().getWeaponSprite(type);
     }

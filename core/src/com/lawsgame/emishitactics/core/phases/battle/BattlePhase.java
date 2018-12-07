@@ -38,6 +38,7 @@ public class BattlePhase extends GamePhase {
 
         //FINAL
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
+        asm.load(Assets.ATLAS_BATTLE_ICONS, TextureAtlas.class);
         asm.load(Assets.SKIN_UI, Skin.class);
         asm.load(Assets.STRING_BUNDLE_MAIN, I18NBundle.class); //, new I18NBundleLoader.I18NBundleParameter(new Locale("fr", "FR")));
         asm.finishLoading();
@@ -130,6 +131,7 @@ public class BattlePhase extends GamePhase {
         bim.getCurrentState().update(dt);
         bim.bfr.update(dt);
         bim.scheduler.update(dt);
+        bim.windrose.update(dt);
     }
 
     @Override

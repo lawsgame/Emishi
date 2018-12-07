@@ -406,6 +406,30 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
+    public Data.Orientation getOrientationFromPos(float xCenter, float yCenter, float xTarget, float yTarget){
+        Data.Orientation resOr;
+        float deltaX = xTarget - xCenter;
+        float deltaY = yTarget - yCenter;
+
+        if(deltaX > 0){
+            if(deltaY > 0){
+                resOr = Data.Orientation.EAST;
+            }else{
+                resOr = Data.Orientation.SOUTH;
+            }
+        }else{
+            if(deltaY > 0){
+                resOr = Data.Orientation.NORTH;
+            }else{
+                resOr = Data.Orientation.WEST;
+            }
+        }
+
+
+        return resOr;
+    }
+
+    @Override
     public void dispose() {
         super.dispose();
     }

@@ -46,7 +46,6 @@ public class AssetProvider implements Disposable{
     public HashMap<String, TextureRegion> portraits = new HashMap<String, TextureRegion>();
     public GenUnitST genSpriteTree = new GenUnitST();
     public CharaST charaSpriteTree = new CharaST();
-
     public Map2<AreaColor, AreaSpriteType, TextureRegion> areaTextureRegions = new Map2<AreaColor, AreaSpriteType, TextureRegion>();
 
 
