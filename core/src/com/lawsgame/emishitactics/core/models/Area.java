@@ -226,6 +226,10 @@ public  class Area extends Model {
         return str;
     }
 
+
+
+
+
     // --------------- SPECIFIC IMPLEMENTATION OF THE AREA CLASS
 
     public static class UnitArea extends Area{
@@ -247,6 +251,12 @@ public  class Area extends Model {
         }
     }
 
+    public static class CoveringUnitArea extends UnitArea {
+
+        public CoveringUnitArea(Battlefield battlefield, AreaType type, Array<int[]> tiles, Unit actor, boolean removedUponMovingUnit) {
+            super(battlefield, type, tiles, actor, removedUponMovingUnit);
+        }
+    }
 
 
 }

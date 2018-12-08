@@ -2,9 +2,12 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.AnimId;
@@ -25,8 +28,8 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     private Vector2 pos;
     protected AnimId state;
     protected Animation animation;
-    protected Array<Sprite> spriteSet;
-
+    protected Array<Sprite> unitSpriteSet;
+    protected Sprite shadowSprite;
 
     // MODEL SNAPHSOT ATTRIBUTES
 
@@ -39,7 +42,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     protected boolean disabled;
     protected boolean promoted;
     protected boolean outofaction = false;
-
 
     // RENDER ATTRIBUTES
 
@@ -60,7 +62,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     private float alpha = 1f;
 
 
-
     public IsoUnitRenderer(int row, int col, Unit model, IsoBFR bfr) {
         super(model);
         this.bfr = bfr;
@@ -76,23 +77,28 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         setCrippled(model.isCrippled());
         setDisabled(model.isDisabled());
         setVisible(true);
+        TextureAtlas atlas = bfr.assetManager.get(Assets.ATLAS_BATTLE_ICONS);
+        TextureRegion shadowRegion = atlas.findRegion(Assets.REGION_UNIT_SHADOW);
+        this.shadowSprite = new Sprite(shadowRegion);
+        this.shadowSprite.setSize(IsoBFR.SPRITE_STD_SIZE * 0.5f, IsoBFR.SPRITE_STD_SIZE * 0.25f);
         display(IDLE);
         setPos(row, col);
     }
 
     @Override
     public void render(SpriteBatch batch) {
-        if(visible && bfr.isInFrame(spriteSet.get(animation.getCurrentFrame()))){
+        if(visible && bfr.isInFrame(unitSpriteSet.get(animation.getCurrentFrame()))){
             if(blinking){
                 this.alpha = 0.7f + 0.3f* MathUtils.cos(blinkPeriod.getValue(blinkTime) * blinkTime);
             }
             updateAlpha();
-            spriteSet.get(animation.getCurrentFrame()).draw(batch);
+            shadowSprite.draw(batch);
+            unitSpriteSet.get(animation.getCurrentFrame()).draw(batch);
         }
     }
 
     private void updateAlpha(){
-        spriteSet.get(animation.getCurrentFrame()).setAlpha(alpha);
+        unitSpriteSet.get(animation.getCurrentFrame()).setAlpha(alpha);
     }
 
     @Override
@@ -114,17 +120,16 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             }
         }
 
-
-
         handleDeplacement(dt);
 
-        if(blinking) blinkTime += dt;
+        if(blinking) {
+            blinkTime += dt;
+        }
 
         if(animationCountDown.isFinished()){
             animationCountDown.reset();
             setBlinking(false);
             this.state = IDLE;
-
             /*
             launchNextAnimation is called twice :
 
@@ -169,7 +174,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     private void setBlinking(boolean blinking){
         this.blinking = blinking;
         if(!blinking) {
-            for(int i = 0; i < spriteSet.size; i++) {
+            for(int i = 0; i < unitSpriteSet.size; i++) {
                 this.alpha = 1f;
             }
         }else{
@@ -467,7 +472,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
             // set animation , sprites, ids and rendering coords fitting
             state = animId;
-            spriteSet = updatedSet;
+            unitSpriteSet = updatedSet;
             updateSpritePos();
             animation.set(updatedSet.size, animId.getSpeed(), animId.isLoop(), animId.isBacknforth(), animId.isRandomlyStarted());
             animation.stop();
@@ -482,18 +487,19 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     }
 
     /**
-     *
      * to be called whenever the unit renderer change of position.
-     *
+     * update sprites positions according to the value of {@link IsoUnitRenderer#pos}
      *
      */
     private void updateSpritePos(){
         float xSprite;
-        for(int i = 0; i < spriteSet.size; i++){
-            xSprite = pos.x - IsoBFR.SPRITE_STD_SIZE*((spriteSet.get(i).getWidth() == spriteSet.get(i).getHeight()) ? 0.5f : 0.25f );
-            spriteSet.get(i).setX(xSprite);
-            spriteSet.get(i).setY(pos.y - IsoBFR.SPRITE_STD_SIZE*IsoBFR.RATIO*0.5f);
+        for(int i = 0; i < unitSpriteSet.size; i++){
+            xSprite = pos.x - IsoBFR.SPRITE_STD_SIZE*((unitSpriteSet.get(i).getWidth() == unitSpriteSet.get(i).getHeight()) ? 0.5f : 0.25f );
+            unitSpriteSet.get(i).setX(xSprite);
+            unitSpriteSet.get(i).setY(pos.y - IsoBFR.SPRITE_STD_SIZE*IsoBFR.RATIO*0.5f);
         }
+        this.shadowSprite.setX(getCenterX() - shadowSprite.getWidth() / 2f);
+        this.shadowSprite.setY(getCenterY() - shadowSprite.getHeight() / 2f);
     }
 
     @Override

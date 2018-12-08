@@ -139,6 +139,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
         areaRenderers.add(new TempoAreaRenderer(model));
     }
 
+    @Override
+    public void removeUnitRenderer(Unit model, boolean uponMoving) {
+
+    }
+
     public void removeAreaRenderer(Area model){
         for(int i = 0; i < areaRenderers.size; i++){
             if(areaRenderers.get(i).getModel() == model) {
@@ -205,6 +210,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
                 return true;
         }
         return existed;
+    }
+
+    @Override
+    protected void removeAreaRenderersAssociatedWith(Unit model, boolean uponMoving) {
+
     }
 
 

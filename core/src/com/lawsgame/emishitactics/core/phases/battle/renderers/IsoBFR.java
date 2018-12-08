@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -26,6 +27,7 @@ public class IsoBFR extends BattlefieldRenderer {
     private static float Y_CAM_BOUNDS_OFFSET = RATIO;
 
     private boolean visible;
+    protected AssetManager assetManager;
     protected AssetProvider assetProvider;
     private Array<Array<IsoTileRenderer>> tileRenderers;
     private Array<Array<BattleUnitRenderer>> unitRenderers;
@@ -34,12 +36,13 @@ public class IsoBFR extends BattlefieldRenderer {
     private ShapeRenderer backkgroundRenderer;
 
 
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider){
-        this(battlefield, gcm, assetProvider,false);
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider, AssetManager assetManager){
+        this(battlefield, gcm, assetProvider, assetManager, false);
     }
 
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider, boolean test) {
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider, AssetManager assetManager, boolean test) {
         super(battlefield, gcm);
+        this.assetManager = assetManager;
         int depth = 2*(battlefield.getNbRows() + battlefield.getNbColumns()) - 3;
         this.tileRenderers = new Array<Array<IsoTileRenderer>> ();
         this.unitRenderers = new Array<Array<BattleUnitRenderer>>();
@@ -238,7 +241,7 @@ public class IsoBFR extends BattlefieldRenderer {
 
 
     protected void updateBURRenderCall(IsoUnitRenderer unitRenderer){
-        removeUnitRenderer(unitRenderer.getModel());
+        removeUnitRenderer(unitRenderer.getModel(), true);
         int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
         int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
         if(getModel().checkIndexes(row, col)) {
@@ -247,7 +250,7 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     protected void updateBURRenderCall(int rowTarget, int colTarget, IsoUnitRenderer unitRenderer){
-        removeUnitRenderer(unitRenderer.getModel());
+        removeUnitRenderer(unitRenderer.getModel(), true);
         int row = getRow(unitRenderer.getCenterX(), unitRenderer.getCenterY());
         int col = getCol(unitRenderer.getCenterX(), unitRenderer.getCenterY());
         if(getModel().checkIndexes(row, col) && getModel().checkIndexes(rowTarget, colTarget)) {
@@ -301,13 +304,13 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    public void removeUnitRenderer(Unit model) {
+    public void removeUnitRenderer(Unit model, boolean uponMoving) {
         BattleUnitRenderer bur;
         for (int i = 0; i < unitRenderers.size; i++) {
             for (int j = 0; j < unitRenderers.get(i).size; j++) {
                 if (unitRenderers.get(i).get(j).getModel() == model) {
                     bur = unitRenderers.get(i).removeIndex(j);
-                    removeAreaRenderersAssociatedWith(bur.getModel());
+                    removeAreaRenderersAssociatedWith(bur.getModel(), uponMoving);
                     j--;
                 }
             }
@@ -362,14 +365,14 @@ public class IsoBFR extends BattlefieldRenderer {
     }
 
     @Override
-    protected void removeAreaRenderersAssociatedWith(Unit model) {
+    protected void removeAreaRenderersAssociatedWith(Unit model, boolean uponMoving) {
         Area.UnitArea unitArea;
         for(int i = 0; i < areaRenderers.size; i++){
             for(int j = 0; j < areaRenderers.get(i).size; j++){
                 if(areaRenderers.get(i).get(j).getModel() instanceof Area.UnitArea) {
 
                     unitArea = (Area.UnitArea) areaRenderers.get(i).get(j).getModel();
-                    if (unitArea.getActor() == model){
+                    if (unitArea.getActor() == model && (!uponMoving || unitArea.isRemovedUponMovingUnit())){
 
                         model.detach(areaRenderers.get(i).get(j));
                         areaRenderers.get(i).removeIndex(j);

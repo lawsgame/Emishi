@@ -38,7 +38,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
 
             if (data instanceof Unit) {
 
-                removeUnitRenderer((Unit) data);
+                removeUnitRenderer((Unit) data, false);
             } else if(data instanceof Data.Weather){
 
                 this.renderedWeather = (Data.Weather) data;
@@ -69,7 +69,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                         @Override
                         public void apply() {
                             bur.setPos(notif.row, notif.col);
-                            removeAreaRenderersAssociatedWith(bur.getModel());
+                            removeAreaRenderersAssociatedWith(bur.getModel(), true);
                         }
                     });
                 }else{
@@ -83,7 +83,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                     @Override
                     public void apply() {
                         bur.displayWalk(notif.path, notif.reveal);
-                        removeAreaRenderersAssociatedWith(bur.getModel());
+                        removeAreaRenderersAssociatedWith(bur.getModel(), true);
                     }
                 });
             }else if(data instanceof Area){
@@ -122,11 +122,11 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract void addTileRenderer(int row, int col, Tile model);
     public abstract BattleUnitRenderer addUnitRenderer(int row, int col, Unit model);
     public abstract void addAreaRenderer(Area area);
-    public abstract void removeUnitRenderer(Unit model);
+    public abstract void removeUnitRenderer(Unit model, boolean uponMoving);
     public abstract void removeAreaRenderer(Area model);
     protected abstract boolean isUnitRendererCreated(Unit model);
     protected abstract boolean isAreaRendererCreated(Area model);
-    protected abstract void removeAreaRenderersAssociatedWith(Unit model);
+    protected abstract void removeAreaRenderersAssociatedWith(Unit model, boolean uponMoving);
     public abstract Data.Orientation getOrientationFromPos(float xCenter, float yCenter, float xTarget, float yTarget);
 
     public void displayDeploymentAreas(boolean visible) {

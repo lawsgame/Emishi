@@ -310,10 +310,10 @@ public class Battlefield extends Model {
         return removedAreas;
     }
 
-    public Array<UnitArea> removeAllAttachedArea(Unit actor, boolean moved){
+    public Array<UnitArea> removeAllAttachedArea(Unit actor, boolean uponMoving){
         Array<UnitArea> removedAreas = new Array<UnitArea>();
         for(int i = 0; i < unitAreas.size; i++){
-            if(unitAreas.get(i).getActor() == actor && (!moved || unitAreas.get(i).isRemovedUponMovingUnit())){
+            if(unitAreas.get(i).getActor() == actor && (!uponMoving || unitAreas.get(i).isRemovedUponMovingUnit())){
                 removedAreas.add(unitAreas.removeIndex(i));
                 i--;
             }
@@ -1043,7 +1043,7 @@ public class Battlefield extends Model {
      *
      * get the shortest validPath of a target buildingType using the A* algorithm
      *
-     * @return an {[row, col]} array  representing the shortest validPath from one buildingType to another,
+     * @return an {[row, col]} array  representing the shortest validPath from one tile to another,
      * excluding (rowI, colI) and finishing by (rowf, colf). If the path is invalid, the returned array will be empty
      *
      */

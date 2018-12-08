@@ -95,7 +95,7 @@ public class BattlePhase extends GamePhase {
         AssetProvider assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
         assetProvider.set(battlefield, asm);
 
-        BattlefieldRenderer bfr = new IsoBFR(battlefield, gameCM, assetProvider);
+        BattlefieldRenderer bfr = new IsoBFR(battlefield, gameCM, assetProvider, asm);
 
         this.bim = new BattleInteractionMachine(bfr, asm, stageUI, player, assetProvider);
         //BattleInteractionState initBIS = new TestBIS(bim);

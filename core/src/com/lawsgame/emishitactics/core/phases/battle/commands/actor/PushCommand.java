@@ -66,7 +66,7 @@ public class PushCommand extends ActorCommand {
         scheduleRenderTask(task);
 
         // handle event
-        Notification.StepOn stepOn = new Notification.StepOn(rowEndTile, colEndTile, getTarget());
+        Notification.StepOn stepOn = new Notification.StepOn(rowTarget, colTarget, rowEndTile, colEndTile, getTarget());
         if(isAnyEventTriggerable(stepOn, rowEndTile, colEndTile)){
             this.eventTriggered = true;
             handleEvents(stepOn, rowEndTile, colEndTile);

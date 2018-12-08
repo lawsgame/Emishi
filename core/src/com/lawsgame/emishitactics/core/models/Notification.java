@@ -17,15 +17,15 @@ public class Notification {
 
     public static class StepOn {
         public final Unit walker;
-        public int rowTile;
-        public int colTile;
+        public final int rowTile;
+        public final int colTile;
+        public final int fromRow;
+        public final int fromCol;
 
-        public StepOn(Unit walker){
+        public StepOn(int fromRow, int fromCol, int rowTile, int colTile, Unit walker){
             this.walker = walker;
-        }
-
-        public StepOn(int rowTile, int colTile, Unit walker){
-            this.walker = walker;
+            this.fromRow = fromRow;
+            this.fromCol = fromCol;
             this.rowTile = rowTile;
             this.colTile = colTile;
         }

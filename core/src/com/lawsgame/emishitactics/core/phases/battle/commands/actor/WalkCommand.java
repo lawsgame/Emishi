@@ -5,12 +5,11 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Notification.StepOn;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 
@@ -26,13 +25,14 @@ public class WalkCommand extends ActorCommand {
     @Override
     protected void execute() {
 
-        Notification.StepOn stepOn = new Notification.StepOn(getInitiator());
 
         Array<int[]> subpath = new Array<int[]>();
+        int [] previousPos = new int[]{getRowinitiator(), getColInitiator()};
         for(int i = 0; i < validPath.size; i++){
             subpath.add(validPath.get(i));
-            stepOn.rowTile = subpath.peek()[0];
-            stepOn.colTile = subpath.peek()[1];
+            StepOn stepOn = new StepOn(previousPos[0], previousPos[1], subpath.peek()[0], subpath.peek()[1], getInitiator());
+            previousPos[0] = subpath.peek()[0];
+            previousPos[1] = subpath.peek()[1];
             if(isAnyEventTriggerable(stepOn, subpath.peek()[0], subpath.peek()[1])){
 
                 moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
