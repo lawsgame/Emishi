@@ -158,7 +158,13 @@ public class HandleOutcomeBIS extends BattleInteractionState{
         return true;
     }
 
-
+    @Override
+    public void end() {
+        super.end();
+        bim.pp.levelUpPanel.hide();;
+        bim.pp.experiencePanel.hide();
+        bim.pp.lootPanel.hide();
+    }
 
     //----------------- HELPER CLASS ---------------------------------------
 

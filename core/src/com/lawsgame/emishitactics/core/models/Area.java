@@ -5,6 +5,7 @@ import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 
 
 public  class Area extends Model {
@@ -40,14 +41,6 @@ public  class Area extends Model {
 
     public Area(Battlefield battlefield, AreaType type, int rCenter, int cCenter, int rangeMin, int rangeMax){
         this(battlefield , type, Utils.getEreaFromRange(battlefield, rCenter, cCenter, rangeMin, rangeMax));
-    }
-
-    public static UnitArea createGuardedArea(Battlefield bf, int rowActor, int colActor, Unit actor){
-        return new UnitArea(bf,
-                Data.AreaType.GUARD_AREA,
-                Utils.getEreaFromRange(bf, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX),
-                actor,
-                true);
     }
 
     public void substract(Array<int[]> removedTiles, boolean notifyObservers){
@@ -251,12 +244,6 @@ public  class Area extends Model {
         }
     }
 
-    public static class CoveringUnitArea extends UnitArea {
-
-        public CoveringUnitArea(Battlefield battlefield, AreaType type, Array<int[]> tiles, Unit actor, boolean removedUponMovingUnit) {
-            super(battlefield, type, tiles, actor, removedUponMovingUnit);
-        }
-    }
 
 
 }

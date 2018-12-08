@@ -3,6 +3,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -30,7 +31,7 @@ public class GuardCommand extends SelfInflitedCommand {
     protected void execute() {
 
         // update model
-        UnitArea area = Area.createGuardedArea(bfr.getModel(), rowActor, colActor, getInitiator());
+        UnitArea area = createGuardedArea(bfr.getModel(), rowActor, colActor, getInitiator());
         bfr.getModel().addUnitArea(area);
 
 
@@ -69,5 +70,9 @@ public class GuardCommand extends SelfInflitedCommand {
                 scheduleRenderTask(new StandardTask(bfr, areas.get(i)));
             }
         }
+    }
+
+    public static UnitArea createGuardedArea(Battlefield bf, int rowActor, int colActor, Unit actor){
+        return new UnitArea(bf, Data.AreaType.GUARD_AREA, Utils.getEreaFromRange(bf, rowActor, colActor, Data.GUARD_REACTION_RANGE_MIN, Data.GUARD_REACTION_RANGE_MAX), actor, true);
     }
 }

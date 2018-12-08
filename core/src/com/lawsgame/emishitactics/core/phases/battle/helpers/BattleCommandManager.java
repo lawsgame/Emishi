@@ -9,6 +9,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
@@ -35,6 +36,7 @@ public class BattleCommandManager {
         setChoice(new AttackCommand(bfr, scheduler, playerInventory));
         setChoice(new PushCommand(bfr, scheduler, playerInventory));
         setChoice(new SwitchPositionCommand(bfr, scheduler, playerInventory));
+        setChoice(new CoveringFireCommand(bfr, scheduler, playerInventory));
         setChoice(new GuardCommand(bfr, scheduler, playerInventory));
         setChoice(new HealCommand(bfr, scheduler, playerInventory));
         setChoice(new StealCommand(bfr, scheduler, playerInventory));

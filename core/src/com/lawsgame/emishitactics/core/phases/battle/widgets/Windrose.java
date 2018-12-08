@@ -67,9 +67,6 @@ public class Windrose extends Observable implements GameElement {
     private void setArrowSprite(TextureAtlas atlas, boolean active, Orientation or){
         // create the array of arrow sprite for a given tuple {active, or}
         Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions(Assets.getWindroseArrowTexture(active, or == Orientation.NORTH || or == Orientation.EAST));
-
-        System.out.println("    > Windrose.setArrowSprite() "+active+" "+or.name().toLowerCase()+" "+regions.size);
-
         Array<Sprite> arrowSprites = new Array<Sprite>();
         Sprite arrowSprite;
         for(int i = 0; i < regions.size; i++){
