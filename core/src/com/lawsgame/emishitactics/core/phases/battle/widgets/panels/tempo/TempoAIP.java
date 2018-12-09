@@ -108,10 +108,6 @@ public class TempoAIP extends ActionInfoPanel {
         setTouchable(Touchable.enabled);
         addListener(listener);
 
-
-        // display action panel data structure
-        System.out.println(this);
-
     }
 
 
@@ -269,13 +265,7 @@ public class TempoAIP extends ActionInfoPanel {
             }
         }else if(command instanceof HealCommand) {
 
-            System.out.println("HEAL COMMAND RECOGN");
-            System.out.println("    initiator valid ? "+command.isInitiatorValid());
-            System.out.println("    target valid ? "+command.isTargetValid());
-
             if(command.isApplicable()){
-
-                System.out.println("APPLICABLE");
 
                 // HEAL
 
@@ -289,7 +279,6 @@ public class TempoAIP extends ActionInfoPanel {
                 int MoralAfterHealing;
                 for(int i = 0; i < hc.getPatients().length; i++){
                     patient = hc.getPatients()[i];
-                    System.out.println("recovered HP : " +hc.getRecoveredHitPoints()[i]);
                     HPAfterHealing = patient.getCurrentHitPoints() + hc.getRecoveredHitPoints()[i];
                     MoralAfterHealing = patient.getCurrentMoral() + hc.getRecoveredMoralPoints()[i];
 

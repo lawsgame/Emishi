@@ -36,7 +36,7 @@ public class CoveringFireCommand extends SelfInflitedCommand {
         // push render task
         StandardTask task = new StandardTask();
         task.addThread(new StandardTask.RendererThread(bfr, area));
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.GUARD));
+        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.COVER));
         scheduleRenderTask(task);
         //  outcome
         outcome.add(getInitiator(), choice.getExperience());

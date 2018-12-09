@@ -62,8 +62,16 @@ public class Banner extends Model  {
         return false;
     }
 
+    private float getValue(BannerBonus bb){
+        return bonuses.get(bb) * bb.getBaseValue();
+    }
+
     public float getValue(BannerBonus bb, boolean takeModeIntoAccount){
-        return (bb.getMode() == mode || bb.getMode() == Data.BBMode.ALL || !takeModeIntoAccount) ? bonuses.get(bb) * bb.getBaseValue() : 0;
+        return (bb.getMode() == mode || bb.getMode() == Data.BBMode.ALL || !takeModeIntoAccount) ? getValue(bb) : 0;
+    }
+
+    public float getValue(BannerBonus bb, Data.BBMode desiredMode){
+        return (bb.getMode() == desiredMode || bb.getMode() == Data.BBMode.ALL) ? getValue(bb) : 0;
     }
 
     public void setMode(Data.BBMode mode) {

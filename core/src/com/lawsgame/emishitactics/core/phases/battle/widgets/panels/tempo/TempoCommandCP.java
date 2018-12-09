@@ -8,10 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChangeTactic;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
@@ -19,6 +21,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.C
 public class TempoCommandCP extends ChoicePanel.CommandChoicePanel {
     private static final int BUTTON_WIDTH = 210;
     private static final int BUTTON_HEIGTH_SW = 70;
+    private static final int BUTTON_HEIGTH_SC = 90;
     public static float X_PADDING = 15f;
     public static float Y_REL_PADDING = 10f;
     public static float SLIDE_DURATION = 0.5f;
@@ -92,6 +95,24 @@ public class TempoCommandCP extends ChoicePanel.CommandChoicePanel {
             BuildCommand bc = (BuildCommand)choice;
             button = new TextButton(bc.getBuildingType().getName(), skin, "commandpan");
             button.setHeight(TempoActionCP.BUTTON_HEIGTH);
+        }else if(choice instanceof ChangeTactic){
+
+            ChangeTactic ctc = (ChangeTactic)choice;
+            StringBuilder builder = new StringBuilder();
+            if(ctc.getInitiator() != null){
+                Banner banner = ctc.getInitiator().getBanner();
+                builder.append("Mode : "+ctc.getMode());
+                float bonus;
+                for(Data.BannerBonus bb : Data.BannerBonus.values()) {
+                    bonus = banner.getValue(bb, ctc.getMode());
+                    if (bonus > 0){
+                        builder.append("\n     "+bb.name().toLowerCase()+" : "+ ((bonus < 1) ? ((int) (bonus *100))+"%" : (int)bonus));
+                    }
+                }
+
+            }
+            button = new TextButton(builder.toString(), skin, "commandpan");
+            button.setHeight(BUTTON_HEIGTH_SC);
         }else{
 
             button = new TextButton("command std choice", skin, "commandpan");
@@ -109,6 +130,5 @@ public class TempoCommandCP extends ChoicePanel.CommandChoicePanel {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        //System.out.println("    DRAWN");
     }
 }

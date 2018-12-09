@@ -25,7 +25,6 @@ public class WalkCommand extends ActorCommand {
     @Override
     protected void execute() {
 
-
         Array<int[]> subpath = new Array<int[]>();
         int [] previousPos = new int[]{getRowinitiator(), getColInitiator()};
         for(int i = 0; i < validPath.size; i++){
@@ -34,16 +33,13 @@ public class WalkCommand extends ActorCommand {
             previousPos[0] = subpath.peek()[0];
             previousPos[1] = subpath.peek()[1];
             if(isAnyEventTriggerable(stepOn, subpath.peek()[0], subpath.peek()[1])){
-
                 moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
                 moveCommand.setDecoupled(true);
                 if(moveCommand.apply(rowActor, colActor)) {
                     scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
-
                     // perform event
                     this.eventTriggered = true;
                     handleEvents(stepOn, subpath.peek()[0], subpath.peek()[1]);
-
                     // keep walking if possible
                     WalkCommand walkCommand = new WalkCommand(bfr, scheduler, outcome.playerInventory);
                     walkCommand.setInitiator(subpath.peek()[0], subpath.peek()[1]);
@@ -57,11 +53,8 @@ public class WalkCommand extends ActorCommand {
                     }
                     break;
                 }
-
-
             }
         }
-
         if(!eventTriggered){
             moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
             moveCommand.setDecoupled(true);
@@ -69,7 +62,6 @@ public class WalkCommand extends ActorCommand {
                 scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
             }
         }
-
     }
 
     /**

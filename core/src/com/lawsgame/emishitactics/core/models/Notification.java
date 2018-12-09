@@ -29,6 +29,17 @@ public class Notification {
             this.rowTile = rowTile;
             this.colTile = colTile;
         }
+
+        @Override
+        public String toString() {
+            return "StepOn{" +
+                    "walker=" + walker +
+                    ", rowTile=" + rowTile +
+                    ", colTile=" + colTile +
+                    ", fromRow=" + fromRow +
+                    ", fromCol=" + fromCol +
+                    '}';
+        }
     }
 
     public static class BeginArmyTurn{

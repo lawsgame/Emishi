@@ -23,7 +23,6 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
     protected void execute() {
         // update model
         getInitiator().switchWeapon(weaponIndex);
-
         // push render task
         scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
     }
@@ -33,9 +32,7 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
         if(getInitiator().switchWeapon(weaponIndex)) {
             scheduleRenderTask(new StandardTask(bfr.getUnitRenderer(getInitiator()), Data.AnimId.SWITCH_WEAPON));
         }
-
         handleEvents(this);
-
     }
 
 

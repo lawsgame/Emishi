@@ -3,7 +3,7 @@
     <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY">
         <Army affiliation = "ENEMY_0">
             <Squad>
-                <Unit row = "14" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "13" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
                     <Attribute id= "right handed" value="true"/>
                     <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>

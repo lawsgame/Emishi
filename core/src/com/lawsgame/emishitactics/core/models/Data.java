@@ -59,7 +59,6 @@ public class Data {
     public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
 
     //UI parameters
-    public static final float PANEL_SLIDE_SPEED = 600;
     public static final float AIBIS_ACTION_PANEL_DURATION_APPEARANCE = 3.0f;
     public static final float AIBIS_DELAY_CAMERA_FOCUS = 1.5f;
 
@@ -186,7 +185,8 @@ public class Data {
         WOUNDED(        AnimSpriteSetId.WOUNDED),
         LEVELUP(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         SWITCH_WEAPON(  AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        SPECIAL_MOVE(   AnimSpriteSetId.SPECIAL_MOVE);
+        SPECIAL_MOVE(   AnimSpriteSetId.SPECIAL_MOVE),
+        CHANGE_STRATEGY(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
 
         AnimSpriteSetId soldierId;
         AnimSpriteSetId warchiefId;
@@ -246,29 +246,32 @@ public class Data {
 
         MOVE                (0, 0, true, false, false, 0, 0, false, new int[][]{{0, 0}}),
         WALK                (0, 0, true, false, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
-        ATTACK              (1, 0, false, true, false, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
+        ATTACK              (3, 0, false, true, false, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
         SWITCH_POSITION     (0, 0, true, false, false, 1, 1, false, new int[][]{{0, 0}}),
         PUSH                (0, 0, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        SWITCH_WEAPON       (0, 0, false, true, true, 0, 0, false, new int[][]{{0, 0}}),
+        SWITCH_WEAPON       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
         CHOOSE_ORIENTATION  (0, 0, false, true, false, 0, 0, true, new int[][]{{0, 0}}),
-        HEAL                (1, 10, false, true, false, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
-        GUARD               (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        STEAL               (1, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        BUILD               (3, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        PLUNDER             (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        COVER_AREA          (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
+        HEAL                (3, 10, false, true, false, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
+        GUARD               (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        STEAL               (3, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        BUILD               (5, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        PLUNDER             (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        COVER_AREA          (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
         private int experience;
         private boolean undoable;
         private  boolean actedBased;
+        /**
+         * Attention! if infinitlyDoable && undoable are true, then while calling unexecute(), only the last previous state registered can be re-established
+         */
         private boolean infinitlyDoable;
         private int rangeMin;
-        private int rangeMax;                  // if true, command that turn actedBased to true is executed, moved otherwise.
+        private int rangeMax;
         private RangedBasedType rangedBasedType;
         private boolean endTurnActionOnly;
-
         /**
          * TempoAreaWidget of impact :
          * ( 0, 0) = targeted tile
@@ -308,7 +311,7 @@ public class Data {
             }
             if(costBannerBonus > cost)
                 costBannerBonus = cost;
-            return cost + costBannerBonus;
+            return cost - costBannerBonus;
         }
 
         public int getExperience() {
@@ -846,7 +849,6 @@ public class Data {
         HEAL,
         STEAL,
         BUILD,
-        COVER,
 
         NONE
     }

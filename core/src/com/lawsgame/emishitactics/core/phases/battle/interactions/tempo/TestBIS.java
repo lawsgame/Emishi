@@ -14,6 +14,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
@@ -85,7 +86,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< CUSTOMED COMMAND related tests >>>***------------------------
 
-        customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
 
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -98,6 +99,15 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         bim.bfr.addAreaRenderer(ccActionArea);
         bim.bfr.addAreaRenderer(ccTargets);
 
+        // INITIATE ACTION PANEL
+
+        final Skin skin = bim.asm.get(Assets.SKIN_UI);
+        panel = ActionInfoPanel.create(bim.uiStage.getViewport(), skin, bim.bfr, TempoAIP.class);
+        bim.uiStage.addActor(panel);
+
+        // AREA ADDING
+
+
         // set guarded area
         Unit randomFoe = bim.bfr.getModel().getUnit(13,8);
         randomFoe.addNativeAbility(Data.Ability.GUARD);
@@ -106,9 +116,18 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         guardCommand.setFree(true);
         if(!guardCommand.apply(randomFoePos[0], randomFoePos[1])){ }
 
-        // initiate action panel
-        final Skin skin = bim.asm.get(Assets.SKIN_UI);
-        panel = ActionInfoPanel.create(bim.uiStage.getViewport(), skin, bim.bfr, TempoAIP.class);
+        // set covered area
+        randomFoe = bim.bfr.getModel().getUnit(13,5);
+        randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
+        CoveringFireCommand cfc = new CoveringFireCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        cfc.setFree(true);
+        if(!cfc.apply(randomFoePos[0], randomFoePos[1])){
+            System.out.println("command failed to be applied");
+            System.out.println("    initiator ? : " + walkCommand.isInitiatorValid());
+            System.out.println("    target ?    : " + walkCommand.isTargetValid());
+        }
+
+
 
         /*
         SwitchWeaponCommand command = new SwitchWeaponCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), 1);
@@ -118,7 +137,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         panel.setContent(command);
         */
 
-        bim.uiStage.addActor(panel);
         //panel.show();
 
 
@@ -216,7 +234,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        bim.windrose.render(batch);
+        //bim.windrose.render(batch);
         if(regions != null && regions.size > 0)
             batch.draw(regions.get(animation.getCurrentFrame()), 1, 1, 1, 0.5f);
     }
@@ -224,7 +242,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     @Override
     public boolean handleTouchInput(float xTouch, float yTouch) {
-        return bim.windrose.handleInput(xTouch, yTouch);
+        return false; //bim.windrose.handleInput(xTouch, yTouch);
     }
 
     @Override
@@ -279,7 +297,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // TEST CUSTOMED COMMAND
 
-        /*
+
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
 
@@ -326,7 +344,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
             }
         }
-        */
+
 
 
 
@@ -339,18 +357,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     public void update60(float dt) {
         animation.update(dt);
         bim.windrose.update(dt);
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
-            event.setDecoupled(false);
-            if(!event.apply()){
-                System.out.println("fail to be applied "+event.isApplicable());
-            }else{
-                System.out.println("applied");
-            }
-
-        }
-
-
     }
 
 

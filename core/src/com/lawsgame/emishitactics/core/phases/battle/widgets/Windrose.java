@@ -117,7 +117,6 @@ public class Windrose extends Observable implements GameElement {
     public boolean handleInput(float xInput, float yInput){
         if(enable){
             Orientation orGotten = bfr.getOrientationFromPos(targetPos.x, targetPos.y + IsoBFR.SPRITE_STD_SIZE * 0.5f, xInput, yInput);
-            System.out.println(orGotten);
             setArrowOrientation(orGotten);
             return true;
         }

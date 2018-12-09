@@ -13,7 +13,7 @@ public class Player {
     public static Player create(){
         Army playerArmy = Army.createPlayerArmyTemplate();
 
-        Unit warlord = new Unit.CharacterUnit("Aterui", "Emishi lord", Data.UnitTemplate.SOLAIRE, 6, Data.WeaponType.SWORD, false, false, false, false);
+        Unit warlord = new Unit.CharacterUnit("Aterui", "Emishi lord", Data.UnitTemplate.SOLAIRE, 25, Data.WeaponType.SWORD, false, false, false, false);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
@@ -26,12 +26,10 @@ public class Player {
 
         playerArmy.add(warlord);
         playerArmy.add(soldier1);
-        //playerArmy.add(warchief1);
         playerArmy.add(soldier2);
 
         playerArmy.appointWarLord(warlord);
         playerArmy.appointSoldier(soldier1, 0);
-        //playerArmy.appointWarChief(warchief1);
         playerArmy.appointSoldier(soldier2, 0);
 
         warlord.getBanner().increment(Data.BannerBonus.ATTACK_MIGHT);

@@ -1,7 +1,7 @@
 
 battle_icons.png
 format: RGBA8888
-filter: Linear,Linear
+filter: Nearest,Nearest
 repeat: none
 guard_icon
   rotate: false
@@ -115,3 +115,87 @@ shadow
   orig: 64, 32
   offset: 0, 0
   index: -1
+sparkle_loot
+  rotate: false
+  xy: 640, 0
+  size: 33, 32
+  orig: 33, 32
+  offset: 0, 0
+  index: 2
+sparkle_trap
+  rotate: false
+  xy: 673, 0
+  size: 33, 32
+  orig: 33, 32
+  offset: 0, 0
+  index: 2
+sparkle_loot
+  rotate: false
+  xy: 704, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+sparkle_loot
+  rotate: false
+  xy: 706, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+sparkle_loot
+  rotate: false
+  xy: 736, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+sparkle_loot
+  rotate: false
+  xy: 738, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+sparkle_loot
+  rotate: false
+  xy: 768, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 5
+sparkle_trap
+  rotate: false
+  xy: 770, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+sparkle_trap
+  rotate: false
+  xy: 800, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+sparkle_trap
+  rotate: false
+  xy: 802, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+sparkle_trap
+  rotate: false
+  xy: 832, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+sparkle_trap
+  rotate: false
+  xy: 834, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 5
