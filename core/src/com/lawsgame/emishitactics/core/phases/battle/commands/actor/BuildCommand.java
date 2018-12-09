@@ -28,6 +28,7 @@ public class BuildCommand extends ActorCommand {
         // update model
         Tile oldTile = bfr.getModel().getTile(rowTarget, colTarget);
         bfr.getModel().setTile(rowTarget, colTarget, buildingType, false);
+        bfr.getModel().getTile(rowTarget, colTarget).setFragile(true);
         Data.Orientation  builderOrientation = Utils.getOrientationFromCoords(rowActor, colActor, rowTarget, colTarget);
         getInitiator().setOrientation(builderOrientation);
 

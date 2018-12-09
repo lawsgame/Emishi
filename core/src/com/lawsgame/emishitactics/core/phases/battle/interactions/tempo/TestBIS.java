@@ -13,7 +13,6 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
@@ -33,7 +32,6 @@ import java.util.LinkedList;
 public class TestBIS extends BattleInteractionState implements Observer, ChoicePanel.CommandReceiver {
 
     Unit sltdUnit;
-    Unit foeWL;
 
     Array<Sprite> sprites;
     Animation animation;
@@ -54,7 +52,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     ChoicePanel.CommandChoicePanel ccp;
 
 
-    Array<TextureAtlas.AtlasRegion> regions = null;
+    Array<TextureAtlas.AtlasRegion> regions = new Array<TextureAtlas.AtlasRegion>();
 
 
     public TestBIS(BattleInteractionMachine bim) {
@@ -107,7 +105,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // AREA ADDING
 
-
         // set guarded area
         Unit randomFoe = bim.bfr.getModel().getUnit(13,8);
         randomFoe.addNativeAbility(Data.Ability.GUARD);
@@ -127,8 +124,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
             System.out.println("    target ?    : " + walkCommand.isTargetValid());
         }
 
-
-
         /*
         SwitchWeaponCommand command = new SwitchWeaponCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), 1);
         int[] sltdPos = bim.bfr.getModel().getUnitPos(sltdUnit);
@@ -146,21 +141,10 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         // -------***<<< EVENT related tests >>>***------------------------
 
         TrapEvent.addTrigger(bim, 11, 4, 3);
-
-        for(int r = 0; r < bim.bfr.getModel().getNbRows(); r++){
-            for(int c = 0; c < bim.bfr.getModel().getNbColumns(); c++){
-                if(bim.bfr.getModel().getTile(r,c).getType().isUrbanArea()){
-                    bim.bfr.getModel().getTile(r,c).setFragile(true);
-                }
-            }
-        }
-
-        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.bfr.getGCM(), 0);
-
-
-
-
-
+        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.bfr.getGCM(), -1);
+        //bim.bfr.getModel().getTile(10, 7).setFragile(true);
+        event.getTargetTileTree().addChild(10, 7,1);
+        event.getTargetTileTree().addChild(13, 13, 1f);
 
 
 
@@ -357,6 +341,13 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     public void update60(float dt) {
         animation.update(dt);
         bim.windrose.update(dt);
+
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+            event.setDecoupled(false);
+            event.apply();
+            event.setDecoupled(true);
+        }
     }
 
 

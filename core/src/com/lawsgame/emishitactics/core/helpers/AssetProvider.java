@@ -21,7 +21,7 @@ import com.lawsgame.emishitactics.core.models.Data.TileSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.engine.datastructures.Map2;
+import com.lawsgame.emishitactics.engine.datastructures.maps.Map2;
 
 import java.util.HashMap;
 

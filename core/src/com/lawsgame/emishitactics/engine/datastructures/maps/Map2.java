@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.engine.datastructures;
+package com.lawsgame.emishitactics.engine.datastructures.maps;
 
 import java.util.HashMap;
 

@@ -33,7 +33,7 @@ public class Data {
     public static final int WC_CHARISMA_BONUS_ATT_ACC = 3;
     public static final int SQUAD_SIZE_EXCEEDANCE_CHA_MALUS = 3;
     public static final int BRAVERY_MORAL_RECOVERY_RATE = 3;
-    public static final float CHANCE_OF_COLLAPSING = 1f; //over 1
+    public static final float CHANCE_OF_COLLAPSING_FROM_FRAGILE_TILES = 1f; //over 1
 
 
     // RENDER parameters

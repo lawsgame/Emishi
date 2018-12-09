@@ -1,5 +1,8 @@
 package com.lawsgame.emishitactics.engine.datastructures;
 
+import com.lawsgame.emishitactics.engine.datastructures.maps.Map2;
+import com.lawsgame.emishitactics.engine.datastructures.maps.Map3;
+
 import org.junit.Before;
 import org.junit.Test;
 

@@ -6,6 +6,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
+import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
@@ -19,68 +20,73 @@ import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 public class EarthquakeEvent extends BattleCommand {
     private float earthquakeDuration;
     private final CameraManager gcm;
+    private Node targetTileTree;
 
     public EarthquakeEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, float earthquakeDuration) {
         super(bfr, scheduler, playerInventory);
         this.earthquakeDuration = earthquakeDuration;
         this.gcm = gcm;
+        this.targetTileTree = new Node();
     }
 
 
-    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, final int turn){
+    public static EarthquakeEvent
+
+    addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, final int turn){
         EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, playerInventory, gcm, Data.EARTHQUAKE_DURATION);
 
         Model.Trigger trigger = new Model.Trigger(true, event) {
-
             @Override
             public boolean isTriggerable(Object data) {
                 return data instanceof Notification.BeginArmyTurn
                         & bfr.getModel().getTurn() == turn
                         && ((Notification.BeginArmyTurn) data).army.isPlayerControlled();
-
             }
         };
         bfr.getModel().add(trigger);
         return event;
     }
 
-
+    public Node getTargetTileTree(){
+        return targetTileTree;
+    }
 
     @Override
     protected void execute() {
         StandardTask task = new StandardTask();
-        Array<int[]> tilesTurnIntoRuins = new Array<int[]>();
-
+        // update tile and handle wounded units
         Unit victim;
         Notification.TakeDamage notif;
+        Array<int[]> tilesTurnIntoRuins = getAllDestroyedTiles();
+        int rowRuins;
+        int colRuins;
+        for(int i = 0; i < tilesTurnIntoRuins.size; i++){
+            rowRuins = tilesTurnIntoRuins.get(i)[0];
+            colRuins = tilesTurnIntoRuins.get(i)[1];
+            bfr.getModel().setTile(rowRuins, colRuins, bfr.getModel().getTile(rowRuins,colRuins).getType().getDamagedType(), false);
+            task.addThread(new StandardTask.RendererThread(bfr, new Notification.SetTile(rowRuins, colRuins, bfr.getModel().getTile(rowRuins, colRuins))));
+
+            if(bfr.getModel().isTileOccupied(rowRuins, colRuins)){
+                victim = bfr.getModel().getUnit(rowRuins,colRuins);
+                if(!victim.isOutOfAction()){
+                    notif = victim.takeDamage(3, false, false, 1f);
+                    notif.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
+                    victim.setCrippled(true);
+                    notif.fleeingOrientation = victim.getOrientation().getOpposite();
+                    task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), notif));
+                }
+            }
+        }
+        // add unit prostrating animation
         Battlefield bf = bfr.getModel();
         for(int r = 0; r < bf.getNbRows(); r++){
             for(int c = 0; c < bf.getNbColumns(); c++){
-                if(bf.isTileExisted(r, c) && bf.getTile(r, c).collapse()){
-
-                    tilesTurnIntoRuins.add(new int[]{r, c});
-                    bf.setTile(r, c, bf.getTile(r,c).getType().getDamagedType(), false);
-                    task.addThread(new StandardTask.RendererThread(bfr, new Notification.SetTile(r, c, bf.getTile(r, c))));
-
-                    if(bf.isTileOccupied(r, c)){
-                        victim = bf.getUnit(r,c);
-                        if(!victim.isOutOfAction()){
-                            notif = victim.takeDamage(3, false, false, 1f);
-                            victim.setCrippled(true);
-                            notif.critical = false;
-                            notif.crippled = true;
-                            notif.disabled = false;
-                            notif.backstab = false;
-                            notif.fleeingOrientation = victim.getOrientation().getOpposite();
-                            task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), notif));
-                        }
-                    }
-                }else if(bf.isTileOccupied(r, c) && !bf.getUnit(r, c).isOutOfAction()){
+                if(bf.isTileOccupied(r, c) && !bf.getUnit(r, c).isOutOfAction()){
                     task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(bf.getUnit(r, c)), Data.AnimId.WOUNDED));
                 }
             }
         }
-
+        // add camera shaking
         StandardTask.CommandThread commandThread = new StandardTask.CommandThread();
         commandThread.addQuery(new SimpleCommand() {
             @Override
@@ -91,12 +97,32 @@ public class EarthquakeEvent extends BattleCommand {
         commandThread.setTag("shake camera");
         task.addThread(commandThread);
         task.addThread(new StandardTask.DelayThread(earthquakeDuration));
-
+        // conclude
         scheduleRenderTask(task);
         Notification.OOAReport report = removeOutOfActionUnits();
         handleEvents(report, tilesTurnIntoRuins);
-
     }
+
+
+    private Array<int[]>  getAllDestroyedTiles(){
+        Array<int[]> destroyed = new Array<int[]>();
+        // get fragile tiles
+        Tile tile;
+        for(int r = 0; r < bfr.getModel().getNbRows(); r++) {
+            for (int c = 0; c < bfr.getModel().getNbColumns(); c++) {
+                if(bfr.getModel().isTileExisted(r,c)){
+                    tile = bfr.getModel().getTile(r, c);
+                    if(tile.getType().isDestructible() && tile.isFragile() && MathUtils.random() <= Data.CHANCE_OF_COLLAPSING_FROM_FRAGILE_TILES){
+                        destroyed.add(new int[]{r, c});
+                    }
+                }
+            }
+        }
+        // get programmed tiles
+        destroyed.addAll(targetTileTree.getProgrammedDestroyedTiles(bfr.getModel()));
+        return destroyed;
+    }
+
 
     @Override
     public boolean isApplicable() {
@@ -140,4 +166,54 @@ public class EarthquakeEvent extends BattleCommand {
             this.yZero = yZero - getY(0);
         }
     }
+
+
+
+    // ------------------ PROGRAMMED TREE -----------------------
+
+    public static class Node {
+        protected int[] coords;
+        protected float proba; // of collapsing
+        protected Node parent;
+        protected Array<Node>  children;
+
+        public Node(int row, int col, float proba){
+            this.coords = new int[]{row, col};
+            this.proba = proba;
+            this.parent = null;
+            this.children = new Array<Node>();
+        }
+
+        public Node() {
+            this(-1,-1,0);
+        }
+
+        public Node addChild(int row, int col, float proba){
+            Node chilfNode = new Node(row, col, proba);
+            chilfNode.parent = this;
+            this.children.add(chilfNode);
+            return chilfNode;
+        }
+
+        /**
+         * if the tile stores at a node collapsed, then its children would not!
+         *
+         * @param bf : battlefield
+         * @return all destroyed tile coords
+         */
+        public Array<int[]> getProgrammedDestroyedTiles(Battlefield bf){
+            Array<int[]> destroyed = new Array<int[]>();
+            if(bf.isTileExisted(coords[0], coords[1])
+                    && bf.getTile(coords[0], coords[1]).getType().isDestructible()
+                    && MathUtils.random() <= proba) {
+                destroyed.add(coords);
+            }else{
+                for(int i = 0; i < children.size ; i++) {
+                    destroyed.addAll(children.get(i).getProgrammedDestroyedTiles(bf));
+                }
+            }
+            return destroyed;
+        }
+    }
+
 }
