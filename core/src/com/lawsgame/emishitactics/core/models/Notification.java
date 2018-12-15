@@ -5,6 +5,26 @@ import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 
 public class Notification {
 
+    public static class igniteSparkles {
+        public final Array<int[]> tiles;
+        public final Array<Data.SparkleType> sparkleType;
+
+        public igniteSparkles() {
+            this.tiles = new Array<int[]>();
+            this.sparkleType = new Array<Data.SparkleType>();
+        }
+    }
+    
+    public static class ExtinguishSparkle {
+        public final int rowTile;
+        public final int colTile;
+
+        public ExtinguishSparkle(int rowTile, int colTile) {
+            this.rowTile = rowTile;
+            this.colTile = colTile;
+        }
+    }
+
     public static class StateChanged {
         private  static StateChanged changed = null;
 

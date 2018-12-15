@@ -11,6 +11,7 @@ import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 
 
 import java.util.LinkedList;
@@ -780,12 +781,7 @@ public class Battlefield extends Model {
     }
 
 
-
-
-
     //------------------- PATH & AREA FETCHING METHODS -----------------------
-
-
 
 
     private static final CheckMoveMap checkmap = new CheckMoveMap();
@@ -1041,7 +1037,7 @@ public class Battlefield extends Model {
      *
      * Algorythm A* : https://www.youtube.com/watch?v=-L-WgKMFuhE
      *
-     * get the shortest validPath of a target buildingType using the A* algorithm
+     * get the shortest validPath of a target using the A* algorithm
      *
      * @return an {[row, col]} array  representing the shortest validPath from one tile to another,
      * excluding (rowI, colI) and finishing by (rowf, colf). If the path is invalid, the returned array will be empty

@@ -17,6 +17,7 @@ import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.AreaColor;
+import com.lawsgame.emishitactics.core.models.Data.SparkleType;
 import com.lawsgame.emishitactics.core.models.Data.TileSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
@@ -42,11 +43,12 @@ public class AssetProvider implements Disposable{
 
     private float spriteStdSize;
     private Array<TextureRegion> undefinedTileSprites = new Array<TextureRegion>();
-    private HashMap<TileSpriteSetId, Array<TextureRegion>> tileSprites = new HashMap<Data.TileSpriteSetId, Array<TextureRegion>> ();
+    private HashMap<TileSpriteSetId, Array<TextureRegion>> tileTRs = new HashMap<Data.TileSpriteSetId, Array<TextureRegion>> ();
     public HashMap<String, TextureRegion> portraits = new HashMap<String, TextureRegion>();
     public GenUnitST genSpriteTree = new GenUnitST();
     public CharaST charaSpriteTree = new CharaST();
-    public Map2<AreaColor, AreaSpriteType, TextureRegion> areaTextureRegions = new Map2<AreaColor, AreaSpriteType, TextureRegion>();
+    public Map2<AreaColor, AreaSpriteType, TextureRegion> areaTR = new Map2<AreaColor, AreaSpriteType, TextureRegion>();
+    public HashMap<SparkleType, Array<TextureRegion>> sparkleTR = new HashMap<SparkleType, Array<TextureRegion>>();
 
 
 
@@ -59,10 +61,10 @@ public class AssetProvider implements Disposable{
         if(id != null) {
             Array<TextureRegion> regions;
             if (id.isUpper()) {
-                regions = tileSprites.get(id);
+                regions = tileTRs.get(id);
             } else {
-                if(tileSprites.containsKey(id) && tileSprites.get(id) != null) {
-                    regions = tileSprites.get(id);
+                if(tileTRs.containsKey(id) && tileTRs.get(id) != null) {
+                    regions = tileTRs.get(id);
                 }else{
                     regions = undefinedTileSprites;
                 }
@@ -84,9 +86,9 @@ public class AssetProvider implements Disposable{
 
     public Sprite getAreaSprite(AreaColor color, AreaSpriteType type){
         Sprite sprite;
-        TextureRegion region = areaTextureRegions.get(color, type);
+        TextureRegion region = areaTR.get(color, type);
         if(region == null) {
-            sprite = new Sprite(areaTextureRegions.get(AreaColor.LIGHT_BLUE, type));
+            sprite = new Sprite(areaTR.get(AreaColor.LIGHT_BLUE, type));
         }else{
             sprite = new Sprite(region);
         }
@@ -109,7 +111,7 @@ public class AssetProvider implements Disposable{
             Array<TextureAtlas.AtlasRegion> atlasRegions;
             Array<TextureRegion> regions;
 
-            // LOAD TILE SET
+            // LOAD TILE TR
 
             dirHandle = Gdx.files.internal(Assets.TILE_SPRITES_DIR);
             if(dirHandle.child(battlefield.getEnvironment().name().toLowerCase()+EXT_PACK).exists()) {
@@ -135,14 +137,14 @@ public class AssetProvider implements Disposable{
                             atlasRegions.get(i).getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
                             regions.add(atlasRegions.get(i));
                         }
-                        this.tileSprites.put(tileId, regions);
+                        this.tileTRs.put(tileId, regions);
                     }
 
                 }
             }
 
 
-            // LOAD AREA SETS
+            // LOAD AREA TR
 
             dirHandle = Gdx.files.internal(Assets.AREA_SPRITES_DIR);
             Data.AreaColor color;
@@ -160,7 +162,7 @@ public class AssetProvider implements Disposable{
                             if (region != null) {
 
                                 region.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-                                areaTextureRegions.put(color, AreaSpriteType.values()[j], region);
+                                areaTR.put(color, AreaSpriteType.values()[j], region);
                             }
                         }
                     }
@@ -168,6 +170,18 @@ public class AssetProvider implements Disposable{
 
             }
 
+
+            // LOAD SPARKLE TR
+
+            atlas = asm.get(Assets.ATLAS_BATTLE_ICONS, TextureAtlas.class);
+            for(int i = 0; i < SparkleType.values().length; i++) {
+                atlasRegions = atlas.findRegions(Assets.getSparkleTR(SparkleType.values()[i]));
+                regions = new Array<TextureRegion>();
+                for(int j = 0; j < atlasRegions.size; j++){
+                    regions.add(atlasRegions.get(j));
+                }
+                sparkleTR.put(SparkleType.values()[i], regions);
+            }
 
 
             // LOAD UNITS SS

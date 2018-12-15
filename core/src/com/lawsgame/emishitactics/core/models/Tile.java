@@ -12,10 +12,12 @@ public class Tile extends Model{
 
     protected TileType type;
     protected boolean fragile;
+    protected boolean revealed;
 
     public Tile(TileType type){
         this.type = type;
         this.fragile = false;
+        this.revealed = false;
     }
 
 
@@ -40,6 +42,14 @@ public class Tile extends Model{
 
     public void setFragile(boolean fragile) {
         this.fragile = fragile;
+    }
+
+    public boolean isRevealed() {
+        return revealed;
+    }
+
+    public void setRevealed(boolean revealed) {
+        this.revealed = revealed;
     }
 
     public String toString(){

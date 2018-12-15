@@ -16,6 +16,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
@@ -211,7 +212,7 @@ public class IsoBFR extends BattlefieldRenderer {
                     tileRenderers.get(renderIndex).removeIndex(i);
                 }
             }
-            tileRenderers.get(renderIndex).add(IsoTileRenderer.create(row, col, model, assetProvider, this));
+            tileRenderers.get(renderIndex).add(IsoTileRenderer.create(row, col, model, this));
         }
     }
 
@@ -234,6 +235,17 @@ public class IsoBFR extends BattlefieldRenderer {
                 if (areaRenderers.get(i).get(j).getModel() == area) {
                     return areaRenderers.get(i).get(j);
                 }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public TileRenderer getTileRenderer(int row, int col) {
+        int renderIndex = 2*row + 2*col;
+        for(int j = 0; j < tileRenderers.get(renderIndex).size; j++) {
+            if (tileRenderers.get(renderIndex).get(j).row == row && tileRenderers.get(renderIndex).get(j).col == col) {
+                return tileRenderers.get(renderIndex).get(j);
             }
         }
         return null;

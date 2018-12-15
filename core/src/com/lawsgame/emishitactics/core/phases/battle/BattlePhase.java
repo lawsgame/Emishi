@@ -55,7 +55,7 @@ public class BattlePhase extends GamePhase {
             // float scale = 1f;
             float lineSpacingFactor = 0.95f;
             float charSpacingFactor = 1.05f;
-            // prevent LIBGDX to replace ghyph to fit the pîxel canvas, leading to a slight misalignment of the rendered glyphs
+            // prevent LIBGDX of replacing ghyph to fit the pîxel canvas, leading to a slight misalignment of the rendered glyphs
             testFont.setUseIntegerPositions(false);
             // apply linear filtering on the underlying texture to smoothe the glyph on screen
             testFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);

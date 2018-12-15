@@ -12,6 +12,7 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.timers.CountDown;
 
@@ -233,6 +234,11 @@ public class TempoBattlefield2DRenderer extends BattlefieldRenderer {
             if(areaRenderers.get(i).getModel() == area)
                 return areaRenderers.get(i);
         }
+        return null;
+    }
+
+    @Override
+    public TileRenderer getTileRenderer(int row, int col) {
         return null;
     }
 

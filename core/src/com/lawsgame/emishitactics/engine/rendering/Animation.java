@@ -19,6 +19,8 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	private boolean playing = false;
 	private float time = 0;
 
+	
+
 	private enum Direction{
 		FORTH,
 		BACK
@@ -36,7 +38,7 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	
 	@Override
 	public void update(float dt){
-		if(playing){
+		if(playing && length > 1){
 			time +=dt;
 			if(time  > speed){
 				time = 0;
@@ -99,7 +101,15 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	}
 
 	public void set(int length, float speed, boolean loop, boolean backnforth, boolean randomStart){
-		this.length = length;
+		if(length < 1){
+			try {
+				throw new Exception("Animation.class do not accept a lenght lower than 1, however the length parameter is at : "+length);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else {
+			this.length = length;
+		}
 		this.speed = speed;
 		this.loop = loop;
 		this.backnforth = backnforth;
@@ -122,4 +132,22 @@ public class Animation extends Observable implements GameUpdatableEntity {
     public boolean isLoop() {
         return loop;
     }
+
+	public boolean isPlaying() { return playing; }
+
+
+	@Override
+	public String toString() {
+		return "Animation{" +
+				"frameCurrentIndex=" + frameCurrentIndex +
+				", length=" + length +
+				", speed=" + speed +
+				", backnforth=" + backnforth +
+				", loop=" + loop +
+				", randomStart=" + randomStart +
+				", direction=" + direction +
+				", finish=" + finish +
+				", playing=" + playing +
+				'}';
+	}
 }

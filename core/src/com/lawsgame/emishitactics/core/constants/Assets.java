@@ -53,6 +53,7 @@ public class Assets {
     }
     public static String getRegionUnitAction(AnimSpriteSetId id, boolean east){ return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south"); }
     public static String getWindroseArrowTexture(boolean active, boolean north){ return String.format("arrow_%s_%s", (north) ? "north": "west", (active) ? "active": "inactive"); }
+    public static String getSparkleTR(Data.SparkleType sparkleType) { return "sparkle_"+sparkleType.name().toLowerCase();}
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";
     public static final String REGION_UNIT_PORTRAIT = "portrait";
     public static final String REGION_UNIT_GUARD_ICON = "guard_icon";
@@ -66,6 +67,7 @@ public class Assets {
 
     public static final String FONT_MAIN = "fonts/default_font.fnt";
     public static final String FONT_UI = "fonts/defaut_font_ui.fnt";
+
 
 
     //  ---***$$$  SHADER  $$$***----

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
@@ -20,6 +21,8 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveC
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoTileRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
@@ -43,7 +46,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     WalkCommand walkCommand = null;
     EarthquakeEvent event = null;
 
-
     Area ccActionArea;
     Area ccImpactArea;
     Area ccTargets;
@@ -51,8 +53,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     ActionInfoPanel panel;
     ChoicePanel.CommandChoicePanel ccp;
 
-
-    Array<TextureAtlas.AtlasRegion> regions = new Array<TextureAtlas.AtlasRegion>();
 
 
     public TestBIS(BattleInteractionMachine bim) {
@@ -65,8 +65,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
 
 
-
-
         // -------***<<< ANIMATION tests >>>***------------------------
 
         sprites = bim.provider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
@@ -76,9 +74,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         }
         animation = new Animation(sprites.size, 0.3f, true, false, false);
         animation.play();
-
-
-
 
 
 
@@ -208,6 +203,21 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         animation.play();
         */
 
+
+
+        // -------***<<< SPARKLE ANIM TEST >>>***------------------------
+
+        Sprite sprite;
+        Array<TextureRegion> sparkleTR = bim.provider.sparkleTR.get(Data.SparkleType.TRAP);
+        sprites = new Array<Sprite>();
+        for(int i = 0; i < sparkleTR.size; i++){
+            sprite = new Sprite(sparkleTR.get(i));
+            sprite.setSize(2, 2 );
+            sprite.setPosition(2, 2);
+            sprites.add(sprite);
+        }
+        animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, true, false);
+        animation.play();
     }
 
 
@@ -218,15 +228,13 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        //bim.windrose.render(batch);
-        if(regions != null && regions.size > 0)
-            batch.draw(regions.get(animation.getCurrentFrame()), 1, 1, 1, 0.5f);
+        //sprites.get(animation.getCurrentFrame()).draw(batch);
     }
 
 
     @Override
     public boolean handleTouchInput(float xTouch, float yTouch) {
-        return false; //bim.windrose.handleInput(xTouch, yTouch);
+        return false;
     }
 
     @Override
@@ -347,6 +355,10 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
             event.setDecoupled(false);
             event.apply();
             event.setDecoupled(true);
+        }else if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
+            TileRenderer tr = bim.bfr.getTileRenderer(15, 5);
+            tr.setRevealed(!tr.isRevealed(), Data.SparkleType.LOOT);
+            System.out.println("sparkle revealed ? "+tr.isRevealed());
         }
     }
 

@@ -94,6 +94,18 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                 }else{
                     addAreaRenderer(area);
                 }
+            }else if(data instanceof Notification.igniteSparkles){
+                Notification.igniteSparkles ignite = (Notification.igniteSparkles)data;
+                TileRenderer tileRenderer;
+                for (int i = 0; i < ignite.tiles.size; i++) {
+                    if (i < ignite.sparkleType.size) {
+                        tileRenderer = getTileRenderer(ignite.tiles.get(i)[0], ignite.tiles.get(i)[1]);
+                        tileRenderer.setRevealed(true, ignite.sparkleType.get(i));
+                    }
+                }
+            }else if(data instanceof Notification.ExtinguishSparkle){
+                Notification.ExtinguishSparkle extinguishSparkle = (Notification.ExtinguishSparkle) data;
+                getTileRenderer(extinguishSparkle.rowTile, extinguishSparkle.colTile).setRevealed(false, null);
             }
             launchNextAnimation();
         }
@@ -119,6 +131,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract float getCenterY(int row, int col);
     public abstract BattleUnitRenderer getUnitRenderer(Unit model);
     public abstract AreaRenderer getAreaRenderer(Area area);
+    public abstract TileRenderer getTileRenderer(int row, int col);
     public abstract void addTileRenderer(int row, int col, Tile model);
     public abstract BattleUnitRenderer addUnitRenderer(int row, int col, Unit model);
     public abstract void addAreaRenderer(Area area);
@@ -134,6 +147,10 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         for(int i = 0; i< deploymentArea.size; i++){
             getAreaRenderer(deploymentArea.get(i)).setVisible(visible);
         }
+    }
+
+    public void displayAllTraps(boolean reveal){
+
     }
 
 

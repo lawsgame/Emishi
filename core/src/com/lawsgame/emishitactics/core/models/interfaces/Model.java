@@ -51,7 +51,14 @@ public abstract class Model extends Observable{
         return triggers.size > 0;
     }
 
-
+    public boolean searchForEventType(Class<? extends BattleCommand> eventType){
+        for(int i = 0; i < triggers.size; i++){
+            if(eventType.isInstance(triggers.get(i).eventCommand)){
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 
