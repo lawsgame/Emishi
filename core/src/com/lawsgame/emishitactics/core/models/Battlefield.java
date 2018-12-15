@@ -521,6 +521,35 @@ public class Battlefield extends Model {
         return res;
     }
 
+    public boolean isTileCovered(int row, int col, Affiliation walkerAffiliation){
+        boolean covered = false;
+        for(int i = 0; i < unitAreas.size; i++){
+            if(unitAreas.get(i).getType() == AreaType.COVER
+                    && unitAreas.get(i).contains(row, col)
+                    && unitAreas.get(i).getActor().isMobilized()
+                    && unitAreas.get(i).getActor().getArmy().getAffiliation() != walkerAffiliation){
+                covered = true;
+                break;
+            }
+        }
+        return covered;
+    }
+
+    public boolean isTileTrapped(int row, int col){
+        return isTileExisted(row, col) && getTile(row, col).searchForEventType(TrapEvent.class) && getTile(row, col).isRevealed();
+    }
+
+    /**
+     *
+     * @param row
+     * @param col
+     * @param walkerAffiliation
+     * @return true if safe for a unit of this {@param alliedAffiliation}
+     */
+    public boolean isTileSafe(int row, int col, Affiliation walkerAffiliation){
+        return  !isTileTrapped(row, col) && !isTileCovered(row, col, walkerAffiliation);
+    }
+
 
 
     //----------------- UNIT MANAGEMENT ----------------------

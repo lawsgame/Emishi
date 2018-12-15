@@ -224,7 +224,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< OTHER TESTS >>>***------------------
 
-        bfr.displayAllTraps();
+        //bfr.displayAllTraps();
     }
 
 
@@ -253,6 +253,13 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // SEARCH FOR TRAPS
 
+        /*
+        if(Gdx.input.isKeyPressed(Input.Keys.A)){
+            System.out.println("covered ? "+bim.bfr.getModel().isTileCovered(row, col, sltdUnit.getArmy().getAffiliation()));
+        }else if(Gdx.input.isKeyPressed(Input.Keys.Z)){
+            System.out.println("trapped ? "+bim.bfr.getModel().isTileTrapped(row, col));
+        }
+        */
 
         // PANEL
 

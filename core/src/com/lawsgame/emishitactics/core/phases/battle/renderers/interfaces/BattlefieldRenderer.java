@@ -157,6 +157,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                 tr = getTileRenderer(r,c);
                 if(tr != null && tr.getModel().searchForEventType(TrapEvent.class)){
                     tr.setRevealed(true, Data.SparkleType.TRAP);
+                    tr.getModel().setRevealed(true);
                 }
             }
         }
