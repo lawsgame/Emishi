@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
@@ -26,7 +25,7 @@ public class BattleOverBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        batch.draw(TempoSpritePool.get().getBlackBGSprite(), bim.bfr.getGCM().getClipBounds().getX(), bim.bfr.getGCM().getClipBounds().getY(), bim.bfr.getGCM().getPortWidth(), bim.bfr.getGCM().getPortHeight());
+
     }
 
 

@@ -11,15 +11,19 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.Windrose;
+import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
@@ -27,7 +31,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final BattlefieldRenderer bfr;
     public final BattleCommandManager bcm;
     public final AssetManager asm;
-    public final AssetProvider provider;
     public final TileHighlighter thl;
     public final PanelPool pp;
     public final Windrose windrose;
@@ -37,19 +40,22 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final Stage uiStage;
 
 
-    public BattleInteractionMachine(BattlefieldRenderer bfr, AssetManager asm, Stage stageUI, Player player, AssetProvider provider) {
-        this.bfr = bfr;
+    public BattleInteractionMachine(CameraManager gcm, AssetManager asm, Stage stageUI, Player player, int chapterId) {
+        Battlefield battlefield = BattlefieldLoader.load(asm, chapterId);
+        battlefield.randomlyDeploy(player.getArmy());
+        battlefield.pushPlayerArmyTurnForward();
+
+        this.bfr = new IsoBFR(battlefield, gcm, asm);
         this.asm = asm;
         this.player = player;
-        this.provider = provider;
         this.scheduler = new AnimationScheduler();
         this.thl = new TileHighlighter(bfr);
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
         this.multiplexer = new InputMultiplexer();
         this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
         this.uiStage = stageUI;
-        Skin uiSkin = asm.get(Assets.SKIN_UI, Skin.class);
-        this.pp = new PanelPool(stageUI, uiSkin, localization);
+        Skin skin = asm.get(Assets.SKIN_UI, Skin.class);
+        this.pp = new PanelPool(stageUI, skin, localization);
         this.windrose = new Windrose(bfr, asm);
 
     }
@@ -145,7 +151,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
     @Override
     public void dispose() {
-        provider.dispose();
+        bfr.dispose();
     }
 
 }

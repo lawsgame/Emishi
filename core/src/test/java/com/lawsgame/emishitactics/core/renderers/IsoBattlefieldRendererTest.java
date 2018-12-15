@@ -26,7 +26,7 @@ public class IsoBattlefieldRendererTest {
                 battlefield.setTile(r,c, Data.TileType.PLAIN, true);
             }
         }
-        bfr0 = new IsoBFR(battlefield, null, new AssetProvider(IsoBFR.SPRITE_STD_SIZE), new AssetManager(), true);
+        bfr0 = new IsoBFR(battlefield, null, new AssetManager(), true);
 
     }
 

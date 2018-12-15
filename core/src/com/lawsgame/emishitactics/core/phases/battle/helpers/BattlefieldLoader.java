@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -38,11 +39,11 @@ public class BattlefieldLoader {
 
     // ------------- LOAD BATTLEFIELD ------------------
 
-    public static Battlefield load(BattlePhase phase, int bfId){
+    public static Battlefield load(AssetManager asm, int bfId){
 
         // LOAD TEXTURE MAPPING THE BATTLEFIELD
 
-        TextureAtlas layoutAtlas = phase.getAsm().get(Assets.ATLAS_MAPS);
+        TextureAtlas layoutAtlas = asm.get(Assets.ATLAS_MAPS);
         Texture layoutTexture =  layoutAtlas.findRegion(Assets.getRegionMap(bfId)).getTexture();
         if (!layoutTexture.getTextureData().isPrepared()) {
             layoutTexture.getTextureData().prepare();

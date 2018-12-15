@@ -35,7 +35,7 @@ public class DeploymentBIS extends BattleInteractionState {
         int[] warlordPos = bim.bfr.getModel().getUnitPos(sltdUnit);
         bim.focusOn(warlordPos[0], warlordPos[1], true, false, false, TileHighlighter.SltdUpdateMode.ERASE_SLTD_TILE_MEMORY, false);
 
-        startButton = StartButton.create(bim.asm, bim.uiStage.getViewport());
+        startButton = new StartButton(bim.asm.get(Assets.SKIN_UI, Skin.class), bim.uiStage.getViewport());
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -190,24 +190,12 @@ public class DeploymentBIS extends BattleInteractionState {
         public static final float HEIGHT = 70;
         public static final float PAD_TOP = 7/8f;
 
-        private StartButton(TextButtonStyle style, Viewport uiPort) {
-            super("START BATTLE", style);
+        private StartButton(Skin skin, Viewport uiPort) {
+            super("START BATTLE", skin, "default");
             setSize(WIDTH, HEIGHT);
             setX(uiPort.getWorldWidth()/2 - WIDTH/2);
             setY(uiPort.getWorldHeight()*PAD_TOP - HEIGHT/2);
 
-        }
-
-        static StartButton create(AssetManager asm, Viewport uiPort){
-            TextureAtlas uiAtlas = asm.get(Assets.ATLAS_TEMPO_UI);
-            Skin skin = new Skin(uiAtlas);
-
-            TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-            style.up = skin.getDrawable(Assets.UI_BUTTON_UP);
-            style.down = skin.getDrawable(Assets.UI_BUTTON_DOWN);
-            style.font = BattlePhase.testFont;
-
-            return new StartButton(style, uiPort);
         }
     }
 

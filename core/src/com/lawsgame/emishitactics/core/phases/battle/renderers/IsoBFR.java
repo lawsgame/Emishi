@@ -10,7 +10,6 @@ import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
@@ -28,20 +27,20 @@ public class IsoBFR extends BattlefieldRenderer {
     private static float Y_CAM_BOUNDS_OFFSET = RATIO;
 
     private boolean visible;
+    public AssetProvider assetProvider;
     protected AssetManager assetManager;
-    protected AssetProvider assetProvider;
     private Array<Array<IsoTileRenderer>> tileRenderers;
     private Array<Array<BattleUnitRenderer>> unitRenderers;
     private Array<Array<AreaRenderer>> areaRenderers;
 
-    private ShapeRenderer backkgroundRenderer;
+    private ShapeRenderer bgndRenderer;
 
 
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider, AssetManager assetManager){
-        this(battlefield, gcm, assetProvider, assetManager, false);
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager){
+        this(battlefield, gcm, assetManager, false);
     }
 
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetProvider assetProvider, AssetManager assetManager, boolean test) {
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager, boolean test) {
         super(battlefield, gcm);
         this.assetManager = assetManager;
         int depth = 2*(battlefield.getNbRows() + battlefield.getNbColumns()) - 3;
@@ -53,7 +52,8 @@ public class IsoBFR extends BattlefieldRenderer {
         }
 
         this.visible = true;
-        this.assetProvider = assetProvider;
+        this.assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
+        this.assetProvider.set(battlefield, assetManager);
 
         this.areaRenderers  = new Array<Array<AreaRenderer>>();
         this.areaRenderers.add(new Array<AreaRenderer>());
@@ -68,7 +68,7 @@ public class IsoBFR extends BattlefieldRenderer {
             Y_CAM_BOUNDS_OFFSET = 0;
         } else {
 
-            this.backkgroundRenderer = new ShapeRenderer();
+            this.bgndRenderer = new ShapeRenderer();
 
             // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
             for (int r = 0; r < battlefield.getNbRows(); r++) {
@@ -104,15 +104,15 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public void prerender() {
-        backkgroundRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        backkgroundRenderer.rect(0,0,
+        bgndRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        bgndRenderer.rect(0,0,
                 Gdx.graphics.getWidth(),
                 Gdx.graphics.getHeight(),
                 renderedWeather.getLowerColor(),
                 renderedWeather.getLowerColor(),
                 renderedWeather.getUpperColor(),
                 renderedWeather.getUpperColor());
-        backkgroundRenderer.end();
+        bgndRenderer.end();
     }
 
     @Override
@@ -446,7 +446,9 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public void dispose() {
+
         super.dispose();
+        assetProvider.dispose();
     }
 
     @Override

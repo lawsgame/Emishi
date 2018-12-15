@@ -21,6 +21,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveC
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoTileRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
@@ -58,6 +59,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     public TestBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true, true, false);
 
+        IsoBFR bfr = ((IsoBFR)bim.bfr);
         sltdUnit = bim.player.getArmy().getWarlord();
         sltdUnit.addNativeAbility(Data.Ability.BUILD);
         sltdUnit.addNativeAbility(Data.Ability.HEAL);
@@ -67,7 +69,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< ANIMATION tests >>>***------------------------
 
-        sprites = bim.provider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
+        sprites = bfr.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
         for(int i =0; i < sprites.size; i++){
             sprites.get(i).setPosition(1, 1);
             sprites.get(i).setSize(1, 2);
@@ -208,7 +210,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         // -------***<<< SPARKLE ANIM TEST >>>***------------------------
 
         Sprite sprite;
-        Array<TextureRegion> sparkleTR = bim.provider.sparkleTR.get(Data.SparkleType.TRAP);
+        Array<TextureRegion> sparkleTR = bfr.assetProvider.sparkleTR.get(Data.SparkleType.TRAP);
         sprites = new Array<Sprite>();
         for(int i = 0; i < sparkleTR.size; i++){
             sprite = new Sprite(sparkleTR.get(i));

@@ -9,11 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
-import com.lawsgame.emishitactics.core.helpers.TempoSpritePool;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -31,11 +28,6 @@ public class BattlePhase extends GamePhase {
     private BattleInteractionMachine bim;
 
     public void loadRequiredAssets() {
-        //TEMPO
-        asm.load(Assets.ATLAS_TEMPO_UI, TextureAtlas.class);
-        asm.load(Assets.ATLAS_TEMPO_UNITS, TextureAtlas.class);
-        asm.load(Assets.ATLAS_TEMPO_TILES, TextureAtlas.class);
-
         //FINAL
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
         asm.load(Assets.ATLAS_BATTLE_ICONS, TextureAtlas.class);
@@ -76,28 +68,18 @@ public class BattlePhase extends GamePhase {
     }
 
 
-    private static float getPixelPerfectGamePortWidth(int spritePixelWidth){
-        return Gdx.app.getGraphics().getWidth() * IsoBFR.SPRITE_STD_SIZE/ spritePixelWidth;
+    private static float getPixelPerfectGamePortWidth(){
+        return Gdx.app.getGraphics().getWidth() * IsoBFR.SPRITE_STD_SIZE/ 192f;
     }
 
     public BattlePhase(GPM gpm, Player player, int chapterId ){
-        super(gpm, getPixelPerfectGamePortWidth(192));
-        System.out.println("game port width : " +getPixelPerfectGamePortWidth(192));
+        super(gpm, getPixelPerfectGamePortWidth());
+        System.out.println("game port width : " +getPixelPerfectGamePortWidth());
 
         loadRequiredAssets();
-
-        Battlefield battlefield = BattlefieldLoader.load(this, chapterId);
-        battlefield.randomlyDeploy(player.getArmy());
-        battlefield.pushPlayerArmyTurnForward();
-
         setFontParams(true);
-        TempoSpritePool.get().set(asm);
-        AssetProvider assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
-        assetProvider.set(battlefield, asm);
 
-        BattlefieldRenderer bfr = new IsoBFR(battlefield, gameCM, assetProvider, asm);
-
-        this.bim = new BattleInteractionMachine(bfr, asm, stageUI, player, assetProvider);
+        this.bim = new BattleInteractionMachine(gameCM, asm, stageUI, player, chapterId);
         BattleInteractionState initBIS = new TestBIS(bim);
         //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);

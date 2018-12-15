@@ -27,11 +27,6 @@ public class Assets {
 
     // atlases
 
-    // TEMPO
-    public static final String ATLAS_TEMPO_UNITS = "textures/tempo/unit_sprites.pack";
-    public static final String ATLAS_TEMPO_UI = "textures/tempo/ui_skin.pack";
-    public static final String ATLAS_TEMPO_TILES = "textures/tempo/tiles.pack";
-
     public static final String ATLAS_MAPS = "textures/maps.pack";
     public static final String ATLAS_BATTLE_ICONS = "textures/battle_icons.pack";
     public static final String TILE_SPRITES_DIR = "textures/tiles";
@@ -40,9 +35,6 @@ public class Assets {
 
 
     // regions
-
-    //TEMPO
-    public static final String REGION_TEMPO_UNIT_SPRITES = "unit_sprites_tempo";
 
     public static String getRegionMap(int id) {
         return "map"+id;
