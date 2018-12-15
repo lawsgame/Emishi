@@ -51,15 +51,9 @@ public class TrapEvent extends BattleCommand{
         return event;
     }
 
-    private static TrapEvent addTrigger(BattlefieldRenderer bfr,
-                                        AnimationScheduler scheduler,
-                                        Inventory playerInventory,
-                                        Tile tile, final int rowTile, final int colTile,
-                                        ShortUnitPanel shortUnitPanel){
-
+    public static TrapEvent addTrigger(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Tile tile, final int rowTile, final int colTile, ShortUnitPanel shortUnitPanel){
         TrapEvent event = new TrapEvent(bfr, scheduler, playerInventory, Data.TRAP_DAMAGE, rowTile, colTile, shortUnitPanel);
         if(bfr.getModel().isTileExisted(rowTile, colTile) && tile != null) {
-
             Model.Trigger trigger = new Model.Trigger( false, event) {
                 @Override
                 public boolean isTriggerable(Object data) {
@@ -72,7 +66,6 @@ public class TrapEvent extends BattleCommand{
             };
             tile.add(trigger);
         }
-
         return event;
     }
 

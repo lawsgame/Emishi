@@ -23,10 +23,14 @@ import com.lawsgame.emishitactics.core.models.Data.WeaponTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.Equipment;
+import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -69,7 +73,7 @@ public class BattlefieldLoader {
 
         //CREATE BATTLEFIELD INSTANCE
 
-        Battlefield bf = new Battlefield(rows/2,cols/2);
+        Battlefield bf = new Battlefield(bfId, rows/2,cols/2);
 
 
 
@@ -158,14 +162,15 @@ public class BattlefieldLoader {
 
                 // DEPLOY ARMIES
 
+                Array<XmlReader.Element> armyElts = battleElt.getChildrenByName("Army");
                 XmlReader.Element armyElt;
                 XmlReader.Element squadElt;
                 XmlReader.Element unitElt;
                 Unit unit;
                 MilitaryForce army;
-                for (int j = 0; j < battleElt.getChildCount(); j++) {
+                for (int j = 0; j < armyElts.size; j++) {
+                    armyElt = armyElts.get(j);
 
-                    armyElt = battleElt.getChild(j);
                     Affiliation affiliation = Affiliation.ENEMY_0;
                     for(Affiliation a: Affiliation.values()){
                         if(a.name().equals(armyElt.get("affiliation"))){
@@ -208,8 +213,6 @@ public class BattlefieldLoader {
                         }
                     }
                 }
-
-
             }
 
         } catch (IOException e) {
@@ -329,6 +332,62 @@ public class BattlefieldLoader {
     }
 
 
+
+
+    public static void addEventsToBattlefield(AssetManager asm, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory inventory, ShortUnitPanel sup) {
+        try {
+
+            XmlReader.Element battlesElt = reader.parse(Gdx.files.internal(Assets.XML_BATTLE_PARAMS));
+            XmlReader.Element battleElt = null;
+            for (int i = 0; i < battlesElt.getChildCount(); i++) {
+                if (battlesElt.getChild(i).getInt("battlefieldId") == bfr.getModel().getId()) {
+                    battleElt = battlesElt.getChild(i);
+                    break;
+                }
+            }
+
+            if(battleElt != null) {
+
+                // TRAPS AREA
+
+                int[] pos;
+                int traps;
+                Array<int[]> trappedArea = new Array<int[]>();
+                XmlReader.Element trapAreaElt;
+                XmlReader.Element posElt;
+                Array< XmlReader.Element> trapAreaElts = battleElt.getChildrenByName("TrapArea");
+                for (int i = 0; i< trapAreaElts.size; i++) {
+                    // clear previous trapped area
+                    trappedArea.clear();
+                    trapAreaElt = trapAreaElts.get(i);
+                    // get the number of traps
+                    traps = trapAreaElt.getInt("nb", 0);
+                    // get trapped area
+                    for(int j = 0; j < trapAreaElt.getChildCount(); j++){
+                           posElt = trapAreaElt.getChild(j);
+                           pos = new int[]{posElt.getInt("row", -1), posElt.getInt("col", -1)};
+                           trappedArea.add(pos);
+                    }
+                    // set traps
+                    while (trappedArea.size > 0 && traps > 0) {
+                        pos = trappedArea.random();
+                        trappedArea.removeValue(pos, true);
+                        if (bfr.getModel().isTileReachable(pos[0], pos[1], false)
+                                && !bfr.getModel().getTile(pos[0], pos[1]).getType().isUrbanArea()) {
+                            TrapEvent.addTrigger(bfr, scheduler, inventory, bfr.getModel().getTile(pos[0], pos[1]), pos[0], pos[1], sup);
+                            traps--;
+                        }
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     // ------------- LOAD DICTIONARIES ------------------
 
     public static void loadNameDictionary(){
@@ -353,5 +412,6 @@ public class BattlefieldLoader {
     public static void unloadNameDictionary(){
         NAME_DICTIONARY.clear();
     }
+
 
 }

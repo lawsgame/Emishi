@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Battles>
     <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY">
+        <TrapArea nb="2">
+            <Tile row="15" col="5"/>
+            <Tile row="15" col="6"/>
+            <Tile row="15" col="7"/>
+        </TrapArea>
         <Army affiliation = "ENEMY_0">
             <Squad>
                 <Unit row = "13" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">

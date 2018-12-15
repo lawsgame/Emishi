@@ -12,7 +12,7 @@ public class BattlefieldTest {
 
     @Before
     public void before(){
-        battlefield = new Battlefield(9,9);
+        battlefield = new Battlefield(0, 9,9);
         for(int r = 0; r < 7; r++){
             for(int c = 0; c < 7; c++){
                 battlefield.setTile(r, c, Data.TileType.PLAIN, false);

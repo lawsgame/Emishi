@@ -31,6 +31,7 @@ import java.util.LinkedList;
  */
 
 public class Battlefield extends Model {
+    private int id;
     private Tile[][] tiles;
     private Unit[][] units;
     private Array<Area> deploymentAreas;
@@ -45,7 +46,8 @@ public class Battlefield extends Model {
     private BattleSolver solver;
 
 
-    public Battlefield (int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
+    public Battlefield (int id, int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
+        this.id = id;
         if(nbRows > 0 && nbCols > 0) {
             this.tiles = new Tile[nbRows][nbCols];
             this.units = new Unit[nbRows][nbCols];
@@ -61,13 +63,16 @@ public class Battlefield extends Model {
         this.turn = 0;
     }
 
-    public Battlefield(int nbRows, int nbCols){
-        this(nbRows, nbCols, Data.Weather.getStandard(), Environment.getStandard(), new BattleSolver.KillAll());
+    public Battlefield(int id, int nbRows, int nbCols){
+        this(id, nbRows, nbCols, Data.Weather.getStandard(), Environment.getStandard(), new BattleSolver.KillAll());
     }
 
 
     //------------------ GETTERS & SETTERS ---------------------------------
 
+    public int getId(){
+        return id;
+    }
 
     public Tile[][] getTiles() {
         return tiles;
@@ -111,7 +116,6 @@ public class Battlefield extends Model {
         this.solver = battleSolver;
         this.solver.setBattlefield(this);
     }
-
 
 
 

@@ -20,7 +20,7 @@ public class IsoBattlefieldRendererTest {
         int nbRows = 3;
         int nbCols = 4;
 
-        Battlefield battlefield = new Battlefield(nbRows,nbCols);
+        Battlefield battlefield = new Battlefield(0, nbRows,nbCols);
         for(int r = 0; r < nbRows; r++){
             for(int c = 0; c < nbCols; c++){
                 battlefield.setTile(r,c, Data.TileType.PLAIN, true);

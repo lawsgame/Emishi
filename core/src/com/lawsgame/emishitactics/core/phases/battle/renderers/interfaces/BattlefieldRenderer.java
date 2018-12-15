@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
@@ -149,8 +150,16 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }
     }
 
-    public void displayAllTraps(boolean reveal){
-
+    public void displayAllTraps(){
+        TileRenderer tr;
+        for(int r = 0; r < getModel().getNbRows(); r++){
+            for(int c = 0; c  < getModel().getNbColumns(); c++){
+                tr = getTileRenderer(r,c);
+                if(tr != null && tr.getModel().searchForEventType(TrapEvent.class)){
+                    tr.setRevealed(true, Data.SparkleType.TRAP);
+                }
+            }
+        }
     }
 
 

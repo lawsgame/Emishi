@@ -25,7 +25,7 @@ public class UtilsTest {
 
     @Before
     public void before(){
-        bf = new Battlefield(9,9);
+        bf = new Battlefield(0, 9,9);
         for(int r = 0; r < 9; r++){
             for(int c = 0; c < 9; c++){
                 bf.setTile(r,c, Data.TileType.PLAIN, false);

@@ -112,8 +112,6 @@ public abstract class IsoTileRenderer extends TileRenderer {
         }else{
             sparkleAnimation = null;
         }
-
-        System.out.println("    animation : "+sparkleAnimation);
     }
 
     private float getSparkleSpriteSize(){

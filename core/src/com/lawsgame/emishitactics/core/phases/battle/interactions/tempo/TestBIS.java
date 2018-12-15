@@ -220,6 +220,11 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         }
         animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, true, false);
         animation.play();
+
+
+        // -------***<<< OTHER TESTS >>>***------------------
+
+        bfr.displayAllTraps();
     }
 
 
@@ -245,6 +250,8 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         System.out.println("input : "+row+" "+col);
         int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
         //bim.moveCameraTo(row, col, true);
+
+        // SEARCH FOR TRAPS
 
 
         // PANEL
@@ -291,7 +298,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // TEST CUSTOMED COMMAND
 
-
+        /*
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
 
@@ -338,7 +345,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
             }
         }
-
+        */
 
 
 

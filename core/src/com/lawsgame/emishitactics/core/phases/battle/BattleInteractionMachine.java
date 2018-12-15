@@ -6,14 +6,11 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
@@ -44,20 +41,19 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         Battlefield battlefield = BattlefieldLoader.load(asm, chapterId);
         battlefield.randomlyDeploy(player.getArmy());
         battlefield.pushPlayerArmyTurnForward();
-
+        this.scheduler = new AnimationScheduler();
         this.bfr = new IsoBFR(battlefield, gcm, asm);
+        this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
+        Skin skin = asm.get(Assets.SKIN_UI, Skin.class);
+        this.pp = new PanelPool(stageUI, skin, localization);
+        BattlefieldLoader.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
         this.asm = asm;
         this.player = player;
-        this.scheduler = new AnimationScheduler();
         this.thl = new TileHighlighter(bfr);
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
         this.multiplexer = new InputMultiplexer();
-        this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
         this.uiStage = stageUI;
-        Skin skin = asm.get(Assets.SKIN_UI, Skin.class);
-        this.pp = new PanelPool(stageUI, skin, localization);
         this.windrose = new Windrose(bfr, asm);
-
     }
 
     @Override
