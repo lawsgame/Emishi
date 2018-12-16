@@ -588,7 +588,7 @@ public class Unit extends Model {
             }
         }
         for(int i = 0; i < weapons.size; i++){
-            if(weapons.get(i).getTemplate().getAbility() == Data.Ability.NONE){
+            if(weapons.get(i).getTemplate().getAbility() != Data.Ability.NONE){
                 ability = weapons.get(i).getTemplate().getAbility();
                 if(!abilities.contains(ability, true))
                     abilities.add(ability);

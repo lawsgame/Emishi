@@ -345,7 +345,7 @@ public class IsoBFR extends BattlefieldRenderer {
     @Override
     public void addAreaRenderer(Area area) {
         if(!isAreaRendererCreated(area)){
-            areaRenderers.get(area.getType().getLayerIndex()).add(new IsoAreaRenderer(area, this, this.assetProvider));
+            areaRenderers.get(area.getType().getLayerIndex()).add(new IsoAreaRenderer(area, this));
         }
     }
 

@@ -14,6 +14,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
@@ -21,8 +22,10 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveC
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoAreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoTileRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
@@ -36,6 +39,7 @@ import java.util.LinkedList;
 public class TestBIS extends BattleInteractionState implements Observer, ChoicePanel.CommandReceiver {
 
     Unit sltdUnit;
+    AreaRenderer areaRenderer;
 
     Array<Sprite> sprites;
     Animation animation;
@@ -81,7 +85,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< CUSTOMED COMMAND related tests >>>***------------------------
 
-        customedCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
 
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -224,7 +228,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< OTHER TESTS >>>***------------------
 
-        //bfr.displayAllTraps();
+        bfr.displayAllTraps();
     }
 
 
@@ -235,7 +239,10 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        //sprites.get(animation.getCurrentFrame()).draw(batch);
+        if(areaRenderer != null){
+            areaRenderer.render(batch);
+        }
+
     }
 
 
@@ -251,15 +258,13 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
         //bim.moveCameraTo(row, col, true);
 
-        // SEARCH FOR TRAPS
 
-        /*
-        if(Gdx.input.isKeyPressed(Input.Keys.A)){
-            System.out.println("covered ? "+bim.bfr.getModel().isTileCovered(row, col, sltdUnit.getArmy().getAffiliation()));
-        }else if(Gdx.input.isKeyPressed(Input.Keys.Z)){
-            System.out.println("trapped ? "+bim.bfr.getModel().isTileTrapped(row, col));
-        }
-        */
+
+        // PATH
+
+        //Array<int[]> path = bim.bfr.getModel().getShortestPath(actorPos[0], actorPos[1], row, col, false, Data.Affiliation.ALLY, true);
+        //areaRenderer = new IsoAreaRenderer(new Area(bim.bfr.getModel(),   Data.AreaType.GUARD_AREA, path), (IsoBFR)bim.bfr);
+
 
         // PANEL
 
@@ -305,7 +310,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // TEST CUSTOMED COMMAND
 
-        /*
+
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
 
@@ -352,7 +357,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
             }
         }
-        */
+
 
 
 

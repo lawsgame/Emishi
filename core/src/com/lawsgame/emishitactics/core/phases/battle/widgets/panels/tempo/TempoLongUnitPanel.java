@@ -107,10 +107,10 @@ public class TempoLongUnitPanel extends LongUnitPanel {
         builder.append("\nWeapon type : "+ unit.getCurrentWeapon().getTemplate().getWeaponType().name().toLowerCase());
         builder.append("\nDamage type : "+unit.getCurrentWeapon().getTemplate().getDamageType().name().toLowerCase());
         builder.append("\n\n    ABILITIES\n");
-        builder.append("\nAbilities : ");
+        builder.append("\nAbilities : \n    ");
         Array<Data.Ability> activeAbilities = unit.getAbilities();
         for(int i = 0; i < activeAbilities.size ; i++) {
-            builder.append("\n  " + unit.getAbilities().get(i).name().toLowerCase());
+            builder.append(activeAbilities.get(i).name().toLowerCase()+", ");
         }
 
         statisticLabel.setText(builder.toString());

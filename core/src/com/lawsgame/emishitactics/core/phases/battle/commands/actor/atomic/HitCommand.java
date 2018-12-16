@@ -73,6 +73,12 @@ public class HitCommand extends ActorCommand{
         this.guardCommand.setFree(true);
     }
 
+
+    @Override
+    public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
+        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.getCurrentWeapon().isUsable();
+    }
+
     @Override
     public void init() {
         super.init();
@@ -166,6 +172,8 @@ public class HitCommand extends ActorCommand{
         getInitiator().setOrientation(reOrientation);
         initiatorThread.addQuery(reOrientation);
         initiatorThread.addQuery(attackNotif);
+
+        getInitiator().getCurrentWeapon().decrementDurability();
 
         DefenderData data;
         for(int i = 0; i < defendersData.size; i++) {

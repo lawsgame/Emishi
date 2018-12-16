@@ -88,6 +88,20 @@ public class Weapon extends Observable implements Item{
 
     @Override
     public String toString() {
-        return getTemplate().name().toLowerCase();
+        String str = getTemplate().name().toLowerCase()
+                +" : " +getTemplate().getDamageMin()+"-"+getTemplate().getDamageMax()
+                +" | "+getTemplate().getAccuracy()
+                +" | "+getTemplate().getRangeMin()+"-"+getTemplate().getRangeMax()
+                +" | "+getTemplate().getDamageType().name().toLowerCase()
+                +" | "+getDurability()+"/"+getTemplate().getDurabilityMax();
+        return str;
+    }
+
+    public void decrementDurability() {
+        durability--;
+    }
+
+    public boolean isUsable() {
+        return durability > 0;
     }
 }

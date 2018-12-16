@@ -1076,7 +1076,7 @@ public class Battlefield extends Model {
      * excluding (rowI, colI) and finishing by (rowf, colf). If the path is invalid, the returned array will be empty
      *
      */
-    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Affiliation affiliation){
+    public Array<int[]>  getShortestPath(int rowI, int colI, int rowf, int colf, boolean pathfinder, Affiliation affiliation, boolean safePathOnly){
         Array<int[]> res = new Array<int[]>();
 
         if(isTileAvailable(rowf, colf, pathfinder) && affiliation != null) {
@@ -1108,28 +1108,32 @@ public class Battlefield extends Model {
                 PathNode node;
                 neighbours = new Array<PathNode>();
                 if (isTileReachable(current.row + 1, current.col, pathfinder)
-                        && !isTileOccupiedByFoe(current.row + 1, current.col, affiliation)) {
+                        && !isTileOccupiedByFoe(current.row + 1, current.col, affiliation)
+                        && (!safePathOnly || isTileSafe(current.row + 1, current.col, affiliation))){
                     node = new PathNode(current.row + 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row, current.col + 1, pathfinder)
-                        && !isTileOccupiedByFoe(current.row, current.col + 1, affiliation)) {
+                        && !isTileOccupiedByFoe(current.row, current.col + 1, affiliation)
+                        && (!safePathOnly || isTileSafe(current.row, current.col + 1, affiliation))) {
                     node = new PathNode(current.row, current.col + 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row - 1, current.col, pathfinder)
-                        && !isTileOccupiedByFoe(current.row - 1, current.col, affiliation)) {
+                        && !isTileOccupiedByFoe(current.row - 1, current.col, affiliation)
+                        && (!safePathOnly || isTileSafe(current.row - 1, current.col, affiliation))) {
                     node = new PathNode(current.row - 1, current.col, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
                 if (isTileReachable(current.row, current.col - 1, pathfinder)
-                        && !isTileOccupiedByFoe(current.row, current.col - 1, affiliation)) {
+                        && !isTileOccupiedByFoe(current.row, current.col - 1, affiliation)
+                        && (!safePathOnly || isTileSafe(current.row, current.col - 1, affiliation))) {
                     node = new PathNode(current.row, current.col - 1, rowf, colf, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
@@ -1208,25 +1212,29 @@ public class Battlefield extends Model {
                 // get available neighbor nodes which are not yet in the closed list
                 PathAreaNode node;
                 neighbours = new Array<PathAreaNode>();
-                if (current.remainingRange > 1 || (isTileReachable(current.row + 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row + 1, current.col, affiliation))) {
+                if (current.remainingRange > 1 || (isTileReachable(current.row + 1, current.col, pathfinder)
+                        && !isTileOccupiedByFoe(current.row + 1, current.col, affiliation))) {
                     node = new PathAreaNode(current.row + 1, current.col, rowActor, colActor, rangeMax, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (current.remainingRange > 1 || (isTileReachable(current.row, current.col + 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col + 1, affiliation))) {
+                if (current.remainingRange > 1 || (isTileReachable(current.row, current.col + 1, pathfinder)
+                        && !isTileOccupiedByFoe(current.row, current.col + 1, affiliation))) {
                     node = new PathAreaNode(current.row, current.col + 1, rowActor, colActor, rangeMax, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (current.remainingRange > 1 || (isTileReachable(current.row - 1, current.col, pathfinder) && !isTileOccupiedByFoe(current.row - 1, current.col, affiliation))) {
+                if (current.remainingRange > 1 || (isTileReachable(current.row - 1, current.col, pathfinder)
+                        && !isTileOccupiedByFoe(current.row - 1, current.col, affiliation))) {
                     node = new PathAreaNode(current.row - 1, current.col, rowActor, colActor, rangeMax, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);
                     }
                 }
-                if (current.remainingRange > 1 || (isTileReachable(current.row, current.col - 1, pathfinder) && !isTileOccupiedByFoe(current.row, current.col - 1, affiliation))) {
+                if (current.remainingRange > 1 || (isTileReachable(current.row, current.col - 1, pathfinder)
+                        && !isTileOccupiedByFoe(current.row, current.col - 1, affiliation))) {
                     node = new PathAreaNode(current.row, current.col - 1, rowActor, colActor, rangeMax, current, this);
                     if (!closed.contains(node, false)) {
                         neighbours.add(node);

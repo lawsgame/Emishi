@@ -105,7 +105,7 @@ public class ReinforcementEvent extends BattleCommand {
                     deploymentPositions.get(i)[0],
                     deploymentPositions.get(i)[1],
                     reinforcements.get(i).has(Data.Ability.PATHFINDER),
-                    reinforcements.get(i).getArmy().getAffiliation());
+                    reinforcements.get(i).getArmy().getAffiliation(), false);
             if(path.size == 0){
                 return false;
             }else{
