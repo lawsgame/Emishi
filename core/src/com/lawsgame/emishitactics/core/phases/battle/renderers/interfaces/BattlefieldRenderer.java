@@ -95,8 +95,8 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
                 }else{
                     addAreaRenderer(area);
                 }
-            }else if(data instanceof Notification.igniteSparkles){
-                Notification.igniteSparkles ignite = (Notification.igniteSparkles)data;
+            }else if(data instanceof Notification.IgniteSparkles){
+                Notification.IgniteSparkles ignite = (Notification.IgniteSparkles)data;
                 TileRenderer tileRenderer;
                 for (int i = 0; i < ignite.tiles.size; i++) {
                     if (i < ignite.sparkleType.size) {

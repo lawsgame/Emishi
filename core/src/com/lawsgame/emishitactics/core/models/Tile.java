@@ -93,9 +93,9 @@ public class Tile extends Model{
         }
     }
 
-    public static class ItemType extends LootableTile<Item>{
+    public static class ItemTile extends LootableTile<Item>{
 
-        public ItemType(TileType type, Item loot) {
+        public ItemTile(TileType type, Item loot) {
             super(type, loot);
         }
     }

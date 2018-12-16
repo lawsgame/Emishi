@@ -4,9 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.lawsgame.emishitactics.core.models.Unit;
 
-import java.util.HashMap;
 import java.util.Random;
 
 public class Data {
@@ -35,11 +33,10 @@ public class Data {
     public static final int BRAVERY_MORAL_RECOVERY_RATE = 3;
     public static final float CHANCE_OF_COLLAPSING_FROM_FRAGILE_TILES = 1f; //over 1
     public static final int TRAP_DAMAGE = 3;
+    public static final int SCAN_AREA_RANGE = 3;
 
 
     // RENDER parameters
-        public static final float SPEED_TEMPO_WALK = 3f;  //tile/s
-        public static final float SPEED_TEMPO_PUSHED = 8f;
     public static final float SPEED_WALK = 1.5f;
     public static final float SPEED_PUSHED = 1.9f;
     public static final float ANIMATION_NORMAL_SPEED = 0.35f;
@@ -62,7 +59,7 @@ public class Data {
 
     //UI parameters
     public static final float AIBIS_ACTION_PANEL_DURATION_APPEARANCE = 3.0f;
-    public static final float AIBIS_DELAY_CAMERA_FOCUS = 1.5f;;
+    public static final float AIBIS_DELAY_CAMERA_FOCUS = 1.5f;
 
 
     static Random r = new Random();
@@ -149,6 +146,11 @@ public class Data {
     }
 
 
+    /**
+     * !!! ATTENTION !!!
+     *
+     * modifying there names can lead to a asset provider error!
+     */
     public enum AnimSpriteSetId{
         WALK_FLEE_SWITCHPOSITION                (false),
         LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED(true),
@@ -199,7 +201,8 @@ public class Data {
         LEVELUP(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         SWITCH_WEAPON(  AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         SPECIAL_MOVE(   AnimSpriteSetId.SPECIAL_MOVE),
-        CHANGE_STRATEGY(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
+        CHANGE_STRATEGY(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        SCAN_AREA(      AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
 
         AnimSpriteSetId soldierId;
         AnimSpriteSetId warchiefId;
@@ -272,8 +275,9 @@ public class Data {
         BUILD               (5, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
         PLUNDER             (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         COVER_AREA          (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}});
+        SCAN_AREA           (3, 20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
+        END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
         private int experience;
@@ -405,11 +409,6 @@ public class Data {
                 }
             }
             return orientedArea;
-        }
-
-
-        public int getImpactAreaSize(){
-            return impactArea.size + 1;
         }
 
         public String getName(I18NBundle mainI18nBundle) {
@@ -866,7 +865,7 @@ public class Data {
         PATHFINDER,
         UNBREAKABLE,
         SHADOW,
-        VIGILANT,
+        VIGILANT,       // can not be stolen from
 
         //Support
         GUARD,

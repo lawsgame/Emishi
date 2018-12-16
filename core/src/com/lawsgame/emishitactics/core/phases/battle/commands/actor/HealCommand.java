@@ -73,10 +73,8 @@ public class HealCommand extends SelfInflitedCommand {
 
         // push render task
         scheduleRenderTask(task);
-
         // set outcome
         outcome.add(getInitiator(), choice.getExperience());
-
         // handle events
         handleEvents(this);
     }

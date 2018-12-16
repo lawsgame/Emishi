@@ -71,7 +71,7 @@ public class AggressiveAI extends PassiveAI {
                             // target found
                             attackTarget = attackTargetsAtRange.random();
 
-                            System.out.println("                interesting MOVE TILE: " + moveTarget[0] + " " + moveTarget[1]);
+                            System.out.println("                interesting WALK_FLEE_SWITCHPOSITION TILE: " + moveTarget[0] + " " + moveTarget[1]);
                             System.out.println("                    1) actor valid ? : "+walkCommand.isInitiatorValid(actorPos[0], actorPos[1], actor));
                             System.out.println("                    2) target valid ? : "+walkCommand.isTargetValid(actor, actorPos[0], actorPos[1], moveTarget[0], moveTarget[1]));
                             System.out.println("                    TARGET TILE: " + attackTarget[0] + " " + attackTarget[1]);

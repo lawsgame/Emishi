@@ -14,6 +14,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFire
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.HealCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ScanAreaCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PushCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand;
@@ -41,6 +42,7 @@ public class BattleCommandManager {
         setChoice(new GuardCommand(bfr, scheduler, playerInventory));
         setChoice(new HealCommand(bfr, scheduler, playerInventory));
         setChoice(new StealCommand(bfr, scheduler, playerInventory));
+        setChoice(new ScanAreaCommand(bfr, scheduler, playerInventory));
         Array<ActorCommand>  commands = new Array<ActorCommand>();
         for(int i = 0; i < Data.MAX_WEAPON_CARRIED_UPON_PROMOTION; i++){
             commands.add(new SwitchWeaponCommand(bfr, scheduler, playerInventory, i));

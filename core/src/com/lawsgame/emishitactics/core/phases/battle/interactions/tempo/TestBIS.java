@@ -17,6 +17,9 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ScanAreaCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
@@ -85,7 +88,8 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< CUSTOMED COMMAND related tests >>>***------------------------
 
-        customedCommand = new AttackCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        sltdUnit.addNativeAbility(Data.Ability.PATHFINDER);
+        customedCommand = new ScanAreaCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
 
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -228,7 +232,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< OTHER TESTS >>>***------------------
 
-        bfr.displayAllTraps();
+        //bfr.displayAllTraps();
     }
 
 
@@ -314,7 +318,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
 
-            // MOVE SLTD UNIT
+            // WALK_FLEE_SWITCHPOSITION SLTD UNIT
 
             if(bim.bfr.getModel().isTileOccupied(row, col)){
                 sltdUnit = bim.bfr.getModel().getUnit(row, col);

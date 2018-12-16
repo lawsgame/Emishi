@@ -5,13 +5,19 @@ import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 
 public class Notification {
 
-    public static class igniteSparkles {
+    public static class IgniteSparkles {
         public final Array<int[]> tiles;
         public final Array<Data.SparkleType> sparkleType;
 
-        public igniteSparkles() {
+        public IgniteSparkles() {
             this.tiles = new Array<int[]>();
             this.sparkleType = new Array<Data.SparkleType>();
+        }
+
+        public void add(int[] tilePos, Data.SparkleType type){
+            tiles.add(tilePos);
+            sparkleType.add(type);
+
         }
     }
     

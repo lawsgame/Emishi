@@ -343,7 +343,7 @@ public abstract class ActorCommand extends BattleCommand{
         return getImpactArea(rowActor, colActor, rowTarget, colTarget);
     }
 
-    public final Array<int[]> getImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0){
+    public Array<int[]> getImpactArea(int rowActor0, int colActor0, int rowTarget0, int colTarget0){
         Array<int[]> orientedArea = choice.getOrientedImpactArea(Utils.getOrientationFromCoords(rowActor0, colActor0, rowTarget0, colTarget0));
         if(bfr.getModel().isTileExisted(rowTarget0, colTarget0)) {
             for (int i = 0; i < orientedArea.size; i++) {
