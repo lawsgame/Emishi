@@ -11,6 +11,8 @@ import com.lawsgame.emishitactics.core.models.interfaces.Model;
 public class Tile extends Model{
 
     protected TileType type;
+    protected Item loot;
+    protected Unit recruit;
     protected boolean fragile;
     protected boolean revealed;
 
@@ -18,14 +20,8 @@ public class Tile extends Model{
         this.type = type;
         this.fragile = false;
         this.revealed = false;
-    }
-
-
-
-    //--------------- PROCESS -------------------------------
-
-    public boolean isLooted() {
-        return true;
+        this.loot = null;
+        this.recruit = null;
     }
 
     //--------------- GETTERS & SETTERS ---------------------
@@ -52,53 +48,23 @@ public class Tile extends Model{
         this.revealed = revealed;
     }
 
+    public boolean isLooted() {
+        return loot == null;
+    }
+
+    public Item getLoot(){
+        return loot;
+    }
+
+    public boolean isHidingRecruit(){
+        return recruit != null;
+    }
+
+    public Unit getRecruit(){
+        return recruit;
+    }
+
     public String toString(){
         return type.name();
     }
-
-
-
-
-
-
-    //------------- SUB CLASS ---------------------
-
-
-    public static class LootableTile<T> extends Tile{
-        protected boolean looted;
-        protected T loot;
-
-        public LootableTile(TileType type, T loot) {
-            super(type);
-            this.loot = loot;
-            this.looted = loot == null;
-        }
-
-        public void setLoot(T loot){
-            this.looted = false;
-            this.loot = loot;
-        }
-
-        public T getLoot(){
-            this.looted = true;
-            return loot;
-        }
-    }
-
-    public static class RecruitTile extends LootableTile<Unit>{
-
-
-        public RecruitTile(TileType type, Unit loot) {
-            super(type, loot);
-        }
-    }
-
-    public static class ItemTile extends LootableTile<Item>{
-
-        public ItemTile(TileType type, Item loot) {
-            super(type, loot);
-        }
-    }
-
-
 }

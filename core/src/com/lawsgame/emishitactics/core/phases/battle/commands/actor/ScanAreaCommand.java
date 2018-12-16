@@ -44,7 +44,7 @@ public class ScanAreaCommand extends SelfInflitedCommand {
                 if(tile.searchForEventType(TrapEvent.class)) {
                     getInfo = true;
                     igniteSparkles.add(new int[]{r, c}, Data.SparkleType.TRAP);
-                }else if(!tile.isLooted() && tile instanceof Tile.ItemTile){
+                }else if(!tile.isLooted()){
                     getInfo = true;
                     igniteSparkles.add(new int[]{r, c}, Data.SparkleType.LOOT);
                 }

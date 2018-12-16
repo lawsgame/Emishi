@@ -277,6 +277,7 @@ public class Data {
         COVER_AREA          (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         SCAN_AREA           (3, 20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
+        PICK_LOOT           (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
