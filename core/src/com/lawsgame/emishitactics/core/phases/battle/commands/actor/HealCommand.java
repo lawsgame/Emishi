@@ -10,12 +10,12 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class HealCommand extends SelfInflitedCommand {
-    private final boolean boostHP = true;
-    private final boolean boostMoral = true;
+    private final boolean BOOST_HP = true;
+    private final boolean BOOST_MORAL = true;
+
     private int healPower;
     private Unit[] patients;
     private int[] recoveredHP;
@@ -46,8 +46,8 @@ public class HealCommand extends SelfInflitedCommand {
         recoveredMoral = new int[targets.size];
         for(int i = 0; i < targets.size; i++){
             patients[i] = bfr.getModel().getUnit(targets.get(i)[0], targets.get(i)[1]);
-            recoveredHP[i] = (boostHP) ? patients[i].getRecoveredHitPoints(healPower) : 0;
-            recoveredMoral[i] = (boostMoral) ? patients[i].getRecoveredMoralPoints(healPower) : 0;
+            recoveredHP[i] = (BOOST_HP) ? patients[i].getRecoveredHitPoints(healPower) : 0;
+            recoveredMoral[i] = (BOOST_MORAL) ? patients[i].getRecoveredMoralPoints(healPower) : 0;
         }
 
     }
@@ -63,11 +63,11 @@ public class HealCommand extends SelfInflitedCommand {
 
 
         StandardTask task = new StandardTask();
-        task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), Data.AnimId.HEAL));
 
         for(int i = 0; i < patients.length; i++) {
-            if(patients[i].improveCondition(healPower, boostMoral, boostHP)) {
-                task.addThread(new RendererThread(bfr.getUnitRenderer(patients[i]), new Notification.Treated(healPower)));
+            if(patients[i].improveCondition((BOOST_MORAL) ? healPower : 0 , (BOOST_HP) ? healPower : 0)) {
+                task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(patients[i]), new Notification.Treated(healPower)));
             }
         }
 

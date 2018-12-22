@@ -327,13 +327,8 @@ public class Data {
         }
 
         public int getCost(int rowActor, int colActor, Unit actor, Battlefield battlefield) {
-            int costBannerBonus = 0;
-            if(battlefield.isStandardBearerAtRange(actor, rowActor, colActor)){
-                costBannerBonus -= (int) actor.getArmy().getSquadBanner(actor, true).getValue(BannerBonus.AP_COST, true);
-            }
-            if(costBannerBonus > cost)
-                costBannerBonus = cost;
-            return cost - costBannerBonus;
+            int costBannerBonus = (int) Formulas.getCurrentUnitBannerBonus(actor, rowActor, colActor, battlefield, BannerBonus.AP_COST);
+            return (costBannerBonus <= cost) ? cost - costBannerBonus : 0;
         }
 
         public int getExperience() {
@@ -529,7 +524,7 @@ public class Data {
         BROKEN_BRIDGE(  "broken bridge", 95, 101, 124,      false, false, false,                    0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BROKEN_BRIDGE),
         BRIDGE(         "bridge", 85, 96, 134,              true, true, true,TileType.BROKEN_BRIDGE,0, 0, 0, 0, 0, false,     TileSpriteSetId.WATER, TileSpriteSetId.BRIDGE),
         WATCH_TOWER(    "watch tower", 193, 26, 137,        true, true, true,                       3, 0, 1, 0, 0, true,      TileSpriteSetId.PLAIN, TileSpriteSetId.WATCH_TOWER),
-        TRAP(           "trap", 99, 26, 137,                true, true, true,                       3, 0, 1, 0, 0, true,      TileSpriteSetId.TRAP, null);
+        TRAP(           "trap", 99, 26, 137,                true, true, true,                       0, 0, 0, 0, 0, true,      TileSpriteSetId.TRAP, null);
 
         private String name;
 

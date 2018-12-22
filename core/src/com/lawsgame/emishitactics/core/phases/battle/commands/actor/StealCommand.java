@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererSubTaskQueue;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class StealCommand extends ActorCommand {
@@ -41,13 +41,13 @@ public class StealCommand extends ActorCommand {
 
         // push render taks
         StandardTask task = new StandardTask();
-        RendererThread stealerRendererThread = new RendererThread(bfr.getUnitRenderer(stealer), stealer.getOrientation());
+        RendererSubTaskQueue stealerRendererThread = new RendererSubTaskQueue(bfr.getUnitRenderer(stealer), stealer.getOrientation());
         stealerRendererThread.addQuery(stealer, Data.AnimId.STEAL);
-        RendererThread stolenRendererThread = new RendererThread(bfr.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
+        RendererSubTaskQueue stolenRendererThread = new RendererSubTaskQueue(bfr.getUnitRenderer(stolen), stealer.getOrientation().getOpposite());
         stolenRendererThread.addQuery(stolen, (stealSuccessful) ? Data.AnimId.WOUNDED : Data.AnimId.DODGE);
         stolenRendererThread.addQuery(stolen, stolen.getOrientation());
-        task.addThread(stolenRendererThread);
-        task.addThread(stealerRendererThread);
+        task.addParallelSubTask(stolenRendererThread);
+        task.addParallelSubTask(stealerRendererThread);
         scheduleRenderTask(task);
 
         // se outoome

@@ -34,15 +34,15 @@ public class BannerTest {
         banner.increment(Data.BannerBonus.RANGE);
 
 
-        assertTrue(banner.getValue(Data.BannerBonus.MORAL_SHIELD, false) == 0.3f);
+        assertTrue(banner.getValue(Data.BannerBonus.MORAL_SHIELD) == 0.3f);
         assertTrue(banner.getUsedPoints() == 12);
-        assertTrue(banner.getValue(Data.BannerBonus.RANGE, false) == 1);
+        assertTrue(banner.getValue(Data.BannerBonus.RANGE) == 1);
         assertTrue(banner.getMaxPoints() == 15);
         assertTrue(banner.getRemainingPoints() == 3);
 
         banner.decrementBonus(Data.BannerBonus.MORAL_SHIELD);
 
-        assertTrue(banner.getValue(Data.BannerBonus.MORAL_SHIELD, false) == 0.2f);
+        assertTrue(banner.getValue(Data.BannerBonus.MORAL_SHIELD) == 0.2f);
         assertTrue(banner.getUsedPoints() == 9);
         assertTrue(banner.getRemainingPoints() == 6);
     }

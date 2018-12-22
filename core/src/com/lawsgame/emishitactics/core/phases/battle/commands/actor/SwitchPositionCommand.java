@@ -6,7 +6,6 @@ import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.Tile;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -43,10 +42,10 @@ public class SwitchPositionCommand extends ActorCommand {
         StandardTask task = new StandardTask();
         Array<int[]> path = new Array<int[]>();
         path.add(new int[]{rowTarget, colTarget});
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), bfr.getModel(), new Notification.Walk(getInitiator(), path, false)));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), bfr.getModel(), new Notification.Walk(getInitiator(), path, false)));
         path = new Array<int[]>();
         path.add(new int[]{rowActor, colActor});
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getTarget()), bfr.getModel(), new Notification.Walk(getTarget(), path, false)));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getTarget()), bfr.getModel(), new Notification.Walk(getTarget(), path, false)));
         scheduleRenderTask(task);
 
 

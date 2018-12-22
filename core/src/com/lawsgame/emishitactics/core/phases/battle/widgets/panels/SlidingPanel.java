@@ -21,7 +21,7 @@ public abstract class SlidingPanel extends Panel {
      * @param xShowingPadding :
      * @param yPadding :
      * @param width :
-     * @param top :  if true, apply yPadding from the top, else form the bottom
+     * @param top :  if true, run yPadding from the top, else form the bottom
      * @param left : true if hide in the left side of the screen
      */
     public SlidingPanel(Viewport uiport, float slidingDuration, float xShowingPadding, float yPadding, int width, int height, boolean top, boolean left) {

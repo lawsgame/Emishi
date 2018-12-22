@@ -17,20 +17,25 @@ public class Player {
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warlord.setLeadership(19);
+        warlord.setLeadership(3);
         Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 8, Data.WeaponType.BOW, false, false, false, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         Unit soldier2 = new Unit("Rota", Data.UnitTemplate.SOLAR_KNIGHT, 1, Data.WeaponType.POLEARM, false, false, false, false);
-        soldier1.addWeapon(new Weapon(Data.WeaponTemplate.SPEAR));
+        soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SPEAR));
+        Unit soldier3 = new Unit("Rota", Data.UnitTemplate.SOLAR_KNIGHT, 1, Data.WeaponType.AXE, false, false, false, false);
+        soldier3.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
+
 
 
         playerArmy.add(warlord);
         playerArmy.add(soldier1);
         playerArmy.add(soldier2);
+        playerArmy.add(soldier3);
 
         playerArmy.appointWarLord(warlord);
         playerArmy.appointSoldier(soldier1, 0);
-        playerArmy.appointSoldier(soldier2, 0);
+        //playerArmy.appointSoldier(soldier2, 0);
+        //playerArmy.appointSoldier(soldier3, 0);
 
         warlord.getBanner().increment(Data.BannerBonus.ATTACK_MIGHT);
         warlord.getBanner().increment(Data.BannerBonus.MORAL_SHIELD);

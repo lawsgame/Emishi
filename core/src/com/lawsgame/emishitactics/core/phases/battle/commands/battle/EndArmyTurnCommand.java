@@ -5,13 +5,11 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 public class EndArmyTurnCommand extends BattleCommand {
     protected MilitaryForce army;
@@ -34,27 +32,30 @@ public class EndArmyTurnCommand extends BattleCommand {
 
     @Override
     protected void execute() {
+
+        // DONE => ACTIVE
+
         //update model
         army.setDone(false, false);
-
         //push render tasks
         Array<Array<Unit>> mobilizedTroops = army.getAllSquads();
         StandardTask resetDoneTask = new StandardTask();
-        StandardTask.RendererThread doneThread;
+        StandardTask.RendererSubTaskQueue doneThread;
         BattleUnitRenderer bur;
         for(int i = 0; i < mobilizedTroops.size; i++){
             for(int j = 0; j < mobilizedTroops.get(i).size; j++){
                 bur = bfr.getUnitRenderer(mobilizedTroops.get(i).get(j));
                 if(!mobilizedTroops.get(i).get(j).isOutOfAction()) {
                     if(bur != null) {
-                        doneThread = new StandardTask.RendererThread(bur, Notification.Done.get(false));
-                        resetDoneTask.addThread(doneThread);
+                        doneThread = new StandardTask.RendererSubTaskQueue(bur, Notification.Done.get(false));
+                        resetDoneTask.addParallelSubTask(doneThread);
                     }
                 }
             }
         }
-
         scheduleRenderTask(resetDoneTask);
+        handleEvents(this, -1, -1);
+
     }
 
     @Override

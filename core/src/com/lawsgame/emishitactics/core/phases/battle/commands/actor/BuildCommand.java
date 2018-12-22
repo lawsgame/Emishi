@@ -34,11 +34,11 @@ public class BuildCommand extends ActorCommand {
 
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new StandardTask.RendererThread(bfr, new SetTile(rowTarget, colTarget, bfr.getModel().getTile(rowTarget, colTarget), oldTile, SetTile.TransformationType.BUILT)));
-        StandardTask.RendererThread builderThread = new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, new SetTile(rowTarget, colTarget, bfr.getModel().getTile(rowTarget, colTarget), oldTile, SetTile.TransformationType.BUILT)));
+        StandardTask.RendererSubTaskQueue builderThread = new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()));
         builderThread.addQuery(builderOrientation);
         builderThread.addQuery(Data.AnimId.BUILD);
-        task.addThread(builderThread);
+        task.addParallelSubTask(builderThread);
         scheduleRenderTask(task);
 
         // set outcome

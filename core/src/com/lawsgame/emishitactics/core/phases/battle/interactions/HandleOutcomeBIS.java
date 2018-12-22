@@ -2,16 +2,13 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand.Outcome;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS.HandleOutcomeTask.HOTType;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.LinkedList;
 import java.util.Stack;
@@ -49,12 +46,8 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
         super.init();
         if(outcome != null && !outcome.isHandled()){
-            int[] expLvls;
-            int experience;
             float xReceiverBUR;
             float yReceiverBUR;
-            int rowReceiver;
-            int colReceiver;
             while (!outcome.isHandled()) {
 
                 if(!outcome.isExpHandled()){
@@ -62,26 +55,44 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
                     ActorCommand.ExperiencePointsHolder holder = outcome.expHolders.peek();
                     if(holder.hasNext()){
-                        expLvls = holder.next();
-                        experience = expLvls[expLvls.length - 1];
+                        final Unit receiver = holder.receiver;
+                        final int[] expLvls = holder.next();
+                        final int experience = expLvls[expLvls.length - 1];
                         xReceiverBUR = bim.bfr.getUnitRenderer(holder.receiver).getCenterX();
                         yReceiverBUR = bim.bfr.getUnitRenderer(holder.receiver).getCenterY();
-                        rowReceiver = bim.bfr.getRow(xReceiverBUR, yReceiverBUR);
-                        colReceiver = bim.bfr.getCol(xReceiverBUR, yReceiverBUR);
+                        final int rowReceiver = bim.bfr.getRow(xReceiverBUR, yReceiverBUR);
+                        final int colReceiver = bim.bfr.getCol(xReceiverBUR, yReceiverBUR);
 
                         //A TESTER!!!!
 
-
                         HandleOutcomeTask experienceTask = new HandleOutcomeTask(HOTType.EXPERIENCE);
-                        experienceTask.addThread(new StandardTask.CommandThread(new DisplayExperiencePanel(rowReceiver, colReceiver, experience, bim), 0f));
+                        experienceTask.addParallelSubTask(new StandardTask.CommandSubTask(0f){
+                            @Override
+                            public void run() {
+                                bim.focusOn(rowReceiver, colReceiver, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
+                                bim.pp.experiencePanel.update(experience);
+                                bim.pp.experiencePanel.show();
+                                bim.pp.levelUpPanel.hide();
+                                bim.pp.lootPanel.hide();
+                            }
+                        });
                         tasks.add(experienceTask);
 
                         if(expLvls.length > 1){
                             // of the unit has leveled up
                             HandleOutcomeTask levelUpTask = new HandleOutcomeTask(HOTType.LEVELUP);
-                            levelUpTask.addThread(new RendererThread(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
+                            levelUpTask.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
                             if (holder.receiver.isMobilized() || holder.receiver.getArmy().isPlayerControlled()) {
-                                levelUpTask.addThread(new StandardTask.CommandThread(new DisplayLevelupPanel(holder.receiver, expLvls, bim), 0f));
+                                //levelUpTask.addParallelSubTask(new StandardTask.CommandSubTask(new DisplayLevelupPanel(holder.receiver, expLvls, bim), 0f));
+                                levelUpTask.addParallelSubTask(new StandardTask.CommandSubTask(0f){
+                                    @Override
+                                    public void run() {
+                                        bim.pp.experiencePanel.hide();
+                                        bim.pp.levelUpPanel.update(receiver, expLvls);
+                                        bim.pp.levelUpPanel.show();
+                                        bim.pp.lootPanel.hide();
+                                    }
+                                });
                             }
                             tasks.add(levelUpTask);
                         }
@@ -90,9 +101,19 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                     }
 
                 }else {
-                    ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
+                    final ActorCommand.DroppedItemHolder holder = outcome.droppedItemHolders.pop();
                     HandleOutcomeTask lootTask = new HandleOutcomeTask(HOTType.LOOT);
-                    lootTask.addThread(new StandardTask.CommandThread(new DisplayLootPanel(holder.droppedItem, !aiTurn, bim), 0f));
+                    //lootTask.addParallelSubTask(new StandardTask.CommandSubTask(new DisplayLootPanel(holder.droppedItem, !aiTurn, bim), 0f));
+                    lootTask.addParallelSubTask(new StandardTask.CommandSubTask(0f){
+                        @Override
+                        public void run() {
+                            bim.pp.experiencePanel.hide();
+                            bim.pp.levelUpPanel.hide();
+                            bim.pp.lootPanel.update(holder.droppedItem, !aiTurn);
+                            bim.pp.lootPanel.show();
+                        }
+                    });
+
                     tasks.offer(lootTask);
                 }
             }
@@ -185,72 +206,5 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
         }
     }
-
-
-    static class DisplayExperiencePanel extends SimpleCommand {
-        private int rowReceiver;
-        private int colReceiver;
-        private int experience;
-        private BattleInteractionMachine bim;
-
-        public DisplayExperiencePanel(int rowReceiver, int colReceiver, int experience, BattleInteractionMachine bim) {
-            this.bim = bim;
-            this.rowReceiver= rowReceiver;
-            this.colReceiver = colReceiver;
-            this.experience = experience;
-
-        }
-
-        @Override
-        public void apply() {
-            bim.focusOn(rowReceiver, colReceiver, true, true, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
-            bim.pp.experiencePanel.update(experience);
-            bim.pp.experiencePanel.show();
-            bim.pp.levelUpPanel.hide();
-            bim.pp.lootPanel.hide();
-        }
-
-    }
-
-    static class DisplayLevelupPanel extends SimpleCommand{
-        private Unit receiver;
-        private int[] statGain;
-        private BattleInteractionMachine bim;
-
-        public DisplayLevelupPanel(Unit receiver, int[] statGain, BattleInteractionMachine bim) {
-            this.receiver = receiver;
-            this.statGain = statGain;
-            this.bim = bim;
-        }
-
-        @Override
-        public void apply() {
-            bim.pp.experiencePanel.hide();
-            bim.pp.levelUpPanel.update(receiver, statGain);
-            bim.pp.levelUpPanel.show();
-            bim.pp.lootPanel.hide();
-        }
-    }
-
-    static class DisplayLootPanel extends SimpleCommand{
-        private Item droppedItem;
-        private boolean forThePlayer;
-        private BattleInteractionMachine bim;
-
-        public DisplayLootPanel(Item droppedItem, boolean playerTurn, BattleInteractionMachine bim) {
-            this.droppedItem = droppedItem;
-            this.forThePlayer = playerTurn;
-            this.bim = bim;
-        }
-
-        @Override
-        public void apply() {
-            bim.pp.experiencePanel.hide();
-            bim.pp.levelUpPanel.hide();
-            bim.pp.lootPanel.update(droppedItem, forThePlayer);
-            bim.pp.lootPanel.show();
-        }
-    }
-
 
 }

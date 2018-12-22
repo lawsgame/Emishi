@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandSubTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -65,8 +65,18 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
         //schedule the panels dance
         StandardTask hideShortPanelTask = new StandardTask();
-        hideShortPanelTask.addThread(new CommandThread(bim.pp.hideSTP, 0));
-        hideShortPanelTask.addThread(new CommandThread(bim.pp.hideSUP, 0));
+        hideShortPanelTask.addParallelSubTask(new CommandSubTask(0){
+            @Override
+            public void run() {
+                bim.pp.hideSTP.apply();
+            }
+        });
+        hideShortPanelTask.addParallelSubTask(new CommandSubTask(0) {
+            @Override
+            public void run() {
+                bim.pp.hideSUP.apply();
+            }
+        });
         bim.scheduler.addTask(hideShortPanelTask);
         if(bim.pp.isActionPanelAvailable(currentCommand.getActionChoice())) {
 
@@ -119,7 +129,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
                 }
 
                 // launch the action selection interaction state
-                bim.scheduler.addTask(new StandardTask(new GetBackToSelectAction(currentCommand, bim, historic), 0));
+                bim.replace(new SelectActionBIS(bim, currentCommand.getInitiator(), historic));
 
             }
         }
@@ -133,24 +143,6 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
             if(bim.pp.isActionPanelAvailable(currentCommand.getActionChoice()))
                 bim.scheduler.addTask(new StandardTask(removeActionPanelCommand, 0));
             bim.replace(new HandleOutcomeBIS(bim, historic, false));
-        }
-    }
-
-
-    static class GetBackToSelectAction extends SimpleCommand{
-        private ActorCommand currentCommand;
-        private BattleInteractionMachine bim;
-        private Stack<ActorCommand> historic;
-
-        public GetBackToSelectAction(ActorCommand currentCommand, BattleInteractionMachine bim, Stack<ActorCommand> historic) {
-            this.currentCommand = currentCommand;
-            this.bim = bim;
-            this.historic = historic;
-        }
-
-        @Override
-        public void apply() {
-            bim.replace(new SelectActionBIS(bim, currentCommand.getInitiator(), historic));
         }
     }
 

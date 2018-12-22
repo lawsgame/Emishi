@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
@@ -27,8 +26,14 @@ public class EndUnitTurnCommand extends SelfInflitedCommand {
         getInitiator().setActed(true);
 
         StandardTask task = new StandardTask();
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), Notification.Done.get(true)));
-        task.addThread(new StandardTask.CommandThread(thl.generateTileHighlightingEndTurnCommand(), 0));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), Notification.Done.get(true)));
+        task.addParallelSubTask(new StandardTask.CommandSubTask( 0){
+
+            @Override
+            public void run() {
+                thl.generateTileHighlightingEndTurnCommand().apply();
+            }
+        });
         this.scheduleRenderTask(task);
     }
 

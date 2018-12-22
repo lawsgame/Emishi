@@ -15,7 +15,6 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 public class EarthquakeEvent extends BattleCommand {
     private float earthquakeDuration;
@@ -64,7 +63,7 @@ public class EarthquakeEvent extends BattleCommand {
             rowRuins = tilesTurnIntoRuins.get(i)[0];
             colRuins = tilesTurnIntoRuins.get(i)[1];
             bfr.getModel().setTile(rowRuins, colRuins, bfr.getModel().getTile(rowRuins,colRuins).getType().getDamagedType(), false);
-            task.addThread(new StandardTask.RendererThread(bfr, new Notification.SetTile(rowRuins, colRuins, bfr.getModel().getTile(rowRuins, colRuins))));
+            task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, new Notification.SetTile(rowRuins, colRuins, bfr.getModel().getTile(rowRuins, colRuins))));
 
             if(bfr.getModel().isTileOccupied(rowRuins, colRuins)){
                 victim = bfr.getModel().getUnit(rowRuins,colRuins);
@@ -73,7 +72,7 @@ public class EarthquakeEvent extends BattleCommand {
                     notif.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
                     victim.setCrippled(true);
                     notif.fleeingOrientation = victim.getOrientation().getOpposite();
-                    task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), notif));
+                    task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(victim), notif));
                 }
             }
         }
@@ -82,21 +81,20 @@ public class EarthquakeEvent extends BattleCommand {
         for(int r = 0; r < bf.getNbRows(); r++){
             for(int c = 0; c < bf.getNbColumns(); c++){
                 if(bf.isTileOccupied(r, c) && !bf.getUnit(r, c).isOutOfAction()){
-                    task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(bf.getUnit(r, c)), Data.AnimId.WOUNDED));
+                    task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(bf.getUnit(r, c)), Data.AnimId.WOUNDED));
                 }
             }
         }
         // add camera shaking
-        StandardTask.CommandThread commandThread = new StandardTask.CommandThread();
-        commandThread.addQuery(new SimpleCommand() {
+        StandardTask.CommandSubTask commandThread = new StandardTask.CommandSubTask(0){
             @Override
-            public void apply() {
+            public void run() {
                 gcm.move(new ShakeVF(earthquakeDuration), earthquakeDuration);
             }
-        }, 0f);
+        };
         commandThread.setTag("shake camera");
-        task.addThread(commandThread);
-        task.addThread(new StandardTask.DelayThread(earthquakeDuration));
+        task.addParallelSubTask(commandThread);
+        task.addParallelSubTask(new StandardTask.DelaySubTask(earthquakeDuration));
         // conclude
         scheduleRenderTask(task);
         Notification.OOAReport report = removeOutOfActionUnits();

@@ -86,7 +86,10 @@ public abstract class AI extends Observable implements Runnable {
     protected boolean checkApplyAndStore(final ActorCommand command, int rowTarget, int colTarget, final CommandBundle bundle){
         command.setTarget(rowTarget, colTarget);
         command.setDecoupled(true);
-        ActionInfoPanel panel = ph.getActionPanel(command);
+        ActionInfoPanel panel = null;
+        if(ph.isActionPanelAvailable(command.getActionChoice())) {
+            panel = ph.getActionPanel(command);
+        }
         if(command.apply()){
             bundle.offer(command, panel);
             return true;

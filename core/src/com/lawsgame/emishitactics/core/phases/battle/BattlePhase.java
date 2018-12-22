@@ -59,7 +59,7 @@ public class BattlePhase extends GamePhase {
             float charSpacingFactor = 1.05f;
             // prevent LIBGDX of replacing ghyph to fit the pîxel canvas, leading to a slight misalignment of the rendered glyphs
             testFont.setUseIntegerPositions(false);
-            // apply linear filtering on the underlying texture to smoothe the glyph on screen
+            // run linear filtering on the underlying texture to smoothe the glyph on screen
             testFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             //add character spacing to avoid overlapping causing by the addition of outline of glyph
             for (int i = 0; i < testFont.getData().glyphs.length; i++) {
@@ -85,8 +85,8 @@ public class BattlePhase extends GamePhase {
         setFontParams(true);
 
         this.bim = new BattleInteractionMachine(gameCM, asm, stageUI, player, chapterId);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

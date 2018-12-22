@@ -78,11 +78,11 @@ public class TempoLongUnitPanel extends LongUnitPanel {
             builder.append("\nBanner");
             builder.append("\n  | mode        : "+banner.getMode().name().toLowerCase());
             builder.append("\n  | points        : "+banner.getRemainingPoints()+"/"+banner.getMaxPoints());
-            builder.append("\n  | strength      : "+banner.getValue(Data.BannerBonus.ATTACK_MIGHT, false));
-            builder.append("\n  | range         : "+banner.getValue(Data.BannerBonus.RANGE, false));
-            builder.append("\n  | loot          : "+banner.getValue(Data.BannerBonus.LOOT_RATE, false)+"%");
-            builder.append("\n  | AP reduc cost : "+banner.getValue(Data.BannerBonus.AP_COST, false));
-            builder.append("\n  | moral reduc   : "+banner.getValue(Data.BannerBonus.MORAL_SHIELD, false)+"%");
+            builder.append("\n  | strength      : "+banner.getValue(Data.BannerBonus.ATTACK_MIGHT));
+            builder.append("\n  | range         : "+banner.getValue(Data.BannerBonus.RANGE));
+            builder.append("\n  | loot          : "+banner.getValue(Data.BannerBonus.LOOT_RATE)+"%");
+            builder.append("\n  | AP reduc cost : "+banner.getValue(Data.BannerBonus.AP_COST));
+            builder.append("\n  | moral reduc   : "+banner.getValue(Data.BannerBonus.MORAL_SHIELD)+"%");
         }
         generalLabel.setText(builder.toString());
         builder.setLength(0);
@@ -100,7 +100,7 @@ public class TempoLongUnitPanel extends LongUnitPanel {
             builder.append("\n  "+equipments.get(i).toString());
         }
         builder.append("\n\n    CURRENT WEAPONS\n");
-        builder.append("\nName : "+unit.getCurrentWeapon().toString());
+        builder.append("\nName : "+unit.getCurrentWeapon().getTemplate().name().toLowerCase());
         builder.append("\nBase damage : "+unit.getCurrentWeapon().getTemplate().getDamageMin()+" - "+unit.getCurrentWeapon().getTemplate().getDamageMax());
         builder.append("\nBase accuracy : "+unit.getCurrentWeapon().getTemplate().getAccuracy());
         builder.append("\nRange : ("+unit.getCurrentWeapon().getTemplate().getRangeMin()+", "+unit.getCurrentWeapon().getTemplate().getRangeMax()+")");

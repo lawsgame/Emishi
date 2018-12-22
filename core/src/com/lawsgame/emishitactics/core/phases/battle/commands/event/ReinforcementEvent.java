@@ -49,7 +49,7 @@ public class ReinforcementEvent extends BattleCommand {
 
         Unit unit;
         StandardTask deployTask = new StandardTask();
-        StandardTask.RendererThread thread;
+        StandardTask.RendererSubTaskQueue thread;
         Notification.UnitAppears eventNotif = new Notification.UnitAppears();
         for(int i = 0; i < reinforcements.size; i++) {
             //update model
@@ -60,10 +60,10 @@ public class ReinforcementEvent extends BattleCommand {
             BattleUnitRenderer bur = bfr.addUnitRenderer(entryPoints.get(i)[0], entryPoints.get(i)[1], unit);
             bur.setVisible(false);
             // push render task
-            thread = new StandardTask.RendererThread(bfr.getUnitRenderer(unit));
+            thread = new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(unit));
             thread.addQuery(Notification.Visible.get(true));
             thread.addQuery(bfr.getModel(), new Notification.Walk(unit, paths.get(i), true));
-            deployTask.addThread(thread);
+            deployTask.addParallelSubTask(thread);
         }
         scheduleRenderTask(deployTask);
         handleEvents(eventNotif, -1,-1);

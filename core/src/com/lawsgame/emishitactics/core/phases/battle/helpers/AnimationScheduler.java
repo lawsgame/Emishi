@@ -30,12 +30,10 @@ public class AnimationScheduler implements GameUpdatableEntity{
                 tasks.peek().notifyAllObservers(tasks.peek());
                 tasks.pop();
             }
-
             if(!tasks.isEmpty()) {
                 if (!tasks.peek().isInitiazed()) {
                     tasks.peek().init();
                 }
-
                 //update the threads of the current task
                 tasks.peek().update(dt);
             }
@@ -79,6 +77,7 @@ public class AnimationScheduler implements GameUpdatableEntity{
         public abstract boolean isInitiazed();
         public abstract boolean isCompleted();
         public abstract boolean isIrrelevant();
+        public abstract Task merge(Task task);
 
 
     }

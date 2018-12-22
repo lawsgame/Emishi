@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
+import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.StepOn;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -28,15 +29,15 @@ public class CoveringFireCommand extends SelfInflitedCommand {
     @Override
     protected void execute() {
         // update model
-        int rangeMin = getInitiator().getCurrentWeaponRangeMin(rowActor, colActor, bfr.getModel());
-        int rangeMax = getInitiator().getCurrentWeaponRangeMax(rowActor, colActor, bfr.getModel());
+        int rangeMin = Formulas.getCurrentWeaponRangeMin(getInitiator(), rowActor, colActor, bfr.getModel());
+        int rangeMax = Formulas.getCurrentWeaponRangeMax(getInitiator(), rowActor, colActor, bfr.getModel());
         Array<int[]> tiles = Utils.getEreaFromRange(bfr.getModel(), rowActor, colActor, rangeMin, rangeMax);
         Area.UnitArea area = new CoveringUnitArea(rowActor, colActor, bfr, scheduler, outcome.playerInventory, tiles);
         bfr.getModel().addUnitArea(area);
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new StandardTask.RendererThread(bfr, area));
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.COVER));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, area));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), Data.AnimId.COVER));
         scheduleRenderTask(task);
         //  outcome
         outcome.add(getInitiator(), choice.getExperience());

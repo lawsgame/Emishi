@@ -50,16 +50,12 @@ public class IsoBFR extends BattlefieldRenderer {
             tileRenderers.add(new Array<IsoTileRenderer>());
             unitRenderers.add(new Array<BattleUnitRenderer>());
         }
-
-        this.visible = true;
-        this.assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
-        this.assetProvider.set(battlefield, assetManager);
-
         this.areaRenderers  = new Array<Array<AreaRenderer>>();
         this.areaRenderers.add(new Array<AreaRenderer>());
         this.areaRenderers.add(new Array<AreaRenderer>());
         this.areaRenderers.add(new Array<AreaRenderer>());
         this.areaRenderers.add(new Array<AreaRenderer>());
+        this.visible = true;
 
         // required for the junit testes
         if (test) {
@@ -68,8 +64,9 @@ public class IsoBFR extends BattlefieldRenderer {
             Y_CAM_BOUNDS_OFFSET = 0;
         } else {
 
+            this.assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
+            this.assetProvider.set(battlefield, assetManager);
             this.bgndRenderer = new ShapeRenderer();
-
             // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
             for (int r = 0; r < battlefield.getNbRows(); r++) {
                 for (int c = 0; c < battlefield.getNbColumns(); c++) {
@@ -79,7 +76,6 @@ public class IsoBFR extends BattlefieldRenderer {
                     }
                 }
             }
-
             // set up area renderers
             for (int i = 0; i < getModel().getUnitAreas().size ; i++) {
                 addAreaRenderer(getModel().getUnitAreas().get(i));
@@ -87,7 +83,6 @@ public class IsoBFR extends BattlefieldRenderer {
             for (int i = 0; i < battlefield.getDeploymentAreas().size; i++) {
                 addAreaRenderer(battlefield.getDeploymentAreas().get(i));
             }
-
             //set weather renderer
             this.renderedWeather = getModel().getWeather();
         }

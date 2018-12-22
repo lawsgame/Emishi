@@ -56,11 +56,11 @@ set CMD_LINE_ARGS=
 set _SKIP=2
 
 :win9xME_args_slurp
-if "xCenter%~1" == "xCenter" goto apply
+if "xCenter%~1" == "xCenter" goto run
 
 set CMD_LINE_ARGS=%*
 
-:apply
+:run
 @rem Setup the command line
 
 set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar

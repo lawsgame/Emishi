@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.RangedBasedType;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -15,6 +16,9 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+
+import static com.lawsgame.emishitactics.core.models.Formulas.getCurrentWeaponRangeMin;
+import static com.lawsgame.emishitactics.core.models.Formulas.getCurrentWeaponRangeMax;
 
 /**
  *
@@ -26,7 +30,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
  *  if(bcm.canActionBePerformed(actor, ...){
  *      ActorCommand command = bcm.get(...);
  *      command.setTarget(...);
- *      if(command.apply()){
+ *      if(command.run()){
  *
  *          // the command has been applied successfully*
  *      }else{
@@ -41,7 +45,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
  *  ActorCommand command = new ActorCommand( choice, ...);
  *  command.setInitiator(...);
  *  command.setTarget(...);
- *  if(command.apply()){
+ *  if(command.run()){
  *
  *          // the command has been applied successfully
  *  }else{
@@ -55,12 +59,12 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
  *  1 - get the command
  *  2 - set initiator and target
  *  3 - (optional) display action pan
- *  4 - execute the command
+ *  4 - run the command
  *
  * no need to put back the command in the BCM
  *
  *
- * ActorCommand.execute() method struture :
+ * ActorCommand.run() method struture :
  *  0 - (optional) register the old model state to perform undo() if required
  *  1 - update the model
  *  2 - push the render task
@@ -323,8 +327,8 @@ public abstract class ActorCommand extends BattleCommand{
                     break;
                 case WEAPON:
                     Unit actor = bfr.getModel().getUnit(rowActor, colActor);
-                    int rangeMin = actor.getCurrentWeaponRangeMin(rowActor, colActor, bfr.getModel());
-                    int rangeMax = actor.getCurrentWeaponRangeMax(rowActor, colActor, bfr.getModel());
+                    int rangeMin = getCurrentWeaponRangeMin(actor, rowActor, colActor, bfr.getModel());
+                    int rangeMax = Formulas.getCurrentWeaponRangeMax(actor, rowActor, colActor, bfr.getModel());
                     actionArea = Utils.getEreaFromRange(bfr.getModel(), rowActor, colActor, rangeMin, rangeMax);
                     break;
                 case SPECIFIC:
@@ -387,8 +391,8 @@ public abstract class ActorCommand extends BattleCommand{
         boolean valid = false;
         if(initiator != null && choice.getRangedType() ==  Data.RangedBasedType.WEAPON || choice.getRangedType() == Data.RangedBasedType.SPECIFIC){
 
-            int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? getCurrentWeaponRangeMin(initiator, rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == Data.RangedBasedType.WEAPON) ? getCurrentWeaponRangeMax(initiator, rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
 
@@ -410,8 +414,8 @@ public abstract class ActorCommand extends BattleCommand{
         boolean valid = false;
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC){
 
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? getCurrentWeaponRangeMin(initiator, rowActor0, colActor0, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? getCurrentWeaponRangeMax(initiator, rowActor0, colActor0, bfr.getModel()) : choice.getRangeMax();
             int dist = Utils.dist(rowActor0, colActor0, rowTarget0, colTarget0);
             if (rangeMin <= dist && dist <= rangeMax) {
 
@@ -432,8 +436,8 @@ public abstract class ActorCommand extends BattleCommand{
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
 
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? getCurrentWeaponRangeMin(initiator, row, col, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? getCurrentWeaponRangeMax(initiator, row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
                 for (int c = col - rangeMin; c <= col + rangeMax; c++) {
@@ -453,8 +457,8 @@ public abstract class ActorCommand extends BattleCommand{
         Array<int[]>  targetsAtRange = new Array<int[]>();
         if(initiator != null && choice.getRangedType() ==  RangedBasedType.WEAPON || choice.getRangedType() == RangedBasedType.SPECIFIC) {
 
-            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMin(row, col, bfr.getModel()) : choice.getRangeMin();
-            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? initiator.getCurrentWeaponRangeMax(row, col, bfr.getModel()) : choice.getRangeMax();
+            int rangeMin = (choice.getRangedType() == RangedBasedType.WEAPON) ? getCurrentWeaponRangeMin(initiator, row, col, bfr.getModel()) : choice.getRangeMin();
+            int rangeMax = (choice.getRangedType() == RangedBasedType.WEAPON) ? getCurrentWeaponRangeMax(initiator, row, col, bfr.getModel()) : choice.getRangeMax();
             int dist;
             for (int r = row - rangeMin; r <= row + rangeMax; r++) {
                 for (int c = col - rangeMin; c <= col + rangeMax; c++) {

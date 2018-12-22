@@ -295,7 +295,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         if(!bim.bfr.getModel().isTileOccupied(row, col)){
             moveCommand.setPath(bim.bfr.getModel().getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation()));
             moveCommand.setReveal(false);
-            if(!moveCommand.apply(actorPos[0], actorPos[1])){
+            if(!moveCommand.run(actorPos[0], actorPos[1])){
                 System.out.println("command failed to be applied");
                 System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
                 System.out.println("    target ?    : "+customedCommand.isTargetValid());
@@ -307,7 +307,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         /*
         if(!bim.bfr.getModel().isTileOccupied(row, col)) {
-            if (!walkCommand.apply(actorPos[0], actorPos[1], row, col)) {
+            if (!walkCommand.run(actorPos[0], actorPos[1], row, col)) {
                 System.out.println("command failed to be applied");
                 System.out.println("    initiator ? : " + walkCommand.isInitiatorValid());
                 System.out.println("    target ?    : " + walkCommand.isTargetValid());
@@ -346,7 +346,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
                 panel.show();
             }
 
-            // apply command
+            // run command
             if(!customedCommand.apply()){
                 System.out.println("command failed to be applied");
                 System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());

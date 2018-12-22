@@ -12,11 +12,9 @@ import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
-import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 public class TrapEvent extends BattleCommand{
     private int damage;
@@ -78,15 +76,14 @@ public class TrapEvent extends BattleCommand{
         victim.setCrippled(true);
 
         StandardTask task = new StandardTask();
-        task.addThread(new StandardTask.CommandThread(new SimpleCommand() {
-            @Override
-            public void apply() {
+        task.addParallelSubTask(new StandardTask.CommandSubTask(0) {
+            public void run() {
                 shortUnitPanel.hide();
                 shortUnitPanel.update(victim);
                 shortUnitPanel.show();
             }
-        }, 0f));
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(victim), takeDamage));
+        });
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(victim), takeDamage));
 
         if(bfr.getModel().isTileExisted(row, col) && bfr.getModel().getTile(row, col).getType() != Data.TileType.TRAP) {
 
@@ -94,7 +91,7 @@ public class TrapEvent extends BattleCommand{
             addTrigger(bfr, scheduler, outcome.playerInventory, tile, row, col, shortUnitPanel);
             bfr.getModel().setTile(row, col, tile, false);
 
-            task.addThread(new StandardTask.RendererThread(bfr, new SetTile(row, col, tile)));
+            task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, new SetTile(row, col, tile)));
         }
 
         scheduler.addTask(task);

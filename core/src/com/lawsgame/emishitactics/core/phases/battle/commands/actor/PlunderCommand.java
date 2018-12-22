@@ -26,8 +26,8 @@ public class PlunderCommand extends SelfInflitedCommand {
 
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new StandardTask.RendererThread(bfr, new SetTile(rowTarget, colTarget, bfr.getModel().getTile(rowTarget, colTarget), oldTile, SetTile.TransformationType.PLUNDERED)));
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.PLUNDER));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, new SetTile(rowTarget, colTarget, bfr.getModel().getTile(rowTarget, colTarget), oldTile, SetTile.TransformationType.PLUNDERED)));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), Data.AnimId.PLUNDER));
         scheduleRenderTask(task);
 
         // set outcome

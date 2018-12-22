@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 
 public class Formulas {
@@ -41,21 +40,9 @@ public class Formulas {
 
     public static int[] getCurrentAttackMightRange(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         int[] attackMight = attacker.getAppAttackMight();
-
-        // BANNER PRE CALCULUS
-        int  bannerAMBonus = 0;
-        boolean bannerAtrange = battlefield.isStandardBearerAtRange(attacker, rowAttacker0, colAttacker0);
-        if(bannerAtrange){
-            MilitaryForce attackerArmy = attacker.getArmy();
-            Banner attackerbanner = attackerArmy.getSquadBanner(attacker, true);
-            bannerAMBonus = (int) attackerbanner.getValue(Data.BannerBonus.ATTACK_MIGHT, true);
-        }
-
         for(int i =0; i < attackMight.length; i++) {
             attackMight[i] += battlefield.getTile(rowAttacker0, colAttacker0).getType().getAttackMightBonus();
-            if(bannerAtrange){
-                attackMight[i] += bannerAMBonus;
-            }
+            attackMight[i] += getCurrentUnitBannerBonus(attacker, rowAttacker0, colDefender0, battlefield, Data.BannerBonus.ATTACK_MIGHT);
 
         }
         return attackMight;
@@ -98,20 +85,16 @@ public class Formulas {
 
     public static int getLootRate(Unit attacker, int rowActor, int colActor, Battlefield bf){
         int lootRate = 0;
-        if(attacker.isMobilized() && attacker.getArmy().isPlayerControlled()) {
+        if(attacker.getArmy().isPlayerControlled()) {
             lootRate += Data.BASE_DROP_RATE + attacker.getAppDexterity() / 2 + attacker.getChiefCharisma() / 2;
-            if(bf.isStandardBearerAtRange(attacker, rowActor, colActor)){
-                lootRate += (int) attacker.getArmy().getSquadBanner(attacker, true).getValue(Data.BannerBonus.LOOT_RATE, true);
-            }
+            lootRate += Formulas.getCurrentUnitBannerBonus(attacker, rowActor, colActor, bf, Data.BannerBonus.LOOT_RATE);
         }
         return lootRate;
     }
 
     public static float getMoralModifier(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         float moralModifier = 1f;
-        if(battlefield.isStandardBearerAtRange(defender, rowDefender0, colDefender0)){
-            moralModifier -= defender.getArmy().getSquadBanner(defender, true).getValue(Data.BannerBonus.MORAL_SHIELD, true);
-        }
+        moralModifier -= getCurrentUnitBannerBonus(defender, rowDefender0, colDefender0, battlefield, Data.BannerBonus.MORAL_SHIELD);
         return moralModifier;
     }
 
@@ -128,5 +111,43 @@ public class Formulas {
 
     public static int getHealPower(int rowAHealer, int colHealer, int rowTarget, int colTarget, Unit healer, Unit patient, Battlefield battlefield) {
         return Data.HEAL_BASE_POWER + healer.getLevel()/2;
+    }
+
+    public static int getCurrentWeaponRangeMin(Unit actor, int rowUnit, int colUnit, Battlefield battlefield) {
+        return actor.getCurrentWeapon().getTemplate().getRangeMin();
+    }
+
+
+    public static int getCurrentWeaponRangeMax(Unit actor, int rowActor, int colActor, Battlefield battlefield) {
+        int rangeMax = actor.getCurrentWeapon().getTemplate().getRangeMax();
+        if(battlefield.isTileExisted(rowActor, colActor)){
+            if(rangeMax > 1) {
+                Data.TileType tileType = battlefield.getTile(rowActor, colActor).getType();
+                if(tileType.enhanceRange()) rangeMax++;
+                rangeMax += getCurrentUnitBannerBonus(actor, rowActor, colActor, battlefield, Data.BannerBonus.RANGE);
+            }
+        }
+        return rangeMax;
+    }
+
+    /**
+     *  get the specific banner bonus obtained by a unit if he was at the position {row, col}
+     *
+     *
+     * @param row : row targeted
+     * @param col : col targeted
+     * @param bb : banner bonus to get
+     * @return : bonus value
+     */
+    public static float getCurrentUnitBannerBonus(Unit unit, int row, int col, Battlefield bf, Data.BannerBonus bb){
+        float bonusValue = 0;
+        if(bf.isStandardBearerAtRange(unit, row,  col)){
+            MilitaryForce army = unit.getArmy();
+            if(!army.isSquadOversized(unit)) {
+                Banner banner = army.getSquadBanner(unit, true);
+                bonusValue = banner.getCurrentValue(bb);
+            }
+        }
+        return bonusValue;
     }
 }

@@ -11,7 +11,7 @@ public class TempoSUP extends ShortUnitPanel {
     private static final float SLIDE_DURATION = 0.5f;
     private static final int X_SHOWING_PADDING = 15;
     private static final int Y_PADDING = 15;
-    private static final int WIDTH = 260;
+    private static final int WIDTH = 320;
     private static final int HEIGHT = 180;
     private static final boolean TOP = false;
     private static final boolean LEFT = false;
@@ -60,7 +60,7 @@ public class TempoSUP extends ShortUnitPanel {
         builder.append(content.getAppMoral());
         builder.append("\nAction Points  : ");
         builder.append(content.getActionPoints());
-        builder.append("\nCurrent weapon : ");
+        builder.append("\nCW : ");
         builder.append(content.getCurrentWeapon().toString());
 
         label.setText(builder.toString());

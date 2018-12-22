@@ -2,7 +2,6 @@ package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
-import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.models.Area.UnitArea;
@@ -12,7 +11,6 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class GuardCommand extends SelfInflitedCommand {
@@ -37,8 +35,8 @@ public class GuardCommand extends SelfInflitedCommand {
 
         // push render task
         StandardTask task = new StandardTask();
-        task.addThread(new RendererThread(bfr, area));
-        task.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.GUARD));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, area));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), Data.AnimId.GUARD));
         // animated guarded units as well
         Unit guardedUnit;
         int dist;
@@ -49,7 +47,7 @@ public class GuardCommand extends SelfInflitedCommand {
                 dist = Utils.dist(rowActor, colActor, r, c);
                 if(rangeMin <= dist && dist <= rangeMax && bfr.getModel().isTileOccupiedByAlly(r,c, getInitiator().getArmy().getAffiliation())){
                     guardedUnit = bfr.getModel().getUnit(r,c);
-                    task.addThread(new RendererThread(bfr.getUnitRenderer(guardedUnit), Data.AnimId.GUARDED));
+                    task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(guardedUnit), Data.AnimId.GUARDED));
                 }
             }
         }

@@ -25,9 +25,9 @@ public class PickLootCommand extends SelfInflitedCommand {
     protected void execute() {
         Tile tile = bfr.getModel().getTile(rowTarget, colTarget);
         StandardTask task = new StandardTask();
-        task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.PICK_LOOT));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), Data.AnimId.PICK_LOOT));
         if(tile.isRevealed()){
-            task.addThread(new StandardTask.RendererThread(bfr, new Notification.ExtinguishSparkle(rowTarget, colTarget)));
+            task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, new Notification.ExtinguishSparkle(rowTarget, colTarget)));
         }
         // schedule tasks
         scheduleRenderTask(task);

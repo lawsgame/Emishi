@@ -37,7 +37,7 @@ public class SimpleAI extends AI {
             if(endUnitTurnCommand.setInitiator(actorPos[0], actorPos[1])){
                 if(endUnitTurnCommand.isTargetValid()){
                     endUnitTurnCommand.setDecoupled(true);
-                    endUnitTurnCommand.apply();
+                    endUnitTurnCommand.run();
                     bundle.commands.add(endUnitTurnCommand);
                     bundle.panels.add(app.getActionPanel(endUnitTurnCommand));
                 }

@@ -8,7 +8,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandThread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandSubTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
@@ -38,7 +38,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
         super(bim, true, false, false, true, false);
 
         this.ai = new AggressiveAI(bim.bfr, bim.scheduler, bim.pp, bim.player.getInventory(), bim.thl);
-        this.threadAI = new Thread(ai, "AI Thread");
+        this.threadAI = new Thread(ai, "AI SubTask");
         this.bundleQueue = new LinkedList<AI.CommandBundle>();
         this.trackrecord = new Stack<ActorCommand>();
         this.waitForCommand = true;
@@ -180,9 +180,8 @@ public class AiBIS extends BattleInteractionState implements Observer {
                 if(command instanceof ActorCommand) {
 
                     final ActorCommand actorCommand = (ActorCommand)command;
-                    CommandThread commandThread = new CommandThread();
-
-                    commandThread.addQuery(new SimpleCommand() {
+                    // focus the camera on the action and show the action pan if existed
+                    bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
                         @Override
                         public void apply() {
                             bim.focusOn(actorCommand.getRowinitiator(), actorCommand.getColInitiator(), true, false, false, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, false);
@@ -191,34 +190,31 @@ public class AiBIS extends BattleInteractionState implements Observer {
                             }
                             actorCommand.highlightTargets(true);
                         }
-                    }, (panel != null) ? Data.AIBIS_ACTION_PANEL_DURATION_APPEARANCE : Data.AIBIS_DELAY_CAMERA_FOCUS);
-
+                    }, (panel != null) ? Data.AIBIS_ACTION_PANEL_DURATION_APPEARANCE : Data.AIBIS_DELAY_CAMERA_FOCUS));
+                    // if the action pan existed, hide it after a small delay
                     if(panel != null) {
-                        commandThread.addQuery(new SimpleCommand() {
+                        bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
                             @Override
                             public void apply() {
                                 panel.hide();
                             }
-                        }, panel.getHidingTime());
+                        }, panel.getHidingTime()));
                     }
-
-                    commandThread.addQuery(new SimpleCommand() {
+                    // remove action pan after hiding it and
+                    bim.scheduler.addTask(new StandardTask(new SimpleCommand() {
                         @Override
                         public void apply() {
-                            /*
-                            Normally, applying the command would remove the highlighting.
-                            But in the AI case, the command has been applied BEFORE the highlighting has been triggered.
-                            Therefore, the blinking should be turn off manually here
-                             */
+
+                            //Normally, applying the command would remove the highlighting.
+                            //But in the AI case, the command has been applied BEFORE the highlighting has been triggered.
+                            //Therefore, the blinking should be turn off manually here
+
                             actorCommand.highlightTargets(false);
                             if(panel != null)
                                 panel.remove();
                         }
-                    },0);
+                    },0));
 
-                    StandardTask showAction = new StandardTask();
-                    showAction.addThread(commandThread);
-                    bim.scheduler.addTask(showAction);
                 }
 
                 // push the action render task OR trigger

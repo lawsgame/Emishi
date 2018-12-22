@@ -6,7 +6,6 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
@@ -41,11 +40,11 @@ public class MoveCommand extends SelfInflitedCommand {
 
         // push render task
         StandardTask task = new StandardTask();
-        StandardTask.RendererThread thread = new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()));
+        StandardTask.RendererSubTaskQueue thread = new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()));
         if(reveal)
             thread.addQuery(Notification.Visible.get(true));
         thread.addQuery(bfr.getModel(), new Notification.Walk(getInitiator(), path, reveal));
-        task.addThread(thread);
+        task.addParallelSubTask(thread);
         scheduleRenderTask(task);
     }
 

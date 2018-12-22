@@ -10,9 +10,8 @@ import com.lawsgame.emishitactics.engine.GameUpdatableEntity;
  * /finished = is true if the count down is finished
  * /reset = reset the count down to be reused with not necessarily the same delay
  */
-
 public class CountDown implements GameUpdatableEntity {
-	final float delay;
+	private float delay;
 	private float time;
 	private boolean finished;
 	private boolean running;
@@ -47,6 +46,7 @@ public class CountDown implements GameUpdatableEntity {
 	}
 
 	public void reset(float newdelay){
+		delay = newdelay;
 		time = newdelay;
 		finished = false;
 		running = false;

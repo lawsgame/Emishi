@@ -863,8 +863,8 @@ public class Battlefield extends Model {
                 for(int cUnit = 0; cUnit < checkTiles[0].length; cUnit++){
                     if(checkTiles[rUnit][cUnit] > 0){
 
-                        rangeMin = actor.getCurrentWeaponRangeMin(rowOrigin + rUnit, colOrigin + cUnit, battlefield);
-                        rangeMax = actor.getCurrentWeaponRangeMax( rowOrigin + rUnit, colOrigin + cUnit, battlefield);
+                        rangeMin = Formulas.getCurrentWeaponRangeMin(actor, rowOrigin + rUnit, colOrigin + cUnit, battlefield);
+                        rangeMax = Formulas.getCurrentWeaponRangeMax(actor,  rowOrigin + rUnit, colOrigin + cUnit, battlefield);
                         for(int r = rUnit - rangeMax; r <= rUnit + rangeMax; r++){
                             for(int c = cUnit - rangeMax; c <= cUnit + rangeMax; c++){
 

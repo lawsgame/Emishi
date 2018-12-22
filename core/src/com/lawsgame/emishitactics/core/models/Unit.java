@@ -725,26 +725,6 @@ public class Unit extends Model {
     }
 
 
-    public int getCurrentWeaponRangeMin(int rowUnit, int colUnit, Battlefield battlefield) {
-        return getCurrentWeapon().getTemplate().getRangeMin();
-    }
-
-
-    public int getCurrentWeaponRangeMax(int rowUnit, int colUnit, Battlefield battlefield) {
-        int rangeMax = getCurrentWeapon().getTemplate().getRangeMax();
-        if(battlefield.isTileExisted(rowUnit, colUnit)){
-            if(rangeMax > 1) {
-                TileType tileType = battlefield.getTile(rowUnit, colUnit).getType();
-                if(tileType.enhanceRange()) rangeMax++;
-                if(battlefield.isStandardBearerAtRange(this, rowUnit, colUnit)){
-                    rangeMax += getArmy().getSquadBanner(this, true).getValue(Data.BannerBonus.RANGE, true);
-                }
-            }
-        }
-        return rangeMax;
-    }
-
-
     public int getAppAttackAccuracy() {
         return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + Data.WC_CHARISMA_BONUS_ATT_ACC* getChiefCharisma();
     }
@@ -811,7 +791,6 @@ public class Unit extends Model {
             maxWC = 3;
         return maxWC + 1;
     }
-
 
     public boolean isAllyWith(Data.Affiliation affiliation) {
         return (army != null) && army.getAffiliation() == affiliation;
@@ -930,21 +909,21 @@ public class Unit extends Model {
     }
 
 
-    public boolean improveCondition(int healPower, boolean boostMoral, boolean boostPhysicalCondition) {
-        if(isWounded(boostMoral, boostPhysicalCondition)) {
-            if(boostPhysicalCondition) {
-                if (healPower + hitPoints > getAppHitpoints()) {
+    public boolean improveCondition(int boostMoral, int boostPhysical) {
+        if(isWounded(boostMoral > 0, boostPhysical> 0)) {
+            if(boostPhysical > 0) {
+                if (boostPhysical + hitPoints > getAppHitpoints()) {
                     this.currentHitPoints = getAppHitpoints();
                 } else {
                     this.currentHitPoints += getAppHitpoints();
                 }
             }
 
-            if(boostMoral) {
-                if (healPower + currentMoral > getAppMoral()) {
+            if(boostMoral > 0) {
+                if (boostMoral + currentMoral > getAppMoral()) {
                     this.currentMoral = getAppMoral();
                 } else {
-                    this.currentMoral += healPower;
+                    this.currentMoral += boostMoral;
                 }
             }
             return true;

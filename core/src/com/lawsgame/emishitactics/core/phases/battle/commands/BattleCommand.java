@@ -3,10 +3,8 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification.OOAReport;
-import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
@@ -145,7 +143,7 @@ public abstract class BattleCommand extends Observable implements Observer {
 
         StandardTask removeOOAUnitTask = new StandardTask();
         for(int i = 0; i < OOAUnits.size; i++)
-            removeOOAUnitTask.addThread(new StandardTask.RendererThread(bfr, OOAUnits.get(i)));
+            removeOOAUnitTask.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, OOAUnits.get(i)));
         //removeOOAUnitTask.tag("remove OOA units");
         scheduleRenderTask(removeOOAUnitTask);
 

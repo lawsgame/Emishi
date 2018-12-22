@@ -106,7 +106,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         /*
          POOLING SCHEDULER TASK
 
-         By setting poolNextTask to true, the renderer allow itself to wait one fool frame
+         By setting poolNextTask to true, the renderer allow itself to wait one full frame
          for the scheduler to push the next set of tasks to be rendered
          before updating the current animation by calling BUR.display().
 

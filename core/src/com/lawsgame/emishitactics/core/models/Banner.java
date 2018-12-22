@@ -62,12 +62,13 @@ public class Banner extends Model  {
         return false;
     }
 
-    private float getValue(BannerBonus bb){
+    public float getValue(BannerBonus bb){
         return bonuses.get(bb) * bb.getBaseValue();
     }
 
-    public float getValue(BannerBonus bb, boolean takeModeIntoAccount){
-        return (bb.getMode() == mode || bb.getMode() == Data.BBMode.ALL || !takeModeIntoAccount) ? getValue(bb) : 0;
+
+    public float getCurrentValue(BannerBonus bb){
+        return (bb.getMode() == mode || bb.getMode() == Data.BBMode.ALL) ? getValue(bb) : 0;
     }
 
     public float getValue(BannerBonus bb, Data.BBMode desiredMode){
@@ -86,7 +87,7 @@ public class Banner extends Model  {
         String res = "\nBanner of "+bearer;
         res += "\n    war chief ? "+bearer.isWarChief()+"\n";
         for(BannerBonus bb : BannerBonus.values()) {
-            res +="\n    "+bb.name()+" : "+bonuses.get(bb)+" pts => value : "+getValue(bb, false);
+            res +="\n    "+bb.name()+" : "+bonuses.get(bb)+" pts => value : "+getValue(bb);
         }
         return res;
     }

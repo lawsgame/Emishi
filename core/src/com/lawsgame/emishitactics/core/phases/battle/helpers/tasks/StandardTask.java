@@ -11,14 +11,14 @@ import com.lawsgame.emishitactics.engine.timers.CountDown;
 import java.util.LinkedList;
 
 public class StandardTask extends Task {
-    protected Array<Thread> parallelThreads;
+    protected Array<SubTask> parallelSubTasks;
     protected boolean initiazed = false;
     protected String tag = "";
 
 
     public StandardTask(){
 
-        this.parallelThreads = new Array<Thread>();
+        this.parallelSubTasks = new Array<SubTask>();
         this.initiazed = false;
         this.tag = "";
     }
@@ -26,21 +26,27 @@ public class StandardTask extends Task {
 
     public StandardTask(Renderer renderer, Object dataBundle){
         this();
-        RendererThread rendererThread = new RendererThread(renderer);
+        RendererSubTaskQueue rendererThread = new RendererSubTaskQueue(renderer);
         rendererThread.addQuery(dataBundle);
-        parallelThreads.add(rendererThread);
+        parallelSubTasks.add(rendererThread);
     }
 
     public StandardTask(Observable sender, Renderer executer, Object dataBundle){
         this();
-        RendererThread rendererThread = new RendererThread(executer);
+        RendererSubTaskQueue rendererThread = new RendererSubTaskQueue(executer);
         rendererThread.addQuery(sender, dataBundle);
-        parallelThreads.add(rendererThread);
+        parallelSubTasks.add(rendererThread);
     }
 
-    public StandardTask(SimpleCommand command, float delay){
+    public StandardTask(final SimpleCommand command, float delay){
         this();
-        addThread(new  CommandThread(command, delay));
+        addParallelSubTask(new CommandSubTask(delay){
+
+            @Override
+            public void run() {
+                command.apply();
+            }
+        });
     }
 
 
@@ -48,14 +54,14 @@ public class StandardTask extends Task {
     // -------------- METHODS ----------------------
 
     public void update(float dt){
-        for(int i = 0; i < parallelThreads.size; i++){
-            parallelThreads.get(i).update(dt);
+        for(int i = 0; i < parallelSubTasks.size; i++){
+            parallelSubTasks.get(i).update(dt);
         }
     }
 
     public boolean isCompleted() {
-        for(int i = 0; i < parallelThreads.size; i++){
-            if(!parallelThreads.get(i).isCompleted()){
+        for(int i = 0; i < parallelSubTasks.size; i++){
+            if(!parallelSubTasks.get(i).isCompleted()){
                 return false;
             }
         }
@@ -64,17 +70,17 @@ public class StandardTask extends Task {
 
     public void init() {
         initiazed = true;
-        for(int i = 0; i < parallelThreads.size; i++){
-            parallelThreads.get(i).init();
+        for(int i = 0; i < parallelSubTasks.size; i++){
+            parallelSubTasks.get(i).init();
         }
     }
 
-    public void addThread(Thread thread){
-        parallelThreads.add(thread);
+    public void addParallelSubTask(SubTask subTask){
+        parallelSubTasks.add(subTask);
     }
 
-    public <T extends Thread> void addllThreads(Array<T> threads){
-        parallelThreads.addAll(threads);
+    public <T extends SubTask> void addllThreads(Array<T> threads){
+        parallelSubTasks.addAll(threads);
     }
 
 
@@ -86,8 +92,8 @@ public class StandardTask extends Task {
         String str = "STANDARD TASK ";
         if(!getTag().equals("")) str += "["+getTag()+"] ";
         str += ": ";
-        for(int i = 0; i < parallelThreads.size; i++) {
-            str +="\n   "+parallelThreads.get(i).toString();
+        for(int i = 0; i < parallelSubTasks.size; i++) {
+            str +="\n   "+ parallelSubTasks.get(i).toString();
         }
         return str;
     }
@@ -99,12 +105,86 @@ public class StandardTask extends Task {
      */
     @Override
     public boolean isIrrelevant() {
-        for(int i = 0; i < parallelThreads.size; i++){
-            if(!parallelThreads.get(i).isEmpty()){
+        for(int i = 0; i < parallelSubTasks.size; i++){
+            if(!parallelSubTasks.get(i).isEmpty()){
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     *
+     * this function allows to merge two StandardTask
+     * there is two type of merging operations:
+     *  - horizontal one, by adding sub tasks
+     *  - vertizontal one, by update an already existing tasks
+     *
+     *  the merging can occur only if :
+     *  0) {@link this} is empty;
+     *  1) both tasks only possess one {@link RendererSubTaskQueue} with the same renderer as target
+     *  2) both tasks has multiple {@link RendererSubTaskQueue} with no renderer in common, the subtask of param task are then adding tp those the task the method is called upon.
+     *
+     * @param task : task to merge with, by default this task is considered to be occuring after the one on which merge() have been called
+     * @return true if the merging is been success
+     */
+    @Override
+    public Task merge(Task task) {
+        if (task instanceof StandardTask && !initiazed && !((StandardTask) task).initiazed) {
+            StandardTask standardTask = (StandardTask) task;
+            // CASE 1 : task content is wholy merged into the empty this
+            if (this.isIrrelevant()) {
+                this.parallelSubTasks.clear();
+                this.addllThreads(standardTask.parallelSubTasks);
+                standardTask.parallelSubTasks.clear();
+                return this;
+            }
+            // CASE 2
+            RendererSubTaskQueue thisQueue;
+            RendererSubTaskQueue taskQueue;
+            if(this.parallelSubTasks.size == 1
+                    && standardTask.parallelSubTasks.size == 1
+                    && this.parallelSubTasks.get(0) instanceof  RendererSubTaskQueue
+                    && this.parallelSubTasks.get(0) instanceof  RendererSubTaskQueue){
+                thisQueue = (RendererSubTaskQueue)this.parallelSubTasks.get(0);
+                taskQueue = (RendererSubTaskQueue) standardTask.parallelSubTasks.get(0);
+                if(thisQueue.executer == taskQueue.executer){
+                    thisQueue.senders.addAll(taskQueue.senders);
+                    thisQueue.bundles.addAll(taskQueue.bundles);
+                    taskQueue.bundles.clear();
+                    taskQueue.senders.clear();
+                    return this;
+                }
+            }
+            // CASE 3
+            boolean noExecuterInCommon = true;
+            for (int i = 0; i < parallelSubTasks.size; i++) {
+                for (int j = 0; j < standardTask.parallelSubTasks.size; j++) {
+                    if (parallelSubTasks.get(i) instanceof RendererSubTaskQueue
+                            && standardTask.parallelSubTasks.get(j) instanceof RendererSubTaskQueue){
+                        thisQueue = (RendererSubTaskQueue)this.parallelSubTasks.get(i);
+                        taskQueue = (RendererSubTaskQueue) standardTask.parallelSubTasks.get(j);
+                        if(thisQueue.executer == taskQueue.executer){
+                            noExecuterInCommon = false;
+                            break;
+                        }
+                    }else{
+                        noExecuterInCommon = false;
+                        break;
+                    }
+                }
+            }
+            if(noExecuterInCommon){
+                this.addllThreads(standardTask.parallelSubTasks);
+                standardTask.parallelSubTasks.clear();
+                return this;
+            }
+        }
+        return this;
+    }
+
+    public int getNumberOfSubTasks(){
+        return parallelSubTasks.size;
     }
 
 
@@ -117,7 +197,14 @@ public class StandardTask extends Task {
     }
 
 
-    public static abstract class Thread {
+
+
+
+
+
+
+
+    public static abstract class SubTask {
         private String tag = "";
 
         abstract void init();
@@ -136,64 +223,37 @@ public class StandardTask extends Task {
 
 
 
+
+
     //------------------- THREAD IMP --------------------------------
 
-    public static class CommandThread extends Thread {
-        LinkedList<SimpleCommand> commands;
-        LinkedList<Float> delays;
+    public static abstract class CommandSubTask extends SubTask {
         CountDown countDown;
 
-        public CommandThread(){
-            commands = new LinkedList<SimpleCommand>();
-            delays = new LinkedList<Float>();
-            countDown = new CountDown(0);
+        public CommandSubTask(float delay){
+            countDown = new CountDown(delay);
         }
 
-        public CommandThread(SimpleCommand command, float delay){
-            this();
-            addQuery(command, delay);
-        }
-
-        public void addQuery(SimpleCommand command, float delay){
-            if(command != null && delay >= 0){
-                commands.offer(command);
-                delays.offer(delay);
-            }
-
-        }
+        public abstract void run();
 
         @Override
         void init() {
-            launch();
-        }
-
-        private void launch(){
-
-            if(!isEmpty()) {
-                commands.peek().apply();
-                countDown.reset(delays.peek());
-                countDown.run();
-            }
+            countDown.run();
         }
 
         @Override
         boolean isCompleted() {
-            return countDown.isFinished() && commands.size() == 0;
+            return countDown.isFinished();
         }
 
         @Override
         boolean isEmpty() {
-            return commands.size() == 0;
+            return false;
         }
 
         @Override
         void update(float dt) {
             countDown.update(dt);
-            if(countDown.isFinished()&& commands.size() > 0) {
-                commands.pop();
-                delays.pop();
-                launch();
-            }
         }
 
         @Override
@@ -213,7 +273,7 @@ public class StandardTask extends Task {
 
 
 
-    public static class RendererThread extends Thread {
+    public static class RendererSubTaskQueue extends SubTask {
         protected Renderer executer;
         protected boolean bundlesSent;
         protected LinkedList<Observable> senders;
@@ -221,7 +281,7 @@ public class StandardTask extends Task {
         protected CountDown countDown;
 
 
-        public RendererThread(Renderer executer, float delay){
+        public RendererSubTaskQueue(Renderer executer, float delay){
             this.bundlesSent = false;
             this.executer = executer;
             this.countDown = new CountDown(delay);
@@ -230,17 +290,17 @@ public class StandardTask extends Task {
 
         }
 
-        public RendererThread(Renderer executer){
+        public RendererSubTaskQueue(Renderer executer){
             this(executer, 0);
 
         }
 
-        public RendererThread(Renderer executer, Observable sender, Object dataBundle){
+        public RendererSubTaskQueue(Renderer executer, Observable sender, Object dataBundle){
             this(executer);
             addQuery(sender, dataBundle);
         }
 
-        public RendererThread(Renderer renderer, Object dataBundle){
+        public RendererSubTaskQueue(Renderer renderer, Object dataBundle){
             this(renderer);
             addQuery(renderer.getModel(), dataBundle);
         }
@@ -281,7 +341,7 @@ public class StandardTask extends Task {
 
         @Override
         public String toString() {
-            String str = "   RendererThread : executer = "+((executer != null) ? executer.toString(): "null");
+            String str = "   RendererSubTaskQueue : executer = "+((executer != null) ? executer.toString(): "null");
             for (int j = 0; j < bundles.size(); j++) {
                 str += "\n        Notif => sender : " + bundles.get(j) + " => " + senders.get(j);
             }
@@ -291,11 +351,15 @@ public class StandardTask extends Task {
 
 
 
-    public static class DelayThread extends Thread{
-        protected CountDown countDown;
-        protected boolean initiated = false;
 
-        public DelayThread(float delay){
+
+
+
+
+    public static class DelaySubTask extends SubTask {
+        protected CountDown countDown;
+
+        public DelaySubTask(float delay){
             countDown = new CountDown(delay);
         }
 
@@ -321,7 +385,7 @@ public class StandardTask extends Task {
 
         @Override
         public String toString() {
-            return "   DelayThread : duration = "+countDown.getDelay();
+            return "   DelaySubTask : duration = "+countDown.getDelay();
         }
     }
 }

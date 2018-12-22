@@ -29,7 +29,19 @@ public class WaitTask extends AnimationScheduler.Task {
 
     @Override
     public boolean isIrrelevant() {
-        return countDown.getDelay() == 0;
+        return countDown.getDelay() <= 0;
+    }
+
+    @Override
+    public AnimationScheduler.Task merge(AnimationScheduler.Task task) {
+        if(task instanceof WaitTask){
+            WaitTask waitTask = (WaitTask)task;
+            if(!initiated){
+                countDown.reset(countDown.getDelay() + waitTask.countDown.getDelay());
+                waitTask.countDown.reset(0);
+            }
+        }
+        return this;
     }
 
     @Override
@@ -40,5 +52,9 @@ public class WaitTask extends AnimationScheduler.Task {
     @Override
     public String toString() {
         return "WAITING TASK : "+countDown.getDelay()+"\n";
+    }
+
+    public CountDown getCountDown(){
+        return countDown;
     }
 }

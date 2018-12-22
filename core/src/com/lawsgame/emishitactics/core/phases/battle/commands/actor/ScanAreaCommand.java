@@ -50,8 +50,8 @@ public class ScanAreaCommand extends SelfInflitedCommand {
                 }
             }
         }
-        task.addThread(new StandardTask.RendererThread(bfr, igniteSparkles));
-        if(getInfo) task.addThread(new StandardTask.RendererThread(bfr.getUnitRenderer(getInitiator()), Data.AnimId.SCAN_AREA));
+        task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr, igniteSparkles));
+        if(getInfo) task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), Data.AnimId.SCAN_AREA));
         // push render task
         scheduleRenderTask(task);
         // set outcome

@@ -55,10 +55,10 @@ public class RevealRecruitCommand extends SelfInflitedCommand {
         recruitRenderer.setVisible(false);
         // push render task
         StandardTask task = new StandardTask();
-        StandardTask.RendererThread recruitThread = new StandardTask.RendererThread(recruitRenderer);
+        StandardTask.RendererSubTaskQueue recruitThread = new StandardTask.RendererSubTaskQueue(recruitRenderer);
         recruitThread.addQuery(Notification.Visible.get(true));
         recruitThread.addQuery(bfr.getModel(), new Notification.Walk(recruit, path, true));
-        task.addThread(recruitThread);
+        task.addParallelSubTask(recruitThread);
         scheduleRenderTask(task);
         // notif triggers
         Notification.UnitAppears notif = new Notification.UnitAppears();

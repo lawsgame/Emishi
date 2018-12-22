@@ -20,7 +20,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.Task;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererThread;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.RendererSubTaskQueue;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
@@ -143,16 +143,16 @@ public class HitCommand extends ActorCommand{
         StandardTask resetOrTask = new StandardTask();
         if (retaliation) {
             getInitiator().setOrientation(initiatorInitOr);
-            resetOrTask.addThread(new RendererThread(bfr.getUnitRenderer(getInitiator()), initiatorInitOr));
+            resetOrTask.addParallelSubTask(new RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()), initiatorInitOr));
         }
         DefenderData data;
         for(int i = 0; i < defendersData.size; i++){
             data = defendersData.get(i);
             data.targetRenderer.getModel().setOrientation(data.targetInitOrientation);
-            resetOrTask.addThread(new RendererThread(data.targetRenderer, data.targetInitOrientation));
+            resetOrTask.addParallelSubTask(new RendererSubTaskQueue(data.targetRenderer, data.targetInitOrientation));
             if(isDefenderGuardian(i)) {
                 data.defenderRenderer.getModel().setOrientation(data.defenderInitOrientation);
-                resetOrTask.addThread(new RendererThread(data.defenderRenderer, data.defenderInitOrientation));
+                resetOrTask.addParallelSubTask(new RendererSubTaskQueue(data.defenderRenderer, data.defenderInitOrientation));
             }
         }
         return resetOrTask;
@@ -160,10 +160,10 @@ public class HitCommand extends ActorCommand{
 
     protected void performAttack(){
         StandardTask task = new StandardTask();
-        RendererThread initiatorThread = new RendererThread(bfr.getUnitRenderer(getInitiator()));
-        Array<RendererThread> defenderThreads = new Array<RendererThread>();
+        RendererSubTaskQueue initiatorThread = new RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()));
+        Array<RendererSubTaskQueue> defenderThreads = new Array<RendererSubTaskQueue>();
         for(int i = 0; i < defendersData.size; i++)
-            defenderThreads.add(new StandardTask.RendererThread(defendersData.get(i).defenderRenderer));
+            defenderThreads.add(new RendererSubTaskQueue(defendersData.get(i).defenderRenderer));
 
         Array<TakeDamage> notifs = new Array<TakeDamage>();
         Attack attackNotif = new Attack(specialmove);
@@ -221,14 +221,14 @@ public class HitCommand extends ActorCommand{
             for(int i = 0; i < notifs.size; i++){
                 healValue += notifs.get(i).lifeDamageTaken;
             }
-            boolean treated = getInitiator().improveCondition(healValue, true, true);
+            boolean treated = getInitiator().improveCondition(healValue, healValue);
             if(treated)
                 attackNotif.lifeDrained = healValue;
         }
 
-        task.addThread(initiatorThread);
+        task.addParallelSubTask(initiatorThread);
         for(int i = 0; i < defenderThreads.size; i++)
-            task.addThread(defenderThreads.get(i));
+            task.addParallelSubTask(defenderThreads.get(i));
         scheduleRenderTask(task);
 
     }
