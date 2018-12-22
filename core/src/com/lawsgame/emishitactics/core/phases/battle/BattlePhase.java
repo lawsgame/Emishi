@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.Timer;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -26,9 +27,17 @@ public class BattlePhase extends GamePhase {
     public static BitmapFont testFont;
 
     private BattleInteractionMachine bim;
+    private static Timer timer;
+
+
+    public static Timer getTimer(){
+        if(timer == null){
+            timer = new Timer();
+        }
+        return timer;
+    }
 
     public void loadRequiredAssets() {
-        //FINAL
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
         asm.load(Assets.ATLAS_BATTLE_ICONS, TextureAtlas.class);
         asm.load(Assets.SKIN_UI, Skin.class);
@@ -43,6 +52,7 @@ public class BattlePhase extends GamePhase {
         testFont = skin.getFont("default-font");
 
         if(clean) {
+
             float requiredSize = 18f;
             // float scale = 1f;
             float lineSpacingFactor = 0.95f;
@@ -67,11 +77,6 @@ public class BattlePhase extends GamePhase {
 
     }
 
-
-    private static float getPixelPerfectGamePortWidth(){
-        return Gdx.app.getGraphics().getWidth() * IsoBFR.SPRITE_STD_SIZE/ 192f;
-    }
-
     public BattlePhase(GPM gpm, Player player, int chapterId ){
         super(gpm, getPixelPerfectGamePortWidth());
         System.out.println("game port width : " +getPixelPerfectGamePortWidth());
@@ -84,6 +89,10 @@ public class BattlePhase extends GamePhase {
         //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
+    }
+
+    private static float getPixelPerfectGamePortWidth(){
+        return Gdx.app.getGraphics().getWidth() * IsoBFR.SPRITE_STD_SIZE/ 192f;
     }
 
     @Override
