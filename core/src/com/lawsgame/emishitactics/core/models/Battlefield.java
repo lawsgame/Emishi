@@ -281,7 +281,6 @@ public class Battlefield extends Model {
         return null;
     }
 
-    /*
     public Array<int[]> getNeighbourTiles(int row, int col) {
         Array<int[]> tiles = new Array<int[]>();
         if(isTileExisted(row + 1 , col)) tiles.add(new int[]{row + 1 , col});
@@ -290,10 +289,19 @@ public class Battlefield extends Model {
         if(isTileExisted(row , col - 1)) tiles.add(new int[]{row , col - 1});
         return tiles;
     }
-    */
+
+    public Array<int[]> getAvailableNeighbourTiles(int row, int col, boolean pathfinder) {
+        Array<int[]> tiles = new Array<int[]>();
+        if(isTileAvailable(row + 1 , col, pathfinder)) tiles.add(new int[]{row + 1 , col});
+        if(isTileAvailable(row , col + 1, pathfinder)) tiles.add(new int[]{row , col + 1});
+        if(isTileAvailable(row - 1 , col, pathfinder)) tiles.add(new int[]{row - 1 , col});
+        if(isTileAvailable(row , col - 1, pathfinder)) tiles.add(new int[]{row , col - 1});
+        return tiles;
+    }
 
 
-    //------------------ AREAS MAGEMETNS --------------------------------------
+
+    //------------------ AREAS MANAGEMENTS --------------------------------------
 
     public void addUnitArea(UnitArea area){
         if(area != null && area.getActor() != null && !isUnitAreaExisted(area)) {

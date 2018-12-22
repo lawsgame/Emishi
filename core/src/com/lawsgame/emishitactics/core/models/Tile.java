@@ -52,16 +52,28 @@ public class Tile extends Model{
         return loot == null;
     }
 
-    public Item getLoot(){
-        return loot;
+    public Item getLoot(boolean remove){
+        Item lootGotten = loot;
+        if(remove) loot = null;
+        return lootGotten;
     }
 
     public boolean isHidingRecruit(){
         return recruit != null;
     }
 
-    public Unit getRecruit(){
-        return recruit;
+    public Unit getRecruit(boolean remove){
+        Unit recruitGotten = recruit;
+        if(remove) recruit = null;
+        return recruitGotten;
+    }
+
+    public void setLoot(Item loot) {
+        this.loot = loot;
+    }
+
+    public void setRecruit(Unit recruit) {
+        this.recruit = recruit;
     }
 
     public String toString(){

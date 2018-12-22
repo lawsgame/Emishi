@@ -50,26 +50,23 @@ public class ReinforcementEvent extends BattleCommand {
         Unit unit;
         StandardTask deployTask = new StandardTask();
         StandardTask.RendererThread thread;
+        Notification.UnitAppears eventNotif = new Notification.UnitAppears();
         for(int i = 0; i < reinforcements.size; i++) {
-            unit = reinforcements.get(i);
-
-
             //update model
+            unit = reinforcements.get(i);
             bfr.getModel().deploy(deploymentPositions.get(i)[0], deploymentPositions.get(i)[1], unit, false);
-
+            eventNotif.newlyDeployed.add(unit);
             //set renderers
             BattleUnitRenderer bur = bfr.addUnitRenderer(entryPoints.get(i)[0], entryPoints.get(i)[1], unit);
             bur.setVisible(false);
-
             // push render task
             thread = new StandardTask.RendererThread(bfr.getUnitRenderer(unit));
             thread.addQuery(Notification.Visible.get(true));
             thread.addQuery(bfr.getModel(), new Notification.Walk(unit, paths.get(i), true));
             deployTask.addThread(thread);
         }
-
         scheduleRenderTask(deployTask);
-        handleEvents(null, -1,-1);
+        handleEvents(eventNotif, -1,-1);
     }
 
     @Override

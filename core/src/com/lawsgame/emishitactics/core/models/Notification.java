@@ -354,4 +354,8 @@ public class Notification {
 
 
     }
+
+    public static class UnitAppears {
+        public final Array<Unit> newlyDeployed = new Array<Unit>();
+    }
 }

@@ -12,11 +12,14 @@ import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PickLootCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.RevealRecruitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ScanAreaCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
@@ -89,7 +92,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         // -------***<<< CUSTOMED COMMAND related tests >>>***------------------------
 
         sltdUnit.addNativeAbility(Data.Ability.PATHFINDER);
-        customedCommand = new ScanAreaCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand = new RevealRecruitCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
 
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -232,7 +235,10 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< OTHER TESTS >>>***------------------
 
-        //bfr.displayAllTraps();
+        bfr.getModel().getTile(14,7).setLoot(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        bfr.getModel().getTile(10,7).setRecruit(new Unit("Alfred", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD));
+        bfr.displayAllTraps();
+        bfr.displayAllLoots();
     }
 
 

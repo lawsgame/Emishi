@@ -202,6 +202,7 @@ public class Data {
         SWITCH_WEAPON(  AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         SPECIAL_MOVE(   AnimSpriteSetId.SPECIAL_MOVE),
         CHANGE_STRATEGY(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        PICK_LOOT (     AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         SCAN_AREA(      AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
 
         AnimSpriteSetId soldierId;
@@ -278,6 +279,7 @@ public class Data {
         SCAN_AREA           (3, 20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
         PICK_LOOT           (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        REVEAL_RECRUIT      (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;

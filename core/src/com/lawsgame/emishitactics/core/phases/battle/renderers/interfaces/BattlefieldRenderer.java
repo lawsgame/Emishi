@@ -163,6 +163,19 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }
     }
 
+    public void displayAllLoots(){
+        TileRenderer tr;
+        for(int r = 0; r < getModel().getNbRows(); r++){
+            for(int c = 0; c  < getModel().getNbColumns(); c++){
+                tr = getTileRenderer(r,c);
+                if(tr != null && !tr.getModel().isLooted()){
+                    tr.setRevealed(true, Data.SparkleType.LOOT);
+                    tr.getModel().setRevealed(true);
+                }
+            }
+        }
+    }
+
 
     @Override
     public final void getNotification(Observable sender, Object data) {

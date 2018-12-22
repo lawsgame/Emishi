@@ -27,7 +27,6 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.phases.battle.BattlePhase;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
@@ -37,7 +36,7 @@ import java.util.HashMap;
 
 public class BattlefieldLoader {
     private static XmlReader reader = new XmlReader();
-    private static Array<String> NAME_DICTIONARY = new Array<String>();
+    private static Array<String> nameDictionary = new Array<String>();
     private static boolean dictionariesLoaded = false;
 
 
@@ -242,7 +241,7 @@ public class BattlefieldLoader {
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
         boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
         if(!character){
-            name = NAME_DICTIONARY.get(Data.rand(NAME_DICTIONARY.size));
+            name = nameDictionary.get(Data.rand(nameDictionary.size));
         }
         for(UnitTemplate j: UnitTemplate.values()){
             if(j.name().equals(unitElt.get("template"))){
@@ -400,7 +399,7 @@ public class BattlefieldLoader {
                 XmlReader.Element nameElt;
                 for (int i = 0; i < namesElt.getChildCount(); i++) {
                     nameElt = namesElt.getChild(i);
-                    NAME_DICTIONARY.add(nameElt.get("value"));
+                    nameDictionary.add(nameElt.get("value"));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -410,7 +409,7 @@ public class BattlefieldLoader {
     }
 
     public static void unloadNameDictionary(){
-        NAME_DICTIONARY.clear();
+        nameDictionary.clear();
     }
 
 
