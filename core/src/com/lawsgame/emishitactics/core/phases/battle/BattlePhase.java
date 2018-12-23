@@ -85,8 +85,8 @@ public class BattlePhase extends GamePhase {
         setFontParams(true);
 
         this.bim = new BattleInteractionMachine(gameCM, asm, stageUI, player, chapterId);
-        //BattleInteractionState initBIS = new TestBIS(bim);
-        BattleInteractionState initBIS = new SceneBIS(bim);
+        BattleInteractionState initBIS = new TestBIS(bim);
+        //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

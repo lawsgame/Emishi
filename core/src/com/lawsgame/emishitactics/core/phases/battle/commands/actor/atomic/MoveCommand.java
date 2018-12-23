@@ -7,6 +7,8 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PickLootCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.RevealRecruitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
@@ -15,6 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class MoveCommand extends SelfInflitedCommand {
     protected Array<int[]> path;
     protected Data.Orientation oldWalkerOrientation;
+    // if true, the walker appears while walking to his destination.
     protected boolean reveal;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
@@ -30,27 +33,21 @@ public class MoveCommand extends SelfInflitedCommand {
     @Override
     protected void execute() {
         oldWalkerOrientation = getInitiator().getOrientation();
-
         // update model
         bfr.getModel().moveUnit(rowActor, colActor, path.peek()[0], path.peek()[1], false);
         Data.Orientation or = (path.size > 1) ?
                 Utils.getOrientationFromCoords(path.get(path.size - 2)[0], path.get(path.size - 2)[1], path.peek()[0], path.peek()[1]) :
                 Utils.getOrientationFromCoords(rowActor, colActor, path.peek()[0], path.peek()[1]);
         getInitiator().setOrientation(or);
-
         // push render task
-        StandardTask task = new StandardTask();
-        StandardTask.RendererSubTaskQueue thread = new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(getInitiator()));
-        if(reveal)
-            thread.addQuery(Notification.Visible.get(true));
-        thread.addQuery(bfr.getModel(), new Notification.Walk(getInitiator(), path, reveal));
-        task.addParallelSubTask(thread);
-        scheduleRenderTask(task);
+        StandardTask moveTask = new StandardTask(bfr.getModel(), bfr.getUnitRenderer(getInitiator()), new Notification.Walk(getInitiator(), path, reveal));
+        scheduleRenderTask(moveTask);
+
     }
 
     @Override
-    public boolean isUndoable() {
-        return super.isUndoable() && !reveal;
+    public boolean isAppliableWihoutValidation() {
+        return super.isAppliableWihoutValidation() && ! reveal;
     }
 
     @Override

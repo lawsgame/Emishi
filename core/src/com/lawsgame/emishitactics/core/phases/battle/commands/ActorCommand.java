@@ -85,7 +85,6 @@ public abstract class ActorCommand extends BattleCommand{
     protected int colActor;
     protected int rowTarget;
     protected int colTarget;
-    protected boolean eventTriggered;
 
 
     public ActorCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free){
@@ -102,8 +101,7 @@ public abstract class ActorCommand extends BattleCommand{
         this.colActor = -1;
         this.rowTarget = -1;
         this.colTarget = -1;
-        this.eventTriggered = false;
-        this.registerAction = true;
+
     }
 
     public final void setInitiator(int rowActor, int colActor) {
@@ -121,7 +119,7 @@ public abstract class ActorCommand extends BattleCommand{
 
     @Override
     public final boolean apply() {
-
+        this.registerAction = true;
         if(super.apply()) {
 
             /*
@@ -152,6 +150,7 @@ public abstract class ActorCommand extends BattleCommand{
                     System.out.println(showTask());
                 }
                 System.out.println(outcome);
+                System.out.println("\nEvent triggered while performing this command ? "+isEventTriggered());
                 System.out.println("\n              ------***$$ END $$***------\n");
             }
 
@@ -206,9 +205,20 @@ public abstract class ActorCommand extends BattleCommand{
         handleEvents(data, area);
     }
 
+    public boolean isAppliableWihoutValidation(){
+        return choice.isUndoable() && !initiator.isOutOfAction();
+    }
+
+    /**
+     * {@link ActorCommand#isAppliableWihoutValidation()} and this method are almost the same except from taking
+     * into account the value of {@link BattleCommand#isEventTriggered()} which is updated as late as possible just at the
+     * beginning of the method {@link BattleCommand#apply()}. This fact required the existence of both those methods.
+     *
+     * @return true if can be undone
+     */
     @Override
-    public boolean isUndoable() {
-        return choice.isUndoable() && !initiator.isOutOfAction() && !eventTriggered;
+    public final boolean isUndoable() {
+        return isAppliableWihoutValidation() && !isEventTriggered();
     }
 
     @Override

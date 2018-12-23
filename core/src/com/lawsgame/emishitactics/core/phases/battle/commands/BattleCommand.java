@@ -23,7 +23,7 @@ public abstract class BattleCommand extends Observable implements Observer {
     private boolean decoupled;
     private Array<Task> renderTasks;                // ids which allows to certify that the rendering of the command is bundlesSent / completed AND usefull for decoupling view and model updates
     private boolean tasksScheduled;
-
+    private boolean eventTriggered;
     protected Outcome outcome;
 
 
@@ -39,7 +39,7 @@ public abstract class BattleCommand extends Observable implements Observer {
     public boolean apply() {
         // Outcome and animation scheduler cleared.
         this.outcome.reset();
-
+        this.eventTriggered = false;
         if(isApplicable()) {
             execute();
             return true;
@@ -196,6 +196,18 @@ public abstract class BattleCommand extends Observable implements Observer {
     private boolean isAnyEventTriggerable(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
         Battlefield bf = bfr.getModel();
 
+        if(!ignoreBFEvents && bf.isAnyEventTriggerable(data)){
+            return true;
+        }
+
+        if(!ignoreArmieEvents ) {
+            for (int i = 0; i < bf.armyTurnOrder.size(); i++) {
+                if (bf.armyTurnOrder.get(i).isAnyEventTriggerable(data)) {
+                    return true;
+                }
+            }
+        }
+
         if(bf.isTileExisted(row, col)) {
             // check unit
             if(bf.isTileOccupied(row, col)){
@@ -230,14 +242,14 @@ public abstract class BattleCommand extends Observable implements Observer {
      *  3.2) tile related
      *  3.3) area related
      *
-     *
+     *  set the value of eventTriggered if a event occurs
      *
      * @param data : notif to give to the triggers
      * @param area : tiles to check for event to trigger
      * @return if a event has been triggered
      */
     protected final void handleEvents(Object data, Array<int[]> area) {
-
+        eventTriggered = eventTriggered || isAnyEventTriggerable(data, area);
         scheduleMultipleRenderTasks(bfr.getModel().performEvents(data, outcome));
         for(int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++)
             scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data, outcome));
@@ -247,6 +259,7 @@ public abstract class BattleCommand extends Observable implements Observer {
 
 
     protected final void handleEvents(Object data, int row, int col){
+        eventTriggered = eventTriggered || isAnyEventTriggerable(data, row, col);
         handleEvents(data, row, col, false, false);
     }
 
@@ -280,12 +293,12 @@ public abstract class BattleCommand extends Observable implements Observer {
         }
     }
 
-    public void reactiveTriggers(){
-        bfr.getModel().setAllTriggersActive(true);
-    }
-
     public final void setDecoupled(boolean decoupled) {
         this.decoupled = decoupled;
+    }
+
+    public final boolean isEventTriggered(){
+        return eventTriggered;
     }
 
     public String toShortString(){

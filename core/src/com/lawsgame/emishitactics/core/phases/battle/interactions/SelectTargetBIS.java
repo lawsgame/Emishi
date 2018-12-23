@@ -65,7 +65,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
         int row = currentCommand.getRowTarget();
         int col = currentCommand.getColTarget();
         if(currentCommand.isTargetValid()){
-            if(currentCommand.isUndoable()){
+            if(currentCommand.isAppliableWihoutValidation()){
                 // ACTION PERFORM
 
                 currentCommand.attach(this);

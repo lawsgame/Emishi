@@ -220,6 +220,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< SPARKLE ANIM TEST >>>***------------------------
 
+        /*
         Sprite sprite;
         Array<TextureRegion> sparkleTR = bfr.assetProvider.sparkleTR.get(Data.SparkleType.TRAP);
         sprites = new Array<Sprite>();
@@ -231,7 +232,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         }
         animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, true, false);
         animation.play();
-
+        */
 
         // -------***<<< OTHER TESTS >>>***------------------
 
@@ -239,6 +240,8 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         bfr.getModel().getTile(10,7).setRecruit(new Unit("Alfred", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD));
         bfr.displayAllTraps();
         bfr.displayAllLoots();
+
+
     }
 
 
@@ -320,7 +323,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // TEST CUSTOMED COMMAND
 
-
+        /*
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
 
@@ -367,7 +370,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
             }
         }
-
+        */
 
 
 
