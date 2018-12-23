@@ -52,15 +52,10 @@ public class SwitchPositionCommand extends ActorCommand {
         // handle event
 
         Notification.StepOn stepOn = new Notification.StepOn(rowActor, colActor, rowTarget, colTarget, getInitiator());
-        if(isAnyEventTriggerable(stepOn, rowTarget, colTarget)){
-            this.eventTriggered = true;
-            handleEvents(stepOn, rowTarget, colTarget );
-        }
+        handleEvents(stepOn, rowTarget, colTarget );
         stepOn = new Notification.StepOn(rowTarget, colTarget, rowActor, colActor, getTarget());
-        if(isAnyEventTriggerable(stepOn, rowActor, colActor)){
-            this.eventTriggered = true;
-           handleEvents(stepOn, rowActor, colActor);
-        }
+        handleEvents(stepOn, rowActor, colActor);
+
 
     }
 

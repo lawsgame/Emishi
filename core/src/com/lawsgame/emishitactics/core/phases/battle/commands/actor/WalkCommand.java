@@ -38,7 +38,6 @@ public class WalkCommand extends ActorCommand {
                 if(moveCommand.apply(rowActor, colActor)) {
                     scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
                     // perform event
-                    this.eventTriggered = true;
                     handleEvents(stepOn, subpath.peek()[0], subpath.peek()[1]);
                     // keep walking if possible
                     WalkCommand walkCommand = new WalkCommand(bfr, scheduler, outcome.playerInventory);
@@ -55,7 +54,8 @@ public class WalkCommand extends ActorCommand {
                 }
             }
         }
-        if(!eventTriggered){
+        System.out.println("    Is move without event ok (no event triggered)? "+!isEventTriggered());
+        if(!isEventTriggered()){
             moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
             moveCommand.setDecoupled(true);
             if(moveCommand.apply(rowActor, colActor)) {
@@ -97,10 +97,8 @@ public class WalkCommand extends ActorCommand {
 
     @Override
     protected void unexecute() {
-        if(!this.eventTriggered){
-            moveCommand.undo();
-            scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
-        }
+        moveCommand.undo();
+        scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
     }
 
 

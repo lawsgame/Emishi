@@ -15,6 +15,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class MoveCommand extends SelfInflitedCommand {
     protected Array<int[]> path;
     protected Data.Orientation oldWalkerOrientation;
+    // if true, the walker appears while walking to his destination.
     protected boolean reveal;
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
@@ -49,8 +50,8 @@ public class MoveCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public boolean isUndoable() {
-        return super.isUndoable() && !reveal;
+    public boolean isAppliableWihoutValidation() {
+        return super.isAppliableWihoutValidation() && ! reveal;
     }
 
     @Override

@@ -1,15 +1,10 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.actor;
 
-import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
-import com.lawsgame.emishitactics.core.models.Formulas;
 import com.lawsgame.emishitactics.core.models.Inventory;
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class AttackCommand extends HitCommand {
