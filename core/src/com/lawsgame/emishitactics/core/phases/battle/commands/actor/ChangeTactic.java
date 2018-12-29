@@ -13,7 +13,8 @@ public class ChangeTactic extends SelfInflitedCommand {
     private Data.BBMode previousMode;
 
     public ChangeTactic(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Data.BBMode mode) {
-        super(bfr, Data.ActionChoice.CHANGE_TACTIC  , scheduler, playerInventory, true);
+        super(bfr, Data.ActionChoice.CHANGE_TACTIC  , scheduler, playerInventory);
+        setRegisterAction(false);
         this.mode = mode;
     }
 

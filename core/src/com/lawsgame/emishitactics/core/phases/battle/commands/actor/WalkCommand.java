@@ -19,7 +19,7 @@ public class WalkCommand extends ActorCommand {
     protected MoveCommand moveCommand;
 
     public WalkCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, ActionChoice.WALK, scheduler, playerInventory, false);
+        super(bfr, ActionChoice.WALK, scheduler, playerInventory);
     }
 
     @Override
@@ -34,6 +34,7 @@ public class WalkCommand extends ActorCommand {
             previousPos[1] = subpath.peek()[1];
             if(isAnyEventTriggerable(stepOn, subpath.peek()[0], subpath.peek()[1])){
                 moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
+                moveCommand.setFree(true);
                 moveCommand.setDecoupled(true);
                 if(moveCommand.apply(rowActor, colActor)) {
                     scheduleMultipleRenderTasks(moveCommand.confiscateTasks());
@@ -58,6 +59,7 @@ public class WalkCommand extends ActorCommand {
         //System.out.println("    Is move without event ok (no event triggered)? "+!isEventTriggered());
         if(!isEventTriggered()){
             moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
+            moveCommand.setFree(true);
             moveCommand.setDecoupled(true);
             if(moveCommand.apply(rowActor, colActor)) {
                 scheduleMultipleRenderTasks(moveCommand.confiscateTasks());

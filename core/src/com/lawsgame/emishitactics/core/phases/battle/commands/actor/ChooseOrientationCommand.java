@@ -16,8 +16,9 @@ public class ChooseOrientationCommand extends SelfInflitedCommand {
     protected Orientation newOrientation;
 
     public ChooseOrientationCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Orientation newOrientation) {
-        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, playerInventory, true);
-       setOrientation(newOrientation);
+        super(bfr, ActionChoice.CHOOSE_ORIENTATION, scheduler, playerInventory);
+        setFree(true);
+        setOrientation(newOrientation);
     }
 
     public void setOrientation(Orientation newOrientation){

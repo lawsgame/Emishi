@@ -20,7 +20,8 @@ public class SwitchPositionCommand extends ActorCommand {
     private Data.Orientation oldActorOrientation;
 
     public SwitchPositionCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, playerInventory, true);
+        super(bfr, ActionChoice.SWITCH_POSITION, scheduler, playerInventory);
+        setRegisterAction(true);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class CoveringFireCommand extends SelfInflitedCommand {
 
 
     public CoveringFireCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, Data.ActionChoice.COVER_AREA, scheduler, playerInventory, false);
+        super(bfr, Data.ActionChoice.COVER_AREA, scheduler, playerInventory);
     }
 
     @Override

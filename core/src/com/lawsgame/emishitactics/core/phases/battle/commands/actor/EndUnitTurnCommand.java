@@ -15,7 +15,8 @@ public class EndUnitTurnCommand extends SelfInflitedCommand {
 
 
     public EndUnitTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, TileHighlighter thl) {
-        super(bfr, END_TURN, scheduler, playerInventory, true);
+        super(bfr, END_TURN, scheduler, playerInventory);
+        setRegisterAction(false);
         this.thl = thl;
     }
 

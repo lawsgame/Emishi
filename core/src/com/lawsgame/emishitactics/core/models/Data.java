@@ -17,7 +17,7 @@ public class Data {
     public static final int HEAL_BASE_POWER = 3;
     public static final float MAX_UNITS_UNDER_WARLORD = 6; // including the warlord himself / herself
     public static final float MAX_UNITS_UNDER_WAR_CHIEF = 5; // including the war chief himself / herself
-    public static final int AP_REGEN = 3;
+    public static final int AP_REGEN = 1;
     public static final int DEX_FACTOR_ATT_ACC = 3;
     public static final int DEX_FACTOR_AVO = 4;
     public static final int HIT_RATE_BACK_ACC_BONUS = 20;
@@ -265,18 +265,18 @@ public class Data {
 
         MOVE                (0, 0, true, false, false, 0, 0, false, new int[][]{{0, 0}}),
         WALK                (0, 0, true, false, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
-        ATTACK              (3, 0, false, true, false, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
+        ATTACK              (1, 0, false, true, false, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
         SWITCH_POSITION     (0, 0, true, false, false, 1, 1, false, new int[][]{{0, 0}}),
         PUSH                (0, 0, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
         SWITCH_WEAPON       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
         CHOOSE_ORIENTATION  (0, 0, false, true, false, 0, 0, true, new int[][]{{0, 0}}),
-        HEAL                (3, 10, false, true, false, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
-        GUARD               (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        STEAL               (3, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        BUILD               (5, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        PLUNDER             (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        COVER_AREA          (3, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        SCAN_AREA           (3, 20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        HEAL                (1, 10, false, true, false, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
+        GUARD               (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        STEAL               (1, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        BUILD               (3, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        PLUNDER             (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        COVER_AREA          (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        SCAN_AREA           (1, 20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
         PICK_LOOT           (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         REVEAL_RECRUIT      (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),

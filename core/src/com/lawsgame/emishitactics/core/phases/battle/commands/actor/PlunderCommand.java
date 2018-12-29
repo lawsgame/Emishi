@@ -14,7 +14,7 @@ public class PlunderCommand extends SelfInflitedCommand {
 
 
     public PlunderCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, Data.ActionChoice.PLUNDER, scheduler, playerInventory, false);
+        super(bfr, Data.ActionChoice.PLUNDER, scheduler, playerInventory);
     }
 
     @Override

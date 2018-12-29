@@ -16,7 +16,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class PushCommand extends ActorCommand {
 
     public PushCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, ActionChoice.PUSH, scheduler, playerInventory, false);
+        super(bfr, ActionChoice.PUSH, scheduler, playerInventory);
     }
 
     @Override

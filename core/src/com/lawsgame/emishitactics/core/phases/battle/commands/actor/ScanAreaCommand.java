@@ -18,7 +18,7 @@ public class ScanAreaCommand extends SelfInflitedCommand {
 
 
     public ScanAreaCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, Data.ActionChoice.SCAN_AREA, scheduler, playerInventory, false);
+        super(bfr, Data.ActionChoice.SCAN_AREA, scheduler, playerInventory);
     }
 
     @Override

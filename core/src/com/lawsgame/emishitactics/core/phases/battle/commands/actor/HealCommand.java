@@ -22,7 +22,7 @@ public class HealCommand extends SelfInflitedCommand {
     private int[] recoveredMoral;
 
     public HealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, ActionChoice.HEAL, scheduler, playerInventory, false);
+        super(bfr, ActionChoice.HEAL, scheduler, playerInventory);
     }
 
     @Override

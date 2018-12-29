@@ -15,8 +15,9 @@ public class SwitchWeaponCommand extends SelfInflitedCommand {
     private final int weaponIndex;
 
     public SwitchWeaponCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, int weaponIndex) {
-        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, playerInventory, true);
+        super(bfr, ActionChoice.SWITCH_WEAPON, scheduler, playerInventory);
         this.weaponIndex = weaponIndex;
+        setRegisterAction(false);
     }
 
     @Override

@@ -75,9 +75,10 @@ public abstract class ActorCommand extends BattleCommand{
 
 
     protected final ActionChoice choice;
-    protected boolean registerAction;
-    private boolean free;                           // command that does not count as the player choice i.e. set acted and moved as "registerAction" while being applied nor it costs any OA point
-
+    //does not set the actor.acted or .moved to true if the command is executed
+    private boolean registerAction;
+    // does not update the AP of the actor if the command is executed
+    private boolean costless;
 
     private Unit initiator;
     private Unit target;
@@ -87,10 +88,11 @@ public abstract class ActorCommand extends BattleCommand{
     protected int colTarget;
 
 
-    public ActorCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free){
+    public ActorCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory){
         super(bfr, scheduler, playerInventory);
         this.choice = choice;
-        this.free = free;
+        this.registerAction = true;
+        this.costless = false;
     }
 
     /**
@@ -121,42 +123,37 @@ public abstract class ActorCommand extends BattleCommand{
     public final boolean apply() {
         this.registerAction = true;
         if(super.apply()) {
-
-            /*
-             * 1) set as moved or acted
-             * 2) actor pays the cost of performing this action
-             * 3) clean and solve the outcome
-             */
-            if(!free){
-
-                if(choice.isActedBased()) {
-                    getInitiator().setActed(registerAction);
-                }else {
-                    getInitiator().setMoved(registerAction);
-                }
-
-                initiator.addActionPoints(-choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
-
-                outcome.clean();
-                outcome.resolve();
-
-
-                System.out.println("\n              -----***$$ BEGIN $$***-----");
-                System.out.println("\nACTION REPORT of "+initiator.getName()+" performing "+choice.name());
-                System.out.println();
-                if(!isDecoupled())
-                    System.out.println(scheduler);
-                else{
-                    System.out.println(showTask());
-                }
-                System.out.println(outcome);
-                System.out.println("\nEvent triggered while performing this command ? "+isEventTriggered());
-                System.out.println("\n              ------***$$ END $$***------\n");
+            // set as moved or acted
+            if (choice.isActedBased()) {
+                getInitiator().setActed(registerAction);
+            } else {
+                getInitiator().setMoved(registerAction);
             }
-
+            // actor pays the cost of performing this action
+            if(!costless) {
+                initiator.addActionPoints(-choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
+            }
+            // clean and solve the outcome
+            outcome.clean();
+            outcome.resolve();
+            printCommand();
             return true;
         }
         return false;
+    }
+
+    private void printCommand(){
+        System.out.println("\n              -----***$$ BEGIN $$***-----");
+        System.out.println("\nACTION REPORT of "+initiator.getName()+" performing "+choice.name());
+        System.out.println();
+        if(!isDecoupled())
+            System.out.println(scheduler);
+        else{
+            System.out.println(showTask());
+        }
+        System.out.println(outcome);
+        System.out.println("\nEvent triggered while performing this command ? "+isEventTriggered());
+        System.out.println("\n              ------***$$ END $$***------\n");
     }
 
     public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){
@@ -173,13 +170,14 @@ public abstract class ActorCommand extends BattleCommand{
     @Override
     public final boolean undo(){
         if(super.undo()) {
-
-            if (!free) {
-                if (choice.isActedBased())
+            if(registerAction) {
+                if (choice.isActedBased()) {
                     getInitiator().setActed(false);
-                else
+                }else {
                     getInitiator().setMoved(false);
-
+                }
+            }
+            if (!costless) {
                 initiator.addActionPoints(choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
             }
 
@@ -237,13 +235,13 @@ public abstract class ActorCommand extends BattleCommand{
     public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator){
 
         boolean valid = false;
-        if(bfr.getModel().isUnitDeployed(initiator)){
+        if(bfr.getModel().isTileReachable(rowActor, colActor, initiator.has(Data.Ability.PATHFINDER))){
             if(!initiator.isOutOfAction()) {
-                if (free || choice.getCost(rowActor, colActor, initiator, bfr.getModel()) <= initiator.getActionPoints()) {
+                if (costless || choice.getCost(rowActor, colActor, initiator, bfr.getModel()) <= initiator.getActionPoints()) {
                     if (choice.isActedBased()) {
-                        valid = (free || !initiator.isActed()) && !initiator.isDisabled();
+                        valid = (!registerAction || !initiator.isActed()) && !initiator.isDisabled();
                     } else {
-                        valid = (free || !initiator.isMoved()) && !initiator.isCrippled();
+                        valid = (!registerAction || !initiator.isMoved()) && !initiator.isCrippled();
                     }
                 }
             }
@@ -560,12 +558,17 @@ public abstract class ActorCommand extends BattleCommand{
         return bfr.getModel();
     }
 
-    public final boolean isFree() {
-        return free;
+    public final void  setRegisterAction(boolean registerAction) {
+        this.registerAction = registerAction;
+    }
+
+    public final void setCostless(boolean costless) {
+        this.costless = costless;
     }
 
     public final void setFree(boolean free) {
-        this.free = free;
+        setCostless(free);
+        setRegisterAction(!free);
     }
 
 

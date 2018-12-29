@@ -13,7 +13,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class PickLootCommand extends SelfInflitedCommand {
 
     public PickLootCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, Data.ActionChoice.PICK_LOOT, scheduler, playerInventory, false);
+        super(bfr, Data.ActionChoice.PICK_LOOT, scheduler, playerInventory);
+        setRegisterAction(false);
     }
 
     @Override

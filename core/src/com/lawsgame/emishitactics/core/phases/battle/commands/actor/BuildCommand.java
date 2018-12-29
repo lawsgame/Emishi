@@ -18,7 +18,7 @@ public class BuildCommand extends ActorCommand {
     protected Data.TileType buildingType;
 
     public BuildCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Data.TileType buildingType) {
-        super(bfr, ActionChoice.BUILD, scheduler,  playerInventory, false);
+        super(bfr, ActionChoice.BUILD, scheduler,  playerInventory);
         this.buildingType = buildingType;
     }
 

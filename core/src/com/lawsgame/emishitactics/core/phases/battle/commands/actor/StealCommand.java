@@ -17,7 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class StealCommand extends ActorCommand {
 
     public StealCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, ActionChoice.STEAL, scheduler, playerInventory, false);
+        super(bfr, ActionChoice.STEAL, scheduler, playerInventory);
     }
 
     @Override

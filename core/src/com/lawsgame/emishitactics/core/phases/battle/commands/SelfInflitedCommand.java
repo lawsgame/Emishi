@@ -10,8 +10,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 
 public abstract class SelfInflitedCommand extends ActorCommand {
 
-    public SelfInflitedCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory, boolean free) {
-        super(bfr, choice, scheduler, playerInventory, free);
+    public SelfInflitedCommand(BattlefieldRenderer bfr, ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, choice, scheduler, playerInventory);
     }
 
     @Override

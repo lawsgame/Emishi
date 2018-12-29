@@ -15,7 +15,8 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class RevealRecruitCommand extends SelfInflitedCommand {
 
     public RevealRecruitCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, Data.ActionChoice.REVEAL_RECRUIT , scheduler, playerInventory, false);
+        super(bfr, Data.ActionChoice.REVEAL_RECRUIT , scheduler, playerInventory);
+        setRegisterAction(false);
     }
 
     @Override

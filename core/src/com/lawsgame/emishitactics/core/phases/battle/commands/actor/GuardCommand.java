@@ -16,7 +16,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 public class GuardCommand extends SelfInflitedCommand {
 
     public GuardCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, ActionChoice.GUARD, scheduler, playerInventory, false);
+        super(bfr, ActionChoice.GUARD, scheduler, playerInventory);
     }
 
 

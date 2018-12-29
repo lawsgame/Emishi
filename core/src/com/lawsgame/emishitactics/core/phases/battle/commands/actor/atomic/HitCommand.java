@@ -44,7 +44,7 @@ public class HitCommand extends ActorCommand{
     protected boolean healingFromDamage;
 
     public HitCommand(BattlefieldRenderer bfr, Data.ActionChoice choice, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, choice, scheduler, playerInventory, true);
+        super(bfr, choice, scheduler, playerInventory);
         this.retaliation = false;
         this.resetOrientation = false;
         this.specialmove = false;
@@ -192,7 +192,7 @@ public class HitCommand extends ActorCommand{
                 notif.fleeingOrientation = getInitiator().getOrientation();
                 data.defenderRenderer.getModel().setCrippled(cripplingTarget);
                 data.defenderRenderer.getModel().setDisabled(disablingTarget);
-                registerAction = !(repeatableOnKill && data.defenderRenderer.getModel().isOutOfAction());
+                setRegisterAction(!(repeatableOnKill && data.defenderRenderer.getModel().isOutOfAction()));
 
 
                 if (!notif.backstab) {

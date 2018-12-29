@@ -22,10 +22,11 @@ public class MoveCommand extends SelfInflitedCommand {
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory){
         this(bfr, scheduler, playerInventory, new Array<int[]>(), false);
+        setRegisterAction(false);
     }
 
     public MoveCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Array<int[]> path, boolean reveal) {
-        super(bfr, Data.ActionChoice.MOVE, scheduler, playerInventory, true);
+        super(bfr, Data.ActionChoice.MOVE, scheduler, playerInventory);
         this.path = path;
         this.reveal = reveal;
     }
