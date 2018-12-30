@@ -12,10 +12,10 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
-public class RevealRecruitCommand extends SelfInflitedCommand {
+public class VisitCommand extends SelfInflitedCommand {
 
-    public RevealRecruitCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
-        super(bfr, Data.ActionChoice.REVEAL_RECRUIT , scheduler, playerInventory);
+    public VisitCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
+        super(bfr, Data.ActionChoice.VISIT, scheduler, playerInventory);
         setRegisterAction(false);
     }
 

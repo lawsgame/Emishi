@@ -131,6 +131,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
     public abstract int getCol(float gameX, float gameY);
     public abstract float getCenterX(int row, int col);
     public abstract float getCenterY(int row, int col);
+    public abstract float[] getCentriod(Array<int[]> coords);
     public abstract BattleUnitRenderer getUnitRenderer(Unit model);
     public abstract AreaRenderer getAreaRenderer(Area area);
     public abstract TileRenderer getTileRenderer(int row, int col);

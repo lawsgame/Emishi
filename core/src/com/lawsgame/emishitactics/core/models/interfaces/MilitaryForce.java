@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.models.interfaces;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Banner;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -10,7 +11,7 @@ public abstract class MilitaryForce extends Model{
 
 
     public abstract int getId();
-
+    public abstract String getName();
     public abstract Unit getWarlord();
     public abstract Unit getWarchief(Unit unit);
     public abstract Unit getWarchief(int squadIndex);

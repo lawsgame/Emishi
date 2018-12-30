@@ -18,28 +18,29 @@ import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
 
 public class EarthquakeEvent extends BattleCommand {
     private float earthquakeDuration;
-    private final CameraManager gcm;
+    /**
+     *  allow to control which tile should be able to collapse in relation with the other targets
+     *  allow to avoid, by instance, that all bridges collapse at once, rendering the mission impossible to complete.
+     *  see {@link EarthquakeEvent.Node} for futher explanations.
+     */
     private Node targetTileTree;
 
-    public EarthquakeEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, float earthquakeDuration) {
+    public EarthquakeEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, float earthquakeDuration) {
         super(bfr, scheduler, playerInventory);
         this.earthquakeDuration = earthquakeDuration;
-        this.gcm = gcm;
         this.targetTileTree = new Node();
     }
 
 
-    public static EarthquakeEvent
-
-    addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, CameraManager gcm, final int turn){
-        EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, playerInventory, gcm, Data.EARTHQUAKE_DURATION);
-
+    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, final int turn){
+        EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, playerInventory, Data.EARTHQUAKE_DURATION);
         Model.Trigger trigger = new Model.Trigger(true, event) {
             @Override
             public boolean isTriggerable(Object data) {
-                return data instanceof Notification.BeginArmyTurn
+                boolean triggered = data instanceof Notification.BeginArmyTurn
                         & bfr.getModel().getTurn() == turn
                         && ((Notification.BeginArmyTurn) data).army.isPlayerControlled();
+                return triggered;
             }
         };
         bfr.getModel().add(trigger);
@@ -89,7 +90,7 @@ public class EarthquakeEvent extends BattleCommand {
         StandardTask.CommandSubTask commandThread = new StandardTask.CommandSubTask(0){
             @Override
             public void run() {
-                gcm.move(new ShakeVF(earthquakeDuration), earthquakeDuration);
+                bfr.getGCM().move(new ShakeVF(earthquakeDuration), earthquakeDuration);
             }
         };
         commandThread.setTag("shake camera");

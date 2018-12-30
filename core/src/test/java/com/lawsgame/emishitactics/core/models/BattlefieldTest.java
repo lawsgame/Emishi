@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.lawsgame.emishitactics.core.constants.StringKey;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 
 import org.junit.Before;
@@ -32,9 +33,9 @@ public class BattlefieldTest {
     @Test
     public void testArmyQueue(){
         Army army1 = Army.createPlayerArmyTemplate();
-        Army army2 = new Army(Data.Affiliation.ALLY);
-        Army army3 = new Army(Data.Affiliation.ENEMY_0);
-        Army army4 = new Army(Data.Affiliation.ENEMY_0);
+        Army army2 = new Army(Data.Affiliation.ALLY, StringKey.UNNAMED_ARMY_NAME);
+        Army army3 = new Army(Data.Affiliation.ENEMY_0, StringKey.UNNAMED_ARMY_NAME);
+        Army army4 = new Army(Data.Affiliation.ENEMY_0, StringKey.UNNAMED_ARMY_NAME);
 
         battlefield.randomlyDeploy(army1);
         battlefield.randomlyDeploy(army2);

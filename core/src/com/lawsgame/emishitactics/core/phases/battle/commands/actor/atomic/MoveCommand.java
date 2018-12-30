@@ -7,8 +7,6 @@ import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.SelfInflitedCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PickLootCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.RevealRecruitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Battles>
     <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY">
+        <Earthquake turn="1"/>
+        <Recruit row = "1" col = "12" name = "Hector" title="" template="SOLAR_KNIGHT" level="1" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+            <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
+            <Attribute id= "right handed" value="true"/>
+            <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>
+            <Attribute id= "equipement" value ="WARRIOR" stealable="false"/>
+            <Attribute id= "orientation" value="SOUTH"/>
+            <Attribute id= "behaviour" value="PASSIVE"/>
+        </Recruit>
+        <Loot id="SPOON" row="14" col="8"/>
         <TrapArea nb="2">
             <Tile row="15" col="5"/>
             <Tile row="15" col="6"/>
             <Tile row="15" col="7"/>
         </TrapArea>
-        <Army affiliation = "ENEMY_0">
+        <Army affiliation = "ENEMY_0" keyname="enemy army 1">
             <Squad>
                 <Unit row = "13" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>

@@ -4,33 +4,25 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.PickLootCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.RevealRecruitCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ScanAreaCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.actor.VisitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoAreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoTileRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
@@ -55,7 +47,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     MoveCommand moveCommand = null;
     ActorCommand customedCommand = null;
     WalkCommand walkCommand = null;
-    EarthquakeEvent event = null;
+    BattleCommand event = null;
 
     Area ccActionArea;
     Area ccImpactArea;
@@ -92,7 +84,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         // -------***<<< CUSTOMED COMMAND related tests >>>***------------------------
 
         sltdUnit.addNativeAbility(Data.Ability.PATHFINDER);
-        customedCommand = new RevealRecruitCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
+        customedCommand = new VisitCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
         customedCommand.setFree(true);
 
         walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
@@ -149,12 +141,44 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         // -------***<<< EVENT related tests >>>***------------------------
 
         TrapEvent.addTrigger(bim, 11, 4, 3);
-        event = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), bim.bfr.getGCM(), -1);
+        EarthquakeEvent earthquakeEvent = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), -1);
         //bim.bfr.getModel().getTile(10, 7).setFragile(true);
-        event.getTargetTileTree().addChild(10, 7,1);
-        event.getTargetTileTree().addChild(13, 13, 1f);
+        earthquakeEvent.getTargetTileTree().addChild(10, 7,1);
+        earthquakeEvent.getTargetTileTree().addChild(13, 13, 1f);
+        event = earthquakeEvent;
 
+        /*
+        event = new BattleCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) {
+            @Override
+            protected void execute() {
+                System.out.println("command executed !!");
+                StandardTask task = new StandardTask();
+                task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(sltdUnit), Data.AnimId.REGULAR_ATTACK));
+                task.addParallelSubTask(new StandardTask.CommandSubTask(0) {
+                    @Override
+                    public void run() {
+                        System.out.println("command sub task works");
+                    }
+                });
+                scheduleRenderTask(task);
+                System.out.println(scheduler);
+            }
 
+            @Override
+            protected void unexecute() {
+
+            }
+
+            @Override
+            public boolean isApplicable() {
+                return true;
+            }
+
+            @Override
+            public boolean isUndoable() {
+                return false;
+            }
+        };*/
 
         // -------***<<< ACP and CCP tests >>>***------------------------
 
@@ -236,11 +260,10 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< OTHER TESTS >>>***------------------
 
-        bfr.getModel().getTile(14,7).setLoot(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        bfr.getModel().getTile(10,7).setRecruit(new Unit("Alfred", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD));
+        //bfr.getModel().getTile(14,7).setLoot(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        //bfr.getModel().getTile(10,7).setRecruit(new Unit("Alfred", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD));
         bfr.displayAllTraps();
         bfr.displayAllLoots();
-
 
     }
 
@@ -323,11 +346,11 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // TEST CUSTOMED COMMAND
 
-        /*
+
         customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
 
-            // WALK_FLEE_SWITCHPOSITION SLTD UNIT
+            // UPDATE SLTD UNIT POSITION
 
             if(bim.bfr.getModel().isTileOccupied(row, col)){
                 sltdUnit = bim.bfr.getModel().getUnit(row, col);
@@ -360,9 +383,8 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
             // SHOW INFO ABOUT COMMAND
 
             customedCommand.setInitiator(actorPos[0], actorPos[1]);
-            //customedCommand.setFree(true);
+            customedCommand.setFree(true);
             if(customedCommand.isInitiatorValid()) {
-                //customedCommand.setFree(false);
                 Array<int[]> impact = customedCommand.getImpactArea(actorPos[0], actorPos[1], row, col);
                 ccImpactArea.setTiles(impact, true);
                 ccActionArea.setTiles(customedCommand.getActionArea(), true);
@@ -370,7 +392,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
             }
         }
-        */
+
 
 
 

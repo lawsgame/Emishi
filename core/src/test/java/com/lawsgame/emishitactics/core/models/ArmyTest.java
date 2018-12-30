@@ -1,5 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
+import com.lawsgame.emishitactics.core.constants.StringKey;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,8 +21,8 @@ public class ArmyTest {
 
     @Before
     public void before(){
-        army1 = new Army(Data.Affiliation.ALLY);
-        army2 = new Army(Data.Affiliation.ENEMY_0);
+        army1 = new Army(Data.Affiliation.ALLY, StringKey.UNNAMED_ARMY_NAME);
+        army2 = new Army(Data.Affiliation.ENEMY_0, StringKey.UNNAMED_ARMY_NAME);
         phillipe = new Unit("phillipe", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);
         phillipe.setLeadership(20);
         eric = new Unit("eric", Data.UnitTemplate.getStandard(), Data.WeaponType.SWORD);

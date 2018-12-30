@@ -35,6 +35,12 @@ public class Data {
     public static final int TRAP_DAMAGE = 3;
     public static final int SCAN_AREA_RANGE = 3;
 
+    // EXP parameter
+    public static final double EXP_ALPHA = 0.15;
+    public static final double EXP_LVL_GAP_FACTOR = 3;
+    public static final double EXP_WOUNDED_ONLY_FACTOR = 0.33333;
+    public static final int EXP_REQUIRED_LEVEL_UP = 100;
+    public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
 
     // RENDER parameters
     public static final float SPEED_WALK = 1.5f;
@@ -48,14 +54,6 @@ public class Data {
     public static final float BLINK_PERIOD_WOUNDED_AMPLITUDE = 2.0f;
     public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
     public static final float EARTHQUAKE_DURATION = 4.0f;
-
-
-    // EXP parameter
-    public static final double EXP_ALPHA = 0.15;
-    public static final double EXP_LVL_GAP_FACTOR = 3;
-    public static final double EXP_WOUNDED_ONLY_FACTOR = 0.33333;
-    public static final int EXP_REQUIRED_LEVEL_UP = 100;
-    public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
 
     //UI parameters
     public static final float AIBIS_ACTION_PANEL_DURATION_APPEARANCE = 3.0f;
@@ -279,7 +277,7 @@ public class Data {
         SCAN_AREA           (1, 20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
         PICK_LOOT           (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        REVEAL_RECRUIT      (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        VISIT(0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
         END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
@@ -819,7 +817,7 @@ public class Data {
 
 
     public enum EquipmentTemplate{
-        ;
+        SPOON(0,Ability.NONE);
 
         private Ability ability;
         private int dropRate;

@@ -55,6 +55,10 @@ public class BeginArmyTurnCommand extends BattleCommand {
             scheduleRenderTask(task);
 
 
+            // HANDLE EVENTS
+
+            handleEvents(new BeginArmyTurn(army), -1, -1);
+
             // HEAL UNITS NEARBY HEALING TILES
 
             int rNei;
@@ -92,8 +96,6 @@ public class BeginArmyTurnCommand extends BattleCommand {
                 restTasks.get(0).merge(restTasks.get(i));
             }
             scheduleMultipleRenderTasks(restTasks);
-
-            handleEvents(new BeginArmyTurn(army), -1, -1);
         }
     }
 

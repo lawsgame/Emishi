@@ -51,9 +51,9 @@ public class TempoLUP extends LevelUpPanel {
         builder.append("\n__________________");
         builder.append("\nstrength : "+luckyGuy.getStrength()+" +"+statisticGain[4]);
         builder.append("\nARMOR");
-        builder.append("\n  piercinfArmor : "+luckyGuy.getArmor(Data.DamageType.PIERCING)+" +"+statisticGain[5]);
-        builder.append("\n  bluntArmor : "+luckyGuy.getArmor(Data.DamageType.BLUNT)+" +"+statisticGain[6]);
-        builder.append("\n  edgedArmor : "+luckyGuy.getArmor(Data.DamageType.EDGED)+" +"+statisticGain[7]);
+        builder.append("\n  armorPiercing : "+luckyGuy.getArmor(Data.DamageType.PIERCING)+" +"+statisticGain[5]);
+        builder.append("\n  armorBlunt : "+luckyGuy.getArmor(Data.DamageType.BLUNT)+" +"+statisticGain[6]);
+        builder.append("\n  armorEdged : "+luckyGuy.getArmor(Data.DamageType.EDGED)+" +"+statisticGain[7]);
         builder.append("\nagility : "+luckyGuy.getAgility()+" +"+statisticGain[9]);
 
         label.setText(builder.toString());

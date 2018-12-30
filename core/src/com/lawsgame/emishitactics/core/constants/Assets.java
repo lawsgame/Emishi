@@ -15,7 +15,7 @@ public class Assets {
     // ---***$$$  XML  $$$***----
 
     public static final String XML_NAME_DB = "xml/name_db.xml";
-    public static final String XML_BATTLE_PARAMS = "xml/battle_params.xml";
+    public static final String XML_BATTLE_PARAMS = "xml/battlefields_config.xml";
 
 
     //  ---***$$$  SKIN  $$$***----

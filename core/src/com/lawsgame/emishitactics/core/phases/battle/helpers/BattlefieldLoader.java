@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.constants.StringKey;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Army;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -26,7 +27,9 @@ import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
+import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
@@ -104,7 +107,7 @@ public class BattlefieldLoader {
 
                     }else{
 
-                        //TODO: available for unit loading
+                        // UNUSED : available for unit loading
 
                     }
                 }else{
@@ -120,13 +123,13 @@ public class BattlefieldLoader {
                        }
                     }else{
 
-                        //TODO: available for loot loading (shrine, village, etc...)
+                        // UNUSED : available for loot loading (shrine, village, etc...)
                     }
                 }
             }
         }
 
-
+        // BF CONFIGS
 
         try {
             loadNameDictionary();
@@ -143,7 +146,7 @@ public class BattlefieldLoader {
             if(battleElt != null){
 
 
-                // PARAMS
+                // GENERAL PARAMS
 
                 for(Weather weather : Weather.values()){
                     if(battleElt.get("weather").equals(weather.name())){
@@ -177,7 +180,7 @@ public class BattlefieldLoader {
                             break;
                         }
                     }
-                    army = new Army(affiliation);
+                    army = new Army(affiliation, armyElt.get("keyname", StringKey.UNNAMED_ARMY_NAME));
                     bf.addArmyId(army);
 
                     // IF: an amry with the relevant battlefield ID
@@ -210,6 +213,51 @@ public class BattlefieldLoader {
                                 bf.deploy(rowUnit, colUnit, unit, true);
                             }
                         }
+                    }
+                }
+
+                // ADD LOOTS
+
+
+                Array< XmlReader.Element> lootElts = battleElt.getChildrenByName("Loot");
+                XmlReader.Element lootElt;
+                int lootRow;
+                int lootCol;
+                Item loot = null;
+                for(int i = 0; i < lootElts.size; i++) {
+                    lootElt  = lootElts.get(i);
+                    lootRow = lootElt.getInt("row", -1);
+                    lootCol = lootElt.getInt("col", -1);
+                    for(EquipmentTemplate eqt : EquipmentTemplate.values()){
+                        if(eqt.name().equals(lootElt.get("id"))){
+                            loot = new Equipment(eqt, false);
+                        }
+                    }
+                    for(WeaponTemplate wt : WeaponTemplate.values()){
+                        if(wt.name().equals(lootElt.get("id"))){
+                            loot = new Weapon(wt, false, false);
+                        }
+                    }
+                    if(bf.isTileExisted(lootRow, lootCol) && loot != null) {
+                        bf.getTile(lootRow, lootCol).setLoot(loot);
+                    }
+                }
+
+
+                // ADD RECRUITS
+
+                Array< XmlReader.Element> recruitElts = battleElt.getChildrenByName("Recruit");
+                XmlReader.Element recruitElt;
+                int recruitRow;
+                int recruitCol;
+                Unit recruit;
+                for(int i = 0; i < recruitElts.size; i++) {
+                    recruitElt  = recruitElts.get(i);
+                    recruitRow = recruitElt.getInt("row", -1);
+                    recruitCol = recruitElt.getInt("col", -1);
+                    recruit = instanciateUnit(recruitElt);
+                    if(bf.isTileExisted(recruitRow, recruitCol) && recruit != null) {
+                        bf.getTile(recruitRow, recruitCol).setRecruit(recruit);
                     }
                 }
             }
@@ -331,8 +379,6 @@ public class BattlefieldLoader {
     }
 
 
-
-
     public static void addEventsToBattlefield(AssetManager asm, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory inventory, ShortUnitPanel sup) {
         try {
 
@@ -347,7 +393,7 @@ public class BattlefieldLoader {
 
             if(battleElt != null) {
 
-                // TRAPS AREA
+                // SET TRAPS
 
                 int[] pos;
                 int traps;
@@ -378,6 +424,21 @@ public class BattlefieldLoader {
                         }
                     }
                 }
+
+                // Earthquake
+
+                Array<XmlReader.Element> earthquakeEventElts = battleElt.getChildrenByName("Earthquake");
+                int turn;
+                for(int i = 0; i < earthquakeEventElts.size; i++){
+                    turn = earthquakeEventElts.get(i).getInt("turn");
+                    if(turn > 0){
+                        EarthquakeEvent.addTrigger(bfr, scheduler, inventory, turn);
+                    }
+                }
+
+                // Reinforcements
+
+
             }
 
         } catch (IOException e) {

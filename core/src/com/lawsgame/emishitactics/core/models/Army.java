@@ -1,6 +1,8 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.core.constants.StringKey;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -18,7 +20,7 @@ public class Army extends MilitaryForce {
      */
 
     private static int ids = 0;
-
+    private String keyName;
     private int id;
     private boolean playerControlled;
     private final Data.Affiliation affiliation;
@@ -27,8 +29,9 @@ public class Army extends MilitaryForce {
     private Array<Unit> nonMobTroups;
     private boolean ldCondEnabled;
 
-    public Army(Affiliation affiliation){
+    public Army(Affiliation affiliation, String keyName){
         this.id = ids++;
+        this.keyName = keyName;
         this.affiliation = affiliation;
         this.playerControlled = false;
         this.mobilizedTroups = new Array<Array<Unit>>();
@@ -38,7 +41,7 @@ public class Army extends MilitaryForce {
     }
 
     public static Army createPlayerArmyTemplate(){
-        Army playerArmy = new Army(Affiliation.ALLY);
+        Army playerArmy = new Army(Affiliation.ALLY, StringKey.PLAYER_ARMY_NAME);
         playerArmy.playerControlled = true;
         playerArmy.ldCondEnabled = true;
         return playerArmy;
@@ -49,6 +52,10 @@ public class Army extends MilitaryForce {
         return id;
     }
 
+    @Override
+    public String getName() {
+        return keyName;
+    }
 
 
     @Override

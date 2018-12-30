@@ -229,6 +229,7 @@ public class StandardTask extends Task {
 
     public static abstract class CommandSubTask extends SubTask {
         CountDown countDown;
+        private boolean completed = false;
 
         public CommandSubTask(float delay){
             countDown = new CountDown(delay);
@@ -243,7 +244,7 @@ public class StandardTask extends Task {
 
         @Override
         boolean isCompleted() {
-            return countDown.isFinished();
+            return completed;
         }
 
         @Override
@@ -254,6 +255,10 @@ public class StandardTask extends Task {
         @Override
         void update(float dt) {
             countDown.update(dt);
+            if(countDown.isFinished() && !completed){
+                completed = true;
+                run();
+            }
         }
 
         @Override

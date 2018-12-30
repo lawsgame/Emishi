@@ -10,7 +10,12 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
+import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
@@ -54,6 +59,22 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.multiplexer = new InputMultiplexer();
         this.uiStage = stageUI;
         this.windrose = new Windrose(bfr, asm);
+
+        // TEST
+
+        //EarthquakeEvent.addTrigger(bfr, scheduler, player.getInventory(), 1);
+
+        /*
+        ReinforcementEvent event = ReinforcementEvent.addTrigger(1, bfr, scheduler, player.getInventory(), player.getArmy());
+        Unit soldier = new Unit("toro", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);
+        MilitaryForce enemyForce = bfr.getModel().getArmyByName("enemy army 1");
+        if(enemyForce != null){
+            System.out.println("army's name load !");
+            enemyForce.add(soldier);
+            enemyForce.appointSoldier(soldier, 0);
+        }
+        event.addStiffeners(soldier, 10,0, 10,2);
+        */
     }
 
     @Override

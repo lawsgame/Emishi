@@ -266,10 +266,10 @@ public abstract class BattleCommand extends Observable implements Observer {
 
     private void handleEvents(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
 
-        if(ignoreBFEvents)
+        if(!ignoreBFEvents)
             scheduleMultipleRenderTasks(bfr.getModel().performEvents(data, outcome));
 
-        if(ignoreArmieEvents) {
+        if(!ignoreArmieEvents) {
             for (int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++) {
                 scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data, outcome));
             }

@@ -12,6 +12,8 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.engine.CameraManager;
+import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 public class ReinforcementEvent extends BattleCommand {
     private Array<Unit> reinforcements;
@@ -30,18 +32,29 @@ public class ReinforcementEvent extends BattleCommand {
 
     public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, final MilitaryForce currentArmy){
         ReinforcementEvent event = new ReinforcementEvent(bfr, scheduler, playerInventory);
-
         Model.Trigger trigger = new Model.Trigger( true, event) {
-
             @Override
             public boolean isTriggerable(Object data) {
                 return data instanceof Notification.BeginArmyTurn && bfr.getModel().getCurrentArmy() == currentArmy && turn <= bfr.getModel().getTurn();
             }
         };
-
-
         bfr.getModel().add(trigger);
         return event;
+    }
+
+    /**
+     * allow to add one more unit to deploy.
+     *
+     * @param unit : any unit not yet deployed
+     * @param entryRow : row of the tile where the unit begins to appear
+     * @param entryCol : col of the tile where the unit begins to appear
+     * @param deploymentRow : reachable tile row where the unit stand at the end of his move
+     * @param deploymentCol : reachable tile col where the unit stand at the end of his move
+     */
+    public void addStiffeners(Unit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){
+        reinforcements.add(unit);
+        entryPoints.add(new int[]{entryRow, entryCol});
+        deploymentPositions.add(new int[]{deploymentRow, deploymentCol});
     }
 
     @Override
@@ -65,6 +78,13 @@ public class ReinforcementEvent extends BattleCommand {
             thread.addQuery(bfr.getModel(), new Notification.Walk(unit, paths.get(i), true));
             deployTask.addParallelSubTask(thread);
         }
+        scheduleRenderTask(new StandardTask(new SimpleCommand() {
+            @Override
+            public void apply() {
+                float[] focusPoint = bfr.getCentriod(deploymentPositions);
+                bfr.getGCM().moveTo(focusPoint[0], focusPoint[1], true);
+            }
+        }, 0));
         scheduleRenderTask(deployTask);
         handleEvents(eventNotif, -1,-1);
     }
@@ -117,18 +137,5 @@ public class ReinforcementEvent extends BattleCommand {
         return false;
     }
 
-    /**
-     * allow to add one more unit to deploy.
-     *
-     * @param unit : any unit not yet deployed
-     * @param entryRow : row of the tile where the unit begins to appear
-     * @param entryCol : col of the tile where the unit begins to appear
-     * @param deploymentRow : reachable tile row where the unit stand at the end of his move
-     * @param deploymentCol : reachable tile col where the unit stand at the end of his move
-     */
-    public void addStiffeners(Unit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){
-        reinforcements.add(unit);
-        entryPoints.add(new int[]{entryRow, entryCol});
-        deploymentPositions.add(new int[]{deploymentRow, deploymentCol});
-    }
+
 }

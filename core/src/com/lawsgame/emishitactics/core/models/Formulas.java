@@ -86,7 +86,7 @@ public class Formulas {
     public static int getLootRate(Unit attacker, int rowActor, int colActor, Battlefield bf){
         int lootRate = 0;
         if(attacker.getArmy().isPlayerControlled()) {
-            lootRate += Data.BASE_DROP_RATE + attacker.getAppDexterity() / 2 + attacker.getChiefCharisma() / 2;
+            lootRate += Data.BASE_DROP_RATE + attacker.getChiefCharisma() / 2;
             lootRate += Formulas.getCurrentUnitBannerBonus(attacker, rowActor, colActor, bf, Data.BannerBonus.LOOT_RATE);
         }
         return lootRate;
@@ -101,7 +101,7 @@ public class Formulas {
     public static int getStealRate(int rowRobber, int colRobber, int rowStolen, int colStolen, Unit stealer, Unit stolen, Battlefield battlefield){
         int stealRate = 0;
         if(stolen.isStealable()) {
-            stealRate = 100 + 10 * (stolen.getAppAgility() - stolen.getAppDexterity());
+            stealRate = 100 + 10 * (stealer.getAppAgility() - stolen.getAppAgility());
             if (stealRate > 100){
                 stealRate = 100;
             }

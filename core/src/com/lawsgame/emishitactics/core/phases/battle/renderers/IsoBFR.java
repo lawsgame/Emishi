@@ -188,6 +188,24 @@ public class IsoBFR extends BattlefieldRenderer {
         return (col + row + 1) * RATIO / 2.0f + Y_CAM_BOUNDS_OFFSET;
     }
 
+    @Override
+    public float[] getCentriod(Array<int[]> coords) {
+        float[] centriod = new float[2];
+        float nbPointAdded = 0;
+        for(int i = 0; i < coords.size; i++){
+            if(coords.get(i).length > 1){
+                nbPointAdded++;
+                centriod[0] += getCenterX(coords.get(i)[0], coords.get(i)[1]);
+                centriod[1] += getCenterY(coords.get(i)[0], coords.get(i)[1]);
+            }
+        }
+        if(nbPointAdded > 0) {
+            centriod[0] /= nbPointAdded;
+            centriod[1] /= nbPointAdded;
+        }
+        return centriod;
+    }
+
     public float getRenderXFrom(int row, int col) {
         return getCenterX(row, col) - SPRITE_STD_SIZE * 0.5f;
     }

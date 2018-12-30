@@ -165,7 +165,7 @@ public class Battlefield extends Model {
 
 
     public void remove(Trigger trigger){
-        this.remove(trigger);
+        super.remove(trigger);
         for(int r = 0; r < tiles.length; r++){
             for(int c = 0; c < tiles[0].length; c++){
                 if(isTileExisted(r, c)) {
@@ -199,7 +199,6 @@ public class Battlefield extends Model {
                 army = armyTurnOrder.peek();
             }
         }
-
     }
 
 
@@ -785,6 +784,15 @@ public class Battlefield extends Model {
                 if(isTileOccupied(r, c) && getUnit(r, c) == unit){
                     return new int[]{r, c};
                 }
+            }
+        }
+        return null;
+    }
+
+    public MilitaryForce getArmyByName(String keyname){
+        for(int i = 0; i < armyTurnOrder.size(); i++){
+            if(armyTurnOrder.get(i).getName().equals(keyname)){
+                return armyTurnOrder.get(i);
             }
         }
         return null;

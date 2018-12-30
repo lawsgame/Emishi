@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
-import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
@@ -39,11 +38,11 @@ public class Unit extends Model {
     protected int leadership;
     protected int hitPoints;
     protected int strength;
-    protected int piercinfArmor;
-    protected int bluntArmor;
-    protected int edgedArmor;
-    protected int dexterity;
+    protected int armorPiercing;
+    protected int armorBlunt;
+    protected int armorEdged;
     protected int agility;
+    protected int dexterity;
     protected int skill;
     protected int bravery;
 
@@ -110,9 +109,9 @@ public class Unit extends Model {
         this.leadership = template.getBaseLd();
         this.hitPoints = template.getBaseHP();
         this.strength = template.getBaseStr() + ((shielbearer) ?  template.getShieldBearerStrengthBonus(): 0) + ((horseman) ? template.getHorsemanStrengthBonus(): 0);
-        this.piercinfArmor = template.getBasePiercingArmor() + ((shielbearer) ?  template.getShieldBearerArmorPBonus(): 0) + ((horseman) ? template.getHorsemanArmorPBonus(): 0);
-        this.bluntArmor = template.getBaseBluntArmor() + ((shielbearer) ?  template.getShieldBearerArmorBBonus(): 0) + ((horseman) ? template.getHorsemanArmorBBonus(): 0);
-        this.edgedArmor = template.getBaseEgdedArmor() + ((shielbearer) ?  template.getShieldBearerArmorEBonus(): 0) + ((horseman) ? template.getShieldBearerArmorEBonus(): 0);
+        this.armorPiercing = template.getBasePiercingArmor() + ((shielbearer) ?  template.getShieldBearerArmorPBonus(): 0) + ((horseman) ? template.getHorsemanArmorPBonus(): 0);
+        this.armorBlunt = template.getBaseBluntArmor() + ((shielbearer) ?  template.getShieldBearerArmorBBonus(): 0) + ((horseman) ? template.getHorsemanArmorBBonus(): 0);
+        this.armorEdged = template.getBaseEgdedArmor() + ((shielbearer) ?  template.getShieldBearerArmorEBonus(): 0) + ((horseman) ? template.getShieldBearerArmorEBonus(): 0);
         this.dexterity = template.getBaseDex() + ((shielbearer) ?  template.getShieldBearerDexBonus(): 0) + ((horseman) ? template.getHorsemanDexBonus(): 0);
         this.agility = template.getBaseAg() + ((shielbearer) ?  template.getShieldBearerAgilityBonus(): 0) + ((horseman) ? template.getHorsemanAgilityBonus(): 0);
         this.skill = template.getBaseSk();
@@ -237,9 +236,9 @@ public class Unit extends Model {
             this.setLeadership(this.leadership + ld);
             this.hitPoints += hpt;
             this.strength += str;
-            this.bluntArmor += armorB;
-            this.edgedArmor += armorE;
-            this.piercinfArmor += armorP;
+            this.armorBlunt += armorB;
+            this.armorEdged += armorE;
+            this.armorPiercing += armorP;
             this.dexterity += dex;
             this.agility += agi;
             this.skill += ski;
@@ -333,9 +332,9 @@ public class Unit extends Model {
             this.setLeadership((int) (this.leadership + ld));
             this.hitPoints += hpt;
             this.strength += str;
-            this.piercinfArmor += armorP;
-            this.edgedArmor += armorE;
-            this.bluntArmor += armorB;
+            this.armorPiercing += armorP;
+            this.armorEdged += armorE;
+            this.armorBlunt += armorB;
             this.dexterity += dex;
             this.agility +=agi;
             this.skill += ski;
@@ -1090,9 +1089,9 @@ public class Unit extends Model {
     public int getArmor(Data.DamageType damageType) {
         int armor = 0;
         switch(damageType){
-            case BLUNT: armor = bluntArmor; break;
-            case EDGED: armor = edgedArmor; break;
-            case PIERCING: armor = piercinfArmor;break;
+            case BLUNT: armor = armorBlunt; break;
+            case EDGED: armor = armorEdged; break;
+            case PIERCING: armor = armorPiercing;break;
         }
         return armor;
     }
