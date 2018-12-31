@@ -79,12 +79,6 @@ public class HitCommand extends ActorCommand{
         return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.getCurrentWeapon().isUsable();
     }
 
-    @Override
-    public void init() {
-        super.init();
-        defendersData.clear();
-    }
-
     //--------------- EXECUTE -----------------------------------------------
 
     @Override
@@ -184,7 +178,7 @@ public class HitCommand extends ActorCommand{
 
                 int[] dealDamageRange = Formulas.getDealtDamageRange(rowActor, colActor, data.rowInitTarget, data.colInitTarget, getInitiator(),data.defenderRenderer.getModel(), bfr.getModel());
                 int appliedDamage = Formulas.getRandomDamageInput(dealDamageRange);
-                TakeDamage notif = data.defenderRenderer.getModel().takeDamage(appliedDamage, ignorePhysicalDamage, ignoreMoralDamage, data.moralModifier);
+                TakeDamage notif = data.defenderRenderer.getModel().takeDamage(appliedDamage, ignorePhysicalDamage, (ignoreMoralDamage) ? 0 : data.moralModifier);
                 notif.critical = false;
                 notif.crippled = cripplingTarget;
                 notif.disabled = disablingTarget;

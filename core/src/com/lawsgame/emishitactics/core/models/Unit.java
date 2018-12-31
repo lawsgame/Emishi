@@ -931,17 +931,19 @@ public class Unit extends Model {
     }
 
 
-    public TakeDamage takeDamage(int damageDealt, boolean ignorePhysicalDamage, boolean ignoreMoralDamage, float moralModifier){
+    public TakeDamage takeDamage(int damageDealt, boolean ignorePhysicalDamage, float moralModifier){
         TakeDamage.State state = TakeDamage.State.UNDAMAGED;
         int lifeDamageTaken = 0;
 
         // moral damaga
-        if (!has(Data.Ability.UNBREAKABLE) && !ignoreMoralDamage) {
-            if(this.currentMoral > damageDealt * moralModifier) {
+        int moralDamageTaken = (int) (moralModifier*damageDealt);
+        if (!has(Data.Ability.UNBREAKABLE) &&  moralDamageTaken > 0) {
+            if(this.currentMoral > moralDamageTaken) {
                 state = TakeDamage.State.WOUNDED;
-                this.currentMoral -= damageDealt * moralModifier;
+                this.currentMoral -= moralDamageTaken;
             }else{
                 state = TakeDamage.State.FLED;
+                moralDamageTaken = this.currentMoral;
                 this.currentMoral = 0;
 
             }
@@ -961,7 +963,7 @@ public class Unit extends Model {
             }
         }
 
-        return new TakeDamage(this, ignorePhysicalDamage, ignoreMoralDamage, damageDealt, lifeDamageTaken, state);
+        return new TakeDamage(this, lifeDamageTaken, moralDamageTaken, state);
     }
 
 

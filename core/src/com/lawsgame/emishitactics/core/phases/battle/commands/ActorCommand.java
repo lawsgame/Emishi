@@ -45,7 +45,7 @@ import static com.lawsgame.emishitactics.core.models.Formulas.getCurrentWeaponRa
  *  ActorCommand command = new ActorCommand( choice, ...);
  *  command.setInitiator(...);
  *  command.setTarget(...);
- *  if(command.run()){
+ *  if(command.apply()){
  *
  *          // the command has been applied successfully
  *  }else{
@@ -93,17 +93,6 @@ public abstract class ActorCommand extends BattleCommand{
         this.choice = choice;
         this.registerAction = true;
         this.costless = false;
-    }
-
-    /**
-     * to be reusable, useful for the BCM
-     */
-    public void init(){
-        this.rowActor = -1;
-        this.colActor = -1;
-        this.rowTarget = -1;
-        this.colTarget = -1;
-
     }
 
     public final void setInitiator(int rowActor, int colActor) {
@@ -157,7 +146,6 @@ public abstract class ActorCommand extends BattleCommand{
     }
 
     public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){
-        init();
         setInitiator(rowActor, colActor);
         setTarget(rowTarget, colTarget);
         return apply();
@@ -235,7 +223,7 @@ public abstract class ActorCommand extends BattleCommand{
     public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator){
 
         boolean valid = false;
-        if(bfr.getModel().isTileReachable(rowActor, colActor, initiator.has(Data.Ability.PATHFINDER))){
+        if(initiator != null && bfr.getModel().isTileReachable(rowActor, colActor, initiator.has(Data.Ability.PATHFINDER))){
             if(!initiator.isOutOfAction()) {
                 if (costless || choice.getCost(rowActor, colActor, initiator, bfr.getModel()) <= initiator.getActionPoints()) {
                     if (choice.isActedBased()) {

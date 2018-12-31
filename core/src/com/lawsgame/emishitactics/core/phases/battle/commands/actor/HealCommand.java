@@ -26,16 +26,6 @@ public class HealCommand extends SelfInflitedCommand {
     }
 
     @Override
-    public void init() {
-        super.init();
-        healPower = 0;
-        recoveredHP = new int[0];
-        recoveredMoral = new int[0];
-        patients = new Unit[0];
-
-    }
-
-    @Override
     protected void provideActionPanelInfos() {
         super.provideActionPanelInfos();
 

@@ -98,10 +98,8 @@ public class Notification {
 
     public static class TakeDamage {
         public final Unit wounded;
-        public final boolean ignorePhysicalDmg;
-        public final boolean ignoreMoralDmg;
-        public final int damageDealt;
         public final int lifeDamageTaken;
+        public final int moralDamageTaken;
         public final State state;
 
         public boolean crippled;
@@ -117,11 +115,9 @@ public class Notification {
             UNDAMAGED, DIED
         }
 
-        public TakeDamage(Unit wounded, boolean ignorePhysicalDmg, boolean ignoreMoralDmg, int damageDealt, int lifeDamageTaken, State state){
+        public TakeDamage(Unit wounded, int lifeDamageTaken, int moralDamageTaken, State state){
             this.wounded = wounded;
-            this.ignorePhysicalDmg = ignorePhysicalDmg;
-            this.ignoreMoralDmg = ignoreMoralDmg;
-            this.damageDealt = damageDealt;
+            this.moralDamageTaken = moralDamageTaken;
             this.lifeDamageTaken = lifeDamageTaken;
             this.state = state;
             this.disabled = false;
@@ -139,7 +135,7 @@ public class Notification {
         }
 
         public boolean isRelevant(){
-            return damageDealt > 0;
+            return lifeDamageTaken > 0 || moralDamageTaken > 0;
         }
     }
 

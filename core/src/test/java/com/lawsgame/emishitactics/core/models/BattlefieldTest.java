@@ -91,7 +91,7 @@ public class BattlefieldTest {
         assertTrue(debby.isDone());
         assertTrue(army == army3);
 
-        phillipe.takeDamage(300, false, false, 1f);
+        phillipe.takeDamage(300, false,  1f);
         battlefield.nextArmy();
         army = battlefield.getCurrentArmy();
 

@@ -65,7 +65,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         sltdUnit = bim.player.getArmy().getWarlord();
         sltdUnit.addNativeAbility(Data.Ability.BUILD);
         sltdUnit.addNativeAbility(Data.Ability.HEAL);
-        bim.player.getArmy().getSquad(sltdUnit, true).get(1).takeDamage(0, false, false, 1f);
+        bim.player.getArmy().getSquad(sltdUnit, true).get(1).takeDamage(0, false, 1f);
 
 
 
@@ -347,7 +347,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         // TEST CUSTOMED COMMAND
 
 
-        customedCommand.init();
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
 
             // UPDATE SLTD UNIT POSITION

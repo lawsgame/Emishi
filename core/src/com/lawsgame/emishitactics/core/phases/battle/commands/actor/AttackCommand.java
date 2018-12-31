@@ -39,7 +39,6 @@ public class AttackCommand extends HitCommand {
         retalationBlow.setDecoupled(true);
         retalationBlow.setRetaliation(true);
 
-        retalationBlow.init();
         retalationBlow.setInitiator(rowTarget, colTarget);
         retalationBlow.setTarget(rowActor, colActor);
     }

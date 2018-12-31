@@ -95,7 +95,6 @@ public class BattleCommandManager {
                     choice = commandPool.get(i).get(0).getActionChoice();
                     if(!choice.isEndTurnActionOnly() && (choice.isInfinitlyDoable() ||!Utils.stackContainsAtLeastOneElementOf(history, commandPool.get(i)))) {
                         for (int j = 0; j < commandPool.get(i).size; j++) {
-                            commandPool.get(i).get(j).init();
                             commandPool.get(i).get(j).setInitiator(rowActor, colActor);
                             if (commandPool.get(i).get(j).isInitiatorValid()) {
                                 choices.add(choice);
@@ -117,7 +116,6 @@ public class BattleCommandManager {
                 for (int j = 0; j < chosenCommands.size; j++) {
                     chosenCommands.get(j).setInitiator(rowActor, colActor);
                     if (!checkInitiatorValidy || chosenCommands.get(j).isInitiatorValid()) {
-                        chosenCommands.get(j).init();
                         availableCommands.add(chosenCommands.get(j));
                     }
                 }

@@ -46,9 +46,9 @@ public class Player {
         warlord.getBanner().setMode(Data.BBMode.OFFENSIVE);
 
 
-        warlord.takeDamage(1, false, false, 1f);
-        soldier1.takeDamage(1, false, false, 1f);
-        soldier2.takeDamage(1, false, false, 1f);
+        warlord.takeDamage(1, false,  1f);
+        soldier1.takeDamage(1, false,  1f);
+        soldier2.takeDamage(1, false,  1f);
 
         return new Player(new Inventory(), playerArmy);
     }

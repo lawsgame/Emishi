@@ -69,7 +69,7 @@ public class EarthquakeEvent extends BattleCommand {
             if(bfr.getModel().isTileOccupied(rowRuins, colRuins)){
                 victim = bfr.getModel().getUnit(rowRuins,colRuins);
                 if(!victim.isOutOfAction()){
-                    notif = victim.takeDamage(3, false, false, 1f);
+                    notif = victim.takeDamage(3, false, 0f);
                     notif.set(true, false, 0, false, false, victim.getOrientation().getOpposite());
                     victim.setCrippled(true);
                     notif.fleeingOrientation = victim.getOrientation().getOpposite();

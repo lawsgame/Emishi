@@ -31,7 +31,7 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
             Object query = notificationQueue.pop();
             if (query instanceof Notification.TakeDamage) {
                 Notification.TakeDamage notification = (Notification.TakeDamage) query;
-                displayTakeHit(notification.ignorePhysicalDmg, notification.ignoreMoralDmg, notification.damageDealt, notification.critical, notification.backstab);
+                displayTakeHit(notification.lifeDamageTaken, notification.moralDamageTaken, notification.critical, notification.backstab);
             } else if (query instanceof Notification.Attack) {
                 displayAttack((Notification.Attack) query);
             } else if (query instanceof Notification.Done) {
@@ -101,7 +101,7 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
 
     public abstract void displayWalk(Array<int[]> path, boolean reinform);
     public abstract void displayAttack(Notification.Attack query);
-    public abstract void displayTakeHit(boolean ignorePhysicalDamage, boolean ignoreMoralDamage, int damageTaken, boolean critical, boolean backstab);
+    public abstract void displayTakeHit(int lifeDamageTaken, int moralDamageTaken, boolean critical, boolean backstab);
     public abstract void displayTreated(int healedHP);
     public abstract void displayPushed(Data.Orientation pushedTowards);
     public abstract void displayFlee(Data.Orientation fleeingDirection);
