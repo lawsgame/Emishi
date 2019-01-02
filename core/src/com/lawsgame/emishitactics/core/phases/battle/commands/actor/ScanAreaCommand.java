@@ -23,7 +23,7 @@ public class ScanAreaCommand extends SelfInflitedCommand {
 
     @Override
     public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
-        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.has(Data.Ability.PATHFINDER);
+        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.has(Data.Ability.EXPLORE);
     }
 
     @Override

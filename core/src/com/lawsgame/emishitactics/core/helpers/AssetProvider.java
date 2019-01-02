@@ -56,6 +56,7 @@ public class AssetProvider implements Disposable{
         this.spriteStdSize = spriteStdSize;
     }
 
+
     public Array<Sprite> getTileSpriteSet(TileSpriteSetId id) {
         Array<Sprite> sprites = new Array<Sprite>();
         if(id != null) {
@@ -313,10 +314,9 @@ public class AssetProvider implements Disposable{
                     filename[0] = unit.getTemplate().name().toLowerCase();
                     filename[1] = (unit.isCharacter()) ?
                             unit.getWeaponType().name().toLowerCase() :
-                            String.format("%s_%s%s",
+                            String.format("%s_%s",
                                     unit.getWeaponType().name().toLowerCase(),
-                                    (unit.isHorseman()) ? "H" : "F",
-                                    (unit.isShielbearer()) ? "S" : "");
+                                    (unit.isHorseman()) ? "H" : "F");
 
                     if(!unit.isCharacter()){
                         filename[2] = (unit.getArmy().isPlayerControlled()) ? "pc" : "ai";
@@ -362,10 +362,9 @@ public class AssetProvider implements Disposable{
 
                             filename = new String[3];
                             filename[0] = unit.getTemplate().name().toLowerCase();
-                            filename[1] = String.format("%s_%s%s",
+                            filename[1] = String.format("%s_%s",
                                     unit.getWeaponType().name().toLowerCase(),
-                                    (unit.isHorseman()) ? "H" : "F",
-                                    (unit.isShielbearer()) ? "S" : "");
+                                    (unit.isHorseman()) ? "H" : "F");
                             filename[2] = "done";
                             filenames.add(filename);
 

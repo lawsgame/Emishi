@@ -92,7 +92,7 @@ public class Formulas {
         return lootRate;
     }
 
-    public static float getMoralModifier(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
+    public static float getCurrentMoralModifier(int rowAttacker0, int colAttacker0, int rowDefender0, int colDefender0, Unit attacker, Unit defender, Battlefield battlefield){
         float moralModifier = 1f;
         moralModifier -= getCurrentUnitBannerBonus(defender, rowDefender0, colDefender0, battlefield, Data.BannerBonus.MORAL_SHIELD);
         return moralModifier;

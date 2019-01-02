@@ -868,6 +868,7 @@ public class Data {
         HEAL,
         STEAL,
         BUILD,
+        EXPLORE,
 
         NONE
     }

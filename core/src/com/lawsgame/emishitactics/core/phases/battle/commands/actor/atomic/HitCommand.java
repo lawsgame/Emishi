@@ -419,7 +419,7 @@ public class HitCommand extends ActorCommand{
             this.colInitDefender = colInitDefender;
             this.hitrate = Formulas.getHitRate(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
             this.damageDealt = Formulas.getDealtDamageRange(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
-            this.moralModifier = Formulas.getMoralModifier(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
+            this.moralModifier = Formulas.getCurrentMoralModifier(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
             this.lootRate = Formulas.getLootRate(attacker, rowAttacker, colAttacker, bf);
             this.APCost = choice.getCost(rowAttacker, colAttacker, attacker, bf);
         }

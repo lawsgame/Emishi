@@ -324,8 +324,9 @@ public class BattlefieldLoader {
                 }
             }
 
-            if(attributeElt.get("id").equals("right handed"))
-                unit.setRightHanded(attributeElt.getBoolean("value"));
+            if(attributeElt.get("id").equals("leadership")) {
+                unit.setLeadership(attributeElt.getInt("leadership", 20));
+            }
 
             if(attributeElt.get("id").equals("equipement")) {
                 for (EquipmentTemplate value : EquipmentTemplate.values()) {

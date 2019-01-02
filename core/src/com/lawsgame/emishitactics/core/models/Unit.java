@@ -23,11 +23,9 @@ public class Unit extends Model {
     protected int level;
     protected final UnitTemplate template;
     protected final WeaponType weaponType;
-    protected boolean shielbearer;
     protected boolean horseman;
     protected boolean horsemanUponPromotion;
 
-    protected boolean rightHanded = true;
     protected Array<Weapon> weapons;
     protected int experience = 0;
     protected int commandmentExperience = 0;
@@ -41,6 +39,7 @@ public class Unit extends Model {
     protected int armorPiercing;
     protected int armorBlunt;
     protected int armorEdged;
+    //protected int luck;
     protected int agility;
     protected int dexterity;
     protected int skill;
@@ -962,7 +961,6 @@ public class Unit extends Model {
 
             }
         }
-
         return new TakeDamage(this, lifeDamageTaken, moralDamageTaken, state);
     }
 
@@ -989,8 +987,6 @@ public class Unit extends Model {
         return weaponType;
     }
 
-    public boolean isShielbearer() { return shielbearer; }
-
     public boolean isHorseman() {
         return horseman;
     }
@@ -1004,14 +1000,6 @@ public class Unit extends Model {
         this.horsemanUponPromotion = horseman;
         if(isPromoted())
             this.horseman = horseman;
-    }
-
-    public boolean isRightHanded() {
-        return rightHanded;
-    }
-     
-    public boolean setRightHanded(boolean righthanded) {
-        return this.rightHanded = righthanded;
     }
      
 
