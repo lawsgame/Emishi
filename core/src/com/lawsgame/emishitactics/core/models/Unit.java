@@ -39,7 +39,7 @@ public class Unit extends Model {
     protected int armorPiercing;
     protected int armorBlunt;
     protected int armorEdged;
-    //protected int luck;
+    protected int luck;
     protected int agility;
     protected int dexterity;
     protected int skill;
@@ -91,7 +91,6 @@ public class Unit extends Model {
             UnitTemplate template,
             int level,
             WeaponType weaponType,
-            boolean shielbearer,
             boolean horseman,
             boolean horsemanUponPromotion,
             boolean homogeneousLevelsup){
@@ -103,18 +102,19 @@ public class Unit extends Model {
         this.horseman = horseman;
         this.horsemanUponPromotion = horsemanUponPromotion;
 
-        this.mobility = (horseman) ? template.getHorsemanMob() : template.getFootmanMob();
+        this.mobility = template.getBaseMob();
         this.charisma = template.getBaseCha();
         this.leadership = template.getBaseLd();
         this.hitPoints = template.getBaseHP();
-        this.strength = template.getBaseStr() + ((shielbearer) ?  template.getShieldBearerStrengthBonus(): 0) + ((horseman) ? template.getHorsemanStrengthBonus(): 0);
-        this.armorPiercing = template.getBasePiercingArmor() + ((shielbearer) ?  template.getShieldBearerArmorPBonus(): 0) + ((horseman) ? template.getHorsemanArmorPBonus(): 0);
-        this.armorBlunt = template.getBaseBluntArmor() + ((shielbearer) ?  template.getShieldBearerArmorBBonus(): 0) + ((horseman) ? template.getHorsemanArmorBBonus(): 0);
-        this.armorEdged = template.getBaseEgdedArmor() + ((shielbearer) ?  template.getShieldBearerArmorEBonus(): 0) + ((horseman) ? template.getShieldBearerArmorEBonus(): 0);
-        this.dexterity = template.getBaseDex() + ((shielbearer) ?  template.getShieldBearerDexBonus(): 0) + ((horseman) ? template.getHorsemanDexBonus(): 0);
-        this.agility = template.getBaseAg() + ((shielbearer) ?  template.getShieldBearerAgilityBonus(): 0) + ((horseman) ? template.getHorsemanAgilityBonus(): 0);
+        this.strength = template.getBaseStr();
+        this.armorPiercing = template.getBasePiercingArmor();
+        this.armorBlunt = template.getBaseBluntArmor();
+        this.armorEdged = template.getBaseEgdedArmor();
+        this.dexterity = template.getBaseDex();
+        this.agility = template.getBaseAg();
         this.skill = template.getBaseSk();
         this.bravery = template.getBaseBr();
+        this.luck = template.getBaseLuck();
 
         this.weapons = new Array<Weapon>();
         this.weapons.add(Weapon.FIST);
@@ -137,7 +137,7 @@ public class Unit extends Model {
     }
 
     public Unit(String name, UnitTemplate template, WeaponType weaponType){
-        this(name, template, template.getStartingLevel(), weaponType, false, false, false, true);
+        this(name, template, template.getStartingLevel(), weaponType, false, false, true);
     }
 
    public static Unit createGenericUnit(
@@ -145,11 +145,10 @@ public class Unit extends Model {
            UnitTemplate template,
            int level,
            WeaponType weaponType,
-           boolean shielbearer,
            boolean horseman,
            boolean horsemanUponPromotion,
            boolean homogeneousLevelsup){
-        return new Unit(name, template, level, weaponType, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
+        return new Unit(name, template, level, weaponType, horseman, horsemanUponPromotion, homogeneousLevelsup);
    }
 
     public static Unit createCharacterUnit(
@@ -158,10 +157,9 @@ public class Unit extends Model {
             UnitTemplate template,
             int level,
             WeaponType weaponType,
-            boolean shielbearer,
             boolean horseman,
             boolean horsemanUponPromotion){
-        return new CharacterUnit(name, title, template, level, weaponType, shielbearer, horseman, horsemanUponPromotion, true);
+        return new CharacterUnit(name, title, template, level, weaponType, horseman, horsemanUponPromotion, true);
     }
 
 
@@ -175,16 +173,18 @@ public class Unit extends Model {
     public int[] levelup() {
         int mob = 0;
         int cha = 0;
-        int ld = 0;
         int hpt = 0;
+        int bra = 0;
         int str = 0;
         int armorE = 0;
         int armorP = 0;
         int armorB = 0;
-        int dex = 0;
         int agi = 0;
+        int dex = 0;
         int ski = 0;
-        int bra = 0;
+        int luc = 0;
+
+        int[] promoStats = null;
 
         if(this.level < Data.MAX_LEVEL) {
 
@@ -192,6 +192,7 @@ public class Unit extends Model {
             if (Data.PROMOTION_LEVEL != level ) {
                 float GRcha = getAppGrCharisma();
                 float GRHP = getAppGrHitpoints();
+                float GRbra = getAppGrBravery();
                 float GRstr = getAppGrStrength();
                 float GRArmorP = getAppGrArmor(DamageType.PIERCING);
                 float GRArmorB = getAppGrArmor(DamageType.BLUNT);
@@ -199,10 +200,11 @@ public class Unit extends Model {
                 float GRdex = getAppGrDexterity();
                 float GRagi = getAppGrAgility();
                 float GRski = getAppGrSkill();
-                float GRbra = getAppGrBravery();
+                float GRluc = getAppLuck();
 
                 cha += (GRcha  > MathUtils.random()) ? 1 : 0;
                 hpt += (GRHP  > MathUtils.random()) ? 1 : 0;
+                bra += (GRbra  > MathUtils.random()) ? 1 : 0;
                 str += (GRstr  > MathUtils.random()) ? 1 : 0;
                 armorE += (GRArmorE  > MathUtils.random()) ? 1 : 0;
                 armorB += (GRArmorB  > MathUtils.random()) ? 1 : 0;
@@ -210,30 +212,31 @@ public class Unit extends Model {
                 dex += (GRdex  > MathUtils.random()) ? 1 : 0;
                 agi += (GRagi  > MathUtils.random()) ? 1 : 0;
                 ski += (GRski  > MathUtils.random()) ? 1 : 0;
-                bra += (GRbra  > MathUtils.random()) ? 1 : 0;
-            }else{
-                int[] promoStats = promoted();
+                luc += (GRluc  > MathUtils.random()) ? 1 : 0;
 
-                mob = promoStats[0];
+            }else{
+                this.horseman = horsemanUponPromotion;
+
+                mob = template.getProBoMob();
                 cha = template.getProBoCha();
-                ld = template.getProBoLd();
                 hpt = template.getProBoHP();
-                str = template.getProBoStr() + promoStats[1];
-                armorP = template.getProBoPiercingArmor() + promoStats[4];
-                armorE = template.getProBoEdgedArmor() + promoStats[5];
-                armorB = template.getProBoBluntArmor() + promoStats[6];
-                dex = template.getProBoDex() + promoStats[2];
-                agi = template.getProBoAg() + promoStats[3];
-                ski = template.getProBoSk();
                 bra = template.getProBoBr();
+                str = template.getProBoStr();
+                armorP = template.getProBoPiercingArmor();
+                armorE = template.getProBoEdgedArmor();
+                armorB = template.getProBoBluntArmor();
+                dex = template.getProBoDex();
+                agi = template.getProBoAg();
+                ski = template.getProBoSk();
+                luc = template.getProBoLuck();
             }
 
             this.level++;
 
             this.mobility += mob;
             this.charisma += cha;
-            this.setLeadership(this.leadership + ld);
             this.hitPoints += hpt;
+            this.bravery += bra;
             this.strength += str;
             this.armorBlunt += armorB;
             this.armorEdged += armorE;
@@ -241,46 +244,33 @@ public class Unit extends Model {
             this.dexterity += dex;
             this.agility += agi;
             this.skill += ski;
-            this.bravery += bra;
+            this.luck += luc;
         }
 
-        return new int[]{hpt, mob, cha, ld, str, armorP, armorB, armorE, dex, agi, ski, bra};
+        // old : hpt, mob, cha, ld, str, armorP, armorB, armorE, dex, agi, ski, bra
+        return new int[]{ mob, cha, hpt, bra, str, armorP, armorB, armorE, agi, dex, ski, luc};
     }
 
-    private int[] promoted(){
-        int mob = (!horseman && horsemanUponPromotion) ? template.getHorsemanMob() - template.getFootmanMob() : 0;
-        int str = ((!horseman && horsemanUponPromotion) ? template.getHorsemanStrengthBonus(): 0);
-        int dex = ((!horseman && horsemanUponPromotion) ? template.getHorsemanDexBonus(): 0);
-        int agi = ((!horseman && horsemanUponPromotion) ? template.getHorsemanAgilityBonus(): 0);
-        int armorP = ((!horseman && horsemanUponPromotion) ? template.getHorsemanArmorPBonus(): 0);
-        int armorB = ((!horseman && horsemanUponPromotion) ? template.getHorsemanArmorBBonus(): 0);
-        int armorE = ((!horseman && horsemanUponPromotion) ? template.getShieldBearerArmorEBonus(): 0);
-
-        this.horseman = horsemanUponPromotion;
-        mob += Data.MOBILITY_BONUS_PROMOTED;
-
-        return new int[]{mob, str, dex, agi, armorP, armorB, armorE};
-    }
-
-    public void growup(int upto){
+    public int[] growup(int upto){
         int gainLvl = upto - getLevel();
+
+        float mob = 0;
+        float cha = 0;
+        float hpt = 0;
+        float str = 0;
+        float armorE = 0;
+        float armorP = 0;
+        float armorB = 0;
+        float dex = 0;
+        float agi = 0;
+        float ski = 0;
+        float bra = 0;
+        float luc = 0;
+
 
         if(gainLvl > 0){
             int gainBeforePromotion = (Data.PROMOTION_LEVEL <= upto) ? Data.PROMOTION_LEVEL - getLevel() - 1 : upto - getLevel();
             int gainAfterPromotion = upto - Data.PROMOTION_LEVEL;
-
-            float mob = 0;
-            float cha = 0;
-            float ld = 0;
-            float hpt = 0;
-            float str = 0;
-            float armorE = 0;
-            float armorP = 0;
-            float armorB = 0;
-            float dex = 0;
-            float agi = 0;
-            float ski = 0;
-            float bra = 0;
 
             if(gainBeforePromotion > 0){
                 cha += template.getGrowthCha() * gainBeforePromotion;
@@ -296,20 +286,19 @@ public class Unit extends Model {
             }
 
             if(getLevel() < Data.PROMOTION_LEVEL && Data.PROMOTION_LEVEL <= upto){
-                int[] promoStats = promoted();
 
-                mob = promoStats[0];
+                mob = template.getProBoMob();
                 cha = template.getProBoCha();
-                ld = template.getProBoLd();
                 hpt = template.getProBoHP();
-                str = template.getProBoStr() + promoStats[1];
-                armorP = template.getProBoPiercingArmor() + promoStats[4];
-                armorE = template.getProBoEdgedArmor() + promoStats[5];
-                armorB = template.getProBoBluntArmor() + promoStats[6];
-                dex = template.getProBoDex() + promoStats[2];
-                agi = template.getProBoAg() + promoStats[3];
+                str = template.getProBoStr();
+                armorP = template.getProBoPiercingArmor();
+                armorE = template.getProBoEdgedArmor();
+                armorB = template.getProBoBluntArmor();
+                dex = template.getProBoDex();
+                agi = template.getProBoAg();
                 ski = template.getProBoSk();
                 bra = template.getProBoBr();
+                luc = template.getProBoLuck();
             }
 
             if(gainAfterPromotion > 0){
@@ -323,12 +312,12 @@ public class Unit extends Model {
                 agi += template.getProGrowthAg() * gainAfterPromotion;
                 ski += template.getProGrowthSk() * gainAfterPromotion;
                 bra += template.getProGrowthBr()  * gainAfterPromotion;
+                luc += template.getProGrowthLuck() * gainAfterPromotion;
             }
 
             this.level = upto;
             this.mobility += mob;
             this.charisma += cha;
-            this.setLeadership((int) (this.leadership + ld));
             this.hitPoints += hpt;
             this.strength += str;
             this.armorPiercing += armorP;
@@ -338,8 +327,10 @@ public class Unit extends Model {
             this.agility +=agi;
             this.skill += ski;
             this.bravery += bra;
+            this.luck += luc;
         }
 
+        return new int[]{ (int)mob, (int)cha, (int)hpt, (int)bra, (int)str, (int)armorP, (int)armorB, (int)armorE, (int)agi, (int)dex, (int)ski, (int)luc};
     }
 
 
@@ -535,6 +526,15 @@ public class Unit extends Model {
 
     public float getAppGrBravery() {
         return (isPromoted()) ? template.getProGrowthBr() : template.getGrowthBr();
+    }
+
+    public int getAppLuck(){
+        return luck;
+    }
+
+
+    public float getAppGrLuck(){
+        return (isPromoted()) ? template.getGrowthLuck() : template.getProGrowthLuck();
     }
 
     public int getAppMobility() {
@@ -1102,6 +1102,8 @@ public class Unit extends Model {
         return bravery;
     }
 
+    public int getLuck() { return luck; }
+
     public int getCurrentHitPoints() {
         return currentHitPoints;
     }
@@ -1231,8 +1233,8 @@ public class Unit extends Model {
     static class CharacterUnit extends Unit{
         private String title;
 
-        public CharacterUnit(String name, String title, UnitTemplate template, int level, WeaponType weaponType, boolean shielbearer, boolean horseman, boolean horsemanUponPromotion, boolean homogeneousLevelsup) {
-            super(name, template, level, weaponType, shielbearer, horseman, horsemanUponPromotion, homogeneousLevelsup);
+        public CharacterUnit(String name, String title, UnitTemplate template, int level, WeaponType weaponType, boolean horseman, boolean horsemanUponPromotion, boolean homogeneousLevelsup) {
+            super(name, template, level, weaponType, horseman, horsemanUponPromotion, homogeneousLevelsup);
             this.title = title;
         }
 

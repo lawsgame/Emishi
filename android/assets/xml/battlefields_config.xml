@@ -17,7 +17,7 @@
         </TrapArea>
         <Army affiliation = "ENEMY_0" keyname="enemy army 1">
             <Squad>
-                <Unit row = "13" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "13" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id= "leadershio" value="15"/>
                     <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
                     <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>
@@ -25,12 +25,12 @@
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
-                <Unit row = "13" col = "8" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="AXE" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "13" col = "8" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="AXE" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id= "weapon" value="BROAD_AXE" stealable="true" />
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
-                <Unit row = "12" col = "9" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="SWORD" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "12" col = "9" name = "noname" title=""  template="SOLAR_KNIGHT" level="1" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
                     <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>

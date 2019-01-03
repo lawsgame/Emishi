@@ -118,20 +118,20 @@ public class TempoLongUnitPanel extends LongUnitPanel {
 
 
         builder.append("    STATISTICS\n");
+        builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getMobility()+")");
+        builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getLeadership()+")");
+        builder.append("\nCHA  : "+unit.getAppCharisma() +" ("+ unit.getCharisma()+")");
         builder.append("\nHPT  :" + unit.getCurrentHitPoints() +" ("+ unit.getHitpoints()+")");
+        builder.append("\nBRA  : "+unit.getAppBravery() +" ("+ unit.getBravery()+")");
         builder.append("\nSTR  :" + unit.getAppStrength() +" ("+ unit.getStrength()+")");
-        builder.append("\nDEX  :" + unit.getAppDexterity() +" ("+ unit.getDexterity()+")");
-        builder.append("\nSKI  :" + unit.getAppSkill() +" ("+ unit.getSkill()+")");
         builder.append("\nDEF  : ");
         builder.append("\n  against piercing : "+unit.getAppArmor(Data.DamageType.PIERCING));
         builder.append("\n  against edged    : "+unit.getAppArmor(Data.DamageType.EDGED));
         builder.append("\n  against blunt    : "+unit.getAppArmor(Data.DamageType.BLUNT));
         builder.append("\nAGI  : "+ unit.getAppAgility() +" ("+ unit.getAgility()+")");
-        builder.append("\nBRA  : "+unit.getAppBravery() +" ("+ unit.getBravery()+")");
-        builder.append("\nCHA  : "+unit.getAppCharisma() +" ("+ unit.getCharisma()+")");
-        builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getLeadership()+")");
-        builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getMobility()+")");
-
+        builder.append("\nDEX  :" + unit.getAppDexterity() +" ("+ unit.getDexterity()+")");
+        builder.append("\nSKI  :" + unit.getAppSkill() +" ("+ unit.getSkill()+")");
+        builder.append("\nLUC  : "+unit.getAppLuck() +" ("+ unit.getLuck()+")");
         builder.append("\n\nattack might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
         builder.append("\nattack accuracy : "+unit.getAppAttackAccuracy());
         builder.append("\nAvoidance : "+unit.getAppAvoidance());

@@ -11,7 +11,6 @@ public class Data {
 
 
     //MODEL parameters
-    public static final int MOBILITY_BONUS_PROMOTED = 1;
     public static final int PROMOTION_LEVEL = 10;
     public static final int MAX_LEVEL = 30;
     public static final int HEAL_BASE_POWER = 3;
@@ -933,172 +932,152 @@ public class Data {
 
 
     public enum UnitTemplate {
-        SOLAIRE(1, 4, 5, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.HEAL},
-                3, 7, 7, 4, 7, 9, 3, 33, 6, 4, 3,
-                0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
-                0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
-                0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f),
-        SOLAR_KNIGHT(1, 4, 5, new int[]{0, -1, -1, -1, 3, 2}, new int[]{-1, 0, -1, 5, 0, 1}, new Ability[]{Ability.GUARD},
-                3, 7, 7, 4, 7, 9, 3, 33, 6, 4, 3,
-                0, 2, 2, 1, 2, 2, 1, 9, 2, 2, 2,
-                0.00f, 0.15f, 0.10f, 0.10f, 0.10f, 0.15f, 0.15f, 0.55f, 0.40f, 0.40f, 0.45f,
-                0.00f, 0.20f, 0.15f, 0.10f, 0.15f, 0.20f, 0.15f, 0.65f, 0.50f, 0.45f, 0.50f);
+        SOLAIRE(1, new Ability[]{Ability.HEAL},
+                4, 3, 3, 36, 9, 8, 5, 4, 6, 7, 3, 2, 2,
+                1, 0, 2, 9,  1, 2, 2, 1, 1, 2, 2, 2, 3,
+                0.00f, 0.15f, 0.40f, 0.60f, 0.40f, 0.15f, 0.15f, 0.15f, 0.40f, 0.40f, 0.40f, 0.40f,
+                0.00f, 0.20f, 0.50f, 0.70f, 0.50f, 0.20f, 0.20f, 0.20f, 0.50f, 0.50f, 0.50f, 0.50f),
+        SOLAR_KNIGHT(1, new Ability[]{Ability.GUARD},
+                4, 3, 3, 25, 5, 8, 5, 4, 6, 7, 3, 2, 2,
+                1, 0, 2, 9,  1, 2, 2, 1, 1, 2, 2, 2, 3,
+                0.00f, 0.15f, 0.40f, 0.60f, 0.40f, 0.15f, 0.15f, 0.15f, 0.40f, 0.40f, 0.40f, 0.40f,
+                0.00f, 0.20f, 0.50f, 0.70f, 0.50f, 0.20f, 0.20f, 0.20f, 0.50f, 0.50f, 0.50f, 0.50f);
 
 
         private int startingLevel;
-        private int footmanMob;
-        private int horsemanMob;
-        private int[] horsemanBonus;       // str, dex, agi, piercing, blunt, edged
-        private int[] shieldBearerBonus;   // str, dex, agi, piercing, blunt, edged
         private Ability[] nativeAbilities;
 
+        private int baseMob;
         private int baseLd;
+        private int baseCha;
+        private int baseHP;
+        private int baseBr;
         private int baseStr;
         private int basePiercingArmor;
         private int baseBluntArmor;
         private int baseEgdedArmor;
         private int baseAg;
-        private int baseCha;
-        private int baseHP;
         private int baseDex;
         private int baseSk;
-        private int baseBr;
+        private int baseLuck;
 
+        private int proBoMob;
         private int proBoLd;
+        private int proBoCha;
+        private int proBoHP;
+        private int proBoBr;
         private int proBoStr;
         private int proBoPiercingArmor;
         private int proBoBluntArmor;
         private int proBoEdgedArmor;
         private int proBoAg;
-        private int proBoCha;
-        private int proBoHP;
         private int proBoDex;
         private int proBoSk;
-        private int proBoBr;
+        private int proBoLuck;
 
         private float growthLd;
+        private float growthCha;
+        private float growthHP;
+        private float growthBr;
         private float growthStr;
         private float growthPiercingArmor;
         private float growthBluntArmor;
         private float growthEdgegArmor;
         private float growthAg;
-        private float growthCha;
-        private float growthHP;
         private float growthDex;
         private float growthSk;
-        private float growthBr;
+        private float growthLuck;
 
         private float proGrowthLd;
+        private float proGrowthCha;
+        private float getProGrowthHP;
+        private float proGrowthBr;
         private float proGrowthStr;
         private float proGrowthPiercingArmor;
         private float proGrowthBluntArmor;
         private float proGrowthEdgedArmor;
-        private float proGrowthDex;
-        private float proGrowthCha;
-        private float getProGrowthHP;
         private float proGrowthAg;
+        private float proGrowthDex;
         private float proGrowthSk;
-        private float proGrowthBr;
+        private float proGrowthLuck;
 
-        UnitTemplate(int startingLevel, int footmanMob, int horsemanMob, int[] horsemanBonus, int[] shieldBearerBonus, Ability[] nativeAbilities, int baseLd, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseCha, int baseHP, int baseDex, int baseSk, int baseBr, int proBoLd, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoCha, int proBoHP, int proBoDex, int proBoSk, int proBoBr, float growthLd, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthCha, float growthHP, float growthDex, float growthSk, float growthBr, float proGrowthLd, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthDex, float proGrowthCha, float getProGrowthHP, float proGrowthAg, float proGrowthSk, float proGrowthBr) {
+        UnitTemplate(int startingLevel, Ability[] nativeAbilities, int baseMob, int baseLd, int baseCha, int baseHP, int baseBr, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseDex, int baseSk, int baseLuck, int proBoMob, int proBoLd, int proBoCha, int proBoHP, int proBoBr, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoDex, int proBoSk, int proBoLuck, float growthLd, float growthCha, float growthHP, float growthBr, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthDex, float growthSk, float growthLuck, float proGrowthLd, float proGrowthCha, float getProGrowthHP, float proGrowthBr, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthAg, float proGrowthDex, float proGrowthSk, float proGrowthLuck) {
             this.startingLevel = startingLevel;
-            this.footmanMob = footmanMob;
-            this.horsemanMob = horsemanMob;
-            this.horsemanBonus = horsemanBonus;
-            this.shieldBearerBonus = shieldBearerBonus;
             this.nativeAbilities = nativeAbilities;
+            this.baseMob = baseMob;
             this.baseLd = baseLd;
+            this.baseCha = baseCha;
+            this.baseHP = baseHP;
+            this.baseBr = baseBr;
             this.baseStr = baseStr;
             this.basePiercingArmor = basePiercingArmor;
             this.baseBluntArmor = baseBluntArmor;
             this.baseEgdedArmor = baseEgdedArmor;
             this.baseAg = baseAg;
-            this.baseCha = baseCha;
-            this.baseHP = baseHP;
             this.baseDex = baseDex;
             this.baseSk = baseSk;
-            this.baseBr = baseBr;
+            this.baseLuck = baseLuck;
+            this.proBoMob = proBoMob;
             this.proBoLd = proBoLd;
+            this.proBoCha = proBoCha;
+            this.proBoHP = proBoHP;
+            this.proBoBr = proBoBr;
             this.proBoStr = proBoStr;
             this.proBoPiercingArmor = proBoPiercingArmor;
             this.proBoBluntArmor = proBoBluntArmor;
             this.proBoEdgedArmor = proBoEdgedArmor;
             this.proBoAg = proBoAg;
-            this.proBoCha = proBoCha;
-            this.proBoHP = proBoHP;
             this.proBoDex = proBoDex;
             this.proBoSk = proBoSk;
-            this.proBoBr = proBoBr;
+            this.proBoLuck = proBoLuck;
             this.growthLd = growthLd;
+            this.growthCha = growthCha;
+            this.growthHP = growthHP;
+            this.growthBr = growthBr;
             this.growthStr = growthStr;
             this.growthPiercingArmor = growthPiercingArmor;
             this.growthBluntArmor = growthBluntArmor;
             this.growthEdgegArmor = growthEdgegArmor;
             this.growthAg = growthAg;
-            this.growthCha = growthCha;
-            this.growthHP = growthHP;
             this.growthDex = growthDex;
             this.growthSk = growthSk;
-            this.growthBr = growthBr;
+            this.growthLuck = growthLuck;
             this.proGrowthLd = proGrowthLd;
+            this.proGrowthCha = proGrowthCha;
+            this.getProGrowthHP = getProGrowthHP;
+            this.proGrowthBr = proGrowthBr;
             this.proGrowthStr = proGrowthStr;
             this.proGrowthPiercingArmor = proGrowthPiercingArmor;
             this.proGrowthBluntArmor = proGrowthBluntArmor;
             this.proGrowthEdgedArmor = proGrowthEdgedArmor;
-            this.proGrowthDex = proGrowthDex;
-            this.proGrowthCha = proGrowthCha;
-            this.getProGrowthHP = getProGrowthHP;
             this.proGrowthAg = proGrowthAg;
+            this.proGrowthDex = proGrowthDex;
             this.proGrowthSk = proGrowthSk;
-            this.proGrowthBr = proGrowthBr;
+            this.proGrowthLuck = proGrowthLuck;
         }
 
-        public int getHorsemanStrengthBonus() {
-            return horsemanBonus[0];
+        public int getBaseMob() {
+            return baseMob;
         }
 
-        public int getShieldBearerStrengthBonus() {
-            return shieldBearerBonus[0];
+        public int getBaseLuck() {
+            return baseLuck;
         }
 
-        public int getHorsemanDexBonus() {
-            return horsemanBonus[1];
+        public int getProBoMob() {
+            return proBoMob;
         }
 
-        public int getShieldBearerDexBonus() {
-            return shieldBearerBonus[1];
+        public int getProBoLuck() {
+            return proBoLuck;
         }
 
-        public int getHorsemanAgilityBonus() {
-            return horsemanBonus[2];
+        public float getGrowthLuck() {
+            return growthLuck;
         }
 
-        public int getShieldBearerAgilityBonus() {
-            return shieldBearerBonus[2];
-        }
-
-        public int getHorsemanArmorPBonus() {
-            return horsemanBonus[3];
-        }
-
-        public int getShieldBearerArmorPBonus() {
-            return shieldBearerBonus[3];
-        }
-
-        public int getHorsemanArmorBBonus() {
-            return horsemanBonus[4];
-        }
-
-        public int getShieldBearerArmorBBonus() {
-            return shieldBearerBonus[4];
-        }
-
-        public int getHorsemanArmorEBonus() {
-            return horsemanBonus[5];
-        }
-
-        public int getShieldBearerArmorEBonus() {
-            return shieldBearerBonus[5];
+        public float getProGrowthLuck() {
+            return proGrowthLuck;
         }
 
         public int getStartingLevel() {
@@ -1107,14 +1086,6 @@ public class Data {
 
         public String getName(I18NBundle bundle) {
             return bundle.get(name());
-        }
-
-        public int getFootmanMob() {
-            return footmanMob;
-        }
-
-        public int getHorsemanMob() {
-            return horsemanMob;
         }
 
         public Ability[] getNativeAbilities() { return nativeAbilities; }

@@ -284,7 +284,6 @@ public class BattlefieldLoader {
         Equipment equipement;
         WeaponType weaponType = WeaponType.FIST;
         boolean character = !name.equals("noname");
-        boolean shieldbearer = unitElt.getBoolean("shieldbearer");
         boolean horseman = unitElt.getBoolean("horseman");
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
         boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
@@ -306,8 +305,8 @@ public class BattlefieldLoader {
 
 
         unit = (character)?
-                Unit.createCharacterUnit(name, title, unitTemplate,level, weaponType, shieldbearer, horseman, horsemanUponPromotion):
-                Unit.createGenericUnit(name, unitTemplate,level, weaponType, shieldbearer, horseman, horsemanUponPromotion, homogeneousLevels);
+                Unit.createCharacterUnit(name, title, unitTemplate,level, weaponType, horseman, horsemanUponPromotion):
+                Unit.createGenericUnit(name, unitTemplate,level, weaponType, horseman, horsemanUponPromotion, homogeneousLevels);
 
         XmlReader.Element attributeElt;
         for(int k = 0; k < unitElt.getChildCount(); k++){

@@ -86,7 +86,7 @@ public class Formulas {
     public static int getLootRate(Unit attacker, int rowActor, int colActor, Battlefield bf){
         int lootRate = 0;
         if(attacker.getArmy().isPlayerControlled()) {
-            lootRate += Data.BASE_DROP_RATE + attacker.getChiefCharisma() / 2;
+            lootRate += Data.BASE_DROP_RATE + attacker.getAppLuck() / 2 + attacker.getChiefCharisma() / 4;
             lootRate += Formulas.getCurrentUnitBannerBonus(attacker, rowActor, colActor, bf, Data.BannerBonus.LOOT_RATE);
         }
         return lootRate;
