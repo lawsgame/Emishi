@@ -84,14 +84,18 @@ public abstract class BattleCommand extends Observable implements Observer {
             scheduleRenderTask(tasks.get(i));
     }
 
+    private static String CAM_MOVE_TAG = "camera move";
+
     protected final void scheduleCameraTrip(final float xGame, final float yGame, float waitingTime){
         StandardTask task = new StandardTask();
-        task.addParallelSubTask(new StandardTask.CommandSubTask(0) {
+        StandardTask.SubTask moveCamSubTask= new StandardTask.CommandSubTask(0) {
             @Override
             public void run() {
                 bfr.getGCM().moveTo(xGame, yGame, true);
             }
-        });
+        };
+        moveCamSubTask.setTag(CAM_MOVE_TAG);
+        task.addParallelSubTask(moveCamSubTask);
         task.addParallelSubTask(new StandardTask.DelaySubTask(waitingTime));
         scheduleRenderTask(task);
     }

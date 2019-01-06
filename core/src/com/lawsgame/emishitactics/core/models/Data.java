@@ -52,6 +52,7 @@ public class Data {
     public static final float BLINK_PERIOD_WOUNDED_AMPLITUDE = 2.0f;
     public static final float ANIMATION_DURATION = ANIMATION_NORMAL_SPEED*5;
     public static final float EARTHQUAKE_DURATION = 4.0f;
+    public static final float CAM_WAITING_TIME_BEFORE_PROCEEDING_TO_THE_NEXT_ACTION = 0.3f;
 
     //UI parameters
     public static final float AIBIS_ACTION_PANEL_DURATION_APPEARANCE = 3.0f;
@@ -199,7 +200,8 @@ public class Data {
         SPECIAL_MOVE(   AnimSpriteSetId.SPECIAL_MOVE),
         CHANGE_STRATEGY(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
         PICK_LOOT (     AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        SCAN_AREA(      AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
+        SCAN_AREA(      AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        BOOST(  AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
 
         AnimSpriteSetId soldierId;
         AnimSpriteSetId warchiefId;
@@ -246,6 +248,7 @@ public class Data {
         public boolean isRandomlyStarted() {
             return randomlyStarted;
         }
+
     }
 
 

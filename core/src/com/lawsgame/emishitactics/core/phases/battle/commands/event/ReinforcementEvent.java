@@ -14,7 +14,6 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class ReinforcementEvent extends BattleCommand {
-    private static final float WAITING_TIME = 0.3f;
     private Array<Unit> reinforcements;
     private Array<int[]> entryPoints;
     private Array<int[]> deploymentPositions;
@@ -59,16 +58,7 @@ public class ReinforcementEvent extends BattleCommand {
     @Override
     protected void execute() {
         float[] focusPoint = bfr.getCentriod(deploymentPositions);
-        scheduleCameraTrip(focusPoint[0], focusPoint[1], WAITING_TIME);
-        /*
-        scheduleRenderTask(new StandardTask(new SimpleCommand() {
-            @Override
-            public void apply() {
-                float[] focusPoint = bfr.getCentriod(deploymentPositions);
-                bfr.getGCM().moveTo(focusPoint[0], focusPoint[1], true);
-            }
-        }, 0));
-        */
+        scheduleCameraTrip(focusPoint[0], focusPoint[1], Data.CAM_WAITING_TIME_BEFORE_PROCEEDING_TO_THE_NEXT_ACTION);
 
         Unit unit;
         StandardTask deployTask = new StandardTask();

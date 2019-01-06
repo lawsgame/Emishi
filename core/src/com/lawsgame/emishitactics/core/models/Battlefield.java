@@ -334,21 +334,6 @@ public class Battlefield extends Model {
         }
     }
 
-    // --------------------- ARMY MANAGEMENT ------------------------------------
-
-
-    public boolean isDeployedTroopsStillFighting(MilitaryForce army) {
-        Unit unit;
-        for(int r = 0; r < getNbRows(); r++){
-            for(int c = 0; c < getNbColumns(); c++){
-                if(isTileOccupied(r, c)){
-                    unit = getUnit(r,c);
-                    return (army.isUnitRegular(unit) || army.isUnitSkirmisher(unit)) && !unit.isOutOfAction();
-                }
-            }
-        }
-        return false;
-    }
 
     //-------------- TILE STATE CHECK METHODS HIERARCHY ----------------------
     /*
@@ -638,44 +623,25 @@ public class Battlefield extends Model {
         return null;
     }
 
-    public Array<Unit> getStillActiveUnits(MilitaryForce army) {
-        Array<Unit> activeUnits = new Array<Unit>();
+
+
+    public Array<int[]> getUnitsPos(MilitaryForce army, boolean activeRequired, boolean fightingRequired) {
+        Array<int[]> poss = new Array<int[]>();
         for(int r =0; r<getNbRows();r++){
             for(int c = 0; c<getNbColumns(); c++){
                 if(isTileOccupied(r, c)
                         && getUnit(r, c).getArmy() == army
-                        && !getUnit(r, c).isDone()){
-                    activeUnits.add(getUnit(r, c));
+                        && (!activeRequired || !getUnit(r, c).isDone())
+                        && (!fightingRequired || !getUnit(r, c).isOutOfAction())){
+                    poss.add(new int[]{r, c});
                 }
             }
         }
-        return activeUnits;
+        return poss;
     }
 
-    public Array<int[]> getStillActiveUnitCoords(MilitaryForce army) {
-        Array<int[]> activeUnitCoords = new Array<int[]>();
-        for(int r =0; r<getNbRows();r++){
-            for(int c = 0; c<getNbColumns(); c++){
-                if(isTileOccupied(r, c)
-                        && getUnit(r, c).getArmy() == army
-                        && !getUnit(r, c).isDone()){
-                    activeUnitCoords.add(new int[]{r, c});
-                }
-            }
-        }
-        return activeUnitCoords;
-    }
-
-    public int[] getRandomlyStillActiveUnitsCoords(MilitaryForce army){
-        Array<int[]> activeUnits = new Array<int[]>();
-        for(int r =0; r<getNbRows();r++){
-            for(int c = 0; c<getNbColumns(); c++){
-                if(isTileOccupied(r, c) && getUnit(r, c).getArmy() == army && !getUnit(r, c).isDone()){
-                    activeUnits.add(new int[]{r, c});
-                }
-            }
-        }
-        return activeUnits.random();
+    public boolean isArmyDefeated(MilitaryForce army) {
+        return getUnitsPos(army, false, true).size > 0;
     }
 
 

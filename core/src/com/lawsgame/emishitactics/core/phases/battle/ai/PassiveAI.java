@@ -24,7 +24,7 @@ public class PassiveAI extends AI {
 
     @Override
     public int[] nextUnit(MilitaryForce army) {
-        return bfr.getModel().getStillActiveUnitCoords(army).random();
+        return bfr.getModel().getUnitsPos(army, true, true).random();
     }
 
     @Override

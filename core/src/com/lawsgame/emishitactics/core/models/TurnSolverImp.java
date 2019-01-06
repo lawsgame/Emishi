@@ -87,7 +87,7 @@ public class TurnSolverImp implements TurnSolver {
             // remove next army if the current army does not fit the requirements to stay in the turn loop.
             while (!armyTurnOrder.isEmpty()
                     && (armyTurnOrder.peek() == null
-                        || (checkArmyStillFighting && !battlefield.isDeployedTroopsStillFighting(armyTurnOrder.peek())))) {
+                        || (checkArmyStillFighting && !battlefield.isArmyDefeated(armyTurnOrder.peek())))) {
                 armyTurnOrder.pop();
             }
             // increment turn if requires
