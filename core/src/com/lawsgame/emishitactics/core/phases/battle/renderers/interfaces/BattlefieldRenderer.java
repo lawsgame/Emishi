@@ -203,16 +203,4 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         return gcm;
     }
 
-
-
-
-    //----------------- EXCEPTION DECLARATION ---------------------------
-
-    public static class BFRendererException extends Exception{
-        public BFRendererException(String msg){
-            super(msg);
-        }
-    }
-
-
 }

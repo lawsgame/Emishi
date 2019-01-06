@@ -12,7 +12,6 @@ import com.lawsgame.emishitactics.engine.rendering.Renderer;
 import java.util.LinkedList;
 
 public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameElement {
-
     private LinkedList<Object> notificationQueue;
 
     public BattleUnitRenderer(Unit model) {

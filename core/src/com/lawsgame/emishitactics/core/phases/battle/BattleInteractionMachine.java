@@ -14,7 +14,6 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
@@ -24,7 +23,8 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.Windrose;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoWindrose;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.WindRose;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
 
@@ -35,7 +35,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final AssetManager asm;
     public final TileHighlighter thl;
     public final PanelPool pp;
-    public final Windrose windrose;
+    public final WindRose windroseImp;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle localization;
@@ -59,7 +59,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
         this.multiplexer = new InputMultiplexer();
         this.uiStage = stageUI;
-        this.windrose = new Windrose(bfr, asm);
+        this.windroseImp = new IsoWindrose(bfr, asm);
 
         // TEST
 

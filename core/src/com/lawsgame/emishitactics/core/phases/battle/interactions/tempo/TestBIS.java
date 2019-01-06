@@ -20,7 +20,6 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
@@ -229,7 +228,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< WINDROSE >>>***------------------------
 
-        bim.windrose.initialize(bim.bfr.getUnitRenderer(sltdUnit));
+        bim.windroseImp.initialize(bim.bfr.getUnitRenderer(sltdUnit));
 
         /*
         TextureAtlas atlas = bim.asm.get(Assets.ATLAS_BATTLE_ICONS);
@@ -403,7 +402,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
     @Override
     public void update60(float dt) {
         animation.update(dt);
-        bim.windrose.update(dt);
+        bim.windroseImp.update(dt);
 
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){

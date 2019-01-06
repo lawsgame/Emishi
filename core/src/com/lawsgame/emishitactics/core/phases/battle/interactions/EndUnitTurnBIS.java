@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.exceptions.BattlefieldException;
@@ -33,8 +32,8 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
 
             proceed();
         }else {
-            bim.windrose.initialize(bim.bfr.getUnitRenderer(actor));
-            bim.windrose.attach(this);
+            bim.windroseImp.initialize(bim.bfr.getUnitRenderer(actor));
+            bim.windroseImp.attach(this);
             if(bim.bfr.getModel().isUnitDeployed(actor)) {
                 int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
                 bim.focusOn(actorPos[0], actorPos[1], true, true, true, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
@@ -46,19 +45,19 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
     @Override
     public void end() {
         super.end();
-        bim.windrose.detach(this);
-        bim.windrose.setEnable(false);
-        bim.windrose.setVisible(false);
+        bim.windroseImp.detach(this);
+        bim.windroseImp.setEnable(false);
+        bim.windroseImp.setVisible(false);
     }
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        bim.windrose.render(batch);
+        bim.windroseImp.render(batch);
     }
 
     @Override
     public boolean handleTouchInput(float xTouch, float yTouch) {
-        return bim.windrose.handleInput(xTouch, yTouch);
+        return bim.windroseImp.handleInput(xTouch, yTouch);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
 
     @Override
     public void getNotification(Observable sender, Object data) {
-        if(sender  == bim.windrose && data instanceof Data.Orientation){
+        if(sender  == bim.windroseImp && data instanceof Data.Orientation){
             //update actor orientation
             ChooseOrientationCommand orientationCommand = new ChooseOrientationCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), (Data.Orientation) data);
             int[] actorPos = bim.bfr.getModel().getUnitPos(actor);

@@ -1,4 +1,4 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets;
+package com.lawsgame.emishitactics.core.phases.battle.renderers;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -11,18 +11,14 @@ import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.engine.GameElement;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.WindRose;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 import java.util.HashMap;
 
-/**
- *
- * need initialize(), render() and update() to be used
- *
- */
-public class Windrose extends Observable implements GameElement {
+
+public class IsoWindrose extends Observable implements WindRose {
     private static final float ANIM_SPEED = 0.22f;
     private static final float ARROW_SIZE_FACTOR = 0.8f;
     private static final HashMap<Orientation, float[]> spriteRelPos = new HashMap<Orientation, float[]>();
@@ -37,7 +33,7 @@ public class Windrose extends Observable implements GameElement {
     private HashMap<Orientation, Array<Sprite>> arrowActiveSprites;
     private HashMap<Orientation, Array<Sprite>> arrowInactiveSprites;
 
-    public Windrose(BattlefieldRenderer bfr, AssetManager asm){
+    public IsoWindrose(BattlefieldRenderer bfr, AssetManager asm){
         if(spriteRelPos.size() == 0){
             float sss= IsoBFR.SPRITE_STD_SIZE;
             float asf = ARROW_SIZE_FACTOR;

@@ -182,7 +182,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
     @Override
     public void end() {
         super.end();
-        bim.pp.levelUpPanel.hide();;
+        bim.pp.levelUpPanel.hide();
         bim.pp.experiencePanel.hide();
         bim.pp.lootPanel.hide();
     }

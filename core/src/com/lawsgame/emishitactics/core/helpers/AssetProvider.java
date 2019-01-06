@@ -152,7 +152,7 @@ public class AssetProvider implements Disposable{
             for(int i = 0; i < AreaColor.values().length; i++ ){
 
                 color = AreaColor.values()[i];
-                filepath = String.format("%s/%s%s", Assets.AREA_SPRITES_DIR, color.name().toLowerCase(), EXT_PACK);;
+                filepath = String.format("%s/%s%s", Assets.AREA_SPRITES_DIR, color.name().toLowerCase(), EXT_PACK);
                 if(dirHandle.child(AreaColor.values()[i].name().toLowerCase()+EXT_PACK).exists()) {
                     asm.load(filepath, TextureAtlas.class);
                     asm.finishLoading();
