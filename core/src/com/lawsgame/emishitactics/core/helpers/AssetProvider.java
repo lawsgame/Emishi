@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
 import com.lawsgame.emishitactics.core.helpers.spritetree.CharaST;
 import com.lawsgame.emishitactics.core.helpers.spritetree.GenUnitST;
 import com.lawsgame.emishitactics.core.helpers.spritetree.WeaponBranch;
