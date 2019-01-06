@@ -38,7 +38,7 @@ public class EarthquakeEvent extends BattleCommand {
             @Override
             public boolean isTriggerable(Object data) {
                 boolean triggered = data instanceof Notification.BeginArmyTurn
-                        & bfr.getModel().getTurn() == turn
+                        & bfr.getModel().getTurnSolver().getTurn() == turn
                         && ((Notification.BeginArmyTurn) data).army.isPlayerControlled();
                 return triggered;
             }

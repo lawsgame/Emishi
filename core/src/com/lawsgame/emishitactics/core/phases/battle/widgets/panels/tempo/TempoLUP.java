@@ -40,21 +40,22 @@ public class TempoLUP extends LevelUpPanel {
         builder.append("name : "+luckyGuy.getName());
         builder.append("\nlevel : "+luckyGuy.getLevel());
         builder.append("\n");
-        builder.append("\nmobility : "+luckyGuy.getMobility()+" +"+statisticGain[0]);
-        builder.append("\ncharisma : "+luckyGuy.getLeadership()+" +"+statisticGain[1]);
+        builder.append("\nmobility : "+luckyGuy.getBaseStat(Data.UnitStat.MOBILITY)+" +"+statisticGain[0]);
+        builder.append("\nleadership : "+luckyGuy.getBaseStat(Data.UnitStat.LEADERSHIP)+" +"+statisticGain[1]);
+        builder.append("\ncharisma : "+luckyGuy.getBaseStat(Data.UnitStat.CHARISMA)+" +"+statisticGain[2]);
         builder.append("\n__________________");
-        builder.append("\nhitPoints : "+luckyGuy.getHitpoints()+" +"+statisticGain[2]);
-        builder.append("\nbravery : "+luckyGuy.getBravery()+" +"+statisticGain[3]);
+        builder.append("\nhitPoints : "+luckyGuy.getBaseStat(Data.UnitStat.HIT_POINTS)+" +"+statisticGain[3]);
+        builder.append("\nbravery : "+luckyGuy.getBaseStat(Data.UnitStat.BRAVERY)+" +"+statisticGain[4]);
         builder.append("\n__________________");
-        builder.append("\nstrength : "+luckyGuy.getStrength()+" +"+statisticGain[4]);
+        builder.append("\nstrength : "+luckyGuy.getBaseStat(Data.UnitStat.STRENGTH)+" +"+statisticGain[5]);
         builder.append("\nARMOR");
-        builder.append("\n  armorPiercing : "+luckyGuy.getArmor(Data.DamageType.PIERCING)+" +"+statisticGain[5]);
-        builder.append("\n  armorBlunt : "+luckyGuy.getArmor(Data.DamageType.BLUNT)+" +"+statisticGain[6]);
-        builder.append("\n  armorEdged : "+luckyGuy.getArmor(Data.DamageType.EDGED)+" +"+statisticGain[7]);
-        builder.append("\nagility : "+luckyGuy.getAgility()+" +"+statisticGain[8]);
-        builder.append("\ndexterity : "+luckyGuy.getDexterity()+" +"+statisticGain[9]);
-        builder.append("\nskill : "+luckyGuy.getSkill()+" +"+statisticGain[10]);
-        builder.append("\nluck : "+luckyGuy.getLuck()+ " +"+statisticGain[11]);
+        builder.append("\n  armorPiercing : "+luckyGuy.getBaseStat(Data.UnitStat.ARMOR_PIERCING)+" +"+statisticGain[6]);
+        builder.append("\n  armorBlunt : "+luckyGuy.getBaseStat(Data.UnitStat.ARMOR_BLUNT)+" +"+statisticGain[7]);
+        builder.append("\n  armorEdged : "+luckyGuy.getBaseStat(Data.UnitStat.ARMOR_EDGED)+" +"+statisticGain[8]);
+        builder.append("\nagility : "+luckyGuy.getBaseStat(Data.UnitStat.AGILITY)+" +"+statisticGain[9]);
+        builder.append("\ndexterity : "+luckyGuy.getBaseStat(Data.UnitStat.DEXTERITY)+" +"+statisticGain[10]);
+        builder.append("\nskill : "+luckyGuy.getBaseStat(Data.UnitStat.SKILL)+" +"+statisticGain[11]);
+        builder.append("\nluck : "+luckyGuy.getBaseStat(Data.UnitStat.LUCK)+ " +"+statisticGain[12]);
 
         label.setText(builder.toString());
     }

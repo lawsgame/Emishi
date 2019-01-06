@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.models.Data.Behaviour;
+import com.lawsgame.emishitactics.core.models.Data.UnitStat;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
@@ -15,6 +16,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 public class Unit extends Model {
@@ -31,20 +33,7 @@ public class Unit extends Model {
     protected int commandmentExperience = 0;
     private MilitaryForce army = null;
 
-    protected int mobility;
-    protected int charisma;
-    protected int leadership;
-    protected int hitPoints;
-    protected int strength;
-    protected int armorPiercing;
-    protected int armorBlunt;
-    protected int armorEdged;
-    protected int luck;
-    protected int agility;
-    protected int dexterity;
-    protected int skill;
-    protected int bravery;
-
+    protected HashMap<Data.UnitStat, Integer> baseStats;
     protected int currentMoral;
     protected int currentHitPoints;
 
@@ -102,19 +91,10 @@ public class Unit extends Model {
         this.horseman = horseman;
         this.horsemanUponPromotion = horsemanUponPromotion;
 
-        this.mobility = template.getBaseMob();
-        this.charisma = template.getBaseCha();
-        this.leadership = template.getBaseLd();
-        this.hitPoints = template.getBaseHP();
-        this.strength = template.getBaseStr();
-        this.armorPiercing = template.getBasePiercingArmor();
-        this.armorBlunt = template.getBaseBluntArmor();
-        this.armorEdged = template.getBaseEgdedArmor();
-        this.dexterity = template.getBaseDex();
-        this.agility = template.getBaseAg();
-        this.skill = template.getBaseSk();
-        this.bravery = template.getBaseBr();
-        this.luck = template.getBaseLuck();
+        baseStats = new HashMap<UnitStat, Integer>();
+        for(UnitStat stat : UnitStat.values()){
+            baseStats.put(stat, template.getBaseStat(stat));
+        }
 
         this.weapons = new Array<Weapon>();
         this.weapons.add(Weapon.FIST);
@@ -131,7 +111,7 @@ public class Unit extends Model {
             }
         }
 
-        this.currentHitPoints = getAppHitpoints();
+        this.currentHitPoints = getAppStat(UnitStat.HIT_POINTS);
         resetCurrentMoral();
         resetActionPoints();
     }
@@ -170,85 +150,38 @@ public class Unit extends Model {
     }
 
 
-    public int[] levelup() {
-        int mob = 0;
-        int cha = 0;
-        int hpt = 0;
-        int bra = 0;
-        int str = 0;
-        int armorE = 0;
-        int armorP = 0;
-        int armorB = 0;
-        int agi = 0;
-        int dex = 0;
-        int ski = 0;
-        int luc = 0;
-
-        int[] promoStats = null;
-
+    public int[] levelup(){
+        int[] gainedStats = new int[UnitStat.values().length];
         if(this.level < Data.MAX_LEVEL) {
-
-
+            this.level++;
+            float growthRate;
+            UnitStat stat;
             if (Data.PROMOTION_LEVEL != level ) {
-                float GRcha = getAppGrCharisma();
-                float GRHP = getAppGrHitpoints();
-                float GRbra = getAppGrBravery();
-                float GRstr = getAppGrStrength();
-                float GRArmorP = getAppGrArmor(DamageType.PIERCING);
-                float GRArmorB = getAppGrArmor(DamageType.BLUNT);
-                float GRArmorE = getAppGrArmor(DamageType.EDGED);
-                float GRdex = getAppGrDexterity();
-                float GRagi = getAppGrAgility();
-                float GRski = getAppGrSkill();
-                float GRluc = getAppLuck();
-
-                cha += (GRcha  > MathUtils.random()) ? 1 : 0;
-                hpt += (GRHP  > MathUtils.random()) ? 1 : 0;
-                bra += (GRbra  > MathUtils.random()) ? 1 : 0;
-                str += (GRstr  > MathUtils.random()) ? 1 : 0;
-                armorE += (GRArmorE  > MathUtils.random()) ? 1 : 0;
-                armorB += (GRArmorB  > MathUtils.random()) ? 1 : 0;
-                armorP += (GRArmorP  > MathUtils.random()) ? 1 : 0;
-                dex += (GRdex  > MathUtils.random()) ? 1 : 0;
-                agi += (GRagi  > MathUtils.random()) ? 1 : 0;
-                ski += (GRski  > MathUtils.random()) ? 1 : 0;
-                luc += (GRluc  > MathUtils.random()) ? 1 : 0;
-
+               for(int i = 0; i < UnitStat.values().length; i++){
+                   stat = UnitStat.values()[i];
+                   if(stat != UnitStat.LEADERSHIP) {
+                       growthRate = (template.getStatGrowth(stat, isPromoted()));
+                       if (MathUtils.random() < growthRate) {
+                           baseStats.put(stat, baseStats.get(stat) + 1);
+                           gainedStats[i] = 1;
+                       }
+                   }
+               }
             }else{
                 this.horseman = horsemanUponPromotion;
-
-                mob = template.getProBoMob();
-                cha = template.getProBoCha();
-                hpt = template.getProBoHP();
-                bra = template.getProBoBr();
-                str = template.getProBoStr();
-                armorP = template.getProBoPiercingArmor();
-                armorE = template.getProBoEdgedArmor();
-                armorB = template.getProBoBluntArmor();
-                dex = template.getProBoDex();
-                agi = template.getProBoAg();
-                ski = template.getProBoSk();
-                luc = template.getProBoLuck();
+                int bonusFromPromotion;
+                for(int i = 0; i < UnitStat.values().length; i++){
+                    stat = UnitStat.values()[i];
+                    if(stat != UnitStat.LEADERSHIP) {
+                        bonusFromPromotion = template.getProBoStat(stat);
+                        baseStats.put(stat, baseStats.get(stat) + bonusFromPromotion);
+                        gainedStats[i] = bonusFromPromotion;
+                    }
+                }
             }
-
-            this.level++;
-
-            this.mobility += mob;
-            this.charisma += cha;
-            this.hitPoints += hpt;
-            this.bravery += bra;
-            this.strength += str;
-            this.armorBlunt += armorB;
-            this.armorEdged += armorE;
-            this.armorPiercing += armorP;
-            this.dexterity += dex;
-            this.agility += agi;
-            this.skill += ski;
-            this.luck += luc;
         }
-
-        // old : hpt, mob, cha, ld, str, armorP, armorB, armorE, dex, agi, ski, bra
-        return new int[]{ mob, cha, hpt, bra, str, armorP, armorB, armorE, agi, dex, ski, luc};
+        //new int[]{ (int)mob, (int)cha, (int)hpt, (int)bra, (int)str, (int)armorP, (int)armorB, (int)armorE, (int)agi, (int)dex, (int)ski, (int)luc};
+        return gainedStats;
     }
 
     public int[] growup(int upto){
@@ -273,64 +206,67 @@ public class Unit extends Model {
             int gainAfterPromotion = upto - Data.PROMOTION_LEVEL;
 
             if(gainBeforePromotion > 0){
-                cha += template.getGrowthCha() * gainBeforePromotion;
-                hpt += template.getGrowthHP() * gainBeforePromotion;
-                str += template.getGrowthStr() * gainBeforePromotion;
-                armorE += template.getGrowthEdgegArmor()  * gainBeforePromotion;
-                armorB += template.getGrowthBluntArmor()  * gainBeforePromotion;
-                armorP += template.getGrowthPiercingArmor()  * gainBeforePromotion;
-                dex += template.getGrowthDex()  * gainBeforePromotion;
-                agi += template.getGrowthAg() * gainBeforePromotion;
-                ski += template.getGrowthSk() * gainBeforePromotion;
-                bra += template.getGrowthBr()  * gainBeforePromotion;
+                cha += template.getStatGrowth(UnitStat.CHARISMA, false) * gainBeforePromotion;
+                hpt += template.getStatGrowth(UnitStat.HIT_POINTS, false) * gainBeforePromotion;
+                bra += template.getStatGrowth(UnitStat.BRAVERY, false)  * gainBeforePromotion;
+                str += template.getStatGrowth(UnitStat.STRENGTH, false) * gainBeforePromotion;
+                armorE += template.getStatGrowth(UnitStat.ARMOR_EDGED, false)  * gainBeforePromotion;
+                armorB += template.getStatGrowth(UnitStat.ARMOR_BLUNT, false)  * gainBeforePromotion;
+                armorP += template.getStatGrowth(UnitStat.ARMOR_PIERCING, false)  * gainBeforePromotion;
+                agi += template.getStatGrowth(UnitStat.AGILITY, false) * gainBeforePromotion;
+                dex += template.getStatGrowth(UnitStat.DEXTERITY, false)  * gainBeforePromotion;
+                ski += template.getStatGrowth(UnitStat.SKILL, false) * gainBeforePromotion;
+                luc += template.getStatGrowth(UnitStat.LUCK, false) * gainBeforePromotion;
             }
 
             if(getLevel() < Data.PROMOTION_LEVEL && Data.PROMOTION_LEVEL <= upto){
 
-                mob = template.getProBoMob();
-                cha = template.getProBoCha();
-                hpt = template.getProBoHP();
-                str = template.getProBoStr();
-                armorP = template.getProBoPiercingArmor();
-                armorE = template.getProBoEdgedArmor();
-                armorB = template.getProBoBluntArmor();
-                dex = template.getProBoDex();
-                agi = template.getProBoAg();
-                ski = template.getProBoSk();
-                bra = template.getProBoBr();
-                luc = template.getProBoLuck();
+                mob = template.getProBoStat(UnitStat.MOBILITY);
+                cha = template.getProBoStat(UnitStat.CHARISMA);
+                hpt = template.getProBoStat(UnitStat.HIT_POINTS);
+                str = template.getProBoStat(UnitStat.STRENGTH);
+                bra = template.getProBoStat(UnitStat.BRAVERY);
+                armorP = template.getProBoStat(UnitStat.ARMOR_PIERCING);
+                armorE = template.getProBoStat(UnitStat.ARMOR_EDGED);
+                armorB = template.getProBoStat(UnitStat.ARMOR_BLUNT);
+                agi = template.getProBoStat(UnitStat.AGILITY);
+                dex = template.getProBoStat(UnitStat.DEXTERITY);
+                ski = template.getProBoStat(UnitStat.SKILL);
+                luc = template.getProBoStat(UnitStat.LUCK);
             }
 
             if(gainAfterPromotion > 0){
-                cha += template.getProGrowthCha()  * gainAfterPromotion;
-                hpt += template.getGetProGrowthHP() * gainAfterPromotion;
-                str += template.getProGrowthStr() * gainAfterPromotion;
-                armorE += template.getProGrowthEdgedArmor()  * gainAfterPromotion;
-                armorB += template.getProGrowthBluntArmor()  * gainAfterPromotion;
-                armorP += template.getProGrowthPiercingArmor()  * gainAfterPromotion;
-                dex += template.getProGrowthDex()  * gainAfterPromotion;
-                agi += template.getProGrowthAg() * gainAfterPromotion;
-                ski += template.getProGrowthSk() * gainAfterPromotion;
-                bra += template.getProGrowthBr()  * gainAfterPromotion;
-                luc += template.getProGrowthLuck() * gainAfterPromotion;
+
+                cha += template.getStatGrowth(UnitStat.CHARISMA, true) * gainAfterPromotion;
+                hpt += template.getStatGrowth(UnitStat.HIT_POINTS, true) * gainAfterPromotion;
+                bra += template.getStatGrowth(UnitStat.BRAVERY, true)  * gainAfterPromotion;
+                str += template.getStatGrowth(UnitStat.STRENGTH, true) * gainAfterPromotion;
+                armorE += template.getStatGrowth(UnitStat.ARMOR_EDGED, true)  * gainAfterPromotion;
+                armorB += template.getStatGrowth(UnitStat.ARMOR_BLUNT, true)  * gainAfterPromotion;
+                armorP += template.getStatGrowth(UnitStat.ARMOR_PIERCING, true)  * gainAfterPromotion;
+                dex += template.getStatGrowth(UnitStat.DEXTERITY, true)  * gainAfterPromotion;
+                agi += template.getStatGrowth(UnitStat.AGILITY, true) * gainAfterPromotion;
+                ski += template.getStatGrowth(UnitStat.SKILL, true) * gainAfterPromotion;
+                luc += template.getStatGrowth(UnitStat.LUCK, true) * gainAfterPromotion;
             }
 
             this.level = upto;
-            this.mobility += mob;
-            this.charisma += cha;
-            this.hitPoints += hpt;
-            this.strength += str;
-            this.armorPiercing += armorP;
-            this.armorEdged += armorE;
-            this.armorBlunt += armorB;
-            this.dexterity += dex;
-            this.agility +=agi;
-            this.skill += ski;
-            this.bravery += bra;
-            this.luck += luc;
+
+            baseStats.put(UnitStat.MOBILITY, baseStats.get(UnitStat.MOBILITY) + (int)mob);
+            baseStats.put(UnitStat.CHARISMA, baseStats.get(UnitStat.CHARISMA) + (int)cha);
+            baseStats.put(UnitStat.HIT_POINTS, baseStats.get(UnitStat.HIT_POINTS) + (int)hpt);
+            baseStats.put(UnitStat.BRAVERY, baseStats.get(UnitStat.BRAVERY) + (int)bra);
+            baseStats.put(UnitStat.STRENGTH, baseStats.get(UnitStat.STRENGTH) + (int)str);
+            baseStats.put(UnitStat.ARMOR_PIERCING, baseStats.get(UnitStat.ARMOR_PIERCING) + (int)armorP);
+            baseStats.put(UnitStat.ARMOR_EDGED, baseStats.get(UnitStat.ARMOR_EDGED) + (int)armorE);
+            baseStats.put(UnitStat.ARMOR_BLUNT, baseStats.get(UnitStat.ARMOR_BLUNT) + (int)armorB);
+            baseStats.put(UnitStat.DEXTERITY, baseStats.get(UnitStat.DEXTERITY) + (int)dex);
+            baseStats.put(UnitStat.AGILITY, baseStats.get(UnitStat.AGILITY) + (int)agi);
+            baseStats.put(UnitStat.SKILL, baseStats.get(UnitStat.SKILL) + (int)ski);
+            baseStats.put(UnitStat.LUCK, baseStats.get(UnitStat.LUCK) + (int)luc);
         }
 
-        return new int[]{ (int)mob, (int)cha, (int)hpt, (int)bra, (int)str, (int)armorP, (int)armorB, (int)armorE, (int)agi, (int)dex, (int)ski, (int)luc};
+        return new int[]{ (int)mob, 0, (int)cha, (int)hpt, (int)bra, (int)str, (int)armorP, (int)armorB, (int)armorE, (int)agi, (int)dex, (int)ski, (int)luc};
     }
 
 
@@ -414,14 +350,14 @@ public class Unit extends Model {
         return isWarChief();
     }
 
-    public int getAppHitpoints() {
-        return hitPoints;
+    public int getBaseStat(UnitStat stat){
+        return baseStats.get(stat);
     }
 
-
-    public float getAppGrHitpoints() {
-        return  (isPromoted()) ? template.getGetProGrowthHP() : template.getGrowthHP();
+    public int getAppStat(UnitStat stat){
+        return getBaseStat(stat);
     }
+
 
     public void resetCurrentMoral() {
         this.currentMoral = getAppMoral();
@@ -431,7 +367,7 @@ public class Unit extends Model {
 
 
     public int getAppMoral() {
-        return getAppBravery();
+        return getAppStat(UnitStat.BRAVERY);
     }
 
     public Stack<int[]> addExpPoints(int exp) {
@@ -448,98 +384,22 @@ public class Unit extends Model {
         return gainLvl;
     }
 
+    public void setLeadership(int leadership){
+        baseStats.put(UnitStat.LEADERSHIP,leadership);
+    }
+
     public int addLdExpPoints(int exp) {
         int ldLevelGained = 0;
         this.commandmentExperience += exp;
         if(commandmentExperience > Data.EXP_REQUIRED_LD_LEVEL_UP){
             ldLevelGained = commandmentExperience / Data.EXP_REQUIRED_LD_LEVEL_UP;
-            this.setLeadership(this.leadership + ldLevelGained);
+            this.setLeadership(this.getBaseStat(UnitStat.LEADERSHIP) + ldLevelGained);
             this.commandmentExperience = this.commandmentExperience % Data.EXP_REQUIRED_LD_LEVEL_UP;
         }
         return ldLevelGained;
     }
 
 
-    public int getAppCharisma() {
-        return charisma;
-    }
-
-    public float getAppGrCharisma() {
-        return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
-    }
-
-
-    public int getAppLeadership() {
-        return leadership;
-    }
-
-    public int getAppStrength() {
-        return strength;
-    }
-
-    public float getAppGrStrength() {
-        return (isPromoted()) ? template.getProGrowthStr() : template.getGrowthStr();
-    }
-
-    public int getAppArmor(Data.DamageType damageType) {
-        return getArmor(damageType);
-    }
-
-    public float getAppGrArmor(DamageType damageType) {
-        float growthrate = 0;
-        switch(damageType){
-            case BLUNT: growthrate = (isPromoted()) ? template.getProGrowthBluntArmor(): template.getGrowthBluntArmor(); break;
-            case EDGED: growthrate = (isPromoted()) ? template.getProGrowthEdgedArmor(): template.getGrowthEdgegArmor();break;
-            case PIERCING: growthrate = (isPromoted()) ? template.getProGrowthPiercingArmor(): template.getGrowthPiercingArmor();break;
-        }
-        return growthrate;
-    }
-
-    public int getAppAgility() {
-        return agility;
-    }
-
-    public float getAppGrAgility() {
-        return (isPromoted()) ? template.getProGrowthAg() : template.getGrowthAg();
-    }
-
-    public int getAppDexterity() {
-        return dexterity;
-    }
-
-    public float getAppGrDexterity() {
-        return (isPromoted()) ? template.getProGrowthDex() : template.getGrowthDex();
-    }
-
-    public int getAppSkill() {
-        return skill;
-    }
-
-    public float getAppGrSkill() {
-        return (isPromoted()) ? template.getProGrowthSk() : template.getGrowthSk();
-    }
-
-    public int getAppBravery() {
-        return bravery;
-    }
-
-
-    public float getAppGrBravery() {
-        return (isPromoted()) ? template.getProGrowthBr() : template.getGrowthBr();
-    }
-
-    public int getAppLuck(){
-        return luck;
-    }
-
-
-    public float getAppGrLuck(){
-        return (isPromoted()) ? template.getGrowthLuck() : template.getProGrowthLuck();
-    }
-
-    public int getAppMobility() {
-        return mobility;
-    }
 
 
     public void addNativeAbility(Data.Ability ability) {
@@ -724,58 +584,80 @@ public class Unit extends Model {
 
 
     public int getAppAttackAccuracy() {
-        return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppDexterity() + Data.WC_CHARISMA_BONUS_ATT_ACC* getChiefCharisma();
+        return getCurrentWeapon().getTemplate().getAccuracy() + Data.DEX_FACTOR_ATT_ACC * getAppStat(UnitStat.DEXTERITY) + Data.WC_CHARISMA_BONUS_ATT_ACC* getChiefCharisma();
     }
 
 
     public int[] getAppAttackMight() {
-        return new int[]{getCurrentWeapon().getTemplate().getDamageMin() + getAppStrength(), getCurrentWeapon().getTemplate().getDamageMax() + getAppStrength()};
+        return new int[]{getCurrentWeapon().getTemplate().getDamageMin() + getAppStat(UnitStat.STRENGTH), getCurrentWeapon().getTemplate().getDamageMax() + getAppStat(UnitStat.STRENGTH)};
     }
 
     public int getAppDefense(DamageType damageType){
-        return getAppArmor(damageType);
+
+        switch(damageType){
+
+            case BLUNT: return getAppStat(UnitStat.ARMOR_BLUNT);
+            case EDGED: return getAppStat(UnitStat.ARMOR_EDGED);
+            case PIERCING: return getAppStat(UnitStat.ARMOR_PIERCING);
+        }
+        return 0;
     }
 
 
     public int getAppAvoidance() {
-        return Data.DEX_FACTOR_AVO * getAppAgility();
+        return Data.DEX_FACTOR_AVO * getAppStat(UnitStat.AGILITY);
     }
 
     public void resetActionPoints() {
-        this.actionPoints = getAppSkill();
+        this.actionPoints = getAppStat(UnitStat.SKILL);
     }
 
     public void addActionPoints(int points) {
         this.actionPoints += points;
-        if(actionPoints < 0 )
+        if(actionPoints < 0 ) {
             actionPoints = 0;
+        }
 
     }
 
-    public boolean isMobilized() {
-        return (army != null) && getArmy().isUnitMobilized(this);
+    public boolean isMobilized() { return isRegular() || isSkirmisher(); }
+
+    public boolean isRegular(){
+        return (army != null && getArmy().isUnitRegular(this));
+    }
+
+    public boolean isSkirmisher(){
+        return (army != null && getArmy().isUnitSkirmisher(this));
+    }
+
+    public boolean isReverse(){
+        return (army != null && getArmy().isUnitReserve(this));
+    }
+
+    public boolean belongToAnArmy(){
+        return army != null;
     }
 
 
     public boolean isWarChief() {
-        return isMobilized() && army.getWarChiefs().contains(this, true);
+        return isRegular() && army.getWarChiefs().contains(this, true);
     }
 
 
     public boolean isWarlord() {
-        return isMobilized() && this == army.getWarlord();
+        return isRegular() && this == army.getWarlord();
     }
 
 
     public int getMaxSoldiersAs(boolean warlord) {
         int maxSoldiers;
         if(warlord){
-            maxSoldiers = 2 + (this.leadership + 2) / 5;
+            maxSoldiers = 2 + (this.getAppStat(UnitStat.LEADERSHIP) + 2) / 5;
             if(maxSoldiers > Data.MAX_UNITS_UNDER_WARLORD){
                 maxSoldiers = 5;
             }
         }else{
-            maxSoldiers = 1 + (this.leadership + 1) / 5;
+            maxSoldiers = 1 + (this.getAppStat(UnitStat.LEADERSHIP) + 1) / 5;
             if(maxSoldiers > Data.MAX_UNITS_UNDER_WAR_CHIEF){
                 maxSoldiers = 4;
             }
@@ -784,7 +666,7 @@ public class Unit extends Model {
     }
 
     public int getMaxWarChiefs() {
-        int maxWC = this.leadership / 6;
+        int maxWC = this.getAppStat(UnitStat.LEADERSHIP) / 6;
         if(maxWC > 3 )
             maxWC = 3;
         return maxWC + 1;
@@ -814,22 +696,18 @@ public class Unit extends Model {
 
 
     public boolean sameArmyAs(Unit unit) {
-        return army != null && unit.getArmy() != null && this.army == unit.getArmy();
+        return army != null && unit.belongToAnArmy() && this.army == unit.getArmy();
     }
 
     public Unit getWarchief() {
-        if(isMobilized())
-            return army.getWarchief(this);
-        return null;
+        return army.getWarchief(this);
     }
 
 
     public int getChiefCharisma() {
         int chiefCharisma = 0;
-        if(isMobilized() && !army.getWarchief(this).isOutOfAction()){
-            chiefCharisma = army.getWarchief(this).getAppCharisma() - Data.SQUAD_SIZE_EXCEEDANCE_CHA_MALUS * getArmy().getSquadExceedingCapacity(this);
-            if(chiefCharisma < 0 )
-                chiefCharisma = 0;
+        if(isRegular() && !army.getWarchief(this).isOutOfAction()){
+            chiefCharisma = army.getWarchief(this).getAppStat(UnitStat.CHARISMA);
         }
         return chiefCharisma;
     }
@@ -838,7 +716,7 @@ public class Unit extends Model {
     public void replenishMoral(boolean turnBeginning) {
         if(turnBeginning) {
             if(!this.isOutOfAction()) {
-                this.setCurrentMoral(this.getCurrentMoral() + getChiefCharisma() + getAppBravery() / Data.BRAVERY_MORAL_RECOVERY_RATE);
+                this.setCurrentMoral(this.getCurrentMoral() + getChiefCharisma() + getAppStat(UnitStat.BRAVERY) / Data.BRAVERY_MORAL_RECOVERY_RATE);
             }
         }else{
             resetCurrentMoral();
@@ -848,7 +726,7 @@ public class Unit extends Model {
 
     public int getSquadIndex() {
         int squadIndex = -1;
-        if(isMobilized()){
+        if(isRegular()){
             loop :
             {
                 for (int i = 0; i < army.getAllSquads().size; i++) {
@@ -865,7 +743,7 @@ public class Unit extends Model {
     }
 
     public boolean isWounded(boolean morally, boolean physically) {
-        return (currentHitPoints < getAppHitpoints() && physically) || (currentMoral  < getAppMoral() && morally);
+        return (currentHitPoints < getAppStat(UnitStat.HIT_POINTS) && physically) || (currentMoral  < getAppMoral() && morally);
     }
 
     public boolean isOutOfAction() {
@@ -887,8 +765,8 @@ public class Unit extends Model {
 
     public int getRecoveredHitPoints(int healPower) {
         int recoveredHP ;
-        if(healPower + currentHitPoints > getAppHitpoints()){
-            recoveredHP = getAppHitpoints() - currentHitPoints;
+        if(healPower + currentHitPoints > getAppStat(UnitStat.HIT_POINTS)){
+            recoveredHP = getAppStat(UnitStat.HIT_POINTS) - currentHitPoints;
         }else{
             recoveredHP = healPower;
         }
@@ -910,10 +788,10 @@ public class Unit extends Model {
     public boolean improveCondition(int boostMoral, int boostPhysical) {
         if(isWounded(boostMoral > 0, boostPhysical> 0)) {
             if(boostPhysical > 0) {
-                if (boostPhysical + hitPoints > getAppHitpoints()) {
-                    this.currentHitPoints = getAppHitpoints();
+                if (boostPhysical + currentHitPoints > getAppStat(UnitStat.HIT_POINTS)) {
+                    this.currentHitPoints = getAppStat(UnitStat.HIT_POINTS);
                 } else {
-                    this.currentHitPoints += getAppHitpoints();
+                    this.currentHitPoints += getAppStat(UnitStat.HIT_POINTS);
                 }
             }
 
@@ -964,6 +842,23 @@ public class Unit extends Model {
         return new TakeDamage(this, lifeDamageTaken, moralDamageTaken, state);
     }
 
+    public TakeDamage kill(boolean notifyObservers) {
+        final int lostHP =  currentHitPoints;
+        final int lostMoral = currentMoral;
+        this.currentHitPoints = 0;
+        this.currentMoral = 0;
+        TakeDamage takeDamage = new Notification.TakeDamage(
+                this,
+                lostHP,
+                lostMoral,
+                TakeDamage.State.DIED
+        );
+        takeDamage.set(false, false, 0, false, false, getOrientation().getOpposite());
+        if(notifyObservers){
+            notifyAllObservers(takeDamage);
+        }
+        return takeDamage;
+    }
 
 
 
@@ -1051,66 +946,13 @@ public class Unit extends Model {
         this.army = army;
     }
 
-
-    public int getMobility() {
-        return mobility;
-    }
-
-    public int getCharisma() {
-        return charisma;
-    }
-
-    public int getLeadership() {
-        return leadership;
-    }
-
-    public void setLeadership(int leadership) {
-        this.leadership = leadership;
-    }
-
-    public int getHitpoints() {
-        return hitPoints;
-    }
-     
-    public int getStrength() {
-        return strength;
-    }
-
-    public int getArmor(Data.DamageType damageType) {
-        int armor = 0;
-        switch(damageType){
-            case BLUNT: armor = armorBlunt; break;
-            case EDGED: armor = armorEdged; break;
-            case PIERCING: armor = armorPiercing;break;
-        }
-        return armor;
-    }
-
-    public int getDexterity() {
-        return dexterity;
-    }
-     
-    public int getAgility() {
-        return agility;
-    }
-
-    public int getSkill() {
-        return skill;
-    }
-
-    public int getBravery() {
-        return bravery;
-    }
-
-    public int getLuck() { return luck; }
-
     public int getCurrentHitPoints() {
         return currentHitPoints;
     }
 
     public void setCurrentHitPoints(int hitPoints) {
         if(0 <= hitPoints){
-            this.currentHitPoints = ( hitPoints > getAppHitpoints())? getAppHitpoints() : hitPoints;
+            this.currentHitPoints = ( hitPoints > getAppStat(UnitStat.HIT_POINTS))? getAppStat(UnitStat.HIT_POINTS) : hitPoints;
         }
     }
 
@@ -1118,7 +960,6 @@ public class Unit extends Model {
     public int getCurrentMoral() {
         return currentMoral;
     }
-
 
     public void setCurrentMoral(int moral) {
         if(0 <= moral){
@@ -1202,33 +1043,12 @@ public class Unit extends Model {
     public String statToString(boolean apparent){
         String str = "\nname : "+getName();
 
-        str +="\nhitpoints  : ";
-        str += (apparent) ? getAppHitpoints() : getHitpoints();
-        str +="\nbravery    : ";
-        str += (apparent) ? getAppBravery() : getBravery();
-        str +="\ncharisma   : ";
-        str += (apparent) ? getAppCharisma() : getCharisma();
-        str +="\ndexterity: : ";
-        str += (apparent) ? getAppDexterity() : getDexterity();
-        str +="\nskill      : ";
-        str += (apparent) ? getAppSkill() : getSkill();
-        str +="\n_________________: ";
-        str += "\nstrength  : ";
-        str += (apparent) ? getAppStrength() : getStrength();
-        str +="\ndefense    ";
-        str +="\n   piercing : ";
-        str += (apparent) ? getAppArmor(DamageType.PIERCING) : getArmor(DamageType.PIERCING);
-        str +="\n   blunt    : ";
-        str += (apparent) ? getAppArmor(DamageType.BLUNT) : getArmor(DamageType.BLUNT);
-        str +="\n   edged : ";
-        str += (apparent) ? getAppArmor(DamageType.EDGED) : getArmor(DamageType.EDGED);
-        str +="\nagility    : ";
-        str += (apparent) ? getAppAgility() : getAgility();
+        for(UnitStat stat: UnitStat.values()){
+            str += stat.name().toLowerCase()+" : "+getAppStat(stat)+" ("+baseStats.get(stat)+")";
+        }
 
         return str;
     }
-
-
 
     static class CharacterUnit extends Unit{
         private String title;

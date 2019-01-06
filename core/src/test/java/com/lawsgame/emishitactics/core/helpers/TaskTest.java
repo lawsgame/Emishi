@@ -85,7 +85,6 @@ public class TaskTest {
         task2.addParallelSubTask(new StandardTask.RendererSubTaskQueue(renderer0, bundle0));
         task3 = new StandardTask(renderer1, bundle1);
         task2.merge(task3);
-        System.out.println(task2);
         assertTrue(!task2.isIrrelevant());
         assertEquals(task2.getNumberOfSubTasks(), 2);
         assertEquals(task3.getNumberOfSubTasks(), 1);

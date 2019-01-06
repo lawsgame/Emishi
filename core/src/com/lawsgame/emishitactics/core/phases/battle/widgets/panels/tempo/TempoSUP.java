@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
 
@@ -53,7 +54,7 @@ public class TempoSUP extends ShortUnitPanel {
         builder.append("\nHit points  : ");
         builder.append(content.getCurrentHitPoints());
         builder.append("/");
-        builder.append(content.getAppHitpoints());
+        builder.append(content.getAppStat(Data.UnitStat.HIT_POINTS));
         builder.append("\nMoral  : ");
         builder.append(content.getCurrentMoral());
         builder.append("/");

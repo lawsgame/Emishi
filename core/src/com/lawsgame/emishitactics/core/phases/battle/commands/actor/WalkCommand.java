@@ -82,13 +82,13 @@ public class WalkCommand extends ActorCommand {
     public boolean isTargetValid(Unit initiator, int rowActor0, int colActor0, int rowTarget0, int colTarget0) {
         boolean valid = false;
 
-        if(initiator != null && initiator.isMobilized()) {
+        if(initiator != null && initiator.belongToAnArmy()) {
             this.validPath = bfr.getModel().getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getInitiator().has(Data.Ability.PATHFINDER), getInitiator().getArmy().getAffiliation(), true);
-            if (validPath.size > 0 && validPath.size <= getInitiator().getAppMobility()) {
+            if (validPath.size > 0 && validPath.size <= getInitiator().getAppStat(Data.UnitStat.MOBILITY)) {
                 valid = true;
             }else{
                 this.validPath = bfr.getModel().getShortestPath(rowActor0, colActor0, rowTarget0, colTarget0, getInitiator().has(Data.Ability.PATHFINDER), getInitiator().getArmy().getAffiliation(), false);
-                valid = validPath.size > 0 && validPath.size <= getInitiator().getAppMobility();
+                valid = validPath.size > 0 && validPath.size <= getInitiator().getAppStat(Data.UnitStat.MOBILITY);
             }
         }
         return valid;

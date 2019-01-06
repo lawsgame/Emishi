@@ -21,7 +21,7 @@ public class VisitCommand extends SelfInflitedCommand {
 
     @Override
     public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
-        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.isMobilized();
+        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.belongToAnArmy();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class VisitCommand extends SelfInflitedCommand {
         Unit recruit = bfr.getModel().getTile(rowTarget, colTarget).getRecruit(true);
         MilitaryForce army = getInitiator().getArmy();
         army.add(recruit);
-        army.appointSoldier(recruit, getInitiator().getSquadIndex());
+        army.appointSkirmisher(recruit);
         int[] deploymentTile = bfr.getModel().getAvailableNeighbourTiles(rowTarget, colTarget, getInitiator().has(Data.Ability.PATHFINDER)).random();
         bfr.getModel().deploy(deploymentTile[0], deploymentTile[1], recruit, false);
         Array<int[]> path = new Array<int[]>();

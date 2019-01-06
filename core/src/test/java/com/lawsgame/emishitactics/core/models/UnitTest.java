@@ -28,7 +28,7 @@ public class UnitTest {
         float[] array = new float[units.size];
         for(int i = 0; i < array.length; i++){
             unit = units.get(i);
-            array[i] = unit.getAgility();
+            array[i] = unit.getBaseStat(Data.UnitStat.AGILITY);
         }
     }
 

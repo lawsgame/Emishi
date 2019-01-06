@@ -86,7 +86,7 @@ public class Formulas {
     public static int getLootRate(Unit attacker, int rowActor, int colActor, Battlefield bf){
         int lootRate = 0;
         if(attacker.getArmy().isPlayerControlled()) {
-            lootRate += Data.BASE_DROP_RATE + attacker.getAppLuck() / 2 + attacker.getChiefCharisma() / 4;
+            lootRate += Data.BASE_DROP_RATE + attacker.getAppStat(Data.UnitStat.LUCK) / 2 + attacker.getChiefCharisma() / 4;
             lootRate += Formulas.getCurrentUnitBannerBonus(attacker, rowActor, colActor, bf, Data.BannerBonus.LOOT_RATE);
         }
         return lootRate;
@@ -101,7 +101,7 @@ public class Formulas {
     public static int getStealRate(int rowRobber, int colRobber, int rowStolen, int colStolen, Unit stealer, Unit stolen, Battlefield battlefield){
         int stealRate = 0;
         if(stolen.isStealable()) {
-            stealRate = 100 + 10 * (stealer.getAppAgility() - stolen.getAppAgility());
+            stealRate = 100 + 10 * (stealer.getAppStat(Data.UnitStat.AGILITY) - stolen.getAppStat(Data.UnitStat.AGILITY));
             if (stealRate > 100){
                 stealRate = 100;
             }
@@ -143,10 +143,8 @@ public class Formulas {
         float bonusValue = 0;
         if(bf.isStandardBearerAtRange(unit, row,  col)){
             MilitaryForce army = unit.getArmy();
-            if(!army.isSquadOversized(unit)) {
-                Banner banner = army.getSquadBanner(unit, true);
-                bonusValue = banner.getCurrentValue(bb);
-            }
+            Banner banner = army.getSquadBanner(unit, true);
+            bonusValue = banner.getCurrentValue(bb);
         }
         return bonusValue;
     }

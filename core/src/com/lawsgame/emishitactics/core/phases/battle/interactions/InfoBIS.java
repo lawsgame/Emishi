@@ -15,8 +15,8 @@ public class InfoBIS extends BattleInteractionState{
 
     @Override
     public void init() {
-
         super.init();
+        System.out.println("INFO BIS ");
         bim.pp.shortUnitPanel.hide();
         bim.pp.shortTilePanel.hide();
         if(bim.bfr.getModel().isTileOccupied(row, col)) {

@@ -1,7 +1,6 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Unit;
 
 public abstract class BattleSolver {
 
@@ -32,7 +31,7 @@ public abstract class BattleSolver {
                 for (int c = 0; c < battlefield.getNbColumns(); c++) {
                     if (battlefield.isTileOccupied(r, c)) {
                         Unit unit = battlefield.getUnit(r, c);
-                        if (unit.isMobilized()
+                        if (unit.belongToAnArmy()
                                 && !unit.isOutOfAction()
                                 && !affiliations.contains(unit.getArmy().getAffiliation(), true)) {
                             affiliations.add(unit.getArmy().getAffiliation());

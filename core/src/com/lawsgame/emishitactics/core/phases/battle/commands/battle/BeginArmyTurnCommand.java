@@ -36,14 +36,10 @@ public class BeginArmyTurnCommand extends BattleCommand {
         if (army != null) {
 
             // UPDATE MORAL AND AP OF THE WHOLE ARMY
-
             army.replenishMoral(true);
             army.updateActionPoints();
-            if (army.isPlayerControlled())
-                bfr.getModel().incrementTurn();
 
             // REMOVE AREA ASSOCIATED WITH THE UNITS
-
             StandardTask task = new StandardTask();
             Area unitArea;
             for(int i =0; i < bfr.getModel().getUnitAreas().size; i++){
@@ -56,11 +52,9 @@ public class BeginArmyTurnCommand extends BattleCommand {
 
 
             // HANDLE EVENTS
-
             handleEvents(new BeginArmyTurn(army), -1, -1);
 
             // HEAL UNITS NEARBY HEALING TILES
-
             int rNei;
             int cNei;
             int healPower;

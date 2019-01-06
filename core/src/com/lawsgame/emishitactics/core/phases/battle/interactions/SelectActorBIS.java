@@ -35,7 +35,7 @@ public class SelectActorBIS extends BattleInteractionState {
             activeUnitPos[0] = rowInit;
             activeUnitPos[1] = colInit;
         }else{
-            activeUnitPos = bim.bfr.getModel().getRandomlyStillActiveUnitsCoords(bim.player.getArmy().getId());
+            activeUnitPos = bim.bfr.getModel().getRandomlyStillActiveUnitsCoords(bim.player.getArmy());
         }
 
         if(activeUnitPos != null){

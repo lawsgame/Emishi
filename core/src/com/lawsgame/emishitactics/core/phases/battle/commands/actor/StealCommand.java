@@ -53,7 +53,7 @@ public class StealCommand extends ActorCommand {
         // se outoome
         if(stealSuccessful){
             outcome.add(stealer, choice.getExperience());
-            outcome.add(stoleItem, stealer.isMobilized() && stealer.getArmy().isPlayerControlled());
+            outcome.add(stoleItem, stealer.belongToAnArmy() && stealer.getArmy().isPlayerControlled());
         }
 
         handleEvents(this);

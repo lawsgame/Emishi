@@ -47,6 +47,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
     @Override
     public void init() {
+        System.out.println("DEPLOYEMENT BIS");
         super.init();
         bim.uiStage.addActor(startButton);
         bim.bfr.displayDeploymentAreas(true);
@@ -126,7 +127,7 @@ public class DeploymentBIS extends BattleInteractionState {
         this.colUnit = col;
 
         // redeploy the other squad members in the new deployment area
-        bim.bfr.getModel().randomlyDeploy(squadmembers, areaTargetIndex);
+        bim.bfr.getModel().randomlyDeploy(squadmembers, areaTargetIndex, true);
 
         // update cam pos and UI
         updateSltdUnit();

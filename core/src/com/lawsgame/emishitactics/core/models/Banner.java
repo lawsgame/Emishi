@@ -27,7 +27,7 @@ public class Banner extends Model  {
     }
 
     public int getMaxPoints(){
-        return bearer.getAppLeadership();
+        return bearer.getAppStat(Data.UnitStat.LEADERSHIP);
     }
 
     public int getUsedPoints(){

@@ -1,8 +1,10 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.exceptions.BattlefieldException;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChooseOrientationCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.EndUnitTurnCommand;
@@ -65,17 +67,24 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
     }
 
     private void proceed(){
-        if(actor.isMobilized()){
-            if(!actor.isOutOfAction()){
-                int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
+        if (!actor.isOutOfAction()) {
+            int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
+            if(actorPos != null) {
                 this.endUnitTurnCommand.apply(actorPos[0], actorPos[1]);
-            }
-            if (bim.bfr.getModel().getCurrentArmy().isDone()) {
-                bim.replace(new EndArmyTurnBIS(bim));
-            } else {
-                bim.replace(new SelectActorBIS(bim, false));
+            }else{
+                try {
+                    throw new BattlefieldException("actor not OOA yet not deployed!");
+                }catch (BattlefieldException e){
+                    e.printStackTrace();
+                }
             }
         }
+        if (bim.bfr.getModel().getTurnSolver().getCurrentArmy().isDone()) {
+            bim.replace(new EndArmyTurnBIS(bim));
+        } else {
+            bim.replace(new SelectActorBIS(bim, false));
+        }
+
     }
 
     @Override

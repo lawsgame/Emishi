@@ -12,7 +12,7 @@ public class EndArmyTurnBIS extends BattleInteractionState implements Observer {
 
     public EndArmyTurnBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false, true, false);
-        endArmyTurnCommand = new EndArmyTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.bfr.getModel().getCurrentArmy());
+        endArmyTurnCommand = new EndArmyTurnCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), bim.bfr.getModel().getTurnSolver().getCurrentArmy());
     }
 
     @Override
@@ -34,8 +34,8 @@ public class EndArmyTurnBIS extends BattleInteractionState implements Observer {
     public void getNotification(Observable sender, Object data) {
         if(sender instanceof BattleCommand && sender == data){
             endArmyTurnCommand.detach(this);
-            bim.bfr.getModel().nextArmy();
-            if(bim.bfr.getModel().getCurrentArmy().isPlayerControlled()){
+            bim.bfr.getModel().getTurnSolver().nextArmy();
+            if(bim.bfr.getModel().getTurnSolver().getCurrentArmy().isPlayerControlled()){
                 bim.replace(new SelectActorBIS(bim, true));
             }else {
                 bim.replace(new AiBIS(bim));

@@ -181,7 +181,6 @@ public class BattlefieldLoader {
                         }
                     }
                     army = new Army(affiliation, armyElt.get("keyname", StringKey.UNNAMED_ARMY_NAME));
-                    bf.addArmyId(army);
 
                     // IF: an amry with the relevant battlefield ID
 

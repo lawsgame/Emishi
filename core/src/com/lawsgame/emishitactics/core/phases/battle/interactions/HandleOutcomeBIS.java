@@ -82,7 +82,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
                             // of the unit has leveled up
                             HandleOutcomeTask levelUpTask = new HandleOutcomeTask(HOTType.LEVELUP);
                             levelUpTask.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bim.bfr.getUnitRenderer(holder.receiver), Data.AnimId.LEVELUP));
-                            if (holder.receiver.isMobilized() || holder.receiver.getArmy().isPlayerControlled()) {
+                            if (holder.receiver.belongToAnArmy() || holder.receiver.getArmy().isPlayerControlled()) {
                                 //levelUpTask.addParallelSubTask(new StandardTask.CommandSubTask(new DisplayLevelupPanel(holder.receiver, expLvls, bim), 0f));
                                 levelUpTask.addParallelSubTask(new StandardTask.CommandSubTask(0f){
                                     @Override
@@ -139,7 +139,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
          */
         if(aiTurn) {
              bim.rollback();
-         }else if(bim.bfr.getModel().getSolver().isBattleOver()) {
+         }else if(bim.bfr.getModel().getBattleSolver().isBattleOver()) {
             bim.replace(new BattleOverBIS(bim));
         }else{
             if(!historic.isEmpty()&& historic.peek().getInitiator() != null) {

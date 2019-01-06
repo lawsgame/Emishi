@@ -9,12 +9,9 @@ import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.Environment;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
+import com.lawsgame.emishitactics.core.models.interfaces.TurnSolver;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
-
-
-import java.util.LinkedList;
 
 
 /*
@@ -38,12 +35,8 @@ public class Battlefield extends Model {
     private Array<UnitArea> unitAreas;
     private Weather weather;
     private Environment environment;
-
-
-
-    private int turn;
-    public LinkedList<MilitaryForce> armyTurnOrder;
     private BattleSolver solver;
+    private TurnSolver turnSolver;
 
 
     public Battlefield (int id, int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
@@ -57,10 +50,8 @@ public class Battlefield extends Model {
         this.unitAreas = new Array<UnitArea>();
         this.environment = env;
         setWeather(weather);
-
         setSolver(solver);
-        this.armyTurnOrder = new LinkedList<MilitaryForce>();
-        this.turn = 0;
+        this.turnSolver = new TurnSolverImp(this);
     }
 
     public Battlefield(int id, int nbRows, int nbCols){
@@ -98,17 +89,7 @@ public class Battlefield extends Model {
         this.environment = environment;
     }
 
-
-    public int getTurn() {
-        return turn;
-    }
-
-    public void setTurn(int turn) {
-        this.turn = turn;
-    }
-
-
-    public BattleSolver getSolver(){
+    public BattleSolver getBattleSolver(){
         return this.solver;
     }
 
@@ -117,8 +98,9 @@ public class Battlefield extends Model {
         this.solver.setBattlefield(this);
     }
 
-
-
+    public TurnSolver getTurnSolver(){
+        return this.turnSolver;
+    }
 
 
     // --------------- DIMENSION GETTERS -----------------------------------
@@ -142,7 +124,7 @@ public class Battlefield extends Model {
 
     @Override
     public void setAllTriggersActive(boolean active){
-        this.setAllTriggersActive(active);
+        super.setAllTriggersActive(active);
         for(int r = 0; r < tiles.length; r++){
             for(int c = 0; c < tiles[0].length; c++){
                 if(isTileExisted(r, c)) {
@@ -155,9 +137,6 @@ public class Battlefield extends Model {
         }
         for(int i = 0; i < unitAreas.size; i++){
             unitAreas.get(i).setAllTriggersActive(active);
-        }
-        for(int i = 0; i < armyTurnOrder.size(); i++){
-            armyTurnOrder.get(i).setAllTriggersActive(active);
         }
 
     }
@@ -179,67 +158,9 @@ public class Battlefield extends Model {
         for(int i = 0; i < unitAreas.size; i++){
             unitAreas.get(i).remove(trigger);
         }
-        for(int i = 0; i < armyTurnOrder.size(); i++){
-            armyTurnOrder.get(i).remove(trigger);
-        }
 
     }
 
-
-    //----------------- ARMY TURN MANAGEMENT --------------------------------
-
-    /**
-     * is required to be called after all parties are deployed.
-     */
-    public void pushPlayerArmyTurnForward(){
-        if(!armyTurnOrder.isEmpty()) {
-            MilitaryForce army = armyTurnOrder.peek();
-            while (!army.isPlayerControlled()) {
-                armyTurnOrder.offer(armyTurnOrder.pop());
-                army = armyTurnOrder.peek();
-            }
-        }
-    }
-
-
-    /**
-     * only for loaded AI armies which do not use Battlefield.randomlyDeploy()
-     * @param army
-     */
-    public void addArmyId(MilitaryForce army){
-        //performEvent if the army if already deployed
-        boolean armyAlreadyAdded = false;
-        for(int i = 0; i < armyTurnOrder.size(); i++){
-            if(armyTurnOrder.get(i) == army) {
-                armyAlreadyAdded = true;
-                break;
-            }
-        }
-        if(!armyAlreadyAdded) {
-            armyTurnOrder.offer(army);
-        }
-    }
-
-
-    public MilitaryForce getCurrentArmy() {
-        return armyTurnOrder.peek();
-    }
-
-    /*
-     *
-     * @return get next army contains within the ring with at least one  unit who still fights
-     */
-    public void nextArmy(){
-
-        if(!armyTurnOrder.isEmpty()) {
-            armyTurnOrder.offer(armyTurnOrder.pop());
-            MilitaryForce army = armyTurnOrder.peek();
-            while (!armyTurnOrder.isEmpty() && !army.isDeployedTroopsStillFighting(this)) {
-               armyTurnOrder.pop();
-               army = armyTurnOrder.peek();
-            }
-        }
-    }
 
 
 
@@ -413,6 +334,21 @@ public class Battlefield extends Model {
         }
     }
 
+    // --------------------- ARMY MANAGEMENT ------------------------------------
+
+
+    public boolean isDeployedTroopsStillFighting(MilitaryForce army) {
+        Unit unit;
+        for(int r = 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileOccupied(r, c)){
+                    unit = getUnit(r,c);
+                    return (army.isUnitRegular(unit) || army.isUnitSkirmisher(unit)) && !unit.isOutOfAction();
+                }
+            }
+        }
+        return false;
+    }
 
     //-------------- TILE STATE CHECK METHODS HIERARCHY ----------------------
     /*
@@ -502,7 +438,7 @@ public class Battlefield extends Model {
      * @return true if the tile is occupied by another ally
      */
     public boolean isTileOccupiedByAlly(int row , int col, Unit actor){
-        return isTileOccupied(row, col, actor) && getUnit(row, col).isMobilized() && getUnit(row, col).isAllyWith(actor.getArmy().getAffiliation());
+        return isTileOccupied(row, col, actor) && getUnit(row, col).belongToAnArmy() && getUnit(row, col).isAllyWith(actor.getArmy().getAffiliation());
     }
 
     public boolean isTileOccupiedByFoe(int row , int col, Data.Affiliation affiliation){
@@ -533,7 +469,7 @@ public class Battlefield extends Model {
         for(int i = 0; i < unitAreas.size; i++){
             if(unitAreas.get(i).getType() == AreaType.COVER
                     && unitAreas.get(i).contains(row, col)
-                    && unitAreas.get(i).getActor().isMobilized()
+                    && unitAreas.get(i).getActor().belongToAnArmy()
                     && unitAreas.get(i).getActor().getArmy().getAffiliation() != walkerAffiliation){
                 covered = true;
                 break;
@@ -570,56 +506,65 @@ public class Battlefield extends Model {
      * @param unit
      * @param notifyObservers
      */
-    public void deploy(int row, int col, Unit unit, boolean notifyObservers){
+    public boolean deploy(int row, int col, Unit unit, boolean notifyObservers){
         if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) && isUnitDeployable(unit)){
 
             this.units[row][col] = unit;
-            addArmyId(unit.getArmy());
-            if(notifyObservers)
-                notifyAllObservers(new  Notification.SetUnit(row, col, unit));
+            this.getTurnSolver().addArmy(unit.getArmy());
+            if(notifyObservers) {
+                notifyAllObservers(new Notification.SetUnit(row, col, unit));
+            }
+            return true;
         }
+        return false;
     }
 
     public boolean isUnitDeployable(Unit unit) {
         return unit != null && !isUnitDeployed(unit) && unit.isMobilized();
     }
 
-    public void randomlyDeploy(MilitaryForce army){
+    public void randomlyDeploy(MilitaryForce army, boolean notifyObservers){
         if(army != null) {
-            randomlyDeploy(army.getMobilizedUnits(true), 0);
-            addArmyId(army);
+            randomlyDeploy(army.getMobilizedUnits(true), 0, notifyObservers);
         }
     }
 
     /**
      * deploy a group of units on the available tiles of the given deployment area
      *
-     * @param mobilizedTroops
-     * @param areaIndex
+     *
+     *
+     * @param mobilizedTroops : troops to deploy
+     * @param areaIndex : index of the area on which the troops will be deployed
      */
-    public void randomlyDeploy(Array<Unit> mobilizedTroops, int areaIndex){
+    public void randomlyDeploy(Array<Unit> mobilizedTroops, int areaIndex, boolean notifyObservers){
 
-        Array<int[]> deploymentsTile = getDeploymentArea(areaIndex).getTiles();
-
-        int[] coords;
-        Array<int[]> remainingAvailableTiles = new Array<int[]>();
-        Array<Unit> remainingUnits = new Array<Unit>();
-        for (int i = 0; i < deploymentsTile.size; i++) {
-            coords = deploymentsTile.get(i);
-            if (coords.length >= 2 && isTileAvailable(coords[0], coords[1], false)) {
-                remainingAvailableTiles.add(coords);
+        if(0 <= areaIndex && areaIndex < deploymentAreas.size) {
+            // get the deployment area
+            Array<int[]> deploymentsTile = getDeploymentArea(areaIndex).getTiles();
+            // get all available tiles within the area
+            int[] coords;
+            Array<int[]> remainingAvailableTiles = new Array<int[]>();
+            for (int i = 0; i < deploymentsTile.size; i++) {
+                coords = deploymentsTile.get(i);
+                if (coords.length >= 2 && isTileAvailable(coords[0], coords[1], false)) {
+                    remainingAvailableTiles.add(coords);
+                }
             }
-        }
-        for (int i = 0; i < mobilizedTroops.size; i++) {
-            remainingUnits.add(mobilizedTroops.get(i));
-
-        }
-
-        Unit unit;
-        while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
-            coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
-            unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
-            deploy(coords[0], coords[1], unit, true);
+            // get all deployable units
+            Array<Unit> remainingUnits = new Array<Unit>();
+            for (int i = 0; i < mobilizedTroops.size; i++) {
+                if(isUnitDeployable(mobilizedTroops.get(i))) {
+                    remainingUnits.add(mobilizedTroops.get(i));
+                }
+            }
+            // deploy every units while there is no more
+            Unit unit;
+            while (remainingUnits.size > 0 && remainingAvailableTiles.size > 0) {
+                coords = remainingAvailableTiles.removeIndex(Data.rand(remainingAvailableTiles.size));
+                unit = remainingUnits.removeIndex(Data.rand(remainingUnits.size));
+                deploy(coords[0], coords[1], unit, notifyObservers);
+            }
         }
     }
 
@@ -669,7 +614,7 @@ public class Battlefield extends Model {
     public boolean isUnitGuarding(int rowUnit, int colUnit){
         if(isTileOccupied(rowUnit, colUnit)){
             Unit unit = getUnit(rowUnit, colUnit);
-            if(unit.isMobilized()) {
+            if(unit.belongToAnArmy()) {
                 for(int i = 0; i < unitAreas.size; i++){
                     if (unitAreas.get(i).getType() == AreaType.GUARD_AREA
                             && unitAreas.get(i).getActor() != null
@@ -693,12 +638,12 @@ public class Battlefield extends Model {
         return null;
     }
 
-    public Array<Unit> getStillActiveUnits(int armyId) {
+    public Array<Unit> getStillActiveUnits(MilitaryForce army) {
         Array<Unit> activeUnits = new Array<Unit>();
         for(int r =0; r<getNbRows();r++){
             for(int c = 0; c<getNbColumns(); c++){
                 if(isTileOccupied(r, c)
-                        && getUnit(r, c).getArmy().getId() == armyId
+                        && getUnit(r, c).getArmy() == army
                         && !getUnit(r, c).isDone()){
                     activeUnits.add(getUnit(r, c));
                 }
@@ -707,12 +652,12 @@ public class Battlefield extends Model {
         return activeUnits;
     }
 
-    public Array<int[]> getStillActiveUnitCoords(int armyId) {
+    public Array<int[]> getStillActiveUnitCoords(MilitaryForce army) {
         Array<int[]> activeUnitCoords = new Array<int[]>();
         for(int r =0; r<getNbRows();r++){
             for(int c = 0; c<getNbColumns(); c++){
                 if(isTileOccupied(r, c)
-                        && getUnit(r, c).getArmy().getId() == armyId
+                        && getUnit(r, c).getArmy() == army
                         && !getUnit(r, c).isDone()){
                     activeUnitCoords.add(new int[]{r, c});
                 }
@@ -721,11 +666,11 @@ public class Battlefield extends Model {
         return activeUnitCoords;
     }
 
-    public int[] getRandomlyStillActiveUnitsCoords(int armyId){
+    public int[] getRandomlyStillActiveUnitsCoords(MilitaryForce army){
         Array<int[]> activeUnits = new Array<int[]>();
         for(int r =0; r<getNbRows();r++){
             for(int c = 0; c<getNbColumns(); c++){
-                if(isTileOccupied(r, c) && getUnit(r, c).getArmy().getId() == armyId && !getUnit(r, c).isDone()){
+                if(isTileOccupied(r, c) && getUnit(r, c).getArmy() == army && !getUnit(r, c).isDone()){
                     activeUnits.add(new int[]{r, c});
                 }
             }
@@ -789,16 +734,6 @@ public class Battlefield extends Model {
         return null;
     }
 
-    public MilitaryForce getArmyByName(String keyname){
-        for(int i = 0; i < armyTurnOrder.size(); i++){
-            if(armyTurnOrder.get(i).getName().equals(keyname)){
-                return armyTurnOrder.get(i);
-            }
-        }
-        return null;
-    }
-
-
 
     /**
      *
@@ -809,7 +744,7 @@ public class Battlefield extends Model {
      */
     public boolean  isStandardBearerAtRange(Unit unit, int row, int col){
         int dist;
-        if(unit.isMobilized()) {
+        if(unit.belongToAnArmy()) {
             int bannerRange = unit.getArmy().getBannerRange(unit);
 
             for (int r = row - bannerRange; r <= row + bannerRange; r++) {
@@ -891,18 +826,18 @@ public class Battlefield extends Model {
         }
 
         /**
-         * instanciate relevatn attributes and create a blank checkmap
+         * instanciate relevant attributes and create a blank checkmap
          *
          * @param bf
          * @param rowActor
          * @param colActor
          */
         private void set( Battlefield bf, int rowActor, int colActor, Unit actor){
-            if(actor.isMobilized()) {
+            if(actor.belongToAnArmy()) {
 
                 // get actor relevant pieces of information
                 this.pathfinder = actor.has(Data.Ability.PATHFINDER);
-                this.moveRange = actor.getAppMobility();
+                this.moveRange = actor.getAppStat(Data.UnitStat.MOBILITY);
                 this.affiliation = actor.getArmy().getAffiliation();
                 this.battlefield = bf;
 
@@ -1300,10 +1235,6 @@ public class Battlefield extends Model {
     }
 
 
-    public void incrementTurn(){
-        this.turn++;
-    }
-
 
 
     //--------------------------- TO STRING -------------------------------------------
@@ -1317,11 +1248,6 @@ public class Battlefield extends Model {
     public String triggerToString(){
         String str ="BATTLEFIELD ";
         str  += "\n"+super.triggerToString();
-        str +="\n\nARMIES : ";
-        for(int i = 0; i< armyTurnOrder.size(); i++){
-            if(armyTurnOrder.get(i).holdEventTrigger())
-                str += "\n"+armyTurnOrder.get(i).triggerToString();
-        }
         str +="\n\nAREAS : ";
         for(int i = 0; i< unitAreas.size; i++){
             if(unitAreas.get(i).holdEventTrigger())

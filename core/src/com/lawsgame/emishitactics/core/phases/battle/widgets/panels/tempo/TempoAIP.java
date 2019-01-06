@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -283,7 +284,7 @@ public class TempoAIP extends ActionInfoPanel {
                     MoralAfterHealing = patient.getCurrentMoral() + hc.getRecoveredMoralPoints()[i];
 
                     builder.append(command.getInitiator().getName()+" => "+patient.getName());
-                    builder.append("\nHP : "+patient.getCurrentHitPoints()+" -> "+HPAfterHealing+ " /"+patient.getAppHitpoints());
+                    builder.append("\nHP : "+patient.getCurrentHitPoints()+" -> "+HPAfterHealing+ " /"+patient.getAppStat(Data.UnitStat.HIT_POINTS));
                     builder.append("\nMP : "+patient.getCurrentMoral()+" -> "+MoralAfterHealing+" /"+patient.getAppMoral());
 
                     patientPos = command.getBattlefield().getUnitPos(patient);

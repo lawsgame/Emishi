@@ -39,18 +39,19 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle localization;
+    public final Skin uiBattleSkin;
     public final Stage uiStage;
 
 
     public BattleInteractionMachine(CameraManager gcm, AssetManager asm, Stage stageUI, Player player, int chapterId) {
         Battlefield battlefield = BattlefieldLoader.load(asm, chapterId);
-        battlefield.randomlyDeploy(player.getArmy());
-        battlefield.pushPlayerArmyTurnForward();
+        battlefield.randomlyDeploy(player.getArmy(), true);
+        battlefield.getTurnSolver().init(player);
         this.scheduler = new AnimationScheduler();
         this.bfr = new IsoBFR(battlefield, gcm, asm);
         this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
-        Skin skin = asm.get(Assets.SKIN_UI, Skin.class);
-        this.pp = new PanelPool(stageUI, skin, localization);
+        this.uiBattleSkin = asm.get(Assets.SKIN_UI, Skin.class);
+        this.pp = new PanelPool(stageUI, uiBattleSkin, localization);
         BattlefieldLoader.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
         this.asm = asm;
         this.player = player;
@@ -67,9 +68,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         ReinforcementEvent event = ReinforcementEvent.addTrigger(1, bfr, scheduler, player.getInventory(), player.getArmy());
         Unit soldier = new Unit("toro", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);
-        MilitaryForce enemyForce = bfr.getModel().getArmyByName("enemy army 1");
+        MilitaryForce enemyForce = bfr.getModel().getTurnSolver().getArmyByName("enemy army 1");
         if(enemyForce != null){
-            System.out.println("army's name load !");
             enemyForce.add(soldier);
             enemyForce.appointSoldier(soldier, 0);
         }

@@ -244,7 +244,7 @@ public class HitCommand extends ActorCommand{
                     dicesResult = Utils.getMean(1, 100);
                     if (dicesResult < lootRate) {
                         droppedItem = notifs.get(i).wounded.getRandomlyDroppableItem();
-                        outcome.add(droppedItem, receiver.isMobilized() && receiver.getArmy().isPlayerControlled());
+                        outcome.add(droppedItem, receiver.belongToAnArmy() && receiver.getArmy().isPlayerControlled());
                     }
                 }
             }

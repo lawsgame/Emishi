@@ -28,7 +28,6 @@ public class Data {
     public static final int GUARD_REACTION_RANGE_MIN = 1;
     public static final int GUARD_REACTION_RANGE_MAX = 1;
     public static final int WC_CHARISMA_BONUS_ATT_ACC = 3;
-    public static final int SQUAD_SIZE_EXCEEDANCE_CHA_MALUS = 3;
     public static final int BRAVERY_MORAL_RECOVERY_RATE = 3;
     public static final float CHANCE_OF_COLLAPSING_FROM_FRAGILE_TILES = 1f; //over 1
     public static final int TRAP_DAMAGE = 3;
@@ -913,7 +912,8 @@ public class Data {
      * if lord the army fight for
      */
     public enum Allegiance{
-        NO_ALLIGEANCE;
+        NO_ALLIGEANCE,
+        PLAYER_ALLIGIANCE;
 
         public static Allegiance getStandard(){
             return NO_ALLIGEANCE;
@@ -930,6 +930,22 @@ public class Data {
         ENEMY_1
     }
 
+    public enum UnitStat{
+        MOBILITY,
+        LEADERSHIP,
+        CHARISMA,
+        HIT_POINTS,
+        BRAVERY,
+        STRENGTH,
+        ARMOR_PIERCING,
+        ARMOR_BLUNT,
+        ARMOR_EDGED,
+        AGILITY,
+        DEXTERITY,
+        SKILL,
+        LUCK
+
+    }
 
     public enum UnitTemplate {
         SOLAIRE(1, new Ability[]{Ability.HEAL},
@@ -990,7 +1006,7 @@ public class Data {
 
         private float proGrowthLd;
         private float proGrowthCha;
-        private float getProGrowthHP;
+        private float proGrowthHP;
         private float proGrowthBr;
         private float proGrowthStr;
         private float proGrowthPiercingArmor;
@@ -1001,7 +1017,7 @@ public class Data {
         private float proGrowthSk;
         private float proGrowthLuck;
 
-        UnitTemplate(int startingLevel, Ability[] nativeAbilities, int baseMob, int baseLd, int baseCha, int baseHP, int baseBr, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseDex, int baseSk, int baseLuck, int proBoMob, int proBoLd, int proBoCha, int proBoHP, int proBoBr, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoDex, int proBoSk, int proBoLuck, float growthLd, float growthCha, float growthHP, float growthBr, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthDex, float growthSk, float growthLuck, float proGrowthLd, float proGrowthCha, float getProGrowthHP, float proGrowthBr, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthAg, float proGrowthDex, float proGrowthSk, float proGrowthLuck) {
+        UnitTemplate(int startingLevel, Ability[] nativeAbilities, int baseMob, int baseLd, int baseCha, int baseHP, int baseBr, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseDex, int baseSk, int baseLuck, int proBoMob, int proBoLd, int proBoCha, int proBoHP, int proBoBr, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoDex, int proBoSk, int proBoLuck, float growthLd, float growthCha, float growthHP, float growthBr, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthDex, float growthSk, float growthLuck, float proGrowthLd, float proGrowthCha, float proGrowthHP, float proGrowthBr, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthAg, float proGrowthDex, float proGrowthSk, float proGrowthLuck) {
             this.startingLevel = startingLevel;
             this.nativeAbilities = nativeAbilities;
             this.baseMob = baseMob;
@@ -1044,7 +1060,7 @@ public class Data {
             this.growthLuck = growthLuck;
             this.proGrowthLd = proGrowthLd;
             this.proGrowthCha = proGrowthCha;
-            this.getProGrowthHP = getProGrowthHP;
+            this.proGrowthHP = proGrowthHP;
             this.proGrowthBr = proGrowthBr;
             this.proGrowthStr = proGrowthStr;
             this.proGrowthPiercingArmor = proGrowthPiercingArmor;
@@ -1056,29 +1072,10 @@ public class Data {
             this.proGrowthLuck = proGrowthLuck;
         }
 
-        public int getBaseMob() {
-            return baseMob;
+        public static UnitTemplate getStandard() {
+            return SOLAR_KNIGHT;
         }
 
-        public int getBaseLuck() {
-            return baseLuck;
-        }
-
-        public int getProBoMob() {
-            return proBoMob;
-        }
-
-        public int getProBoLuck() {
-            return proBoLuck;
-        }
-
-        public float getGrowthLuck() {
-            return growthLuck;
-        }
-
-        public float getProGrowthLuck() {
-            return proGrowthLuck;
-        }
 
         public int getStartingLevel() {
             return startingLevel;
@@ -1090,184 +1087,65 @@ public class Data {
 
         public Ability[] getNativeAbilities() { return nativeAbilities; }
 
-        public int getBaseCha() {
-            return baseCha;
+        public int getBaseStat(UnitStat stat){
+            switch (stat){
+
+                case MOBILITY: return baseMob;
+                case LEADERSHIP: return baseLd;
+                case CHARISMA: return baseCha;
+                case HIT_POINTS: return baseHP;
+                case BRAVERY: return baseBr;
+                case STRENGTH: return baseStr;
+                case ARMOR_PIERCING: return basePiercingArmor;
+                case ARMOR_BLUNT: return  baseBluntArmor;
+                case ARMOR_EDGED: return baseEgdedArmor;
+                case AGILITY: return baseAg;
+                case DEXTERITY: return baseDex;
+                case SKILL: return baseSk;
+                case LUCK: return baseLuck;
+            }
+            return 0;
         }
 
-        public int getBaseLd() {
-            return baseLd;
+        public int getProBoStat(UnitStat stat){
+            switch (stat){
+
+                case MOBILITY: return proBoMob;
+                case LEADERSHIP: return proBoLd;
+                case CHARISMA: return proBoCha;
+                case HIT_POINTS: return proBoHP;
+                case BRAVERY: return proBoBr;
+                case STRENGTH: return proBoStr;
+                case ARMOR_PIERCING: return proBoPiercingArmor;
+                case ARMOR_BLUNT: return  proBoBluntArmor;
+                case ARMOR_EDGED: return proBoEdgedArmor;
+                case AGILITY: return proBoAg;
+                case DEXTERITY: return proBoDex;
+                case SKILL: return proBoSk;
+                case LUCK: return proBoLuck;
+            }
+            return 0;
         }
 
-        public int getBaseHP() {
-            return baseHP;
-        }
 
-        public int getBaseStr() {
-            return baseStr;
-        }
+        public float getStatGrowth(UnitStat stat, boolean promoted){
+            switch (stat){
 
-        public int getBaseDex() {
-            return baseDex;
-        }
-
-        public int getBaseAg() {
-            return baseAg;
-        }
-
-        public int getBasePiercingArmor() {
-            return basePiercingArmor;
-        }
-
-        public int getBaseBluntArmor() {
-            return baseBluntArmor;
-        }
-
-        public int getBaseEgdedArmor() {
-            return baseEgdedArmor;
-        }
-
-        public int getBaseSk() {
-            return baseSk;
-        }
-
-        public int getBaseBr() {
-            return baseBr;
-        }
-
-        public float getGrowthCha() {
-            return growthCha;
-        }
-
-        public float getGrowthLd() {
-            return growthLd;
-        }
-
-        public float getGrowthHP() {
-            return growthHP;
-        }
-
-        public float getGrowthStr() {
-            return growthStr;
-        }
-
-        public float getGrowthDex() {
-            return growthDex;
-        }
-
-        public float getGrowthAg() {
-            return growthAg;
-        }
-
-        public float getGrowthPiercingArmor() {
-            return growthPiercingArmor;
-        }
-
-        public float getGrowthBluntArmor() {
-            return growthBluntArmor;
-        }
-
-        public float getGrowthEdgegArmor() {
-            return growthEdgegArmor;
-        }
-
-        public float getGrowthSk() {
-            return growthSk;
-        }
-
-        public float getGrowthBr() {
-            return growthBr;
-        }
-
-        public int getProBoCha() {
-            return proBoCha;
-        }
-
-        public int getProBoLd() {
-            return proBoLd;
-        }
-
-        public int getProBoHP() {
-            return proBoHP;
-        }
-
-        public int getProBoStr() {
-            return proBoStr;
-        }
-
-        public int getProBoDex() {
-            return proBoDex;
-        }
-
-        public int getProBoAg() {
-            return proBoAg;
-        }
-
-        public int getProBoPiercingArmor() {
-            return proBoPiercingArmor;
-        }
-
-        public int getProBoBluntArmor() {
-            return proBoBluntArmor;
-        }
-
-        public int getProBoEdgedArmor() {
-            return proBoEdgedArmor;
-        }
-
-        public int getProBoSk() {
-            return proBoSk;
-        }
-
-        public int getProBoBr() {
-            return proBoBr;
-        }
-
-        public float getProGrowthCha() {
-            return proGrowthCha;
-        }
-
-        public float getProGrowthLd() {
-            return proGrowthLd;
-        }
-
-        public float getGetProGrowthHP() {
-            return getProGrowthHP;
-        }
-
-        public float getProGrowthStr() {
-            return proGrowthStr;
-        }
-
-        public float getProGrowthDex() {
-            return proGrowthDex;
-        }
-
-        public float getProGrowthAg() {
-            return proGrowthAg;
-        }
-
-        public float getProGrowthPiercingArmor() {
-            return proGrowthPiercingArmor;
-        }
-
-        public float getProGrowthBluntArmor() {
-            return proGrowthBluntArmor;
-        }
-
-        public float getProGrowthEdgedArmor() {
-            return proGrowthEdgedArmor;
-        }
-
-        public float getProGrowthSk() {
-            return proGrowthSk;
-        }
-
-        public float getProGrowthBr() {
-            return proGrowthBr;
-        }
-
-        public static UnitTemplate getStandard(){
-            return SOLAR_KNIGHT;
+                case MOBILITY: return 0;
+                case LEADERSHIP: return (promoted) ? proGrowthLd : growthLd;
+                case CHARISMA: return (promoted) ? proGrowthCha : growthCha;
+                case HIT_POINTS: return (promoted) ? proGrowthHP : growthHP;
+                case BRAVERY: return (promoted) ? proGrowthBr : growthBr;
+                case STRENGTH: return (promoted) ? proGrowthStr : growthStr;
+                case ARMOR_PIERCING: return (promoted) ? proGrowthPiercingArmor : growthPiercingArmor;
+                case ARMOR_BLUNT: return  (promoted) ? proGrowthBluntArmor : growthBluntArmor;
+                case ARMOR_EDGED: return (promoted) ? proGrowthEdgedArmor : growthEdgegArmor;
+                case AGILITY: return (promoted) ? proGrowthAg : growthAg;
+                case DEXTERITY: return (promoted) ? proGrowthDex : growthDex;
+                case SKILL: return (promoted) ? proGrowthSk : growthSk;
+                case LUCK: return (promoted) ? proGrowthLuck : growthLuck;
+            }
+            return 0;
         }
     }
 

@@ -50,43 +50,48 @@ public class TempoLongUnitPanel extends LongUnitPanel {
     @Override
     protected void setContent(Unit unit) {
 
+
         StringBuilder builder = new StringBuilder("   MAIN\n");
         builder.append("\nName : " + unit.getName());
         builder.append("\nLevel : " + unit.getLevel());
         builder.append("\nUnitTemplate : " + unit.getTemplate().name());
         if (unit.isWarlord()) {
             builder.append("\nPosition : warlord");
-        } else {
-            if (unit.isWarChief()) {
-                builder.append("\nPosition : war chief");
-            } else {
-                builder.append("\nPosition : soldier");
-            }
+        } else if (unit.isWarChief()) {
+            builder.append("\nPosition : war chief");
+        } else if(unit.isRegular()){
+            builder.append("\nPosition : soldier");
+        } else if(unit.isSkirmisher()){
+            builder.append("\nPosition: skirmisher");
         }
-        builder.append("\nHit points: " + unit.getCurrentHitPoints() + "/"+unit.getAppHitpoints());
+        builder.append("\nHPT: " + unit.getCurrentHitPoints() + "/"+unit.getAppStat(Data.UnitStat.HIT_POINTS));
         builder.append("\nMoral: " + unit.getCurrentMoral() + "/" + unit.getAppMoral());
-        builder.append("\nAction Points : " + unit.getActionPoints());
-        builder.append("\nExperience : "+unit.getExperience());
-        if (unit.isMobilized()) {
+        builder.append("\nAP : " + unit.getActionPoints());
+        builder.append("\nEXP : "+unit.getExperience());
+        if (unit.belongToAnArmy()) {
             MilitaryForce army = unit.getArmy();
             builder.append("\n\n    ARMY\n");
             builder.append("\nWarlord : " + army.getWarlord().getName());
-            builder.append(", WCs : "+army.getNbOfSquads()+"/"+army.getWarlord().getMaxWarChiefs());
-            builder.append("\nWar chief : " + army.getWarchief(unit).getName());
-            builder.append(", Squad: "+army.getSquad(unit, true).size+"/"+unit.getWarchief().getMaxSoldiersAs(unit.getWarchief().isWarlord()));
-            Banner banner = army.getSquadBanner(unit, false);
-            builder.append("\nBanner");
-            builder.append("\n  | mode        : "+banner.getMode().name().toLowerCase());
-            builder.append("\n  | points        : "+banner.getRemainingPoints()+"/"+banner.getMaxPoints());
-            builder.append("\n  | strength      : "+banner.getValue(Data.BannerBonus.ATTACK_MIGHT));
-            builder.append("\n  | range         : "+banner.getValue(Data.BannerBonus.RANGE));
-            builder.append("\n  | loot          : "+banner.getValue(Data.BannerBonus.LOOT_RATE)+"%");
-            builder.append("\n  | AP reduc cost : "+banner.getValue(Data.BannerBonus.AP_COST));
-            builder.append("\n  | moral reduc   : "+banner.getValue(Data.BannerBonus.MORAL_SHIELD)+"%");
+            builder.append(" : "+army.getNbOfSquads()+"/"+army.getWarlord().getMaxWarChiefs()+" squads");
+            builder.append("\nskirmisher : "+army.getAllSkirmisher(true).size+" ("+army.getAllSkirmisher(false).size+")");
+            if(unit.isRegular()) {
+                builder.append("\nWar chief : " + army.getWarchief(unit).getName());
+                builder.append(" : " + army.getSquad(unit, true).size + "/" + unit.getWarchief().getMaxSoldiersAs(unit.getWarchief().isWarlord())+" soldiers");
+                Banner banner = army.getSquadBanner(unit, false);
+                builder.append("\nBanner");
+                builder.append("\n  | mode        : " + banner.getMode().name().toLowerCase());
+                builder.append("\n  | points        : " + banner.getRemainingPoints() + "/" + banner.getMaxPoints());
+                builder.append("\n  | strength      : " + banner.getValue(Data.BannerBonus.ATTACK_MIGHT));
+                builder.append("\n  | range         : " + banner.getValue(Data.BannerBonus.RANGE));
+                builder.append("\n  | loot          : " + banner.getValue(Data.BannerBonus.LOOT_RATE) + "%");
+                builder.append("\n  | AP reduc cost : " + banner.getValue(Data.BannerBonus.AP_COST));
+                builder.append("\n  | moral reduc   : " + banner.getValue(Data.BannerBonus.MORAL_SHIELD) + "%");
+            }else if(unit.isSkirmisher()){
+                builder.append("\n => belongs to the skirmisher squad : "+army.getAllSkirmisher(true).size);
+            }
         }
         generalLabel.setText(builder.toString());
         builder.setLength(0);
-
 
         builder.append("    ITEMS\n");
         builder.append("\nWeapon type : "+ unit.getWeaponType()+"\nWeapon : ");
@@ -118,20 +123,20 @@ public class TempoLongUnitPanel extends LongUnitPanel {
 
 
         builder.append("    STATISTICS\n");
-        builder.append("\nMOB  : " + unit.getAppMobility() +" ("+ unit.getMobility()+")");
-        builder.append("\nLDP  : "+unit.getAppLeadership() +" ("+ unit.getLeadership()+")");
-        builder.append("\nCHA  : "+unit.getAppCharisma() +" ("+ unit.getCharisma()+")");
-        builder.append("\nHPT  :" + unit.getCurrentHitPoints() +" ("+ unit.getHitpoints()+")");
-        builder.append("\nBRA  : "+unit.getAppBravery() +" ("+ unit.getBravery()+")");
-        builder.append("\nSTR  :" + unit.getAppStrength() +" ("+ unit.getStrength()+")");
+        builder.append("\nMOB  : " + unit.getAppStat(Data.UnitStat.MOBILITY) +" ("+ unit.getBaseStat(Data.UnitStat.MOBILITY)+")");
+        builder.append("\nLDP  : "+unit.getAppStat(Data.UnitStat.LEADERSHIP) +" ("+ unit.getBaseStat(Data.UnitStat.LEADERSHIP)+")");
+        builder.append("\nCHA  : "+unit.getAppStat(Data.UnitStat.CHARISMA) +" ("+ unit.getBaseStat(Data.UnitStat.CHARISMA)+")");
+        builder.append("\nHPT  :" + unit.getCurrentHitPoints() +" ("+ unit.getBaseStat(Data.UnitStat.HIT_POINTS)+")");
+        builder.append("\nBRA  : "+unit.getAppStat(Data.UnitStat.BRAVERY) +" ("+ unit.getBaseStat(Data.UnitStat.BRAVERY)+")");
+        builder.append("\nSTR  :" + unit.getAppStat(Data.UnitStat.STRENGTH) +" ("+ unit.getBaseStat(Data.UnitStat.STRENGTH)+")");
         builder.append("\nDEF  : ");
-        builder.append("\n  against piercing : "+unit.getAppArmor(Data.DamageType.PIERCING));
-        builder.append("\n  against edged    : "+unit.getAppArmor(Data.DamageType.EDGED));
-        builder.append("\n  against blunt    : "+unit.getAppArmor(Data.DamageType.BLUNT));
-        builder.append("\nAGI  : "+ unit.getAppAgility() +" ("+ unit.getAgility()+")");
-        builder.append("\nDEX  :" + unit.getAppDexterity() +" ("+ unit.getDexterity()+")");
-        builder.append("\nSKI  :" + unit.getAppSkill() +" ("+ unit.getSkill()+")");
-        builder.append("\nLUC  : "+unit.getAppLuck() +" ("+ unit.getLuck()+")");
+        builder.append("\n  against piercing : "+unit.getAppStat(Data.UnitStat.ARMOR_PIERCING));
+        builder.append("\n  against edged    : "+unit.getAppStat(Data.UnitStat.ARMOR_EDGED));
+        builder.append("\n  against blunt    : "+unit.getAppStat(Data.UnitStat.ARMOR_BLUNT));
+        builder.append("\nAGI  : "+ unit.getAppStat(Data.UnitStat.AGILITY) +" ("+ unit.getBaseStat(Data.UnitStat.AGILITY)+")");
+        builder.append("\nDEX  :" + unit.getAppStat(Data.UnitStat.DEXTERITY) +" ("+ unit.getBaseStat(Data.UnitStat.DEXTERITY)+")");
+        builder.append("\nSKI  :" + unit.getAppStat(Data.UnitStat.SKILL) +" ("+ unit.getBaseStat(Data.UnitStat.SKILL)+")");
+        builder.append("\nLUC  : "+unit.getAppStat(Data.UnitStat.LUCK) +" ("+ unit.getBaseStat(Data.UnitStat.LUCK)+")");
         builder.append("\n\nattack might : "+unit.getAppAttackMight()[0]+" - "+unit.getAppAttackMight()[1]);
         builder.append("\nattack accuracy : "+unit.getAppAttackAccuracy());
         builder.append("\nAvoidance : "+unit.getAppAvoidance());
@@ -139,5 +144,6 @@ public class TempoLongUnitPanel extends LongUnitPanel {
 
         equipmentLabel.setText(builder.toString());
         builder.setLength(0);
+
     }
 }

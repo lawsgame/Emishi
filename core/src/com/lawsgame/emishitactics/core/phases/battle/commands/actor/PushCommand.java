@@ -92,7 +92,7 @@ public class PushCommand extends ActorCommand {
     @Override
     public Array<int[]> getTargetsAtRange(int row, int col, Unit actor) {
         Array<int[]> targetsAtRange = new Array<int[]>();
-        if(actor.isMobilized()) {
+        if(actor.belongToAnArmy()) {
             if (bfr.getModel().isTileOccupiedByAlly(row + 1, col, actor.getArmy().getAffiliation())
                     && bfr.getModel().isTileAvailable(row + 2, col, actor.has(Data.Ability.PATHFINDER), actor)) {
                 targetsAtRange.add(new int[]{row + 1, col});

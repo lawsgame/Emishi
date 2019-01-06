@@ -186,14 +186,8 @@ public abstract class BattleCommand extends Observable implements Observer {
             return true;
         }
 
-        for(int i = 0; i < bf.armyTurnOrder.size(); i++){
-            if(bf.armyTurnOrder.get(i).isAnyEventTriggerable(data)) {
-                return true;
-            }
-        }
-
         for(int i = 0; i< area.size; i++){
-            eventTrig = isAnyEventTriggerable(data, area.get(i)[0], area.get(i)[1], true, true);
+            eventTrig = isAnyEventTriggerable(data, area.get(i)[0], area.get(i)[1], true);
         }
 
         return eventTrig;
@@ -201,23 +195,15 @@ public abstract class BattleCommand extends Observable implements Observer {
 
 
     protected final boolean isAnyEventTriggerable(Object data, int row, int col){
-        return isAnyEventTriggerable(data, row, col, false, false);
+        return isAnyEventTriggerable(data, row, col, false);
     }
 
 
-    private boolean isAnyEventTriggerable(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
+    private boolean isAnyEventTriggerable(Object data, int row, int col, boolean ignoreBFEvents){
         Battlefield bf = bfr.getModel();
 
         if(!ignoreBFEvents && bf.isAnyEventTriggerable(data)){
             return true;
-        }
-
-        if(!ignoreArmieEvents ) {
-            for (int i = 0; i < bf.armyTurnOrder.size(); i++) {
-                if (bf.armyTurnOrder.get(i).isAnyEventTriggerable(data)) {
-                    return true;
-                }
-            }
         }
 
         if(bf.isTileExisted(row, col)) {
@@ -263,28 +249,22 @@ public abstract class BattleCommand extends Observable implements Observer {
     protected final void handleEvents(Object data, Array<int[]> area) {
         eventTriggered = eventTriggered || isAnyEventTriggerable(data, area);
         scheduleMultipleRenderTasks(bfr.getModel().performEvents(data, outcome));
-        for(int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++)
-            scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data, outcome));
-        for(int i = 0; i< area.size; i++)
-            handleEvents(data, area.get(i)[0], area.get(i)[1], true, true);
+        for(int i = 0; i< area.size; i++) {
+            handleEvents(data, area.get(i)[0], area.get(i)[1], true);
+        }
     }
 
 
     protected final void handleEvents(Object data, int row, int col){
         eventTriggered = eventTriggered || isAnyEventTriggerable(data, row, col);
-        handleEvents(data, row, col, false, false);
+        handleEvents(data, row, col, false);
     }
 
 
-    private void handleEvents(Object data, int row, int col, boolean ignoreBFEvents, boolean ignoreArmieEvents){
+    private void handleEvents(Object data, int row, int col, boolean ignoreBFEvents){
 
-        if(!ignoreBFEvents)
+        if(!ignoreBFEvents) {
             scheduleMultipleRenderTasks(bfr.getModel().performEvents(data, outcome));
-
-        if(!ignoreArmieEvents) {
-            for (int i = 0; i < bfr.getModel().armyTurnOrder.size(); i++) {
-                scheduleMultipleRenderTasks(bfr.getModel().armyTurnOrder.get(i).performEvents(data, outcome));
-            }
         }
 
         if(bfr.getModel().isTileExisted(row, col)) {

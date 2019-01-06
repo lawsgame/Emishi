@@ -45,7 +45,7 @@ public abstract class AI extends Observable implements Runnable {
         Battlefield bf = bfr.getModel();
         int[] actorPos;
         CommandBundle bundle;
-        if(!bf.getSolver().isBattleOver()) {
+        if(!bf.getBattleSolver().isBattleOver()) {
 
 
             BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bfr, scheduler,playerInventory, army);
@@ -64,7 +64,7 @@ public abstract class AI extends Observable implements Runnable {
                 bundle = new CommandBundle();
                 setCommandBundle(actorPos, bundle);
                 notifyAllObservers(bundle);
-                if (bf.getSolver().isBattleOver()) {
+                if (bf.getBattleSolver().isBattleOver()) {
                     break;
                 }
             }

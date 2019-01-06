@@ -20,7 +20,7 @@ public class ChangeTactic extends SelfInflitedCommand {
 
     @Override
     public boolean isInitiatorValid(int rowActor, int colActor, Unit initiator) {
-        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.isWarChief() && !initiator.getArmy().isSquadOversized(initiator);
+        return super.isInitiatorValid(rowActor, colActor, initiator) && initiator.isWarChief();
     }
 
     @Override

@@ -13,7 +13,7 @@ public class PassiveAI extends AI {
     protected TileHighlighter thl;
 
     public PassiveAI(BattlefieldRenderer bfr, AnimationScheduler scheduler, PanelPool ph, Inventory playerInventory, TileHighlighter thl) {
-        super(bfr, scheduler, ph, playerInventory, bfr.getModel().getCurrentArmy());
+        super(bfr, scheduler, ph, playerInventory, bfr.getModel().getTurnSolver().getCurrentArmy());
         this.thl = thl;
     }
 
@@ -24,7 +24,7 @@ public class PassiveAI extends AI {
 
     @Override
     public int[] nextUnit(MilitaryForce army) {
-        return bfr.getModel().getStillActiveUnitCoords(army.getId()).random();
+        return bfr.getModel().getStillActiveUnitCoords(army).random();
     }
 
     @Override

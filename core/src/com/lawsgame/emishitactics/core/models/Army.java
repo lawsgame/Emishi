@@ -1,16 +1,19 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.I18NBundle;
 import com.lawsgame.emishitactics.core.constants.StringKey;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
+import com.lawsgame.emishitactics.core.models.Data.Allegiance;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.Unit;
 
 public class Army extends MilitaryForce {
 
 
     /**
+     * Struture :
+     *  > affiliation : which sides the army fights, typically, an alliance
+     *  -> allegeance : entity under which the army fights, typically, an nation;
+     *
      *  mob troups =
      *  [ WL S S ... ]
      *  [ WC S S ... ]
@@ -19,23 +22,22 @@ public class Army extends MilitaryForce {
      *
      */
 
-    private static int ids = 0;
     private String keyName;
-    private int id;
     private boolean playerControlled;
-    private final Data.Affiliation affiliation;
-    private Data.Allegiance allegiance;
-    private Array<Array<Unit>> mobilizedTroups;
-    private Array<Unit> nonMobTroups;
+    private final Affiliation affiliation;
+    private Allegiance allegiance;
+    private Array<Array<Unit>> regularTroops;
+    private Array<Unit> skirmishers;
+    private Array<Unit> reserve;
     private boolean ldCondEnabled;
 
     public Army(Affiliation affiliation, String keyName){
-        this.id = ids++;
         this.keyName = keyName;
         this.affiliation = affiliation;
         this.playerControlled = false;
-        this.mobilizedTroups = new Array<Array<Unit>>();
-        this.nonMobTroups = new Array<Unit>();
+        this.regularTroops = new Array<Array<Unit>>();
+        this.skirmishers = new Array<Unit>();
+        this.reserve = new Array<Unit>();
         this.ldCondEnabled = false;
         this.allegiance = Data.Allegiance.getStandard();
     }
@@ -44,12 +46,8 @@ public class Army extends MilitaryForce {
         Army playerArmy = new Army(Affiliation.ALLY, StringKey.PLAYER_ARMY_NAME);
         playerArmy.playerControlled = true;
         playerArmy.ldCondEnabled = true;
+        playerArmy.allegiance = Allegiance.PLAYER_ALLIGIANCE;
         return playerArmy;
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 
     @Override
@@ -57,24 +55,21 @@ public class Army extends MilitaryForce {
         return keyName;
     }
 
-
     @Override
     public Unit getWarlord() {
-        if(this.mobilizedTroups.size > 0 && this.mobilizedTroups.get(0).size > 0){
-            return this.mobilizedTroups.get(0).get(0);
+        if(this.regularTroops.size > 0 && this.regularTroops.get(0).size > 0){
+            return this.regularTroops.get(0).get(0);
         }
         return null;
     }
 
     @Override
     public Unit getWarchief(Unit unit) {
-        if(isUnitMobilized(unit)){
-            Array<Array<Unit>> squads = getAllSquads();
-            for(int i = 0; i < squads.size; i++){
-                for(int j = 0; j < squads.get(i).size; j++){
-                    if(unit == squads.get(i).get(j)){
-                        return squads.get(i).get(0);
-                    }
+        Array<Array<Unit>> squads = getAllSquads();
+        for(int i = 0; i < squads.size; i++){
+            for(int j = 0; j < squads.get(i).size; j++){
+                if(unit == squads.get(i).get(j)){
+                    return squads.get(i).get(0);
                 }
             }
         }
@@ -83,8 +78,8 @@ public class Army extends MilitaryForce {
 
     @Override
     public Unit getWarchief(int squadIndex) {
-        if(isSquadIndexValid(squadIndex)){
-            return mobilizedTroups.get(squadIndex).get(0);
+        if(isIndexSquadValid(squadIndex)){
+            return regularTroops.get(squadIndex).get(0);
         }
         return null;
     }
@@ -92,9 +87,9 @@ public class Army extends MilitaryForce {
     @Override
     public Array<Unit> getWarChiefs() {
         Array<Unit> warChiefs = new Array<Unit>();
-        for(int i = 0; i < mobilizedTroups.size; i++){
-            if(mobilizedTroups.get(i).size > 0) {
-                warChiefs.add(mobilizedTroups.get(i).get(0));
+        for(int i = 0; i < regularTroops.size; i++){
+            if(regularTroops.get(i).size > 0) {
+                warChiefs.add(regularTroops.get(i).get(0));
             }
         }
         return warChiefs;
@@ -103,74 +98,92 @@ public class Army extends MilitaryForce {
     @Override
     public Array<Unit> getSquad(Unit unit, boolean stillFighting) {
         Array<Unit> squad = new Array<Unit>();
-        int squadIndex = -1;
-        loop:
-        {
-            for (int i = 0; i < mobilizedTroups.size; i++) {
-                for (int j = 0; j < mobilizedTroups.get(i).size; j++) {
-                    if (mobilizedTroups.get(i).get(j) == unit) {
-                        squadIndex = i;
-                        break loop;
+        for (int i = 0; i < regularTroops.size; i++) {
+            for (int j = 0; j < regularTroops.get(i).size; j++) {
+                if (regularTroops.get(i).get(j) == unit) {
+                    if(stillFighting){
+                        for(int k = 0; k < regularTroops.get(i).size; k++){
+                            if(!regularTroops.get(i).get(k).isOutOfAction()){
+                                squad.add(regularTroops.get(i).get(k));
+                            }
+                        }
+                    }else {
+                        squad.addAll(regularTroops.get(i));
                     }
-
+                    break;
                 }
             }
-        }
-        if(squadIndex != -1){
-            for(int i = 0; i < mobilizedTroups.get(squadIndex).size; i++){
-                if(!mobilizedTroups.get(squadIndex).get(i).isOutOfAction() || !stillFighting) {
-                    squad.add(mobilizedTroups.get(squadIndex).get(i));
-                }
-            }
-
         }
         return squad;
     }
 
     @Override
     public Array<Array<Unit>> getAllSquads() {
-        return mobilizedTroups;
+        return regularTroops;
     }
 
     @Override
-    public Array<Unit> getMobilizedUnits(boolean stillFighting) {
+    public Array<Unit> getRegularTroops(boolean stillFighting) {
         Array<Unit> res = new Array<Unit>();
-        for(int i = 0; i < mobilizedTroups.size; i++){
-            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(!stillFighting || !mobilizedTroups.get(i).get(j).isOutOfAction())
-                    res.add(mobilizedTroups.get(i).get(j));
+        for(int i = 0; i < regularTroops.size; i++){
+            for(int j = 0; j < regularTroops.get(i).size; j++){
+                if(!stillFighting || !regularTroops.get(i).get(j).isOutOfAction()) {
+                    res.add(regularTroops.get(i).get(j));
+                }
+            }
+        }
+        for(int i = 0; i < skirmishers.size; i++){
+            if(!stillFighting || !skirmishers.get(i).isOutOfAction()) {
+                res.add(skirmishers.get(i));
+            }
+        }
+        return res;
+    }
+
+
+    @Override
+    public Array<Unit> getAllSkirmisher(boolean stillFighting) {
+        Array<Unit> res = new Array<Unit>();
+        for(int i = 0; i < skirmishers.size; i++){
+            if(!stillFighting || !skirmishers.get(i).isOutOfAction()) {
+                res.add(skirmishers.get(i));
             }
         }
         return res;
     }
 
     @Override
-    public Array<Unit> getNonMobilizedUnits() {
-        return nonMobTroups;
+    public Array<Unit> getMobilizedUnits(boolean stillFighting) {
+        Array<Unit> res = getRegularTroops(stillFighting);
+        res.addAll(getAllSkirmisher(stillFighting));
+        return res;
+    }
+
+    @Override
+    public Array<Unit> getReserve() {
+        return reserve;
     }
 
     @Override
     public int getNbOfSquads(){
-        return mobilizedTroups.size;
+        return regularTroops.size;
     }
 
     @Override
     public int getSquadSize(Unit unit, boolean stillFighting) {
-        for (int i = 0; i < mobilizedTroups.size; i++) {
-            for (int j = 0; j < mobilizedTroups.get(i).size; j++) {
-                if (mobilizedTroups.get(i).get(j) == unit) {
+        for (int i = 0; i < regularTroops.size; i++) {
+            for (int j = 0; j < regularTroops.get(i).size; j++) {
+                if (regularTroops.get(i).get(j) == unit) {
                     if (stillFighting) {
-
                         int squadSize = 0;
-                        for (int k = 0; k < mobilizedTroups.get(i).size; k++) {
-                            if(!mobilizedTroups.get(i).get(k).isOutOfAction()){
+                        for (int k = 0; k < regularTroops.get(i).size; k++) {
+                            if(!regularTroops.get(i).get(k).isOutOfAction()){
                                 squadSize++;
                             }
                         }
                         return squadSize;
                     } else {
-
-                        return mobilizedTroups.get(i).size;
+                        return regularTroops.get(i).size;
                     }
                 }
 
@@ -183,8 +196,8 @@ public class Army extends MilitaryForce {
     @Override
     public boolean isWarlord(Unit unit) {
         if(unit != null) {
-            if (this.mobilizedTroups.size > 0 && this.mobilizedTroups.get(0).size > 0) {
-                return this.mobilizedTroups.get(0).get(0) == unit;
+            if (this.regularTroops.size > 0 && this.regularTroops.get(0).size > 0) {
+                return this.regularTroops.get(0).get(0) == unit;
             }
         }
         return false;
@@ -193,8 +206,8 @@ public class Army extends MilitaryForce {
     @Override
     public boolean isWarChief(Unit unit) {
         if(unit != null) {
-            for (int i = 0; i < mobilizedTroups.size; i++) {
-                if (this.mobilizedTroups.get(i).size > 0 && this.mobilizedTroups.get(i).get(0) == unit) {
+            for (int i = 0; i < regularTroops.size; i++) {
+                if (this.regularTroops.get(i).size > 0 && this.regularTroops.get(i).get(0) == unit) {
                     return true;
                 }
             }
@@ -202,34 +215,35 @@ public class Army extends MilitaryForce {
         return false;
     }
 
+    public boolean isUnitMobilized(Unit unit){
+        return isUnitSkirmisher(unit) || isUnitRegular(unit);
+    }
 
     @Override
-    public boolean isUnitMobilized(Unit unit){
-        if(unit != null) {
-            for (int i = 0; i < getNbOfSquads(); i++) {
-                if (mobilizedTroups.get(i).contains(unit, true)) {
-                    return true;
-                }
+    public boolean isUnitRegular(Unit unit){
+        for (int i = 0; i < getNbOfSquads(); i++) {
+            if (regularTroops.get(i).contains(unit, true)) {
+                return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean isUnitSkirmisher(Unit unit) {
+        return skirmishers.contains(unit, true);
     }
 
     @Override
     public boolean isUnitReserve(Unit unit) {
-        if((unit != null))
-            return nonMobTroups.contains(unit, true);
-        return false;
+        return reserve.contains(unit, true);
     }
 
     @Override
-    public boolean contains(Unit unit){
-        return isUnitReserve(unit)|| isUnitMobilized(unit);
-    }
-
-    @Override
-    public boolean isSquadIndexValid(int squadIndex) {
-        return squadIndex < mobilizedTroups.size && 0 <= squadIndex && mobilizedTroups.get(squadIndex).size > 0;
+    public boolean isIndexSquadValid(int squadIndex) {
+        return squadIndex < regularTroops.size
+                && 0 <= squadIndex
+                && regularTroops.get(squadIndex).size > 0;
     }
 
 
@@ -249,8 +263,8 @@ public class Army extends MilitaryForce {
     }
 
     @Override
-    public boolean isAlliedWith(Affiliation affiliation) {
-        return this.affiliation == affiliation;
+    public boolean isAlliedWith(Affiliation a) {
+        return this.affiliation == a;
     }
 
     @Override
@@ -274,69 +288,45 @@ public class Army extends MilitaryForce {
     @Override
     public int getBannerRange(int squadIndex){
         boolean validIndex = 0 <= squadIndex && squadIndex < getNbOfSquads();
-        return (validIndex) ? (int) Math.sqrt(mobilizedTroups.get(squadIndex).get(0).getAppCharisma()) : 0;
+        return (validIndex) ? (int) Math.sqrt(regularTroops.get(squadIndex).get(0).getAppStat(Data.UnitStat.LEADERSHIP)) : 0;
     }
 
     @Override
     public int getBannerRange(Unit unit){
-        return (isUnitMobilized(unit)) ? getBannerRange(unit.getSquadIndex()) : 0;
-    }
-
-    @Override
-    public boolean isDeployedTroopsStillFighting(Battlefield battlefield) {
-        for(int r = 0; r < battlefield.getNbRows(); r++){
-            for(int c = 0; c < battlefield.getNbColumns(); c++){
-                if(battlefield.isTileOccupied(r, c)
-                        && isUnitMobilized(battlefield.getUnit(r,c ))
-                        && !battlefield.getUnit(r,c ).isOutOfAction()){
-                    return true;
-                }
-            }
-        }
-        return false;
+        return (isUnitRegular(unit)) ? getBannerRange(unit.getSquadIndex()) : 0;
     }
 
     @Override
     public void setDone(boolean done, boolean notifyObservers) {
-        for(int i = 0; i < mobilizedTroups.size; i++){
-            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                mobilizedTroups.get(i).get(j).setActed(done);
-                mobilizedTroups.get(i).get(j).setMoved(done);
+        for(int i = 0; i < regularTroops.size; i++){
+            for(int j = 0; j < regularTroops.get(i).size; j++){
+                regularTroops.get(i).get(j).setActed(done);
+                regularTroops.get(i).get(j).setMoved(done);
                 if(notifyObservers){
-                    mobilizedTroups.get(i).get(j).notifyAllObservers(Notification.Done.get(done));
+                    regularTroops.get(i).get(j).notifyAllObservers(Notification.Done.get(done));
                 }
+            }
+        }
+        for(int i = 0; i < skirmishers.size ; i++){
+            skirmishers.get(i).setActed(done);
+            skirmishers.get(i).setMoved(done);
+            if(notifyObservers){
+                skirmishers.get(i).notifyAllObservers(Notification.Done.get(done));
             }
         }
     }
 
     @Override
     public boolean isDone() {
-        for(int i = 0; i < mobilizedTroups.size; i++){
-            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(!mobilizedTroups.get(i).get(j).isDone() && !mobilizedTroups.get(i).get(j).isOutOfAction()){
-
+        for(int i = 0; i < regularTroops.size; i++){
+            for(int j = 0; j < regularTroops.get(i).size; j++){
+                if(!regularTroops.get(i).get(j).isDone() && !regularTroops.get(i).get(j).isOutOfAction()){
                     return false;
                 }
             }
         }
         return true;
     }
-
-
-    @Override
-    public boolean hasSquadStandardBearer(int squadId, boolean stillFighting) {
-        Unit squadMember;
-        if(0 < squadId && squadId < getNbOfSquads()) {
-            for (int i = 0; i < mobilizedTroups.get(squadId).size; i++){
-                squadMember = mobilizedTroups.get(squadId).get(i);
-                if(squadMember.isStandardBearer() && (!squadMember.isOutOfAction() || !stillFighting)){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
     // -------------- ARMY MANAGEMENT ---------------------------------------------------
 
@@ -358,7 +348,7 @@ public class Army extends MilitaryForce {
                 army.remove(unit);
             }
             unit.setArmy(this);
-            nonMobTroups.add(unit);
+            reserve.add(unit);
             successfullytAdded = true;
         }
         return successfullytAdded ;
@@ -379,9 +369,10 @@ public class Army extends MilitaryForce {
     @Override
     public void remove(Unit unit) {
         if(unit != null && contains(unit)) {
-            if(isUnitMobilized(unit)) disengage(unit);
+            if(isUnitRegular(unit) || isUnitSkirmisher(unit))
+                disengage(unit);
             unit.setArmy(null);
-            nonMobTroups.removeValue(unit, true);
+            reserve.removeValue(unit, true);
         }
     }
 
@@ -389,9 +380,9 @@ public class Army extends MilitaryForce {
     public void appointWarLord(Unit warlord) {
         if(isUnitReserve(warlord)) {
             disbandAllSquads();
-            nonMobTroups.removeValue(warlord, true);
-            mobilizedTroups.add(new Array<Unit>());
-            mobilizedTroups.get(0).add(warlord);
+            reserve.removeValue(warlord, true);
+            regularTroops.add(new Array<Unit>());
+            regularTroops.get(0).add(warlord);
             replenishMoral(false);
         }
     }
@@ -422,21 +413,21 @@ public class Army extends MilitaryForce {
             if (squadIndex == 0) {
                 appointWarLord(unit);
             } else if(getWarlord() != null){
-                if ((0 < squadIndex && squadIndex < mobilizedTroups.size)
+                if ((0 < squadIndex && squadIndex < regularTroops.size)
                         || getNbOfSquads() <= getWarlord().getMaxWarChiefs()
                         || ldCondEnabled){
-                    nonMobTroups.removeValue(unit, true);
-                    if (0 < squadIndex && squadIndex < mobilizedTroups.size) {
+                    reserve.removeValue(unit, true);
+                    if (0 < squadIndex && squadIndex < regularTroops.size) {
                         //reset an older squad
-                        if (mobilizedTroups.get(squadIndex).size > 0){
-                            disengage(mobilizedTroups.get(squadIndex).get(0));
+                        if (regularTroops.get(squadIndex).size > 0){
+                            disengage(regularTroops.get(squadIndex).get(0));
                         }
-                        mobilizedTroups.get(squadIndex).add(unit);
+                        regularTroops.get(squadIndex).add(unit);
                     } else {
                         //addExpGained a new squad
                         Array<Unit> newSquad = new Array<Unit>();
                         newSquad.add(unit);
-                        mobilizedTroups.add(newSquad);
+                        regularTroops.add(newSquad);
                     }
                     replenishMoral(false);
                 }
@@ -458,7 +449,7 @@ public class Army extends MilitaryForce {
      *
      *
      * @param soldier
-     * @return return true if the squad is over capacity
+     * @return return true if the unit is succesfully inserted
      */
     @Override
     public boolean appointSoldier(Unit soldier, int squadID, int unitID) {
@@ -472,7 +463,7 @@ public class Army extends MilitaryForce {
                 }
             } else {
             /*
-            the squadID and the unitID are those of a mere soldier, the request can then be improveCondition here.
+            the squadID and the unitID are those of a mere soldier, the request  is handled below.
             IF:  the squad ID is invalid =>  the request is canceled
              */
                 if (0 <= squadID && squadID < getNbOfSquads()) {
@@ -482,26 +473,24 @@ public class Army extends MilitaryForce {
                  - CASE 2 : the unit is simply added to the already mobilized troops
                  */
 
-                    if (0 <= unitID && unitID < mobilizedTroups.get(squadID).size) {
+                    if (0 <= unitID && unitID < regularTroops.get(squadID).size) {
                     /*CASE 1 :
                     IF : the unitID belongs to a existing soldier
                      - the former member of the squad is demobilized
                      - the newbie is added
                      */
-                        Unit formerUnit = this.mobilizedTroups.get(squadID).removeIndex(unitID);
-                        this.nonMobTroups.add(formerUnit);
-                        this.mobilizedTroups.get(squadID).insert(unitID, soldier);
-                        nonMobTroups.removeValue(soldier, true);
+                        Unit formerUnit = this.regularTroops.get(squadID).removeIndex(unitID);
+                        this.reserve.add(formerUnit);
+                        this.regularTroops.get(squadID).insert(unitID, soldier);
+                        reserve.removeValue(soldier, true);
 
-                    } else  {
+                    } else  if( unitID < getWarchief(squadID).getMaxSoldiersAs(squadID == 0)){
                     /*CASE 2 :
                     IF : the squad has a slot available for a new recruit
                      - the newbie is added
                      */
-
-                        this.mobilizedTroups.get(squadID).add(soldier);
-                        nonMobTroups.removeValue(soldier, true);
-                        squadOversized = mobilizedTroups.get(squadID).size > getWarchief(squadID).getMaxSoldiersAs(squadID == 0);
+                        this.regularTroops.get(squadID).add(soldier);
+                        reserve.removeValue(soldier, true);
                     }
                     replenishMoral(false);
 
@@ -516,34 +505,13 @@ public class Army extends MilitaryForce {
         return appointSoldier(unit, squadIndex, -1);
     }
 
-
-    /**
-     * update composition if one of members sees change in critical stat, notably leadership
-     */
     @Override
-    public void checkComposition() {
-        Array<Array<Unit>> squads = getAllSquads();
-        Array<Unit> squad;
-
-        // the warlord leadership is too low => disband the army
-        if(squads.size > getWarlord().getMaxWarChiefs() + 1)
-            disbandAllSquads();
-
-        for(int i = 0; i < squads.size; i++){
-            squad = squads.get(i);
-            if( squad.get(0).getMaxSoldiersAs(i == 0) < squad.size){
-                // the warchief leadership is too low => disband the squad
-                disengage(squad.get(0));
-            }
-
+    public void appointSkirmisher(Unit unit) {
+        if(isUnitReserve(unit)){
+            skirmishers.add(unit);
+            reserve.removeValue(unit, true);
         }
     }
-
-    @Override
-    public void setLeadershipConditionEnabled(boolean enabled) {
-        this.ldCondEnabled = enabled;
-    }
-
 
 
     /**
@@ -565,33 +533,39 @@ public class Army extends MilitaryForce {
      */
     @Override
     public boolean disengage(Unit unit) {
-        if(isUnitMobilized(unit)) {
+
+        if(isUnitRegular(unit)) {
+
+
 
             int squadId = -1;
-            int unitId = -1;
-            for (int i = 0; i < mobilizedTroups.size; i++) {
-                for (int j = 0; j < mobilizedTroups.get(i).size; j++) {
-                    if (unit == mobilizedTroups.get(i).get(j)) {
+            for (int i = 0; i < regularTroops.size; i++) {
+                for (int j = 0; j < regularTroops.get(i).size; j++) {
+                    if (unit == regularTroops.get(i).get(j)) {
                         squadId = i;
-                        unitId = j;
                     }
                 }
             }
 
-            if (squadId != -1 && unitId != -1) {
+            if (squadId != -1) {
                 if(isWarlord(unit)) {
                     disbandAllSquads();
                 } else if (isWarChief(unit)) {
                     Array<Unit> squad = getSquad(unit, false);
-                    mobilizedTroups.removeIndex(squadId);
-                    nonMobTroups.addAll(squad);
+                    regularTroops.removeIndex(squadId);
+                    reserve.addAll(squad);
                 } else {
-                    mobilizedTroups.get(squadId).removeValue(unit, true);
-                    nonMobTroups.add(unit);
-
+                    regularTroops.get(squadId).removeValue(unit, true);
+                    reserve.add(unit);
                 }
                 return true;
             }
+
+
+        }else if(isUnitSkirmisher(unit)){
+            skirmishers.removeValue(unit, true);
+            reserve.add(unit);
+            return true;
         }
         return false;
     }
@@ -602,59 +576,55 @@ public class Army extends MilitaryForce {
     @Override
     public void disbandAllSquads() {
         Unit unit;
-        for(int i = 0 ; i <  mobilizedTroups.size; i++){
-            for(int j = 0; j <  mobilizedTroups.get(i).size; j++){
-                unit = mobilizedTroups.get(i).removeIndex(j);
-                nonMobTroups.add(unit);
+        for(int i = 0; i <  regularTroops.size; i++){
+            for(int j = 0; j <  regularTroops.get(i).size; j++){
+                unit = regularTroops.get(i).removeIndex(j);
+                reserve.add(unit);
                 j--;
             }
         }
-        mobilizedTroups.clear();
+        reserve.addAll(skirmishers);
+        skirmishers.clear();
+        // to remove empty squad arraies
+        regularTroops.clear();
     }
 
     @Override
     public void replenishMoral(boolean turnBeginning) {
-        for(int i = 0; i < mobilizedTroups.size; i++){
-            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                mobilizedTroups.get(i).get(j).replenishMoral(turnBeginning);
+        for(int i = 0; i < regularTroops.size; i++){
+            for(int j = 0; j < regularTroops.get(i).size; j++){
+                regularTroops.get(i).get(j).replenishMoral(turnBeginning);
             }
+        }
+        for(int i = 0; i < skirmishers.size ; i++){
+            skirmishers.get(i).replenishMoral(turnBeginning);
         }
     }
 
     @Override
     public void updateActionPoints() {
-        for(int i = 0; i < mobilizedTroups.size; i++){
-            for(int j = 0; j < mobilizedTroups.get(i).size; j++){
-                if(!mobilizedTroups.get(i).get(j).isOutOfAction()) {
-                    mobilizedTroups.get(i).get(j).addActionPoints(Data.AP_REGEN);
+        for(int i = 0; i < regularTroops.size; i++){
+            for(int j = 0; j < regularTroops.get(i).size; j++){
+                if(!regularTroops.get(i).get(j).isOutOfAction()) {
+                    regularTroops.get(i).get(j).addActionPoints(Data.AP_REGEN);
                 }
             }
         }
-    }
-
-    @Override
-    public int getSquadExceedingCapacity(Unit unit) {
-        int exceedance = 0;
-        Unit warchief = getWarchief(unit);
-        if(warchief != null){
-            exceedance = getSquadSize(unit, false) - warchief.getMaxSoldiersAs(warchief.isWarlord());
+        for(int i = 0; i < skirmishers.size ; i++){
+            skirmishers.get(i).addActionPoints(Data.AP_REGEN);
         }
-        return (exceedance > 0 ) ? exceedance : 0;
-    }
-
-    @Override
-    public boolean isSquadOversized(Unit unit) {
-        return getSquadExceedingCapacity(unit) > 0;
     }
 
     @Override
     public String toLongString(){
         String str = "CURRENT ARMY";
         str += "\nLeader : "+getWarlord();
-        str += "\nMobilized troops : "+getMobilizedUnits(true).size;
-        str += "\nReserve : "+getNonMobilizedUnits().size+"\n";
-        for(int i = 0 ; i <  mobilizedTroups.size; i++){
-            for(int j = 0; j <  mobilizedTroups.get(i).size; j++){
+        str += "\nRegulars : "+(getMobilizedUnits(true).size - getAllSkirmisher(true).size);
+        str += "\nSkirmishers : "+getAllSkirmisher(true).size;
+        str += "\nReserve : "+ getReserve().size+"\n";
+        str += "\n|REGULAR ARMY";
+        for(int i = 0; i <  regularTroops.size; i++){
+            for(int j = 0; j <  regularTroops.get(i).size; j++){
                 if(j == 0){
                     if(i == 0){
                         str += "\n|> ";
@@ -664,12 +634,16 @@ public class Army extends MilitaryForce {
                 }else{
                     str += "\n|----> ";
                 }
-                str += mobilizedTroups.get(i).get(j).getName();
+                str += regularTroops.get(i).get(j).getName();
             }
         }
-        str += "\n|\n|RESERVE ARMY";
-        for(int i = 0; i <  nonMobTroups.size; i++){
-            str += "\n|  "+nonMobTroups.get(i).getName();
+        str += "\n|\n|SKIRMISHER SQUAD";
+        for(int i = 0; i <  skirmishers.size; i++){
+            str += "\n|  "+ skirmishers.get(i).getName();
+        }
+        str += "\n|\n|RESERVE";
+        for(int i = 0; i <  reserve.size; i++){
+            str += "\n|  "+ reserve.get(i).getName();
         }
         return str+"\n";
     }
