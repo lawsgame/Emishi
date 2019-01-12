@@ -16,6 +16,7 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRe
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.WindRose;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.rendering.Renderer;
 
@@ -34,6 +35,7 @@ public class IsoBFR extends BattlefieldRenderer {
     private Array<Array<AreaRenderer>> areaRenderers;
 
     private ShapeRenderer bgndRenderer;
+    private WindRose windrose;
 
 
     public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager){
@@ -85,6 +87,8 @@ public class IsoBFR extends BattlefieldRenderer {
             }
             //set weather renderer
             this.renderedWeather = getModel().getWeather();
+            // set windrose
+            this.windrose = new IsoWindrose(this, assetManager);
         }
     }
 
@@ -149,6 +153,7 @@ public class IsoBFR extends BattlefieldRenderer {
 
     @Override
     public void update(float dt) {
+        windrose.update(dt);
         for(int i = 0; i < unitRenderers.size; i++){
             for(int j = 0; j < tileRenderers.get(i).size; j++){
                 tileRenderers.get(i).get(j).update(dt);
@@ -455,6 +460,11 @@ public class IsoBFR extends BattlefieldRenderer {
 
 
         return resOr;
+    }
+
+    @Override
+    public WindRose getWindRose() {
+        return windrose;
     }
 
     @Override

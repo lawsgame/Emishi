@@ -22,10 +22,7 @@ public class SpriteProviderImp implements SpriteProvider {
         this.spriteStdSize = spriteStdSize;
     }
 
-    @Override
-    public void load(AssetManager asm, Battlefield battlefield) {
 
-    }
 
     @Override
     public Skin getUISkin() {
@@ -55,6 +52,17 @@ public class SpriteProviderImp implements SpriteProvider {
     @Override
     public HashMap<AreaSpriteType, Array<Sprite>> getAreaSS(Data.AreaColor color) {
         return null;
+    }
+
+
+
+
+
+    //-------------- SPRITES LOADING -----------------------------
+
+    @Override
+    public void load(AssetManager asm, Battlefield battlefield) {
+
     }
 
 

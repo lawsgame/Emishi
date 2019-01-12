@@ -25,13 +25,14 @@ public interface SpriteProvider {
         CORNER_OBTUSE
     }
 
-    void load(AssetManager asm, Battlefield battlefield);
+
     Sprite getPortrait(Unit unit);
     Skin getUISkin();
     Array<Sprite> getUnitAnimationSS(BattleUnitRenderer unit, Data.AnimId id);
     Array<Sprite> getTileSS(Data.TileType type, boolean upper);
     Array<Sprite> getSparkleSS(Data.SparkleType type);
     HashMap<AreaSpriteType, Array<Sprite>> getAreaSS(Data.AreaColor color);
+    void load(AssetManager asm, Battlefield battlefield);
 
 
 }

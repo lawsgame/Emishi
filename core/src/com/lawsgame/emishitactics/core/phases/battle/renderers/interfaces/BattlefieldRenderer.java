@@ -32,6 +32,36 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }
     }
 
+    public abstract WindRose getWindRose();
+    public abstract void prerender();
+    public abstract void render(SpriteBatch batch);
+    public abstract int getRow(float gameX, float gameY);
+    public abstract int getCol(float gameX, float gameY);
+    public abstract float getCenterX(int row, int col);
+    public abstract float getCenterY(int row, int col);
+    public abstract float[] getCentriod(Array<int[]> coords);
+    public abstract boolean isIdling();
+    protected abstract void displayBuilding(int rowTile, int colTile, Tile buildingTile);
+    protected abstract void displayCollapsing(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile);
+    protected abstract void displayPlundering(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile);
+    public abstract BattleUnitRenderer getUnitRenderer(Unit model);
+    public abstract AreaRenderer getAreaRenderer(Area area);
+    public abstract TileRenderer getTileRenderer(int row, int col);
+    public abstract void addTileRenderer(int row, int col, Tile model);
+    public abstract BattleUnitRenderer addUnitRenderer(int row, int col, Unit model);
+    public abstract void addAreaRenderer(Area area);
+    public abstract void removeUnitRenderer(Unit model, boolean uponMoving);
+    public abstract void removeAreaRenderer(Area model);
+    protected abstract boolean isUnitRendererCreated(Unit model);
+    protected abstract boolean isAreaRendererCreated(Area model);
+    protected abstract void removeAreaRenderersAssociatedWith(Unit model, boolean uponMoving);
+    public abstract Data.Orientation getOrientationFromPos(float xCenter, float yCenter, float xTarget, float yTarget);
+
+    @Override
+    public boolean isExecuting() {
+        return !isIdling() || notificationQueue.size() > 0;
+    }
+
     protected void launchNextAnimation(){
 
         if(isIdling() && notificationQueue.size() > 0) {
@@ -113,37 +143,6 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }
     }
 
-    public abstract boolean isIdling();
-    protected abstract void displayBuilding(int rowTile, int colTile, Tile buildingTile);
-    protected abstract void displayCollapsing(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile);
-    protected abstract void displayPlundering(int rowTile, int colTile, Tile buildingTile, Tile oldbuildingTile);
-
-    @Override
-    public boolean isExecuting() {
-        return !isIdling() || notificationQueue.size() > 0;
-    }
-
-
-    public abstract void prerender();
-    public abstract void render(SpriteBatch batch);
-
-    public abstract int getRow(float gameX, float gameY);
-    public abstract int getCol(float gameX, float gameY);
-    public abstract float getCenterX(int row, int col);
-    public abstract float getCenterY(int row, int col);
-    public abstract float[] getCentriod(Array<int[]> coords);
-    public abstract BattleUnitRenderer getUnitRenderer(Unit model);
-    public abstract AreaRenderer getAreaRenderer(Area area);
-    public abstract TileRenderer getTileRenderer(int row, int col);
-    public abstract void addTileRenderer(int row, int col, Tile model);
-    public abstract BattleUnitRenderer addUnitRenderer(int row, int col, Unit model);
-    public abstract void addAreaRenderer(Area area);
-    public abstract void removeUnitRenderer(Unit model, boolean uponMoving);
-    public abstract void removeAreaRenderer(Area model);
-    protected abstract boolean isUnitRendererCreated(Unit model);
-    protected abstract boolean isAreaRendererCreated(Area model);
-    protected abstract void removeAreaRenderersAssociatedWith(Unit model, boolean uponMoving);
-    public abstract Data.Orientation getOrientationFromPos(float xCenter, float yCenter, float xTarget, float yTarget);
 
     public void displayDeploymentAreas(boolean visible) {
         Array<Area> deploymentArea = getModel().getDeploymentAreas();

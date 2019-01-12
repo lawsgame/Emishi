@@ -117,6 +117,12 @@ public class Animation extends Observable implements GameUpdatableEntity {
 		stop();
 	}
 
+	public void setSpeed(float speed){
+		if(speed > 0) {
+			this.speed = speed;
+		}
+	}
+
     public int getLength() {
         return length;
     }

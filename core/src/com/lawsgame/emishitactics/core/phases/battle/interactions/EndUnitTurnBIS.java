@@ -32,8 +32,8 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
 
             proceed();
         }else {
-            bim.windroseImp.initialize(bim.bfr.getUnitRenderer(actor));
-            bim.windroseImp.attach(this);
+            bim.bfr.getWindRose().initialize(bim.bfr.getUnitRenderer(actor));
+            bim.bfr.getWindRose().attach(this);
             if(bim.bfr.getModel().isUnitDeployed(actor)) {
                 int[] actorPos = bim.bfr.getModel().getUnitPos(actor);
                 bim.focusOn(actorPos[0], actorPos[1], true, true, true, TileHighlighter.SltdUpdateMode.MATCH_TOUCHED_TILE, true);
@@ -45,19 +45,19 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
     @Override
     public void end() {
         super.end();
-        bim.windroseImp.detach(this);
-        bim.windroseImp.setEnable(false);
-        bim.windroseImp.setVisible(false);
+        bim.bfr.getWindRose().detach(this);
+        bim.bfr.getWindRose().setEnable(false);
+        bim.bfr.getWindRose().setVisible(false);
     }
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        bim.windroseImp.render(batch);
+        bim.bfr.getWindRose().render(batch);
     }
 
     @Override
     public boolean handleTouchInput(float xTouch, float yTouch) {
-        return bim.windroseImp.handleInput(xTouch, yTouch);
+        return bim.bfr.getWindRose().handleInput(xTouch, yTouch);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
 
     @Override
     public void getNotification(Observable sender, Object data) {
-        if(sender  == bim.windroseImp && data instanceof Data.Orientation){
+        if(sender  == bim.bfr.getWindRose() && data instanceof Data.Orientation){
             //update actor orientation
             ChooseOrientationCommand orientationCommand = new ChooseOrientationCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), (Data.Orientation) data);
             int[] actorPos = bim.bfr.getModel().getUnitPos(actor);

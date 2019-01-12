@@ -3,12 +3,10 @@ package com.lawsgame.emishitactics.core.phases.battle.renderers;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.helpers.AssetProvider;
-import com.lawsgame.emishitactics.core.helpers.AssetProvider.AreaSpriteType;
+import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider.AreaSpriteType;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data.AreaColor;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class IsoAreaRenderer extends AreaRenderer {
     protected Array<Sprite> sprites;

@@ -35,7 +35,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final AssetManager asm;
     public final TileHighlighter thl;
     public final PanelPool pp;
-    public final WindRose windroseImp;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle localization;
@@ -59,7 +58,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
         this.multiplexer = new InputMultiplexer();
         this.uiStage = stageUI;
-        this.windroseImp = new IsoWindrose(bfr, asm);
 
         // TEST
 

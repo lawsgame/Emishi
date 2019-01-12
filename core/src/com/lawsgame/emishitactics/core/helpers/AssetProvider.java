@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
+import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider.AreaSpriteType;
 import com.lawsgame.emishitactics.core.helpers.spritetree.CharaST;
 import com.lawsgame.emishitactics.core.helpers.spritetree.GenUnitST;
 import com.lawsgame.emishitactics.core.helpers.spritetree.WeaponBranch;
@@ -30,17 +30,6 @@ import java.util.HashMap;
 public class AssetProvider implements Disposable{
     private static String EXT_PACK = ".pack";
 
-    public enum AreaSpriteType{
-        ANTI_INSIDE_ACUTE,
-        ANTI_INSIDE_OBTUSE,
-        ANTI_OUTSIDE_ACUTE,
-        ANTI_OUTSIDE_OBTUSE,
-        ANTI_SIDE,
-        ANTI_SIDE_UPSIDE_DOWN,
-        BORDER,
-        CORNER_ACUTE,
-        CORNER_OBTUSE
-    }
 
     private float spriteStdSize;
     private Array<TextureRegion> undefinedTileSprites = new Array<TextureRegion>();

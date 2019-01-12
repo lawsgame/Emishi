@@ -1,21 +1,14 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.VisitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
@@ -23,10 +16,8 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.TileRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
 import com.lawsgame.emishitactics.engine.rendering.Animation;
@@ -36,23 +27,7 @@ import java.util.LinkedList;
 public class TestBIS extends BattleInteractionState implements Observer, ChoicePanel.CommandReceiver {
 
     Unit sltdUnit;
-    AreaRenderer areaRenderer;
 
-    Array<Sprite> sprites;
-    Animation animation;
-
-    LinkedList<ActorCommand> historic = new LinkedList<ActorCommand>();
-
-    MoveCommand moveCommand = null;
-    ActorCommand customedCommand = null;
-    WalkCommand walkCommand = null;
-    BattleCommand event = null;
-
-    Area ccActionArea;
-    Area ccImpactArea;
-    Area ccTargets;
-
-    ActionInfoPanel panel;
     ChoicePanel.CommandChoicePanel ccp;
 
 
@@ -67,117 +42,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         bim.player.getArmy().getSquad(sltdUnit, true).get(1).takeDamage(0, false, 1f);
 
 
-
-        // -------***<<< ANIMATION tests >>>***------------------------
-
-        sprites = bfr.assetProvider.genSpriteTree.getSpriteSet(false, false, false, Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD, Data.Orientation.WEST, false, Data.AnimSpriteSetId.HEAL);
-        for(int i =0; i < sprites.size; i++){
-            sprites.get(i).setPosition(1, 1);
-            sprites.get(i).setSize(1, 2);
-        }
-        animation = new Animation(sprites.size, 0.3f, true, false, false);
-        animation.play();
-
-
-
-        // -------***<<< CUSTOMED COMMAND related tests >>>***------------------------
-
-        sltdUnit.addNativeAbility(Data.Ability.PATHFINDER);
-        customedCommand = new VisitCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        customedCommand.setFree(true);
-
-        walkCommand = new WalkCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        walkCommand.setFree(true);
-
-        ccActionArea = new Area(bim.bfr.getModel(), Data.AreaType.MOVE_AREA);
-        ccImpactArea = new Area(bim.bfr.getModel(), Data.AreaType.FOE_ACTION_AREA);
-        ccTargets = new Area(bim.bfr.getModel(), Data.AreaType.DEPLOYMENT_AREA);
-        bim.bfr.addAreaRenderer(ccImpactArea);
-        bim.bfr.addAreaRenderer(ccActionArea);
-        bim.bfr.addAreaRenderer(ccTargets);
-
-        // INITIATE ACTION PANEL
-
-        final Skin skin = bim.asm.get(Assets.SKIN_UI);
-        panel = ActionInfoPanel.create(bim.uiStage.getViewport(), skin, bim.bfr, TempoAIP.class);
-        bim.uiStage.addActor(panel);
-
-        // AREA ADDING
-
-        // set guarded area
-        Unit randomFoe = bim.bfr.getModel().getUnit(13,8);
-        randomFoe.addNativeAbility(Data.Ability.GUARD);
-        int[] randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
-        GuardCommand guardCommand = new GuardCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        guardCommand.setFree(true);
-        if(!guardCommand.apply(randomFoePos[0], randomFoePos[1])){ }
-
-        // set covered area
-        randomFoe = bim.bfr.getModel().getUnit(13,5);
-        randomFoePos = bim.bfr.getModel().getUnitPos(randomFoe);
-        CoveringFireCommand cfc = new CoveringFireCommand(bim.bfr, bim.scheduler, bim.player.getInventory());
-        cfc.setFree(true);
-        if(!cfc.apply(randomFoePos[0], randomFoePos[1])){
-            System.out.println("command failed to be applied");
-            System.out.println("    initiator ? : " + walkCommand.isInitiatorValid());
-            System.out.println("    target ?    : " + walkCommand.isTargetValid());
-        }
-
-        /*
-        SwitchWeaponCommand command = new SwitchWeaponCommand(bim.bfr, bim.scheduler, bim.player.getInventory(), 1);
-        int[] sltdPos = bim.bfr.getModel().getUnitPos(sltdUnit);
-        command.setInitiator(sltdPos[0], sltdPos[1]);
-        command.setTarget(sltdPos[0], sltdPos[1]);
-        panel.setContent(command);
-        */
-
-        //panel.show();
-
-
-
-
-
-        // -------***<<< EVENT related tests >>>***------------------------
-
-        TrapEvent.addTrigger(bim, 11, 4, 3);
-        EarthquakeEvent earthquakeEvent = EarthquakeEvent.addTrigger(bim.bfr, bim.scheduler,  bim.player.getInventory(), -1);
-        //bim.bfr.getModel().getTile(10, 7).setFragile(true);
-        earthquakeEvent.getTargetTileTree().addChild(10, 7,1);
-        earthquakeEvent.getTargetTileTree().addChild(13, 13, 1f);
-        event = earthquakeEvent;
-
-        /*
-        event = new BattleCommand(bim.bfr, bim.scheduler, bim.player.getInventory()) {
-            @Override
-            protected void execute() {
-                System.out.println("command executed !!");
-                StandardTask task = new StandardTask();
-                task.addParallelSubTask(new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(sltdUnit), Data.AnimId.REGULAR_ATTACK));
-                task.addParallelSubTask(new StandardTask.CommandSubTask(0) {
-                    @Override
-                    public void run() {
-                        System.out.println("command sub task works");
-                    }
-                });
-                scheduleRenderTask(task);
-                System.out.println(scheduler);
-            }
-
-            @Override
-            protected void unexecute() {
-
-            }
-
-            @Override
-            public boolean isApplicable() {
-                return true;
-            }
-
-            @Override
-            public boolean isUndoable() {
-                return false;
-            }
-        };*/
 
         // -------***<<< ACP and CCP tests >>>***------------------------
 
@@ -228,8 +92,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         // -------***<<< WINDROSE >>>***------------------------
 
-        bim.windroseImp.initialize(bim.bfr.getUnitRenderer(sltdUnit));
-
         /*
         TextureAtlas atlas = bim.asm.get(Assets.ATLAS_BATTLE_ICONS);
         regions = atlas.findRegions(Assets.getWindroseArrowTexture(true, true));
@@ -239,23 +101,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         animation.play();
         */
 
-
-
-        // -------***<<< SPARKLE ANIM TEST >>>***------------------------
-
-        /*
-        Sprite sprite;
-        Array<TextureRegion> sparkleTR = bfr.assetProvider.sparkleTR.get(Data.SparkleType.TRAP);
-        sprites = new Array<Sprite>();
-        for(int i = 0; i < sparkleTR.size; i++){
-            sprite = new Sprite(sparkleTR.get(i));
-            sprite.setSize(2, 2 );
-            sprite.setPosition(2, 2);
-            sprites.add(sprite);
-        }
-        animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, true, false);
-        animation.play();
-        */
 
         // -------***<<< OTHER TESTS >>>***------------------
 
@@ -268,15 +113,17 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
 
     @Override
+    public void update(float dt) {
+        super.update(dt);
+    }
+
+    @Override
     public void end() {
 
     }
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        if(areaRenderer != null){
-            areaRenderer.render(batch);
-        }
 
     }
 
@@ -288,151 +135,17 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
     @Override
     public boolean handleTouchInput(int row, int col) {
-
-        System.out.println("input : "+row+" "+col);
-        int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
-        //bim.moveCameraTo(row, col, true);
-
-
-
-        // PATH
-
-        //Array<int[]> path = bim.bfr.getModel().getShortestPath(actorPos[0], actorPos[1], row, col, false, Data.Affiliation.ALLY, true);
-        //areaRenderer = new IsoAreaRenderer(new Area(bim.bfr.getModel(),   Data.AreaType.GUARD_AREA, path), (IsoBFR)bim.bfr);
-
-
-        // PANEL
-
-        /*
-        if(bim.pp.choicePanel.isHiding()){
-            bim.pp.choicePanel.show();
-        }else {
-            bim.pp.choicePanel.resetPanel(true);
-        }
-        */
-
-
-        //WALK UNIT
-
-        //bim.bfr.getModel().moveUnit(actorPos[0], actorPos[1], row, col, true);
-
-        /*
-        if(!bim.bfr.getModel().isTileOccupied(row, col)){
-            moveCommand.setPath(bim.bfr.getModel().getShortestPath(actorPos[0], actorPos[1], row, col, false, sltdUnit.getArmy().getAffiliation()));
-            moveCommand.setReveal(false);
-            if(!moveCommand.run(actorPos[0], actorPos[1])){
-                System.out.println("command failed to be applied");
-                System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
-                System.out.println("    target ?    : "+customedCommand.isTargetValid());
-            }
-            //System.out.println(bim.scheduler);
-        }
-        */
-
-
-        /*
-        if(!bim.bfr.getModel().isTileOccupied(row, col)) {
-            if (!walkCommand.run(actorPos[0], actorPos[1], row, col)) {
-                System.out.println("command failed to be applied");
-                System.out.println("    initiator ? : " + walkCommand.isInitiatorValid());
-                System.out.println("    target ?    : " + walkCommand.isTargetValid());
-            }
-        }
-        */
-
-
-
-
-        // TEST CUSTOMED COMMAND
-
-
-        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
-
-            // UPDATE SLTD UNIT POSITION
-
-            if(bim.bfr.getModel().isTileOccupied(row, col)){
-                sltdUnit = bim.bfr.getModel().getUnit(row, col);
-            }else{
-                bim.bfr.getModel().moveUnit(actorPos[0], actorPos[1], row, col, true);
-            }
-        }else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
-
-            // APPLY CUSTOMED COMMAND
-
-            // set parameters
-            customedCommand.setInitiator(actorPos[0], actorPos[1]);
-            customedCommand.setTarget(row, col);
-
-            // update and display action pan
-            if(bim.pp.isActionPanelAvailable(customedCommand.getActionChoice())) {
-                panel.hide();
-                panel.setContent(customedCommand);
-                panel.show();
-            }
-
-            // run command
-            if(!customedCommand.apply()){
-                System.out.println("command failed to be applied");
-                System.out.println("    initiator ? : "+customedCommand.isInitiatorValid());
-                System.out.println("    target ?    : "+customedCommand.isTargetValid());
-            }
-        }else{
-
-            // SHOW INFO ABOUT COMMAND
-
-            customedCommand.setInitiator(actorPos[0], actorPos[1]);
-            customedCommand.setFree(true);
-            if(customedCommand.isInitiatorValid()) {
-                Array<int[]> impact = customedCommand.getImpactArea(actorPos[0], actorPos[1], row, col);
-                ccImpactArea.setTiles(impact, true);
-                ccActionArea.setTiles(customedCommand.getActionArea(), true);
-                ccTargets.setTiles(customedCommand.getTargetsAtRange(), true);
-
-            }
-        }
-
-
-
-
-
-
         return true;
     }
 
-    @Override
-    public void update60(float dt) {
-        animation.update(dt);
-        bim.windroseImp.update(dt);
-
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            event.setDecoupled(false);
-            event.apply();
-            event.setDecoupled(true);
-        }else if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
-            TileRenderer tr = bim.bfr.getTileRenderer(15, 5);
-            tr.setRevealed(!tr.isRevealed(), Data.SparkleType.LOOT);
-            System.out.println("sparkle revealed ? "+tr.isRevealed());
-        }
-    }
-
 
     @Override
-    public void init() {
+    public void getChoicePanelNotification(ActorCommand choice) {
 
     }
 
     @Override
     public void getNotification(Observable sender, Object data) {
-        if(sender == data) {
-            sender.detach(this);
-        }else if(data instanceof Data.Orientation){
-            System.out.println(data);
-        }
-    }
 
-    @Override
-    public void getChoicePanelNotification(ActorCommand choice) {
-        System.out.println(choice.toShortString());
     }
 }
