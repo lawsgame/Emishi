@@ -27,20 +27,16 @@ public class Unit extends Model {
     protected final WeaponType weaponType;
     protected boolean horseman;
     protected boolean horsemanUponPromotion;
-
     protected Array<Weapon> weapons;
     protected int experience = 0;
     protected int commandmentExperience = 0;
     private MilitaryForce army = null;
-
     protected HashMap<Data.UnitStat, Integer> baseStats;
     protected int currentMoral;
     protected int currentHitPoints;
-
     protected int actionPoints = 0;
     protected boolean disabled = false;
     protected boolean crippled = false;
-
     protected Array<Data.Ability> nativeAbilities;
     protected Array<Equipment> equipments;
     protected Banner banner;
@@ -630,7 +626,7 @@ public class Unit extends Model {
         return (army != null && getArmy().isUnitSkirmisher(this));
     }
 
-    public boolean isReverse(){
+    public boolean isReserve(){
         return (army != null && getArmy().isUnitReserve(this));
     }
 

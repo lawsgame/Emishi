@@ -475,6 +475,7 @@ public class Data {
 
 
     public enum TileSpriteSetId {
+        UNDEFINED       (false),
         VILLAGE         (true),
         SANCTUARY       (true),
         STOCKADE        (true),

@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UtilsTest {
@@ -137,5 +138,17 @@ public class UtilsTest {
         assertTrue(Utils.arrayContains(a3 , new int[]{2,5}));
 
 
+    }
+
+    @Test
+    public void testArrayContainsString(){
+        String[] astr0 = new String[]{"a", "c"};
+        String[] astr1 = new String[]{"a", "b"};
+        Array<String[]> atr = new Array<String[]>();
+        atr.add(new String[]{"b", "c", "d"});
+        atr.add(new String[]{"a", "b"});
+        atr.add(new String[]{"b", "c"});
+        assertFalse(Utils.arrayContains(atr, astr0));
+        assertTrue(Utils.arrayContains(atr, astr1));
     }
 }

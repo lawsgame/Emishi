@@ -196,6 +196,27 @@ public class Utils {
         return false;
     }
 
+    public static boolean arrayContains(Array<String[]> array, String[] strings){
+        boolean valid;
+        if(array != null && strings != null) {
+            for (int i = 0; i < array.size; i++) {
+                if (array.get(i).length == strings.length) {
+                    valid = true;
+                    for(int j = 0; j < array.get(i).length; j++){
+                        if(!array.get(i)[j].equals(strings[j])){
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if(valid){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean arrayContains(Array<int[]> intArray, int r, int c){
         if(intArray != null) {
             for (int i = 0; i < intArray.size; i++) {

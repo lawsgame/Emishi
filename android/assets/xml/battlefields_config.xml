@@ -2,7 +2,7 @@
 <Battles>
     <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY">
         <Earthquake turn="1"/>
-        <Recruit row = "1" col = "12" name = "Hector" title="" template="SOLAR_KNIGHT" level="1" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+        <Recruit row = "1" col = "12" name = "Hector" title="" template="SOLAIRE" level="1" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
             <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
             <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>
             <Attribute id= "equipement" value ="WARRIOR" stealable="false"/>

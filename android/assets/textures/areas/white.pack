@@ -1,7 +1,7 @@
 
 white.png
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Linear,Linear
 repeat: none
 corner_acute
   rotate: false

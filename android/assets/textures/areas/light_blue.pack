@@ -1,7 +1,7 @@
 
 light_blue.png
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Linear,Linear
 repeat: none
 anti_inside_acute
   rotate: false

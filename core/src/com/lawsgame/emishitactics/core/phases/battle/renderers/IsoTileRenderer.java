@@ -115,7 +115,7 @@ public abstract class IsoTileRenderer extends TileRenderer {
     }
 
     private float getSparkleSpriteSize(){
-        return IsoBFR.SPRITE_STD_SIZE / 4f;
+        return 0.25f;
     }
 
     @Override

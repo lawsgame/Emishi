@@ -251,23 +251,6 @@ public class Notification {
         }
     }
 
-
-    public static class Horseman {
-        public boolean horseman;
-
-        private static final Horseman FALSE = new Horseman(false);
-        private static final Horseman TRUE = new Horseman(true);
-
-        private Horseman(boolean horseman) {
-            this.horseman = horseman;
-        }
-
-        public static Horseman get(boolean horsman){
-            return (horsman) ? TRUE : FALSE;
-        }
-    }
-
-
     public static class Blink  {
         public final boolean targeted;
 
@@ -353,5 +336,20 @@ public class Notification {
 
     public static class UnitAppears {
         public final Array<Unit> newlyDeployed = new Array<Unit>();
+    }
+
+    public static class Promoted {
+        public final boolean promoted;
+
+        private static final Promoted FALSE = new Promoted(false);
+        private static final Promoted TRUE = new Promoted(true);
+
+        private Promoted(boolean promoted) {
+            this.promoted = promoted;
+        }
+
+        public static Promoted get(boolean promoted){
+            return (promoted) ? TRUE : FALSE;
+        }
     }
 }

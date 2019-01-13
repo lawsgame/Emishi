@@ -59,10 +59,10 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
                 }
             } else if (query instanceof Data.WeaponType) {
                 setWeaponType((Data.WeaponType) query);
-            } else if (query instanceof Notification.Horseman) {
-                setHorseman(((Notification.Horseman) query).horseman);
             } else if (query instanceof Notification.Visible) {
                 setVisible(((Notification.Visible) query).visible);
+            } else if (query instanceof Notification.Promoted) {
+                setPromoted(((Notification.Promoted) query).promoted);
             } else if (query instanceof Notification.Disabled) {
                 setDisabled(((Notification.Disabled) query).disabled);
             } else if (query instanceof Notification.Crippled) {
@@ -95,7 +95,9 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
     public abstract void setOrientation(Data.Orientation or);
     public abstract Data.Orientation getOrientation();
     public abstract void setWeaponType(Data.WeaponType type);
-    public abstract void setHorseman(boolean horseman);
+    public abstract Data.WeaponType getCurrentWeaponType();
+    public abstract void setPromoted(boolean promoted);
+    public abstract boolean isPromoted();
     public abstract boolean isIdling();
 
     public abstract void displayWalk(Array<int[]> path, boolean reinform);

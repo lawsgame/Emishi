@@ -17,7 +17,7 @@ public class Map5<A, B, C, D, E, F> {
      * @param d : can value NULL
      */
     public void put(A a, B b, C c, D d, E e, F f){
-        if(a != null && b != null && c != null){
+        if(a != null && b != null && c != null && d !=null && e != null){
             if(innerMap.get(a) == null)
                 innerMap.put(a, new HashMap<B, HashMap<C, HashMap<D, HashMap<E, F>>>>());
             if(innerMap.get(a).get(b) == null)

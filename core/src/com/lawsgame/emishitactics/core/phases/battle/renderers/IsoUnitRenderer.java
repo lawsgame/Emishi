@@ -35,7 +35,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     protected WeaponType weaponType;
     protected Orientation orientation;
-    protected boolean horseman;
     protected boolean done;
     protected boolean crippled;
     protected boolean disabled;
@@ -68,7 +67,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         this.animation = new Animation(1,1,false,false, false);
         this.weaponType = model.getWeaponType();
         this.orientation = model.getOrientation();
-        this.horseman = model.isHorseman();
         this.done = model.isDone();
         this.promoted = model.isPromoted();
         this.blinkPeriod = new TargetPeriod();
@@ -235,9 +233,19 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     }
 
     @Override
-    public void setHorseman(boolean horseman) {
-        this.horseman = horseman;
-        this.display(state);
+    public WeaponType getCurrentWeaponType() {
+        return weaponType;
+    }
+
+    @Override
+    public void setPromoted(boolean promoted) {
+        this.promoted = promoted;
+        display(state);
+    }
+
+    @Override
+    public boolean isPromoted() {
+        return promoted;
     }
 
     /**
@@ -459,7 +467,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
                 bfr.assetProvider.genSpriteTree.getSpriteSet(
                         getModel().getArmy().isPlayerControlled(),
                         false,
-                        horseman,
+                        false,
                         getModel().getTemplate(),
                         weaponType,
                         orientation,

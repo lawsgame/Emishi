@@ -2,16 +2,24 @@ package com.lawsgame.emishitactics.core.helpers.interfaces;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.models.Data.AnimId;
+import com.lawsgame.emishitactics.core.models.Data.AreaColor;
+import com.lawsgame.emishitactics.core.models.Data.Orientation;
+import com.lawsgame.emishitactics.core.models.Data.SparkleType;
+import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
+import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 
-import java.util.HashMap;
-
-public interface SpriteProvider {
+/**
+ * service class which provides:
+ * - well-sized sprite set
+ *  -skins
+ */
+public interface SpriteProvider extends Disposable {
 
     enum AreaSpriteType{
         ANTI_INSIDE_ACUTE,
@@ -25,13 +33,19 @@ public interface SpriteProvider {
         CORNER_OBTUSE
     }
 
+    enum Flavor {
+        NORMAL, TARGETED, DONE
+    }
 
-    Sprite getPortrait(Unit unit);
-    Skin getUISkin();
-    Array<Sprite> getUnitAnimationSS(BattleUnitRenderer unit, Data.AnimId id);
+    Sprite getPortrait(BattleUnitRenderer bur);
+    Sprite getPortrait(UnitTemplate template, boolean promoted);
+    Sprite getPortrait(boolean playerControlled, UnitTemplate template);
     Array<Sprite> getTileSS(Data.TileType type, boolean upper);
-    Array<Sprite> getSparkleSS(Data.SparkleType type);
-    HashMap<AreaSpriteType, Array<Sprite>> getAreaSS(Data.AreaColor color);
+    Array<Sprite> getTileSS(Data.TileSpriteSetId id);
+    Array<Sprite> getUnitAnimationSS(BattleUnitRenderer unit, AnimId id, Flavor flavor);
+    Array<Sprite> getUnitAnimationSS(UnitTemplate template, WeaponType weaponType, boolean character, boolean promoted, boolean playerControlled, Orientation or, AnimId id, boolean warchief, Flavor param);
+    Array<Sprite> getSparkleSS(SparkleType type);
+    Array<Sprite> getAreaSS(AreaColor color, AreaSpriteType type);
     void load(AssetManager asm, Battlefield battlefield);
 
 
