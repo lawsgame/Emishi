@@ -16,7 +16,7 @@ import com.lawsgame.emishitactics.core.helpers.spritetree.GenUnitST;
 import com.lawsgame.emishitactics.core.helpers.spritetree.WeaponBranch;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
+import com.lawsgame.emishitactics.core.models.Data.AnimUnitSSId;
 import com.lawsgame.emishitactics.core.models.Data.AreaColor;
 import com.lawsgame.emishitactics.core.models.Data.SparkleType;
 import com.lawsgame.emishitactics.core.models.Data.TileSpriteSetId;
@@ -257,9 +257,9 @@ public class AssetProvider implements Disposable{
         Array<TextureAtlas.AtlasRegion> animationSet;
         TextureRegion[] animationArray;
         String spriteSetName;
-        for(AnimSpriteSetId id : AnimSpriteSetId.values()){
+        for(AnimUnitSSId id : AnimUnitSSId.values()){
 
-            spriteSetName = Assets.getRegionUnitAction(id, false);
+            spriteSetName = Assets.getRegionUnit(id, false);
             animationSet = unitAtlas.findRegions(spriteSetName);
             if(animationSet.size > 0) {
                 animationArray = new TextureRegion[animationSet.size];
@@ -269,7 +269,7 @@ public class AssetProvider implements Disposable{
                 node.populate(false, id, done, animationArray);
             }
 
-            spriteSetName = Assets.getRegionUnitAction(id, true);
+            spriteSetName = Assets.getRegionUnit(id, true);
             animationSet = unitAtlas.findRegions(spriteSetName);
             if(animationSet.size > 0) {
 

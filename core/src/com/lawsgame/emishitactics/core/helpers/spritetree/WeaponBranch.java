@@ -22,7 +22,7 @@ public class WeaponBranch {
         return false;
     }
 
-    public void populate(boolean east, Data.AnimSpriteSetId id, boolean done, TextureRegion[] spriteSet){
+    public void populate(boolean east, Data.AnimUnitSSId id, boolean done, TextureRegion[] spriteSet){
         for(int i = 0; i < children.size; i++){
             if(children.get(i).east == east){
                 children.get(i).populate(id, spriteSet, done);
@@ -34,7 +34,7 @@ public class WeaponBranch {
         children.add(node);
     }
 
-    public TextureRegion[] getSpriteSet(Data.Orientation or, Data.AnimSpriteSetId id, boolean done){
+    public TextureRegion[] getSpriteSet(Data.Orientation or, Data.AnimUnitSSId id, boolean done){
         TextureRegion[] res = null;
         for(int i = 0; i < children.size; i++){
             if(children.get(i).isCorrect(or)){

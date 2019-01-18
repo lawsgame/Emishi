@@ -148,7 +148,7 @@ public class Data {
      *
      * modifying there names can lead to a asset provider error!
      */
-    public enum AnimSpriteSetId{
+    public enum AnimUnitSSId {
         WALK_FLEE_SWITCHPOSITION                (false),
         LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED(true),
         PUSHED_BACKSTABBED                      (false),
@@ -166,7 +166,7 @@ public class Data {
 
         private boolean rest0;
 
-        AnimSpriteSetId(boolean rest0) {
+        AnimUnitSSId(boolean rest0) {
             this.rest0 = rest0;
         }
 
@@ -177,41 +177,41 @@ public class Data {
 
 
     public enum AnimId {
-        WALK(           AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_WALK_SPEED, false, false),
-        BACKSTAB(       AnimSpriteSetId.PUSHED_BACKSTABBED),
-        TREATED(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        PUSHED(         AnimSpriteSetId.PUSHED_BACKSTABBED),
-        FLEE(           AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, AnimSpriteSetId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_FLEE_SPEED, true, false),
-        PUSH(           AnimSpriteSetId.PUSH),
-        HEAL(           AnimSpriteSetId.HEAL),
-        STEAL(          AnimSpriteSetId.STEAL),
-        BUILD(          AnimSpriteSetId.BUILD),
-        GUARD(          AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        IDLE(           AnimSpriteSetId.REST, AnimSpriteSetId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
-        REGULAR_ATTACK( AnimSpriteSetId.ATTACK),
-        PLUNDER(        AnimSpriteSetId.ATTACK),
-        COVER(          AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        DODGE(          AnimSpriteSetId.DODGE),
-        DIE(            AnimSpriteSetId.DIE),
-        GUARDED(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        WOUNDED(        AnimSpriteSetId.WOUNDED),
-        LEVELUP(        AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        SWITCH_WEAPON(  AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        SPECIAL_MOVE(   AnimSpriteSetId.SPECIAL_MOVE),
-        CHANGE_STRATEGY(AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        PICK_LOOT (     AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        SCAN_AREA(      AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
-        BOOST(  AnimSpriteSetId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
+        WALK(           AnimUnitSSId.WALK_FLEE_SWITCHPOSITION, AnimUnitSSId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_WALK_SPEED, false, false),
+        BACKSTAB(       AnimUnitSSId.PUSHED_BACKSTABBED),
+        TREATED(        AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        PUSHED(         AnimUnitSSId.PUSHED_BACKSTABBED),
+        FLEE(           AnimUnitSSId.WALK_FLEE_SWITCHPOSITION, AnimUnitSSId.WALK_FLEE_SWITCHPOSITION, true, true, ANIMATION_FLEE_SPEED, true, false),
+        PUSH(           AnimUnitSSId.PUSH),
+        HEAL(           AnimUnitSSId.HEAL),
+        STEAL(          AnimUnitSSId.STEAL),
+        BUILD(          AnimUnitSSId.BUILD),
+        GUARD(          AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        IDLE(           AnimUnitSSId.REST, AnimUnitSSId.BANNER, true, true, ANIMATION_NORMAL_SPEED, false, true),
+        REGULAR_ATTACK( AnimUnitSSId.ATTACK),
+        PLUNDER(        AnimUnitSSId.ATTACK),
+        COVER(          AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        DODGE(          AnimUnitSSId.DODGE),
+        DIE(            AnimUnitSSId.DIE),
+        GUARDED(        AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        WOUNDED(        AnimUnitSSId.WOUNDED),
+        LEVELUP(        AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        SWITCH_WEAPON(  AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        SPECIAL_MOVE(   AnimUnitSSId.SPECIAL_MOVE),
+        CHANGE_STRATEGY(AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        PICK_LOOT (     AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        SCAN_AREA(      AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED),
+        BOOST(  AnimUnitSSId.LEVELUP_HEALED_SWITHWEAPON_GUARD_GUARDED);
 
-        AnimSpriteSetId soldierId;
-        AnimSpriteSetId warchiefId;
+        AnimUnitSSId soldierId;
+        AnimUnitSSId warchiefId;
         boolean loop;
         boolean backnforth;
         float speed;
         boolean timeLimited;
         boolean randomlyStarted;
 
-        AnimId(AnimSpriteSetId soldierId, AnimSpriteSetId warchiefId, boolean loop, boolean backnforth, float speed, boolean timeLimited, boolean randomlyStarted) {
+        AnimId(AnimUnitSSId soldierId, AnimUnitSSId warchiefId, boolean loop, boolean backnforth, float speed, boolean timeLimited, boolean randomlyStarted) {
             this.soldierId = soldierId;
             this.warchiefId = warchiefId;
             this.loop = loop;
@@ -221,13 +221,15 @@ public class Data {
             this.randomlyStarted = randomlyStarted;
         }
 
-        AnimId(AnimSpriteSetId id) {
+        AnimId(AnimUnitSSId id) {
             this(id, id, false, false, Data.ANIMATION_NORMAL_SPEED, true, false);
         }
 
-        public AnimSpriteSetId getSpriteSetId(boolean warchief) {
+        public AnimUnitSSId getSpriteSetId(boolean warchief) {
             return (warchief) ?  warchiefId : soldierId;
         }
+
+        public AnimUnitSSId getSpriteSetId(){ return soldierId; }
 
         public boolean isLoop() {
             return loop;

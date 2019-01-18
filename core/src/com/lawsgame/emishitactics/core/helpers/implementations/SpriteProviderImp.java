@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
@@ -21,6 +22,7 @@ import com.lawsgame.emishitactics.core.models.Data.TileSpriteSetId;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
+import com.lawsgame.emishitactics.core.models.Data.AnimUnitSSId;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.datastructures.maps.Map2;
@@ -36,8 +38,10 @@ public class SpriteProviderImp implements SpriteProvider {
     private Map2<AreaColor, AreaSpriteType, Array<TextureRegion>> areaTRs;
     private HashMap<SparkleType, Array<TextureRegion>> sparkleTRs;
     private HashMap<String, TextureRegion> portraitTRs;
-    private Map7<UnitTemplate, WeaponType, Boolean, Boolean, AnimId, Boolean, Flavor, Array<TextureRegion>> characterTRs;
-    private Map7<UnitTemplate, WeaponType, Boolean, Boolean, AnimId, Boolean, Flavor, Array<TextureRegion>> unitTRs;
+    // b1 = promoted?, b2 = east or north oriented?, b3 = warchief?
+    private Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>> characterTRs;
+    // b1 = player controlled?, b2 = east or north oriented?, b3 = warchief?
+    private Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>> unitTRs;
 
     public SpriteProviderImp(float spriteStdSize){
         this.spriteStdSize = spriteStdSize;
@@ -45,8 +49,8 @@ public class SpriteProviderImp implements SpriteProvider {
         this.areaTRs = new Map2<AreaColor, AreaSpriteType, Array<TextureRegion>>();
         this.sparkleTRs = new HashMap<SparkleType, Array<TextureRegion>>();
         this.portraitTRs = new HashMap<String, TextureRegion>();
-        this.characterTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, AnimId, Boolean, Flavor, Array<TextureRegion>>();
-        this.unitTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, AnimId, Boolean, Flavor, Array<TextureRegion>>();
+        this.characterTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>();
+        this.unitTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>();
     }
 
 
@@ -127,26 +131,25 @@ public class SpriteProviderImp implements SpriteProvider {
     }
 
     @Override
-    public Array<Sprite> getUnitAnimationSS(
-            UnitTemplate template,
-            WeaponType weaponType,
-            boolean character,
-            boolean promoted,
-            boolean playerControlled,
-            Orientation or,
-            AnimId id,
-            boolean warchief,
-            Flavor param) {
+    public Array<Sprite> getUnitAnimationSS(UnitTemplate template, WeaponType weaponType,
+                                            boolean character, boolean promoted, boolean playerControlled, Orientation or,
+                                            AnimId id, boolean warchief, Flavor param) {
+
+
+
+
+        //TODO : required a finer filtering >>>
+
         // get regions
         Array<Sprite> sprites = new Array<Sprite>();
         boolean eastNorth = or == Orientation.EAST || or == Data.Orientation.NORTH;
-        Array<TextureRegion> regions = (character) ?
-            this.characterTRs.get(template, weaponType, promoted, eastNorth, id, warchief, param):
-            this.unitTRs.get(template, weaponType, playerControlled, eastNorth, id, warchief, param);
+        Array<AtlasRegion> regions = (character) ?
+            this.characterTRs.get(template, weaponType, promoted, eastNorth, id.getSpriteSetId(), warchief, param):
+            this.unitTRs.get(template, weaponType, playerControlled, eastNorth, id.getSpriteSetId(), warchief, param);
         if(regions == null){
             regions = (character) ?
-                    this.characterTRs.get(template, weaponType, promoted, eastNorth, id, warchief, param):
-                    this.unitTRs.get(template, weaponType, playerControlled, eastNorth, id, warchief, param);
+                    this.characterTRs.get(template, weaponType, promoted, eastNorth, id.getSpriteSetId(), warchief, param):
+                    this.unitTRs.get(template, weaponType, playerControlled, eastNorth, id.getSpriteSetId(), warchief, param);
         }
         // create sprite set
         boolean shortSprite;
@@ -273,33 +276,92 @@ public class SpriteProviderImp implements SpriteProvider {
                 }
             }
 
-            Array<String[]> filenames = getUncheckedFilePath(battlefield);
+            // LOAD UNITS
+
+            Array<String[]> filenamesArray = getCheckedFilePathFromDeployedUnits(battlefield);
             TextureRegion portraitTR;
             String ext = ".pack";
-            for(int i = 0; i < filenames.size; i++){
-                filepath = String.format("%s/%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenames.get(i)[0], filenames.get(i)[1], filenames.get(i)[2], ext);
+            for(int i = 0; i < filenamesArray.size; i++){
+                filepath = String.format("%s/%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenamesArray.get(i)[0], filenamesArray.get(i)[1], filenamesArray.get(i)[2], ext);
+
                 System.out.print("\n"+filepath);
+
                 fileHandle = Gdx.files.internal(filepath);
                 if(fileHandle.exists()){
+
                     System.out.print(" > exists");
+
                     asm.load(filepath, TextureAtlas.class);
                     asm.finishLoading();
                     atlas =  asm.get(filepath, TextureAtlas.class);
                     if(atlas != null){
                         portraitTR = atlas.findRegion(Assets.REGION_UNIT_PORTRAIT);
                         if (portraitTR != null) {
-                            this.portraitTRs.put(filenames.get(i)[0] + "_" + filenames.get(i)[2], portraitTR);
+                            this.portraitTRs.put(filenamesArray.get(i)[0] + "_" + filenamesArray.get(i)[2], portraitTR);
                         }
+                        fetchAndStoreUnitSpriteSetsIntoMaps(filenamesArray.get(i), atlas);
+                    }
+                }
+            }
+
+            System.out.println(characterTRs);
+            System.out.println();
+            System.out.println(unitTRs);
+        }
+    }
 
 
-                        // TODO: unit animations sprites
+    /**
+     * from the filenames, fill maps with all relevant SS for the unit
+     * from its associated atlas given as parameter
+     *
+     * @param filenames
+     * @param unitAtlas
+     */
+    private void fetchAndStoreUnitSpriteSetsIntoMaps(String[] filenames, TextureAtlas unitAtlas){
+        boolean isCharacter = filenames[2].equals("promoted") || filenames[2].equals("recruit");
+        UnitTemplate template = UnitTemplate.valueOf(filenames[0].toUpperCase());
+        WeaponType weaponType = WeaponType.valueOf(filenames[1].toUpperCase());
+        boolean promotedPC = filenames[2].equals("promoted") || filenames[2].equals("pc");
+        AnimUnitSSId ssMapid;
+        Flavor flavor;
+        String ssAtlasid;
+        Array<TextureAtlas.AtlasRegion> ss;
+        for(int i = 0; i < Data.AnimUnitSSId.values().length; i++){
+            for(int j = 0; j < Flavor.values().length; j++) {
+                ssMapid = AnimUnitSSId.values()[i];
+                flavor = Flavor.values()[j];
+                // for each couple (or, warchief) => put the SS if exists
+                boolean eastNorth;
+                boolean warchief;
+                for(int k = 0; k < 4; k++) {
+                    eastNorth = (k & 1) == 1;
+                    warchief = (k >> 1) == 1;
+                    ssAtlasid = Assets.getRegionUnit(ssMapid, eastNorth, warchief, flavor);
+                    ss = unitAtlas.findRegions(ssAtlasid);
+                    if (ss != null && ss.size > 0) {
+                        if (isCharacter) {
+                            characterTRs.put(template, weaponType, promotedPC, eastNorth, ssMapid, warchief, flavor, ss);
+                        } else {
+                            unitTRs.put(template, weaponType, promotedPC, eastNorth, ssMapid, warchief, flavor, ss);
+                        }
                     }
                 }
             }
         }
     }
 
-    private Array<String[]> getUncheckedFilePath(Battlefield battlefield) {
+
+    /**
+     * Taking the state of the battlefield,
+     * this method create all assoicated filepaths which would point to the altases
+     * which holds the sprites to render the deployed units
+     *
+     *
+     * @param battlefield
+     * @return
+     */
+    private Array<String[]> getCheckedFilePathFromDeployedUnits(Battlefield battlefield) {
         Array<String[]> filenames = new Array<String[]>();
 
         // default unit sprites sheet location
@@ -313,21 +375,30 @@ public class SpriteProviderImp implements SpriteProvider {
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
                 if (battlefield.isTileOccupied(r, c)) {
                     unit = battlefield.getUnit(r, c);
-                    addFilePathFrom(unit, filenames);
+                    addUnitAssociatedFilePath(unit, filenames);
                 }
                 if(battlefield.isTileExisted(r, c) && battlefield.getTile(r, c).isHidingRecruit()){
                     unit = battlefield.getTile(r,c).getRecruit(false);
-                    addFilePathFrom(unit, filenames);
+                    addUnitAssociatedFilePath(unit, filenames);
                 }
                 //TODO: add reinforcements
 
 
             }
         }
-        return filenames;
+        // remove clone paths'names
+        return Utils.arrayRemoveClassTableClones(filenames);
     }
 
-    private void addFilePathFrom(Unit unit, Array<String[]> filenames){
+    /**
+     * add the array of designations of the parent folders
+     * which contains the atlas holding the sprites to render the given unit
+     * to the array filenames
+     *
+     * @param unit
+     * @param filenames
+     */
+    private void addUnitAssociatedFilePath(Unit unit, Array<String[]> filenames){
         // create filepath
         String[] filename = new String[3];
         filename[0] = unit.getTemplate().name().toLowerCase();

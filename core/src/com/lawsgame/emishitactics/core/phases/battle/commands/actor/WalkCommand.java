@@ -56,7 +56,6 @@ public class WalkCommand extends ActorCommand {
                 }
             }
         }
-        //System.out.println("    Is move without event ok (no event triggered)? "+!isEventTriggered());
         if(!isEventTriggered()){
             moveCommand = new MoveCommand(bfr, scheduler, getOutcome().playerInventory, subpath, false);
             moveCommand.setFree(true);

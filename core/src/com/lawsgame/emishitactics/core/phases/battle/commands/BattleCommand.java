@@ -262,6 +262,7 @@ public abstract class BattleCommand extends Observable implements Observer {
     protected final void handleEvents(Object data, int row, int col){
         eventTriggered = eventTriggered || isAnyEventTriggerable(data, row, col);
         handleEvents(data, row, col, false);
+
     }
 
 

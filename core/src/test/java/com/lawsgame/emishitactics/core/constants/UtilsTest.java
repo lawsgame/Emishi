@@ -8,9 +8,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.LinkedList;
-import java.util.TreeMap;
+import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -123,12 +123,13 @@ public class UtilsTest {
     }
 
     @Test
-    public void testRemoveClones(){
-        Utils.arrayRemoveClones(a2);
+    public void testRemoveIntTableClones(){
+        Utils.arrayRemoveIntTableClones(a2);
 
-        assertTrue(a2.size == 4);
+        assertEquals(a2.size, 4);
         assertTrue(Utils.arrayContains(a2 , new int[]{2,5}));
     }
+
 
     @Test
     public void testArrayGetElementsInBothOnly(){

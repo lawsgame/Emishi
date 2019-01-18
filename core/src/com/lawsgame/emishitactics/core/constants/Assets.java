@@ -1,9 +1,9 @@
 package com.lawsgame.emishitactics.core.constants;
 
+import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.AreaType;
-import com.lawsgame.emishitactics.core.models.Data.TileType;
-import com.lawsgame.emishitactics.core.models.Data.AnimSpriteSetId;
+import com.lawsgame.emishitactics.core.models.Data.AnimUnitSSId;
 
 public class Assets {
 
@@ -40,10 +40,14 @@ public class Assets {
         return "map"+id;
     }
     public static String getRegionTile(Data.TileSpriteSetId tileType) { return tileType.name().toLowerCase(); }
-    public static String getTileHighlighted(AreaType id){
-        return id.name().toLowerCase();
+    public static String getTileHighlighted(AreaType id){ return id.name().toLowerCase(); }
+    public static String getRegionUnit(AnimUnitSSId id, boolean east){ return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south"); }
+    public static String getRegionUnit(Data.AnimUnitSSId id, boolean eastNorth, boolean warchief, SpriteProvider.Flavor flavor){
+        return id.name().split("_")[0].toLowerCase()
+                + ((eastNorth)? "_east" : "_south")
+                + ((flavor == SpriteProvider.Flavor.NORMAL)? "" : "_"+flavor.name().toLowerCase())
+                + ((warchief)? "_warchief" :"");
     }
-    public static String getRegionUnitAction(AnimSpriteSetId id, boolean east){ return id.name().split("_")[0].toLowerCase()+ "_" +((east)? "east" : "south"); }
     public static String getWindroseArrowTexture(boolean active, boolean north){ return String.format("arrow_%s_%s", (north) ? "north": "west", (active) ? "active": "inactive"); }
     public static String getSparkleTR(Data.SparkleType sparkleType) { return "sparkle_"+sparkleType.name().toLowerCase();}
     public static final String REGION_TERRAINS_UNDEFINED = "undefined";

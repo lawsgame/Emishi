@@ -246,7 +246,21 @@ public class Utils {
         return removedIndex;
     }
 
-    public static Array<int[]> arrayRemoveClones(Array<int[]> array) {
+    public static Array<int[]> arrayRemoveIntTableClones(Array<int[]> array) {
+        if(array != null) {
+            for (int i = 0; i < array.size; i++) {
+                for (int j = i + 1; j < array.size; j++) {
+                    if (Arrays.equals(array.get(i), array.get(j))) {
+                        array.removeIndex(j);
+                        j--;
+                    }
+                }
+            }
+        }
+        return array;
+    }
+
+    public static <T> Array<T[]> arrayRemoveClassTableClones(Array<T[]> array) {
         if(array != null) {
             for (int i = 0; i < array.size; i++) {
                 for (int j = i + 1; j < array.size; j++) {

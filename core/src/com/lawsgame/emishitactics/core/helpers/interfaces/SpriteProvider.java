@@ -34,7 +34,7 @@ public interface SpriteProvider extends Disposable {
     }
 
     enum Flavor {
-        NORMAL, TARGETED, DONE
+        NORMAL, WHITEBG, DONE
     }
 
     Sprite getPortrait(BattleUnitRenderer bur);

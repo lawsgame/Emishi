@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.implementations.SpriteProviderImp;
 import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -28,6 +30,7 @@ public class TestAssetBIS extends BattleInteractionState {
 
         this.spriteProvider = new SpriteProviderImp(IsoBFR.SPRITE_STD_SIZE);
         this.spriteProvider.load(bim.asm, bim.bfr.getModel());
+        this.sprites = new Array<Sprite>();
 
         /*
         Array<TextureRegion> atr = ((IsoBFR)bim.bfr).assetProvider.sparkleTR.get(Data.SparkleType.LOOT);
@@ -41,28 +44,54 @@ public class TestAssetBIS extends BattleInteractionState {
         }
         */
 
-
+        /*
         this.sprites = spriteProvider.getSparkleSS(Data.SparkleType.LOOT);
         for(int i = 0; i < sprites.size; i++){
             sprites.get(i).setPosition(1, 1);
         }
         this.animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
         this.animation.play();
+        */
 
         //this.sprite = spriteProvider.getPortrait(bim.bfr.getUnitRenderer(bim.player.getArmy().getWarlord()));
-        this.sprite = spriteProvider.getPortrait(false, Data.UnitTemplate.SOLAR_KNIGHT);
-        this.sprite.setSize(2,2);
-        this.sprite.setPosition(2,2);
+        //this.sprite = spriteProvider.getPortrait(false, Data.UnitTemplate.SOLAR_KNIGHT);
+        //this.sprite.setSize(2,2);
+        //this.sprite.setPosition(2,2);
+
+        /*
+        String path = Assets.UNIT_SPRITES_DIR+"/solaire/sword/promoted.pack";
+        bim.asm.load(path, TextureAtlas.class);
+        bim.asm.finishLoading();
+        String id;
+        Sprite sprite;
+        this.sprites = new Array<Sprite>();
+        if(bim.asm.isLoaded(path)){
+            TextureAtlas atlas = bim.asm.get(path);
+            id = Assets.getRegionUnit(Data.AnimUnitSSId.REST, true, true, SpriteProvider.Flavor.WHITEBG);
+            Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions(id);
+            for(int i = 0; i < regions.size; i++){
+                sprite = new Sprite(regions.get(i));
+                sprite.setSize(2,2);
+                sprite.setPosition(2,2);
+                sprites.add(sprite);
+            }
+        }
+        this.animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
+        this.animation.play();
+        */
+
+
+
+
 
 
     }
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        sprites.get(animation.getCurrentFrame()).draw(batch);
-        if(sprite != null){
-            sprite.draw(batch);
-        }
+        if(sprites.size > 0)    sprites.get(animation.getCurrentFrame()).draw(batch);
+        if(sprite != null)      sprite.draw(batch);
+
     }
 
     @Override
@@ -72,7 +101,7 @@ public class TestAssetBIS extends BattleInteractionState {
 
     @Override
     public void update60(float dt) {
-        animation.update(dt);
+        if(animation != null)    animation.update(dt);
         if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
             animation.setSpeed(animation.getSpeed() * (1f - ANIM_DELTA_SPEED));
             System.out.println("animation speed : "+animation.getSpeed()+"s");

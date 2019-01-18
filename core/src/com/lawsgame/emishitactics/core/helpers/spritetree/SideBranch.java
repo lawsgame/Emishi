@@ -37,25 +37,25 @@ public class SideBranch {
                   Data.UnitTemplate template,
                   Data.WeaponType type,
                   boolean east,
-                  Data.AnimSpriteSetId animSpriteSetId,
+                  Data.AnimUnitSSId animUnitSSId,
                   boolean done,
                   TextureRegion[] spriteSet){
         for(int i = 0; i < children.size; i++){
             if(children.get(i).shieldbearer == shield){
-                children.get(i).populate(horseman, template, type, east, animSpriteSetId, spriteSet, done);
+                children.get(i).populate(horseman, template, type, east, animUnitSSId, spriteSet, done);
                 return;
             }
         }
         ShieldedBranch node = new ShieldedBranch(shield);
-        node.populate(horseman, template, type, east, animSpriteSetId, spriteSet, done);
+        node.populate(horseman, template, type, east, animUnitSSId, spriteSet, done);
         children.add(node);
     }
 
-    void populate(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.AnimSpriteSetId animSpriteSetId, TextureRegion[] spriteSet){
-        populate(shield, horseman, template, type, east, animSpriteSetId, true, spriteSet);
+    void populate(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, boolean east, Data.AnimUnitSSId animUnitSSId, TextureRegion[] spriteSet){
+        populate(shield, horseman, template, type, east, animUnitSSId, true, spriteSet);
     }
 
-    public TextureRegion[] getSpriteSet(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimSpriteSetId id){
+    public TextureRegion[] getSpriteSet(boolean shield, boolean horseman, Data.UnitTemplate template, Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimUnitSSId id){
         TextureRegion[] res = null;
         for(int i = 0; i < children.size; i++){
             if(children.get(i).shieldbearer == shield){

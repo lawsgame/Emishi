@@ -66,252 +66,252 @@ attack_south
   orig: 64, 64
   offset: 0, 0
   index: 3
-banner_done_east
+build_east
   rotate: false
   xy: 128, 256
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 0
-banner_done_east
+build_east
   rotate: false
   xy: 192, 320
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-banner_done_east
+build_east
   rotate: false
   xy: 256, 384
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 2
-banner_done_north
+build_south
   rotate: false
   xy: 320, 448
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 0
-banner_done_north
+build_south
   rotate: false
   xy: 0, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-banner_done_north
+build_south
   rotate: false
   xy: 0, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 2
-banner_east
+die_east
   rotate: false
   xy: 64, 128
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 0
-banner_east
+  index: 1
+die_east
   rotate: false
   xy: 128, 192
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 1
-banner_east
+  index: 2
+die_south
   rotate: false
   xy: 192, 256
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-banner_south
+  index: 1
+die_south
   rotate: false
   xy: 256, 320
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 0
-banner_south
+  index: 2
+dodge_east
   rotate: false
   xy: 320, 384
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 1
-banner_south
+  index: 0
+dodge_east
   rotate: false
   xy: 384, 448
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-banner_targeted_east
+  index: 1
+dodge_south
   rotate: false
   xy: 64, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 0
-banner_targeted_east
+dodge_south
   rotate: false
   xy: 64, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-banner_targeted_east
+push_east
   rotate: false
   xy: 128, 128
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-banner_targeted_north
+  index: 1
+push_east
   rotate: false
   xy: 192, 192
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 0
-banner_targeted_north
+  index: 2
+push_south
   rotate: false
   xy: 256, 256
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-banner_targeted_north
-  rotate: false
-  xy: 256, 256
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: 2
-build_east
+push_south
   rotate: false
   xy: 320, 320
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 0
-build_east
+  index: 2
+rest_east_done_warchief
   rotate: false
   xy: 384, 384
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 1
-build_east
+  index: 0
+rest_east_done_warchief
   rotate: false
   xy: 448, 448
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-build_south
+  index: 1
+rest_east_done_warchief
   rotate: false
   xy: 128, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 0
-build_south
+  index: 2
+rest_east_warchief
   rotate: false
   xy: 128, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 1
-build_south
+  index: 0
+rest_east_warchief_1-44
   rotate: false
   xy: 192, 128
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-die_east
+  index: -1
+rest_east_warchief
   rotate: false
   xy: 256, 192
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-die_east
+rest_east_warchief_2-45
   rotate: false
   xy: 320, 256
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-die_south
+  index: -1
+rest_east_warchief
   rotate: false
   xy: 384, 320
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 1
-die_south
+  index: 2
+rest_east_whitebg_warchief
   rotate: false
   xy: 448, 384
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-dodge_east
+  index: 0
+rest_east_whitebg_warchief
   rotate: false
   xy: 512, 448
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 0
-dodge_east
+  index: 1
+rest_east_whitebg_warchief
   rotate: false
   xy: 192, 64
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 1
-dodge_south
+  index: 2
+rest_south_done_warchief
   rotate: false
   xy: 192, 0
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 0
-dodge_south
+rest_south_done_warchief
   rotate: false
   xy: 256, 128
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-push_east
+rest_south_done_warchief
   rotate: false
   xy: 320, 192
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 1
-push_east
+  index: 2
+rest_south_warchief
   rotate: false
   xy: 384, 256
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: 2
-push_south
+  index: 0
+rest_south_whitebg_warchief
   rotate: false
   xy: 448, 320
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
+  index: 0
+rest_south_whitebg_warchief
+  rotate: false
+  xy: 512, 384
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
   index: 1
-push_south
+rest_south_whitebg_warchief
   rotate: false
   xy: 512, 384
   size: 64, 64
@@ -570,63 +570,63 @@ push_south
   orig: 32, 64
   offset: 0, 0
   index: 0
-rest_done_east
+rest_east
   rotate: false
   xy: 576, 192
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 0
-rest_done_east
+rest_east
   rotate: false
   xy: 640, 256
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 1
-rest_done_east
+rest_east
   rotate: false
   xy: 672, 320
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 2
-rest_done_north
+rest_east_done
   rotate: false
   xy: 736, 384
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 0
-rest_done_north
+rest_east_done
   rotate: false
   xy: 800, 448
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 1
-rest_done_north
+rest_east_done
   rotate: false
   xy: 480, 64
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 2
-rest_east
+rest_east_whitebg
   rotate: false
   xy: 480, 0
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 0
-rest_east
+rest_east_whitebg
   rotate: false
   xy: 544, 128
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 1
-rest_east
+rest_east_whitebg
   rotate: false
   xy: 608, 192
   size: 32, 64
@@ -654,42 +654,42 @@ rest_south
   orig: 32, 64
   offset: 0, 0
   index: 2
-rest_targeted_east
+rest_south_done
   rotate: false
   xy: 832, 448
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 0
-rest_targeted_east
+rest_south_done
   rotate: false
   xy: 512, 64
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 1
-rest_targeted_east
+rest_south_done
   rotate: false
   xy: 512, 0
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 2
-rest_targeted_north
+rest_south_whitebg
   rotate: false
   xy: 576, 128
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 0
-rest_targeted_north
+rest_south_whitebg
   rotate: false
   xy: 640, 192
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 1
-rest_targeted_north
+rest_south_whitebg
   rotate: false
   xy: 640, 192
   size: 32, 64
@@ -745,21 +745,21 @@ wounded_east
   orig: 32, 64
   offset: 0, 0
   index: 0
-wounded_south
+wounded_east_whitebg
   rotate: false
   xy: 672, 192
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 0
-wounded_targered_north
+wounded_south
   rotate: false
   xy: 736, 256
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: 0
-wounded_targeted_east
+wounded_south_whitebg
   rotate: false
   xy: 768, 320
   size: 32, 64

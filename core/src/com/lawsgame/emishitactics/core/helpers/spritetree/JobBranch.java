@@ -33,7 +33,7 @@ public class JobBranch {
         return null;
     }
 
-    public void populate(Data.WeaponType type, boolean east, Data.AnimSpriteSetId id, TextureRegion[] spriteSet, boolean done){
+    public void populate(Data.WeaponType type, boolean east, Data.AnimUnitSSId id, TextureRegion[] spriteSet, boolean done){
         for(int i = 0; i < children.size; i++){
             if(children.get(i).type == type){
                 children.get(i).populate(east, id, done, spriteSet);
@@ -45,7 +45,7 @@ public class JobBranch {
         children.add(node);
     }
 
-    public TextureRegion[] getSpriteSet(Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimSpriteSetId id){
+    public TextureRegion[] getSpriteSet(Data.WeaponType type, Data.Orientation or, boolean done, Data.AnimUnitSSId id){
         TextureRegion[] res = null;
         for(int i = 0; i < children.size; i++){
             if(children.get(i).type == type){

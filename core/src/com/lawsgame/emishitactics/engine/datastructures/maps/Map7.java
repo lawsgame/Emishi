@@ -45,4 +45,40 @@ public class Map7<A, B, C, D, E, F, G, H> {
         }
         return null;
     }
+
+    @Override
+    public String toString(){
+        StringBuilder res = new StringBuilder("\nMap 7 =");
+        for(A a : innerMap.keySet()){
+            res.append("\n  ");
+            res.append(a.toString());
+            for(B b : innerMap.get(a).keySet()){
+                res.append((innerMap.get(a).keySet().size() == 1) ? " : " : "\n    ");
+                res.append(b.toString());
+                for(C c : innerMap.get(a).get(b).keySet()){
+                    res.append((innerMap.get(a).get(b).keySet().size() == 1) ? " : " : "\n      ");
+                    res.append(c.toString());
+                    for(D d : innerMap.get(a).get(b).get(c).keySet()){
+                        res.append((innerMap.get(a).get(b).get(c).keySet().size() == 1) ? " : " : "\n        ");
+                        res.append(d.toString());
+                        for(E e : innerMap.get(a).get(b).get(c).get(d).keySet()){
+                            res.append((innerMap.get(a).get(b).get(c).get(d).keySet().size() == 1) ? " : " : "\n          ");
+                            res.append(e.toString());
+                            for(F f : innerMap.get(a).get(b).get(c).get(d).get(e).keySet()){
+                                res.append((innerMap.get(a).get(b).get(c).get(d).get(e).keySet().size() == 1) ? " : " : "\n            ");
+                                res.append(f.toString());
+                                for(G g : innerMap.get(a).get(b).get(c).get(d).get(e).get(f).keySet()){
+                                    res.append((innerMap.get(a).get(b).get(c).get(d).get(e).get(f).keySet().size() == 1) ? " : " : "\n              ");
+                                    res.append(g.toString());
+                                    res.append(" : ");
+                                    res.append(innerMap.get(a).get(b).get(c).get(d).get(e).get(f).get(g).toString());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return res.toString();
+    }
 }
