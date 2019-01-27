@@ -32,6 +32,8 @@ import com.lawsgame.emishitactics.core.models.battlesolvers.KillAll;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
+import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent.StiffenerData;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
@@ -45,9 +47,11 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class SimpleBattlefieldLoader implements BattlefieldLoader {
-    private static XmlReader reader = new XmlReader();
-    private static Array<String> nameDictionary = new Array<String>();
-    private static boolean dictionariesLoaded = false;
+    private XmlReader reader = new XmlReader();
+    private Array<String> nameDictionary = new Array<String>();
+    private boolean dictionariesLoaded = false;
+    private HashMap<Integer, Array<StiffenerData>> stiffeners = new HashMap<Integer, Array<StiffenerData>>();
+
 
 
     // ------------- LOAD BATTLEFIELD ------------------
@@ -177,7 +181,7 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                         for (int n = 0; n < squadElts.get(k).getChildCount(); n++) {
                             unitElt = squadElts.get(k).getChild(n);
                             // instanciation unit
-                            unit = getUnitFrom(unitElt);
+                            unit = instanciate(unitElt);
                             // add to the army composition
                             army.add(unit);
                             if(n == 0){
@@ -190,25 +194,16 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                                 army.appointSoldier(unit, k);
                             }
                             //add  to the battlefield
-                            int rowUnit = unitElt.getInt("row");
-                            int colUnit = unitElt.getInt("col");
-                            if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
-                                bf.deploy(rowUnit, colUnit, unit, true);
-                            }
+                            addUniToBattlefield(unit, unitElt, bf);
                         }
                     }
                     Array<XmlReader.Element> skirmisherElts = armyElt.getChildByName("Skirmishers").getChildrenByName("Unit");
                     for (int k = 0; k < skirmisherElts.size; k++) {
                         unitElt = skirmisherElts.get(k);
-                        unit = getUnitFrom(unitElt);
+                        unit = instanciate(unitElt);
                         army.add(unit);
                         army.appointSkirmisher(unit);
-                        int rowUnit = unitElt.getInt("row");
-                        int colUnit = unitElt.getInt("col");
-                        if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
-                            bf.deploy(rowUnit, colUnit, unit, true);
-                        }
-
+                        addUniToBattlefield(unit, unitElt, bf);
                     }
 
                 }
@@ -251,7 +246,7 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                     recruitElt  = recruitElts.get(i);
                     recruitRow = recruitElt.getInt("row", -1);
                     recruitCol = recruitElt.getInt("col", -1);
-                    recruit = getUnitFrom(recruitElt);
+                    recruit = instanciate(recruitElt);
                     if(bf.isTileExisted(recruitRow, recruitCol) && recruit != null) {
                         bf.getTile(recruitRow, recruitCol).setRecruit(recruit);
                     }
@@ -262,14 +257,31 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
             e.printStackTrace();
         }
 
-        unloadNameDictionary();
         layoutAtlas.dispose();
         layoutPixmap.dispose();
         layoutTexture.dispose();
         return bf;
     }
 
-    private static Unit getUnitFrom(XmlReader.Element unitElt){
+    private void addUniToBattlefield(Unit unit, XmlReader.Element unitElt, Battlefield bf){
+        int rowUnit = unitElt.getInt("row");
+        int colUnit = unitElt.getInt("col");
+        if(unitElt.getName().equals("Unit")) {
+            if (!bf.isTileDeploymentTile(rowUnit, colUnit)) {
+                bf.deploy(rowUnit, colUnit, unit, true);
+            }
+        }else{
+            int reinforcmentId = unitElt.getInt("idReinforcement");
+            int entryRow = unitElt.getInt("entryRow");
+            int entryCol = unitElt.getInt("entryCol");
+            if(stiffeners.get(reinforcmentId) == null){
+                stiffeners.put(reinforcmentId, new Array<StiffenerData>());
+            }
+            stiffeners.get(reinforcmentId).add(new StiffenerData(entryRow, entryCol, rowUnit, colUnit, unit));
+        }
+    }
+
+    private Unit instanciate(XmlReader.Element unitElt){
         Unit unit;
 
         // get all attributes requires to instanciate a unit
@@ -282,9 +294,9 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
         boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
         boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
         UnitTemplate unitTemplate = EnumUtils.getEnum(UnitTemplate.class, unitElt.get("template"));
-        if(unitTemplate != null) unitTemplate = UnitTemplate.getDefaultValue(character);
+        if(unitTemplate == null) unitTemplate = UnitTemplate.getDefaultValue(character);
         WeaponType weaponType = EnumUtils.getEnum(WeaponType.class, unitElt.get("weaponType"));
-        if(weaponType != null) weaponType = WeaponType.getDefaultValue();
+        if(weaponType == null) weaponType = WeaponType.getDefaultValue();
 
         // create unit instance
         unit = (character)?
@@ -419,6 +431,23 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                 // REINFORCEMENTS
 
 
+                Array<XmlReader.Element> reienforcementEvents = battleElt.getChildrenByName("Rienforcement");
+                ReinforcementEvent reienforcementEvent;
+                String armyTurn;
+                int idReinforcement;
+                Array<StiffenerData> data;
+                for(int i = 0; i < reienforcementEvents.size; i++){
+                    turn = reienforcementEvents.get(i).getInt("turn");
+                    armyTurn = reienforcementEvents.get(i).get("armyTurn");
+                    idReinforcement = reienforcementEvents.get(i).getInt("id");
+                    if(turn > 0){
+                        reienforcementEvent = ReinforcementEvent.addTrigger(turn, bfr, scheduler, inventory, bfr.getModel().getTurnSolver().getArmyByName(armyTurn));
+                        data = stiffeners.get(idReinforcement);
+                        for(int j = 0; j < data.size; j++){
+                            reienforcementEvent.addStiffener(data.get(j));
+                        }
+                    }
+                }
             }
 
         } catch (IOException e) {
@@ -430,7 +459,7 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
 
     // ------------- LOAD DICTIONARIES ------------------
 
-    public static void loadNameDictionary(){
+    public void loadNameDictionary(){
         XmlReader reader = new XmlReader();
 
         if(!dictionariesLoaded) {
@@ -449,9 +478,6 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
 
     }
 
-    public static void unloadNameDictionary(){
-        nameDictionary.clear();
-    }
 
 
 }

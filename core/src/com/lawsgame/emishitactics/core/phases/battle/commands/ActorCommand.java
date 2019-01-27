@@ -121,22 +121,6 @@ public abstract class ActorCommand extends BattleCommand{
             // actor pays the cost of performing this action
             if(!costless) {
                 initiator.addActionPoints(-choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
-                outcome.clean();
-                outcome.resolve();
-
-
-                System.out.println("\n              -----***$$ BEGIN $$***-----");
-                System.out.println("\nACTION REPORT of "+initiator.getName()+" performing "+choice.name());
-                System.out.println();
-                if(!isDecoupled())
-                    System.out.println(scheduler);
-                else{
-                    System.out.println(showTask());
-                }
-                System.out.println(outcome);
-                System.out.println("\nEvent triggered while performing this command ? "+isEventTriggered());
-                System.out.println("\n              ------***$$ END $$***------\n");
-
             }
             // clean and solve the outcome
             outcome.clean();

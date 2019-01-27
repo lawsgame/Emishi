@@ -105,7 +105,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         // -------***<<< OTHER TESTS >>>***------------------
 
         //bfr.getModel().getTile(14,7).setLoot(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        //bfr.getModel().getTile(10,7).setRecruit(new Unit("Alfred", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD));
+        //bfr.getModel().getTile(10,7).setRecruit(new unit("Alfred", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD));
         bfr.displayAllTraps();
         bfr.displayAllLoots();
 

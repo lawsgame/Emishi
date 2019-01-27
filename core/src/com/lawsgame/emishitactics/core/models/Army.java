@@ -332,9 +332,9 @@ public class Army extends MilitaryForce {
 
     /**
      *  if not yet contain in the army
-     *      0) remove the Unit for its former army if relevant.
-     *      1) addExpGained Unit to non-mobilized troops
-     *      2) addExpGained army attribute of the Unit
+     *      0) remove the unit for its former army if relevant.
+     *      1) addExpGained unit to non-mobilized troops
+     *      2) addExpGained army attribute of the unit
      *
      * @param unit
      * @return
@@ -515,17 +515,17 @@ public class Army extends MilitaryForce {
 
 
     /**
-     * disengagement consist in removing a Unit form the mobilized army
-     * 1) FIRST we performEvent that the given Unit is:
+     * disengagement consist in removing a unit form the mobilized army
+     * 1) FIRST we performEvent that the given unit is:
      *  - not null
      *  - mobilized
      *  - not a warlord
      *
-     * 2) Then the method fetch the squad's Unit and the Unit indexes
+     * 2) Then the method fetch the squad's unit and the unit indexes
      *
      * 3) then IF those indexes have been founded, 2 cases could rise:
-     *      IF the Unit is a war chief THEN the whole squad is demobilized
-     *      ELSE the Unit is demobilized
+     *      IF the unit is a war chief THEN the whole squad is demobilized
+     *      ELSE the unit is demobilized
      *
      *
      * @param unit

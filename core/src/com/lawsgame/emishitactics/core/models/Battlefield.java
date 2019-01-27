@@ -1218,14 +1218,14 @@ public class Battlefield extends Model {
         str +="\n\nAREAS : ";
         for(int i = 0; i< unitAreas.size; i++){
             if(unitAreas.get(i).holdEventTrigger())
-                str += "\n"+unitAreas.get(i).triggerToString();
+                str += "\n  "+unitAreas.get(i).triggerToString();
         }
 
         str +="\n\nUNITS : ";
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileOccupied(r,c) && getUnit(r, c).holdEventTrigger())
-                    str += "\n"+getUnit(r, c).triggerToString();
+                    str += "\n  "+getUnit(r, c).triggerToString();
             }
         }
 
@@ -1233,7 +1233,7 @@ public class Battlefield extends Model {
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
                 if(isTileExisted(r,c) && getTile(r, c).holdEventTrigger())
-                    str += "\n"+getTile(r, c).triggerToString();
+                    str += "\n  "+getTile(r, c).triggerToString();
             }
         }
         return str;

@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.event;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Notification;
@@ -14,18 +15,12 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 
 public class ReinforcementEvent extends BattleCommand {
-    private Array<Unit> reinforcements;
-    private Array<int[]> entryPoints;
-    private Array<int[]> deploymentPositions;
-    private Array<Array<int[]>> paths;
+    private Array<StiffenerData> stiffenerData;
 
 
     public ReinforcementEvent(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory) {
         super(bfr, scheduler, playerInventory);
-        this.reinforcements = new Array<Unit>();
-        this.entryPoints = new Array<int[]>();
-        this.deploymentPositions = new Array<int[]>();
-        this.paths = new Array<Array<int[]>>();
+        this.stiffenerData = new Array<StiffenerData>();
     }
 
     public static ReinforcementEvent addTrigger(final int turn, final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, final MilitaryForce currentArmy){
@@ -34,6 +29,11 @@ public class ReinforcementEvent extends BattleCommand {
             @Override
             public boolean isTriggerable(Object data) {
                 return data instanceof Notification.BeginArmyTurn && bfr.getModel().getTurnSolver().getCurrentArmy() == currentArmy && turn <= bfr.getModel().getTurnSolver().getTurn();
+            }
+
+            @Override
+            public String toString(){
+                return "Reinforcmeent Trigger on turn "+turn+" at the beginning of the turn of " +currentArmy.getName();
             }
         };
         bfr.getModel().add(trigger);
@@ -49,14 +49,22 @@ public class ReinforcementEvent extends BattleCommand {
      * @param deploymentRow : reachable tile row where the unit stand at the end of his move
      * @param deploymentCol : reachable tile col where the unit stand at the end of his move
      */
-    public void addStiffeners(Unit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){
-        reinforcements.add(unit);
-        entryPoints.add(new int[]{entryRow, entryCol});
-        deploymentPositions.add(new int[]{deploymentRow, deploymentCol});
+    public void addStiffener(Unit unit, int entryRow, int  entryCol, int deploymentRow, int deploymentCol){
+        addStiffener(new StiffenerData(entryRow, entryCol, deploymentRow, deploymentCol, unit));
+    }
+
+    public void addStiffener(StiffenerData data){
+        if(data.isValid(bfr.getModel())) {
+            stiffenerData.add(data);
+        }
     }
 
     @Override
     protected void execute() {
+        Array<int[]> deploymentPositions = new Array<int[]>();
+        for(int i = 0; i < stiffenerData.size; i++){
+            deploymentPositions.add(new int[]{stiffenerData.get(i).deployRow, stiffenerData.get(i).deployCol});
+        }
         float[] focusPoint = bfr.getCentriod(deploymentPositions);
         scheduleCameraTrip(focusPoint[0], focusPoint[1], Data.CAM_WAITING_TIME_BEFORE_PROCEEDING_TO_THE_NEXT_ACTION);
 
@@ -64,18 +72,18 @@ public class ReinforcementEvent extends BattleCommand {
         StandardTask deployTask = new StandardTask();
         StandardTask.RendererSubTaskQueue thread;
         Notification.UnitAppears eventNotif = new Notification.UnitAppears();
-        for(int i = 0; i < reinforcements.size; i++) {
+        for(int i = 0; i < stiffenerData.size; i++) {
             //update model
-            unit = reinforcements.get(i);
+            unit = stiffenerData.get(i).unit;
             bfr.getModel().deploy(deploymentPositions.get(i)[0], deploymentPositions.get(i)[1], unit, false);
             eventNotif.newlyDeployed.add(unit);
             //set renderers
-            BattleUnitRenderer bur = bfr.addUnitRenderer(entryPoints.get(i)[0], entryPoints.get(i)[1], unit);
+            BattleUnitRenderer bur = bfr.addUnitRenderer(stiffenerData.get(i).entryRow, stiffenerData.get(i).entryCol, unit);
             bur.setVisible(false);
             // push render task
             thread = new StandardTask.RendererSubTaskQueue(bfr.getUnitRenderer(unit));
             thread.addQuery(Notification.Visible.get(true));
-            thread.addQuery(bfr.getModel(), new Notification.Walk(unit, paths.get(i), true));
+            thread.addQuery(bfr.getModel(), new Notification.Walk(unit, stiffenerData.get(i).path, true));
             deployTask.addParallelSubTask(thread);
         }
         scheduleRenderTask(deployTask);
@@ -87,39 +95,42 @@ public class ReinforcementEvent extends BattleCommand {
 
     @Override
     public boolean isApplicable() {
-        paths.clear();
         Array<int[]> path;
-        for(int i = 0; i < deploymentPositions.size; i++){
+        StiffenerData data;
+        for(int i = 0; i < stiffenerData.size; i++){
+            data = stiffenerData.get(i);
+            data.path.clear();
 
             // check unit requirements
-            if(!bfr.getModel().isUnitDeployable(reinforcements.get(i))){
+            if(!bfr.getModel().isUnitDeployable(data.unit)){
                 return false;
             }
 
             // check tile requirements
-            if(bfr.getModel().isTileOccupied(deploymentPositions.get(i)[0], deploymentPositions.get(i)[1])){
+            if(bfr.getModel().isTileOccupied(data.deployRow, data.deployCol)){
                 return false;
             }
 
             // deployment tile should be different for each soldier
-            for (int j = 0; j < deploymentPositions.size; j++) {
-                if (deploymentPositions.get(j)[0] == deploymentPositions.get(i)[0] && deploymentPositions.get(j)[1] == deploymentPositions.get(i)[0]) {
+            for (int j = 0; j < stiffenerData.size; j++) {
+                if (i != j && stiffenerData.get(j).deployRow == data.deployRow && stiffenerData.get(j).deployCol == data.deployCol) {
                     return false;
                 }
             }
 
             // path must be valid
             path = bfr.getModel().getShortestPath(
-                    entryPoints.get(i)[0],
-                    entryPoints.get(i)[1],
-                    deploymentPositions.get(i)[0],
-                    deploymentPositions.get(i)[1],
-                    reinforcements.get(i).has(Data.Ability.PATHFINDER),
-                    reinforcements.get(i).getArmy().getAffiliation(), false);
+                    data.entryRow,
+                    data.entryCol,
+                    data.deployRow,
+                    data.deployCol,
+                    data.unit.has(Data.Ability.PATHFINDER),
+                    data.unit.getArmy().getAffiliation(), false);
+
             if(path.size == 0){
                 return false;
             }else{
-                paths.add(path);
+                data.path = path;
             }
         }
         return true;
@@ -131,4 +142,47 @@ public class ReinforcementEvent extends BattleCommand {
     }
 
 
+    @Override
+    public String toString() {
+        String res = "Reinforcement Event";
+        for(int i = 0; i < stiffenerData.size; i++){
+            res = res + "   "+stiffenerData.get(i).toString();
+        }
+        return res;
+    }
+
+
+
+    public static class StiffenerData{
+        public int entryRow;
+        public int entryCol;
+        public int deployRow;
+        public int deployCol;
+        public Array<int[]> path;
+        public Unit unit;
+
+        public StiffenerData(int entryRow, int entryCol, int deployRow, int deployCol, Unit unit) {
+            this.entryRow = entryRow;
+            this.entryCol = entryCol;
+            this.deployRow = deployRow;
+            this.deployCol = deployCol;
+            this.unit = unit;
+            this.path = new Array<int[]>();
+        }
+
+        @Override
+        public String toString() {
+            return "StiffenerData{" +
+                    "entryRow=" + entryRow +
+                    ", entryCol=" + entryCol +
+                    ", deployRow=" + deployRow +
+                    ", deployCol=" + deployCol +
+                    ", unit=" + unit +
+                    '}';
+        }
+
+        public boolean isValid(Battlefield bf) {
+            return unit !=null && bf.isTileReachable(deployRow, deployCol, unit.has(Data.Ability.PATHFINDER));
+        }
+    }
 }

@@ -316,6 +316,7 @@ public class SpriteProviderImp implements SpriteProvider {
                     }
                 }
             }
+            System.out.println("\n");
         }
     }
 

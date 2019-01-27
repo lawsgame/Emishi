@@ -68,8 +68,8 @@ public abstract class Model extends Observable{
         String str = toString();
         str +=  "\n     registered TRIGGERS : ";
         for (int i = 0; i < triggers.size; i++) {
-            str += "\n      trigger " + i + " : " + triggers.get(i);
-            str += "\n          event : " + triggers.get(i).getEventCommand().toString();
+            str += "\n          trigger " + i + " : " + triggers.get(i);
+            str += "\n              event : " + triggers.get(i).getEventCommand().toString();
         }
         return str;
     }

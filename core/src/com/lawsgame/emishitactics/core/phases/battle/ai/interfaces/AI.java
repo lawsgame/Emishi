@@ -59,7 +59,7 @@ public abstract class AI extends Observable implements Runnable {
             while (!army.isDone()) {
                 actorPos = nextUnit(army);
 
-                //Unit selectedUnit = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
+                //unit selectedUnit = bfr.getModel().getUnit(actorPos[0], actorPos[1]);
 
                 bundle = new CommandBundle();
                 setCommandBundle(actorPos, bundle);

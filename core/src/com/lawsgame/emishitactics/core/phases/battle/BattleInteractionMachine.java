@@ -66,6 +66,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
         // TEST
 
+        /*
         ReinforcementEvent event = ReinforcementEvent.addTrigger(1, bfr, scheduler, player.getInventory(), player.getArmy());
         Unit soldier = new Unit("toro", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);
         MilitaryForce enemyForce = bfr.getModel().getTurnSolver().getArmyByName("enemy army 1");
@@ -73,7 +74,11 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
             enemyForce.add(soldier);
             enemyForce.appointSoldier(soldier, 0);
         }
-        event.addStiffeners(soldier, 10,0, 10,2);
+        event.addStiffener(soldier, 10,0, 10,2);
+        */
+
+        System.out.println(battlefield.triggerToString());
+
 
     }
 
