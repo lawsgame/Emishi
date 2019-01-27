@@ -159,9 +159,6 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
 
                 Array<XmlReader.Element> armyElts = battleElt.getChildrenByName("Army");
                 XmlReader.Element armyElt;
-                XmlReader.Element squadElt;
-                XmlReader.Element unitElt;
-                Unit unit;
                 MilitaryForce army;
                 for (int j = 0; j < armyElts.size; j++) {
                     armyElt = armyElts.get(j);
@@ -173,11 +170,12 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                         }
                     }
                     army = new Army(affiliation, armyElt.get("keyname", StringKey.UNNAMED_ARMY_NAME));
-                    // IF: an army with the relevant battlefield ID
-                    for (int k = 0; k < armyElt.getChildCount(); k++) {
-                        squadElt = armyElt.getChild(k);
-                        for (int n = 0; n < squadElt.getChildCount(); n++) {
-                            unitElt = squadElt.getChild(n);
+                    Unit unit;
+                    XmlReader.Element unitElt;
+                    Array<XmlReader.Element> squadElts = armyElt.getChildrenByName("Squad");
+                    for (int k = 0; k < squadElts.size; k++) {
+                        for (int n = 0; n < squadElts.get(k).getChildCount(); n++) {
+                            unitElt = squadElts.get(k).getChild(n);
                             // instanciation unit
                             unit = getUnitFrom(unitElt);
                             // add to the army composition
@@ -199,6 +197,20 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                             }
                         }
                     }
+                    Array<XmlReader.Element> skirmisherElts = armyElt.getChildByName("Skirmishers").getChildrenByName("Unit");
+                    for (int k = 0; k < skirmisherElts.size; k++) {
+                        unitElt = skirmisherElts.get(k);
+                        unit = getUnitFrom(unitElt);
+                        army.add(unit);
+                        army.appointSkirmisher(unit);
+                        int rowUnit = unitElt.getInt("row");
+                        int colUnit = unitElt.getInt("col");
+                        if(!bf.isTileDeploymentTile(rowUnit, colUnit)) {
+                            bf.deploy(rowUnit, colUnit, unit, true);
+                        }
+
+                    }
+
                 }
 
                 // ADD LOOTS

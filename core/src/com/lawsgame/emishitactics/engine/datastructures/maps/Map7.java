@@ -133,6 +133,7 @@ public class Map7<A, B, C, D, E, F, G, H> {
                 }
             }
         }
+        res.append("\n\n");
         return res.toString();
     }
 

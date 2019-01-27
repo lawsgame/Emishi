@@ -37,9 +37,13 @@
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
             </Squad>
-            <Skirmisher>
-
-            </Skirmisher>
+            <Skirmishers>
+                <Unit row = "6" col = "6" name = "noname" title=""  template="SOLAR_KNIGHT" level="2" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                    <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
+                    <Attribute id= "orientation" value="SOUTH"/>
+                    <Attribute id= "behaviour" value="PASSIVE"/>
+                </Unit>
+            </Skirmishers>
             <Reinforcements>
 
             </Reinforcements>
