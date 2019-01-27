@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Content>
+    <Mother type ="com.lawsgame.emishitactics.core.models.tempo.Mother">
+        <Primitive type="int" value="39"/>
+        <Primitive type="float" value="999f"/>
+        <Primitive type="double" value="5.6"/>
+        <Primitive type="boolean" value="true"/>
+        <String value="mother"/>
+        <Enum type="com.lawsgame.emishitactics.core.models.Data$WeaponType" value="AXE"/>
+        <Daughter type="com.lawsgame.emishitactics.core.models.tempo.Daughter">
+            <Primitive type="int" value="11"/>
+            <String value="daughter"/>
+        </Daughter>
+    </Mother>
+    <Enum type="com.lawsgame.emishitactics.core.models.Data$WeaponType" value="AXE"/>
+</Content>

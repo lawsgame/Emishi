@@ -49,8 +49,24 @@ public class SpriteProviderImp implements SpriteProvider {
         this.areaTRs = new Map2<AreaColor, AreaSpriteType, Array<TextureRegion>>();
         this.sparkleTRs = new HashMap<SparkleType, Array<TextureRegion>>();
         this.portraitTRs = new HashMap<String, TextureRegion>();
-        this.characterTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>();
-        this.unitTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>();
+        this.characterTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>(
+                UnitTemplate.getDefaultValue(true),
+                WeaponType.SWORD,
+                false, // recruit
+                false, // east or north
+                AnimUnitSSId.REST,
+                false, // not a warchief but a mere soldier
+                Flavor.NORMAL
+        );
+        this.unitTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>(
+                UnitTemplate.getDefaultValue(false),
+                WeaponType.SWORD,
+                false, // pc
+                false, // east or north
+                AnimUnitSSId.REST,
+                false, // not a warchief but a mere soldier
+                Flavor.NORMAL
+        );
     }
 
 
@@ -134,29 +150,18 @@ public class SpriteProviderImp implements SpriteProvider {
     public Array<Sprite> getUnitAnimationSS(UnitTemplate template, WeaponType weaponType,
                                             boolean character, boolean promoted, boolean playerControlled, Orientation or,
                                             AnimId id, boolean warchief, Flavor param) {
-
-
-
-
-        //TODO : required a finer filtering >>>
-
         // get regions
         Array<Sprite> sprites = new Array<Sprite>();
         boolean eastNorth = or == Orientation.EAST || or == Data.Orientation.NORTH;
         Array<AtlasRegion> regions = (character) ?
-            this.characterTRs.get(template, weaponType, promoted, eastNorth, id.getSpriteSetId(), warchief, param):
-            this.unitTRs.get(template, weaponType, playerControlled, eastNorth, id.getSpriteSetId(), warchief, param);
-        if(regions == null){
-            regions = (character) ?
-                    this.characterTRs.get(template, weaponType, promoted, eastNorth, id.getSpriteSetId(), warchief, param):
-                    this.unitTRs.get(template, weaponType, playerControlled, eastNorth, id.getSpriteSetId(), warchief, param);
-        }
+                this.characterTRs.get(template, weaponType, promoted, eastNorth, id.getSpriteSetId(), warchief, param):
+                this.unitTRs.get(template, weaponType, playerControlled, eastNorth, id.getSpriteSetId(), warchief, param);
         // create sprite set
         boolean shortSprite;
         boolean flipped = or == Data.Orientation.WEST || or == Data.Orientation.NORTH;
         Sprite sprite;
         for(int i = 0; i < regions.size; i++){
-            shortSprite = regions.get(i).getRegionHeight() != regions.get(i).getRegionHeight();
+            shortSprite = regions.get(i).getRegionWidth() != regions.get(i).getRegionHeight();
             sprite = new Sprite(regions.get(i));
             sprite.setSize(((shortSprite) ? 0.5f: 1f) *spriteStdSize, spriteStdSize);
             if (flipped) {
@@ -165,6 +170,14 @@ public class SpriteProviderImp implements SpriteProvider {
             sprites.add(sprite);
         }
         return sprites;
+    }
+
+    @Override
+    public Array<TextureAtlas.AtlasRegion> getStandardUnitAnimationSS(boolean character) {
+        return (character) ?
+                characterTRs.getStandard():
+                unitTRs.getStandard();
+
     }
 
     @Override
@@ -219,7 +232,7 @@ public class SpriteProviderImp implements SpriteProvider {
             // fetch the file path of the tile sprites
             dirHandle = Gdx.files.internal(Assets.TILE_SPRITES_DIR);
             filename  = battlefield.getEnvironment().name().toLowerCase() + EXT_PACK;
-            filepath = String.format("%s/%s", Assets.TILE_SPRITES_DIR, (dirHandle.child(filename).exists()) ? filename : Environment.getStandard().name().toLowerCase() + EXT_PACK);
+            filepath = String.format("%s/%s", Assets.TILE_SPRITES_DIR, (dirHandle.child(filename).exists()) ? filename : Environment.getDefaultValue().name().toLowerCase() + EXT_PACK);
             // load texture regions from the appointed file
             asm.load(filepath, TextureAtlas.class);
             asm.finishLoading();
@@ -303,10 +316,6 @@ public class SpriteProviderImp implements SpriteProvider {
                     }
                 }
             }
-
-            System.out.println(characterTRs);
-            System.out.println();
-            System.out.println(unitTRs);
         }
     }
 

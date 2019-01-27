@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.helpers.interfaces;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.lawsgame.emishitactics.core.models.Battlefield;
@@ -44,6 +45,7 @@ public interface SpriteProvider extends Disposable {
     Array<Sprite> getTileSS(Data.TileSpriteSetId id);
     Array<Sprite> getUnitAnimationSS(BattleUnitRenderer unit, AnimId id, Flavor flavor);
     Array<Sprite> getUnitAnimationSS(UnitTemplate template, WeaponType weaponType, boolean character, boolean promoted, boolean playerControlled, Orientation or, AnimId id, boolean warchief, Flavor param);
+    Array<TextureAtlas.AtlasRegion> getStandardUnitAnimationSS(boolean character);
     Array<Sprite> getSparkleSS(SparkleType type);
     Array<Sprite> getAreaSS(AreaColor color, AreaSpriteType type);
     void load(AssetManager asm, Battlefield battlefield);

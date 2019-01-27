@@ -4,9 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.helpers.implementations.SpriteProviderImp;
 import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -31,6 +29,24 @@ public class TestAssetBIS extends BattleInteractionState {
         this.spriteProvider = new SpriteProviderImp(IsoBFR.SPRITE_STD_SIZE);
         this.spriteProvider.load(bim.asm, bim.bfr.getModel());
         this.sprites = new Array<Sprite>();
+
+        this.sprites = spriteProvider.getUnitAnimationSS(
+                Data.UnitTemplate.SOLAIRE,
+                Data.WeaponType.SWORD,
+                false,
+                false,
+                true,
+                Data.Orientation.WEST,
+                Data.AnimId.IDLE,
+                true,
+                SpriteProvider.Flavor.NORMAL
+        );
+        for(int i =0; i < sprites.size; i++){
+            sprites.get(i).setPosition(1, 1);
+            sprites.get(i).setSize(1, 1);
+        }
+        this.animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
+        this.animation.play();
 
         /*
         Array<TextureRegion> atr = ((IsoBFR)bim.bfr).assetProvider.sparkleTR.get(Data.SparkleType.LOOT);
@@ -76,8 +92,7 @@ public class TestAssetBIS extends BattleInteractionState {
                 sprites.add(sprite);
             }
         }
-        this.animation = new Animation(sprites.size, Data.ANIMATION_NORMAL_SPEED, true, false, false);
-        this.animation.play();
+
         */
 
 
@@ -89,8 +104,10 @@ public class TestAssetBIS extends BattleInteractionState {
 
     @Override
     public void renderAhead(SpriteBatch batch) {
-        if(sprites.size > 0)    sprites.get(animation.getCurrentFrame()).draw(batch);
-        if(sprite != null)      sprite.draw(batch);
+        if(sprites != null
+                && sprites.size > 0
+                && animation != null)     sprites.get(animation.getCurrentFrame()).draw(batch);
+        if(sprite != null)                          sprite.draw(batch);
 
     }
 

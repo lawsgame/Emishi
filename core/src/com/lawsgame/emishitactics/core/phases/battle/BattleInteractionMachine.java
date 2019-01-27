@@ -8,25 +8,29 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.XmlReader;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
+import com.lawsgame.emishitactics.core.models.tempo.Mother;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.loaders.SimpleBattlefieldLoader;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoWindrose;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.WindRose;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
+import com.lawsgame.emishitactics.engine.utils.ClassInstanciator;
+
+import java.io.IOException;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
     public final Player player;
@@ -43,7 +47,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
 
 
     public BattleInteractionMachine(CameraManager gcm, AssetManager asm, Stage stageUI, Player player, int chapterId) {
-        Battlefield battlefield = BattlefieldLoader.load(asm, chapterId);
+        BattlefieldLoader bfl = new SimpleBattlefieldLoader();
+        Battlefield battlefield = bfl.load(asm, chapterId);
         battlefield.randomlyDeploy(player.getArmy(), true);
         battlefield.getTurnSolver().init(player);
         this.scheduler = new AnimationScheduler();
@@ -51,7 +56,7 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
         this.uiBattleSkin = asm.get(Assets.SKIN_UI, Skin.class);
         this.pp = new PanelPool(stageUI, uiBattleSkin, localization);
-        BattlefieldLoader.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
+        bfl.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
         this.asm = asm;
         this.player = player;
         this.thl = new TileHighlighter(bfr);
@@ -60,9 +65,6 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.uiStage = stageUI;
 
         // TEST
-
-        //EarthquakeEvent.addTrigger(bfr, scheduler, player.getInventory(), 1);
-
 
         ReinforcementEvent event = ReinforcementEvent.addTrigger(1, bfr, scheduler, player.getInventory(), player.getArmy());
         Unit soldier = new Unit("toro", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);

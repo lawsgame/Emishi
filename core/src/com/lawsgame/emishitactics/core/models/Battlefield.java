@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.Environment;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
+import com.lawsgame.emishitactics.core.models.battlesolvers.KillAll;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import com.lawsgame.emishitactics.core.models.interfaces.TurnSolver;
@@ -55,7 +56,7 @@ public class Battlefield extends Model {
     }
 
     public Battlefield(int id, int nbRows, int nbCols){
-        this(id, nbRows, nbCols, Data.Weather.getStandard(), Environment.getStandard(), new BattleSolver.KillAll());
+        this(id, nbRows, nbCols, Data.Weather.getDefaultValue(), Environment.getDefaultValue(), new KillAll());
     }
 
 

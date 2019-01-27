@@ -112,7 +112,7 @@ public class Data {
     public enum Environment{
         PRINCIPALITY;
 
-        public static Environment getStandard(){
+        public static Environment getDefaultValue(){
             return PRINCIPALITY;
         }
     }
@@ -137,7 +137,7 @@ public class Data {
             return upperColor;
         }
 
-        public static Weather getStandard(){
+        public static Weather getDefaultValue(){
             return SUNNY;
         }
     }
@@ -656,6 +656,10 @@ public class Data {
             return this.getDamagedType() == RUINS;
         }
 
+        public static TileType getDefaultValue(){
+            return PLAIN;
+        }
+
     }
 
 
@@ -672,7 +676,11 @@ public class Data {
         BOW,
         MACE,
         POLEARM,
-        FIST
+        FIST;
+
+        public static WeaponType getDefaultValue(){
+            return FIST;
+        }
     }
 
     /**
@@ -1078,8 +1086,8 @@ public class Data {
             this.proGrowthLuck = proGrowthLuck;
         }
 
-        public static UnitTemplate getStandard() {
-            return SOLAR_KNIGHT;
+        public static UnitTemplate getDefaultValue(boolean character) {
+            return (character) ? SOLAIRE : SOLAR_KNIGHT;
         }
 
 

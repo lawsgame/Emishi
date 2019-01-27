@@ -108,7 +108,7 @@ public class AssetProvider implements Disposable{
             if(dirHandle.child(battlefield.getEnvironment().name().toLowerCase()+EXT_PACK).exists()) {
                 filepath = String.format("%s/%s%s", Assets.TILE_SPRITES_DIR, battlefield.getEnvironment().name().toLowerCase(), EXT_PACK);
             }else{
-                filepath = String.format("%s/%s%s", Assets.TILE_SPRITES_DIR, Data.Environment.getStandard().name().toLowerCase(), EXT_PACK);
+                filepath = String.format("%s/%s%s", Assets.TILE_SPRITES_DIR, Data.Environment.getDefaultValue().name().toLowerCase(), EXT_PACK);
             }
 
             asm.load(filepath, TextureAtlas.class);

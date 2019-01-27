@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
+import com.lawsgame.emishitactics.core.helpers.implementations.SpriteProviderImp;
+import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -28,7 +30,7 @@ public class IsoBFR extends BattlefieldRenderer {
     private static float Y_CAM_BOUNDS_OFFSET = RATIO;
 
     private boolean visible;
-    public AssetProvider assetProvider;
+    protected SpriteProvider spriteProvider;
     protected AssetManager assetManager;
     private Array<Array<IsoTileRenderer>> tileRenderers;
     private Array<Array<BattleUnitRenderer>> unitRenderers;
@@ -66,8 +68,8 @@ public class IsoBFR extends BattlefieldRenderer {
             Y_CAM_BOUNDS_OFFSET = 0;
         } else {
 
-            this.assetProvider = new AssetProvider(IsoBFR.SPRITE_STD_SIZE);
-            this.assetProvider.set(battlefield, assetManager);
+            this.spriteProvider = new SpriteProviderImp(IsoBFR.SPRITE_STD_SIZE);
+            this.spriteProvider.load(assetManager, battlefield);
             this.bgndRenderer = new ShapeRenderer();
             // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
             for (int r = 0; r < battlefield.getNbRows(); r++) {
@@ -222,7 +224,7 @@ public class IsoBFR extends BattlefieldRenderer {
     @Override
     public void addTileRenderer(int row, int col, Tile model) {
 
-        if(assetProvider != null && getModel().checkIndexes(row, col)){
+        if(spriteProvider != null && getModel().checkIndexes(row, col)){
             int renderIndex  = 2*row + 2*col;
             for(int i = 0; i < tileRenderers.get(renderIndex).size; i++){
                 if(tileRenderers.get(renderIndex).get(i).row == row && tileRenderers.get(renderIndex).get(i).col == col){
@@ -471,7 +473,7 @@ public class IsoBFR extends BattlefieldRenderer {
     public void dispose() {
 
         super.dispose();
-        assetProvider.dispose();
+        spriteProvider.dispose();
     }
 
     @Override

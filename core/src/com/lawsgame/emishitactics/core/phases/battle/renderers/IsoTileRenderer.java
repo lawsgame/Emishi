@@ -93,7 +93,7 @@ public abstract class IsoTileRenderer extends TileRenderer {
                 Sprite sprite;
                 float cx = bfr.getCenterX(row, col);
                 float cy = bfr.getCenterY(row, col);
-                Array<? extends TextureRegion> sparkleTRs = bfr.assetProvider.sparkleTR.get(type);
+                Array<? extends TextureRegion> sparkleTRs = bfr.spriteProvider.getSparkleSS(type);
                 for (int i = 0; i < sparkleTRs.size; i++) {
                     sprite = new Sprite(sparkleTRs.get(i));
 
@@ -134,12 +134,12 @@ public abstract class IsoTileRenderer extends TileRenderer {
 
         protected SimpleITR(int row, int col, Tile model, IsoBFR bfr) {
             super(row, col, model, bfr);
-            Array<Sprite> spriteset = bfr.assetProvider.getTileSpriteSet(model.getType().getUpperPart());
+            Array<Sprite> spriteset = bfr.spriteProvider.getTileSS(model.getType().getUpperPart());
             if(spriteset.size > 0){
                 this.upperPart = spriteset.get(0);
                 this.upperPart.setPosition(bfr.getRenderXFrom(row, col), bfr.getRenderYFrom(row, col, true));
             }
-            spriteset = bfr.assetProvider.getTileSpriteSet(model.getType().getLowerPart());
+            spriteset = bfr.spriteProvider.getTileSS(model.getType().getLowerPart());
             if(spriteset.size > 0){
                 this.lowerPart = spriteset.get(0);
                 this.lowerPart.setPosition(bfr.getRenderXFrom(row, col), bfr.getRenderYFrom(row, col, false));
@@ -178,8 +178,8 @@ public abstract class IsoTileRenderer extends TileRenderer {
 
         protected AnimatedITR(int row, int col, Tile model, IsoBFR bfr) {
             super(row, col, model, bfr);
-            this.upperPart = bfr.assetProvider.getTileSpriteSet(model.getType().getUpperPart());
-            this.lowerPart = bfr.assetProvider.getTileSpriteSet(model.getType().getLowerPart());
+            this.upperPart = bfr.spriteProvider.getTileSS(model.getType().getUpperPart());
+            this.lowerPart = bfr.spriteProvider.getTileSS(model.getType().getLowerPart());
             this.upperAnimation = new Animation(upperPart.size, Data.ANIMATION_NORMAL_SPEED, true, true, true);
             this.lowerAnimation = new Animation(lowerPart.size, Data.ANIMATION_NORMAL_SPEED, true, true, true);
         }

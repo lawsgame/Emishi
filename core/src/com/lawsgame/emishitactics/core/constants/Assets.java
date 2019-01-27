@@ -7,15 +7,19 @@ import com.lawsgame.emishitactics.core.models.Data.AnimUnitSSId;
 
 public class Assets {
 
-    // ---***$$$  STRING  $$$***----
+    // ---***sss  PATH  $$$***----
+
+    public static final String PROJECT_PATH = "com.lawsgame.emishitactics.";
+
+    // ---***$$$  STRING  $$$***---
 
     public static final String STRING_BUNDLE_MAIN = "string/MainBundle";
 
 
     // ---***$$$  XML  $$$***----
 
-    public static final String XML_NAME_DB = "xml/name_db.xml";
-    public static final String XML_BATTLE_PARAMS = "xml/battlefields_config.xml";
+    public static final String XML_NAME_DB = "xml/name-db.xml";
+    public static final String XML_BATTLE_PARAMS = "xml/battlefields-config.xml";
 
 
     //  ---***$$$  SKIN  $$$***----

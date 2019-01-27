@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Battles>
-    <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY">
+    <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY" >
+        <Solver type="com.lawsgame.emishitactics.core.models.battlesolvers.AnyKill"/>
         <Earthquake turn="1"/>
         <Recruit row = "1" col = "12" name = "Hector" title="" template="SOLAIRE" level="1" weaponType="BOW" horseman="false" shieldbearer="false" horsemanUponPromotion="false" homogeneousLevels = "true">
             <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
@@ -36,6 +37,12 @@
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
             </Squad>
+            <Skirmisher>
+
+            </Skirmisher>
+            <Reinforcements>
+
+            </Reinforcements>
         </Army>
     </Battle>
 </Battles>

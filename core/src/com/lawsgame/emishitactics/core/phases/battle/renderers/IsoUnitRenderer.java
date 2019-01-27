@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.AnimId;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
@@ -39,7 +40,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     protected boolean crippled;
     protected boolean disabled;
     protected boolean promoted;
-    protected boolean outofaction = false;
+    protected boolean outOfAction = false;
 
     // RENDER ATTRIBUTES
 
@@ -455,27 +456,8 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
      */
     @Override
     public void display(AnimId animId) {
-
-        Array<Sprite> updatedSet = (getModel().isCharacter()) ?
-                bfr.assetProvider.charaSpriteTree.getSpriteSet(
-                        promoted,
-                        getModel().getTemplate(),
-                        weaponType,
-                        orientation,
-                        done,
-                        animId.getSpriteSetId(getModel().isWarChief())) :
-                bfr.assetProvider.genSpriteTree.getSpriteSet(
-                        getModel().getArmy().isPlayerControlled(),
-                        false,
-                        false,
-                        getModel().getTemplate(),
-                        weaponType,
-                        orientation,
-                        done,
-                        animId.getSpriteSetId(getModel().isWarChief())) ;
-
+        Array<Sprite> updatedSet = bfr.spriteProvider.getUnitAnimationSS(this, animId, (done) ? SpriteProvider.Flavor.DONE : SpriteProvider.Flavor.NORMAL);
         if(updatedSet != null) {
-
             // set animation , sprites, ids and rendering coords fitting
             state = animId;
             unitSpriteSet = updatedSet;
@@ -487,7 +469,7 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
             if(state.isTimeLimited()) {
                 animationCountDown.run();
             }
-            outofaction = state == AnimId.DIE || state == AnimId.FLEE;
+            outOfAction = state == AnimId.DIE || state == AnimId.FLEE;
 
         }
     }
