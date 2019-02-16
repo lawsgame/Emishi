@@ -284,24 +284,28 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
     private Unit instanciate(XmlReader.Element unitElt){
         Unit unit;
 
-        // get all attributes requires to instanciate a unit
-        String name = unitElt.get("name");
-        boolean character = !name.equals("noname");
-        if(!character) name = nameDictionary.get(Data.rand(nameDictionary.size));
-        String title = unitElt.get("title");
-        int level = unitElt.getInt("level");
-        boolean horseman = unitElt.getBoolean("horseman");
-        boolean horsemanUponPromotion = unitElt.getBoolean("horsemanUponPromotion");
-        boolean homogeneousLevels = unitElt.getBoolean("homogeneousLevels");
-        UnitTemplate unitTemplate = EnumUtils.getEnum(UnitTemplate.class, unitElt.get("template"));
-        if(unitTemplate == null) unitTemplate = UnitTemplate.getDefaultValue(character);
-        WeaponType weaponType = EnumUtils.getEnum(WeaponType.class, unitElt.get("weaponType"));
-        if(weaponType == null) weaponType = WeaponType.getDefaultValue();
-
-        // create unit instance
-        unit = (character)?
-                Unit.createCharacterUnit(name, title, unitTemplate,level, weaponType, horseman, horsemanUponPromotion):
-                Unit.createGenericUnit(name, unitTemplate,level, weaponType, horseman, horsemanUponPromotion, homogeneousLevels);
+        if(unitElt.getBooleanAttribute("character")) {
+            // the unit is a legendary figure
+            Data.CharacterTemplate cTemplate = null;
+            for(Data.CharacterTemplate characterTemplate : Data.CharacterTemplate.values()){
+                if(characterTemplate.name().equals(unitElt.get("cTemplate"))){
+                    cTemplate = characterTemplate;
+                }
+            }
+            if(cTemplate == null){
+                cTemplate = Data.CharacterTemplate.getDefaultValue();
+            }
+            unit = Unit.createCharacterUnit(cTemplate, unitElt.getName().equals("Recruit"));
+        }else{
+            // the unit is a generic soldier
+            String name = nameDictionary.get(Data.rand(nameDictionary.size));
+            int level = unitElt.getInt("level");
+            UnitTemplate unitTemplate = EnumUtils.getEnum(UnitTemplate.class, unitElt.get("template"));
+            if (unitTemplate == null) unitTemplate = UnitTemplate.getDefaultValue();
+            WeaponType weaponType = EnumUtils.getEnum(WeaponType.class, unitElt.get("weaponType"));
+            if (weaponType == null) weaponType = WeaponType.getDefaultValue();
+            unit = Unit.createGenericUnit(name, unitTemplate, level, weaponType, false);
+        }
 
         // fill unit instance
         Weapon weapon;

@@ -13,16 +13,16 @@ public class Player {
     public static Player create(){
         Army playerArmy = Army.createPlayerArmyTemplate();
 
-        Unit warlord = new Unit.CharacterUnit("Aterui", "Emishi lord", Data.UnitTemplate.SOLAIRE, 25, Data.WeaponType.SWORD, false, false, false);
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
+        Unit.CharacterUnit warlord = Unit.createCharacterUnit(Data.CharacterTemplate.SOLAIRE, true);
+        warlord.chooseWeaponFightStyle(0);
+        warlord.growup(25);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
         warlord.setLeadership(3);
-        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 8, Data.WeaponType.BOW, false, false, false);
+        Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 8, Data.WeaponType.BOW, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
-        Unit soldier2 = new Unit("Rota", Data.UnitTemplate.SOLAR_KNIGHT, 1, Data.WeaponType.POLEARM, false, false, false);
+        Unit soldier2 = new Unit("Rota", Data.UnitTemplate.SOLAR_KNIGHT, 1, Data.WeaponType.POLEARM, false);
         soldier2.addWeapon(new Weapon(Data.WeaponTemplate.SPEAR));
-        Unit soldier3 = new Unit("Rota", Data.UnitTemplate.SOLAR_KNIGHT, 1, Data.WeaponType.AXE, false, false, false);
+        Unit soldier3 = new Unit("Rota", Data.UnitTemplate.SOLAR_KNIGHT, 1, Data.WeaponType.AXE, false);
         soldier3.addWeapon(new Weapon(Data.WeaponTemplate.BROAD_AXE));
 
 

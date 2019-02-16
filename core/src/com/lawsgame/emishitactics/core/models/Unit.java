@@ -8,6 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data.UnitStat;
 import com.lawsgame.emishitactics.core.models.Data.DamageType;
 import com.lawsgame.emishitactics.core.models.Data.Orientation;
 import com.lawsgame.emishitactics.core.models.Data.UnitTemplate;
+import com.lawsgame.emishitactics.core.models.Data.CharacterTemplate;
 import com.lawsgame.emishitactics.core.models.Data.WeaponType;
 import com.lawsgame.emishitactics.core.models.Notification.TakeDamage;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
@@ -24,9 +25,7 @@ public class Unit extends Model {
     protected final String name;
     protected int level;
     protected final UnitTemplate template;
-    protected final WeaponType weaponType;
-    protected boolean horseman;
-    protected boolean horsemanUponPromotion;
+    protected WeaponType weaponType;
     protected Array<Weapon> weapons;
     protected int experience = 0;
     protected int commandmentExperience = 0;
@@ -67,25 +66,14 @@ public class Unit extends Model {
      * @param template
      * @param level
      * @param weaponType
-     * @param horseman
-     * @param horsemanUponPromotion
      * @param homogeneousLevelsup
      */
-    public Unit(
-            String name,
-            UnitTemplate template,
-            int level,
-            WeaponType weaponType,
-            boolean horseman,
-            boolean horsemanUponPromotion,
-            boolean homogeneousLevelsup){
+    public Unit( String name, UnitTemplate template, int level, WeaponType weaponType, boolean homogeneousLevelsup){
 
         this.name = name;
         this.template = template;
         this.level = template.getStartingLevel();
-        this.weaponType = weaponType;
-        this.horseman = horseman;
-        this.horsemanUponPromotion = horsemanUponPromotion;
+        this.setWeaponType(weaponType);
 
         baseStats = new HashMap<UnitStat, Integer>();
         for(UnitStat stat : UnitStat.values()){
@@ -113,29 +101,20 @@ public class Unit extends Model {
     }
 
     public Unit(String name, UnitTemplate template, WeaponType weaponType){
-        this(name, template, template.getStartingLevel(), weaponType, false, false, true);
+        this(name, template, template.getStartingLevel(), weaponType, true);
     }
 
-   public static Unit createGenericUnit(
-           String name,
-           UnitTemplate template,
-           int level,
-           WeaponType weaponType,
-           boolean horseman,
-           boolean horsemanUponPromotion,
-           boolean homogeneousLevelsup){
-        return new Unit(name, template, level, weaponType, horseman, horsemanUponPromotion, homogeneousLevelsup);
+   public static Unit createGenericUnit( String name, UnitTemplate template, int level, WeaponType weaponType, boolean homogeneousLevelsup){
+        return new Unit(name, template, level, weaponType, homogeneousLevelsup);
    }
 
-    public static Unit createCharacterUnit(
-            String name,
-            String title,
-            UnitTemplate template,
-            int level,
-            WeaponType weaponType,
-            boolean horseman,
-            boolean horsemanUponPromotion){
-        return new CharacterUnit(name, title, template, level, weaponType, horseman, horsemanUponPromotion, true);
+    public static CharacterUnit createCharacterUnit(CharacterTemplate cTemplate, boolean playerRoaster){
+        CharacterUnit character = new CharacterUnit(cTemplate);
+        if(!playerRoaster){
+            // foe character have only one defined weapon type they can used, on the contrary, player can choose which WT the recruited unit will use.
+            character.chooseWeaponFightStyle(0);
+        }
+        return character;
     }
 
 
@@ -164,7 +143,6 @@ public class Unit extends Model {
                    }
                }
             }else{
-                this.horseman = horsemanUponPromotion;
                 int bonusFromPromotion;
                 for(int i = 0; i < UnitStat.values().length; i++){
                     stat = UnitStat.values()[i];
@@ -270,10 +248,19 @@ public class Unit extends Model {
         return Data.PROMOTION_LEVEL <= level ;
     }
 
+    public String getTitle() {return template.name(); }
+
     public String getTitle(I18NBundle bundle) {
         return template.getName(bundle);
     }
 
+    public Array<Weapon> setWeaponType(WeaponType weaponType){
+        Array<Weapon> discardedWeapons = new Array<Weapon>();
+        discardedWeapons.addAll(weapons);
+        this.weapons.clear();
+        this.weaponType = (weaponType == null) ? WeaponType.FIST : weaponType;
+        return discardedWeapons;
+    }
 
     public boolean addWeapon(Weapon weapon) {
         boolean weaponAdded = false;
@@ -879,20 +866,8 @@ public class Unit extends Model {
     }
 
     public boolean isHorseman() {
-        return horseman;
+        return isPromoted() ? template.isHorseman() : template.isHorsemanUponPromotion();
     }
-
-    public void setHorseman(boolean horseman) { this.horseman = horseman; }
-
-    public boolean isHorsemanUponPromotion() { return horsemanUponPromotion; }
-
-
-    public void setHorsemanUponPromotion(boolean horseman) {
-        this.horsemanUponPromotion = horseman;
-        if(isPromoted())
-            this.horseman = horseman;
-    }
-     
 
     public Array<Weapon> getWeapons() {
         return weapons;
@@ -1048,20 +1023,30 @@ public class Unit extends Model {
 
     static class CharacterUnit extends Unit{
         private String title;
+        private WeaponType[]  usableWeaponType;
+        private Weapon[] startingWeapons;
 
-        public CharacterUnit(String name, String title, UnitTemplate template, int level, WeaponType weaponType, boolean horseman, boolean horsemanUponPromotion, boolean homogeneousLevelsup) {
-            super(name, template, level, weaponType, horseman, horsemanUponPromotion, homogeneousLevelsup);
-            this.title = title;
+        public CharacterUnit(CharacterTemplate cTemplate) {
+            super(cTemplate.name(), cTemplate.getTemplate(), cTemplate.getTemplate().getStartingLevel(), null , false);
+            this.title = cTemplate.getTitle();
+            this.usableWeaponType = cTemplate.getUsableWeaponTypes();
+            this.startingWeapons = cTemplate.getStartingWeapons();
         }
 
-        public CharacterUnit(String name, UnitTemplate template, WeaponType weaponType){
-            super(name, template, weaponType);
-            this.title = "no title";
-
-        }
+        public String getTitle(){return title;}
          
         public String getTitle(I18NBundle bundle) {
             return bundle.get(title);
+        }
+
+        public void chooseWeaponFightStyle(int wtype){
+            if( 0 <= wtype && wtype < usableWeaponType.length ) {
+                setWeaponType(usableWeaponType[wtype]);
+                Weapon startingWeapon;
+                for (int i = 0; i < startingWeapons.length; i++) {
+                    addWeapon(startingWeapons[i]);
+                }
+            }
         }
     }
 }

@@ -50,7 +50,7 @@ public class SpriteProviderImp implements SpriteProvider {
         this.sparkleTRs = new HashMap<SparkleType, Array<TextureRegion>>();
         this.portraitTRs = new HashMap<String, TextureRegion>();
         this.characterTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>(
-                UnitTemplate.getDefaultValue(true),
+                Data.CharacterTemplate.getDefaultValue().getTemplate(),
                 WeaponType.SWORD,
                 false, // recruit
                 false, // east or north
@@ -59,7 +59,7 @@ public class SpriteProviderImp implements SpriteProvider {
                 Flavor.NORMAL
         );
         this.unitTRs = new Map7<UnitTemplate, WeaponType, Boolean, Boolean, Data.AnimUnitSSId, Boolean, Flavor, Array<AtlasRegion>>(
-                UnitTemplate.getDefaultValue(false),
+                UnitTemplate.getDefaultValue(),
                 WeaponType.SWORD,
                 false, // pc
                 false, // east or north

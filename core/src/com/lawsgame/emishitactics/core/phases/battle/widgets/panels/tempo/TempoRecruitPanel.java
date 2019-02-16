@@ -11,9 +11,9 @@ import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.RecruitPanel;
 
-public class TempoLongUnitPanel extends LongUnitPanel {
+public class TempoRecruitPanel extends RecruitPanel {
     private static int WIDTH = 650;
     private static int HEIGHT = 450;
     private static float FADE_DURATION = 0.2f;
@@ -22,7 +22,8 @@ public class TempoLongUnitPanel extends LongUnitPanel {
     private Label statisticLabel;
     private Label equipmentLabel;
 
-    public TempoLongUnitPanel(Viewport stageUIViewport, float fadingDuration, int width, int height,
+
+    public TempoRecruitPanel(Viewport stageUIViewport, float fadingDuration, int width, int height,
                               Label generalLabel,
                               Label statisticLabel,
                               Label equipmentLabel) {
@@ -54,7 +55,7 @@ public class TempoLongUnitPanel extends LongUnitPanel {
         StringBuilder builder = new StringBuilder("   MAIN\n");
         builder.append("\nName : " + unit.getName());
         builder.append("\nLevel : " + unit.getLevel());
-        builder.append("\nTitle : " + unit.getTitle());
+        builder.append("\nUnitTemplate : " + unit.getTemplate().name());
         if (unit.isWarlord()) {
             builder.append("\nPosition : warlord");
         } else if (unit.isWarChief()) {

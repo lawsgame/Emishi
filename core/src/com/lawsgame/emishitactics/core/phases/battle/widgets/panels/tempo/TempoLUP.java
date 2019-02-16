@@ -57,6 +57,11 @@ public class TempoLUP extends LevelUpPanel {
         builder.append("\nskill : "+luckyGuy.getBaseStat(Data.UnitStat.SKILL)+" +"+statisticGain[11]);
         builder.append("\nluck : "+luckyGuy.getBaseStat(Data.UnitStat.LUCK)+ " +"+statisticGain[12]);
 
+        if(luckyGuy.getLevel() == 10){
+            // if the unit gets promoted.
+            builder.append("\n => PROMOTED !!!");
+        }
+
         label.setText(builder.toString());
     }
 }

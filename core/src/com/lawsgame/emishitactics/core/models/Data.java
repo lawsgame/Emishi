@@ -961,13 +961,15 @@ public class Data {
 
     }
 
+
+
     public enum UnitTemplate {
-        SOLAIRE(1, new Ability[]{Ability.HEAL},
+        SOLAIRE(1, new Ability[]{Ability.HEAL}, false, false,
                 4, 3, 3, 36, 9, 8, 5, 4, 6, 7, 3, 2, 2,
                 1, 0, 2, 9,  1, 2, 2, 1, 1, 2, 2, 2, 3,
                 0.00f, 0.15f, 0.40f, 0.60f, 0.40f, 0.15f, 0.15f, 0.15f, 0.40f, 0.40f, 0.40f, 0.40f,
                 0.00f, 0.20f, 0.50f, 0.70f, 0.50f, 0.20f, 0.20f, 0.20f, 0.50f, 0.50f, 0.50f, 0.50f),
-        SOLAR_KNIGHT(1, new Ability[]{Ability.GUARD},
+        SOLAR_KNIGHT(1, new Ability[]{Ability.GUARD}, false, false,
                 4, 3, 3, 25, 5, 8, 5, 4, 6, 7, 3, 2, 2,
                 1, 0, 2, 9,  1, 2, 2, 1, 1, 2, 2, 2, 3,
                 0.00f, 0.15f, 0.40f, 0.60f, 0.40f, 0.15f, 0.15f, 0.15f, 0.40f, 0.40f, 0.40f, 0.40f,
@@ -976,6 +978,8 @@ public class Data {
 
         private int startingLevel;
         private Ability[] nativeAbilities;
+        private boolean horseman;
+        private boolean horsemanUponPromotion;
 
         private int baseMob;
         private int baseLd;
@@ -1031,9 +1035,11 @@ public class Data {
         private float proGrowthSk;
         private float proGrowthLuck;
 
-        UnitTemplate(int startingLevel, Ability[] nativeAbilities, int baseMob, int baseLd, int baseCha, int baseHP, int baseBr, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseDex, int baseSk, int baseLuck, int proBoMob, int proBoLd, int proBoCha, int proBoHP, int proBoBr, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoDex, int proBoSk, int proBoLuck, float growthLd, float growthCha, float growthHP, float growthBr, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthDex, float growthSk, float growthLuck, float proGrowthLd, float proGrowthCha, float proGrowthHP, float proGrowthBr, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthAg, float proGrowthDex, float proGrowthSk, float proGrowthLuck) {
+        UnitTemplate(int startingLevel, Ability[] nativeAbilities, boolean horseman, boolean horsemanUponPromotion, int baseMob, int baseLd, int baseCha, int baseHP, int baseBr, int baseStr, int basePiercingArmor, int baseBluntArmor, int baseEgdedArmor, int baseAg, int baseDex, int baseSk, int baseLuck, int proBoMob, int proBoLd, int proBoCha, int proBoHP, int proBoBr, int proBoStr, int proBoPiercingArmor, int proBoBluntArmor, int proBoEdgedArmor, int proBoAg, int proBoDex, int proBoSk, int proBoLuck, float growthLd, float growthCha, float growthHP, float growthBr, float growthStr, float growthPiercingArmor, float growthBluntArmor, float growthEdgegArmor, float growthAg, float growthDex, float growthSk, float growthLuck, float proGrowthLd, float proGrowthCha, float proGrowthHP, float proGrowthBr, float proGrowthStr, float proGrowthPiercingArmor, float proGrowthBluntArmor, float proGrowthEdgedArmor, float proGrowthAg, float proGrowthDex, float proGrowthSk, float proGrowthLuck) {
             this.startingLevel = startingLevel;
             this.nativeAbilities = nativeAbilities;
+            this.horseman = horseman;
+            this.horsemanUponPromotion = horsemanUponPromotion;
             this.baseMob = baseMob;
             this.baseLd = baseLd;
             this.baseCha = baseCha;
@@ -1086,13 +1092,21 @@ public class Data {
             this.proGrowthLuck = proGrowthLuck;
         }
 
-        public static UnitTemplate getDefaultValue(boolean character) {
-            return (character) ? SOLAIRE : SOLAR_KNIGHT;
+        public static UnitTemplate getDefaultValue() {
+            return SOLAR_KNIGHT;
         }
 
 
         public int getStartingLevel() {
             return startingLevel;
+        }
+
+        public boolean isHorseman() {
+            return horseman;
+        }
+
+        public boolean isHorsemanUponPromotion() {
+            return horsemanUponPromotion;
         }
 
         public String getName(I18NBundle bundle) {
@@ -1160,6 +1174,43 @@ public class Data {
                 case LUCK: return (promoted) ? proGrowthLuck : growthLuck;
             }
             return 0;
+        }
+    }
+
+
+    public enum CharacterTemplate  {
+        SOLAIRE("Seeker of the Blazing Sun", UnitTemplate.SOLAIRE, new WeaponType[]{WeaponType.SWORD}, new Weapon[]{new Weapon(WeaponTemplate.SHORTSWORD, false, false)});
+
+        private String title;
+        private UnitTemplate template;
+        private WeaponType[] usableWeaponTypes;
+        private Weapon[] startingWeapons;
+
+        CharacterTemplate(String title, UnitTemplate template, WeaponType[] usableWeaponTypes, Weapon[] startWeapons) {
+            this.title = title;
+            this.template = template;
+            this.usableWeaponTypes = usableWeaponTypes;
+            this.startingWeapons = startWeapons;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public UnitTemplate getTemplate() {
+            return template;
+        }
+
+        public WeaponType[] getUsableWeaponTypes() {
+            return usableWeaponTypes;
+        }
+
+        public Weapon[] getStartingWeapons() {
+            return startingWeapons;
+        }
+
+        public static CharacterTemplate getDefaultValue() {
+            return SOLAIRE;
         }
     }
 

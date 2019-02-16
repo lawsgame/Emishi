@@ -38,21 +38,21 @@ public class ArmyTest {
         army1 = new Army(Data.Affiliation.ALLY, StringKey.UNNAMED_ARMY_NAME);
         army2 = new Army(Data.Affiliation.ENEMY_0, StringKey.UNNAMED_ARMY_NAME);
 
-        neron = new Unit("neron", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
-        tibere = new Unit("tibere", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
-        claude = new Unit("claude", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
+        neron = new Unit("neron", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
+        tibere = new Unit("tibere", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
+        claude = new Unit("claude", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
         neron.setLeadership(20);
         tibere.setLeadership(20);
 
 
         prepared = new Army(Data.Affiliation.ALLY, StringKey.UNNAMED_ARMY_NAME);
 
-        tom = new Unit("tom", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
-        gregory = new Unit("gregory", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
-        meg = new Unit("meg", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
-        alice = new Unit("alice", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
-        lizzy = new Unit("lizzy", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
-        grimalkin = new Unit("grimalkin", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
+        tom = new Unit("tom", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
+        gregory = new Unit("gregory", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
+        meg = new Unit("meg", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
+        alice = new Unit("alice", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
+        lizzy = new Unit("lizzy", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
+        grimalkin = new Unit("grimalkin", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
 
         prepared.add(tom);
         prepared.add(gregory);

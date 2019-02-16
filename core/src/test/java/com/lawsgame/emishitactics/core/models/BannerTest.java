@@ -13,7 +13,7 @@ public class BannerTest {
 
     @Before
     public void before(){
-        unit = new Unit("Elo", Data.UnitTemplate.getDefaultValue(false), Data.WeaponType.SWORD);
+        unit = new Unit("Elo", Data.UnitTemplate.getDefaultValue(), Data.WeaponType.SWORD);
         unit.setLeadership(15);
         banner = new Banner(unit);
 
