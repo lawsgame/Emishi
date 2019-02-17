@@ -3,7 +3,7 @@
     <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY" >
         <Solver type="com.lawsgame.emishitactics.core.models.battlesolvers.AnyKill"/>
         <Earthquake turn="1"/>
-        <Recruit row = "1" col = "12" character="SOLAIRE">
+        <Recruit row = "1" col = "12" character = "true" template="SOLAIRE">
             <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
             <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>
             <Attribute id= "orientation" value="SOUTH"/>
@@ -18,7 +18,7 @@
         <Rienforcement id="0" turn="1" armyStiffined="enemy army 1" armyTurn="player army"/>
         <Army affiliation = "ENEMY_0" keyname="enemy army 1">
             <Squad>
-                <Unit row = "13" col = "5" name = "noname" title="" template="SOLAR_KNIGHT" level="8" weaponType="BOW" >
+                <Unit row = "13" col = "5" character = "false" template="SOLAR_KNIGHT" level="8" weaponType="BOW" >
                     <Attribute id= "leadershio" value="25"/>
                     <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
                     <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>
@@ -26,24 +26,24 @@
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
-                <Unit row = "13" col = "8" name = "noname" title=""  template="SOLAR_KNIGHT" level="7" weaponType="AXE" >
+                <Unit row = "13" col = "8" character = "false" template="SOLAR_KNIGHT" level="7" weaponType="AXE" >
                     <Attribute id= "weapon" value="BROAD_AXE" stealable="true" />
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
-                <Unit row = "12" col = "9" name = "noname" title=""  template="SOLAR_KNIGHT" level="1" weaponType="SWORD" >
+                <Unit row = "12" col = "9" character = "false" template="SOLAR_KNIGHT" level="1" weaponType="SWORD" >
                     <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Unit>
-                <Stiffener idReinforcement="0" entryRow="10" entryCol="0" row = "10" col = "2" name = "noname" title=""  template="SOLAR_KNIGHT" level="1" weaponType="SWORD">
+                <Stiffener idReinforcement="0" entryRow="10" entryCol="0" row = "10" col = "2" character = "false" template="SOLAR_KNIGHT" level="1" weaponType="SWORD">
                     <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>
                 </Stiffener>
             </Squad>
             <Skirmishers>
-                <Unit row = "9" col = "9" name = "noname" title=""  template="SOLAR_KNIGHT" level="2" weaponType="SWORD" horseman="false" horsemanUponPromotion="false" homogeneousLevels = "true">
+                <Unit row = "9" col = "9" character = "false" template="SOLAR_KNIGHT" level="2" weaponType="SWORD">
                     <Attribute id= "weapon" value="SHORTSWORD" stealable="true"/>
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>

@@ -288,7 +288,7 @@ public class Army extends MilitaryForce {
     @Override
     public int getBannerRange(int squadIndex){
         boolean validIndex = 0 <= squadIndex && squadIndex < getNbOfSquads();
-        return (validIndex) ? (int) Math.sqrt(regularTroops.get(squadIndex).get(0).getAppStat(Data.UnitStat.LEADERSHIP)) : 0;
+        return (validIndex) ? regularTroops.get(squadIndex).get(0).getAppStat(Data.UnitStat.LEADERSHIP) + 1 : 0;
     }
 
     @Override

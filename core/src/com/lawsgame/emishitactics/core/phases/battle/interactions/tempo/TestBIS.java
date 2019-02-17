@@ -51,7 +51,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         /*
         for(Data.Ability a : sltdUnit.getAbilities())
-            System.out.println(a.name());
+
 
         bim.pp.choicePanel.attach(this);
         bim.pp.choicePanel.setContent(actorPos[0], actorPos[1], bim.bcm, new Stack<ActorCommand>());
@@ -69,7 +69,7 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         //SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 10,10 ,0 , 0, true, true) {};
         SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 10,10 ,150 , 0, true, true) {};
         //SlidingPanel gp = new SlidingPanel(bim.uiStage.getViewport(),0.5f , 10,10 ,150 , 0, true, false) {};
-        //SlidingPanel gp = new TempoActionCP(bim.uiStage.getViewport(), skin);
+        //SlidingPanel gp = new TempoActionChoiceP(bim.uiStage.getViewport(), skin);
         bim.uiStage.addActor(gp);
         gp.addActor(ccp);
 
@@ -84,8 +84,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         ccp.show();
 
 
-        System.out.println(bim.uiStage.getViewport().getWorldHeight());
-        System.out.println(ccp.getY());
         */
 
 
@@ -96,7 +94,6 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         TextureAtlas atlas = bim.asm.get(Assets.ATLAS_BATTLE_ICONS);
         regions = atlas.findRegions(Assets.getWindroseArrowTexture(true, true));
         //regions = atlas.findRegions("arrow_north_active");
-        System.out.println("  region size : "+regions.size);
         animation = new Animation(regions.size, 0.2f, true, true, false);
         animation.play();
         */

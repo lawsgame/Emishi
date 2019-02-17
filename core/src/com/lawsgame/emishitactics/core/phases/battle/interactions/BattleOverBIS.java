@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
@@ -13,7 +14,7 @@ public class BattleOverBIS extends BattleInteractionState {
     @Override
     public void init() {
 
-        System.out.println("BATTLE OVER!");
+        TacticsGame.debug(this.getClass(), "BATTLE OVER!");
         super.init();
     }
 

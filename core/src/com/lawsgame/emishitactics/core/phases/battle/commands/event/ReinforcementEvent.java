@@ -33,7 +33,7 @@ public class ReinforcementEvent extends BattleCommand {
 
             @Override
             public String toString(){
-                return "Reinforcmeent Trigger on turn "+turn+" at the beginning of the turn of " +currentArmy.getName();
+                return "triggers at the beginning of the turn "+turn+" of " +currentArmy.getName();
             }
         };
         bfr.getModel().add(trigger);
@@ -144,7 +144,7 @@ public class ReinforcementEvent extends BattleCommand {
 
     @Override
     public String toString() {
-        String res = "Reinforcement Event";
+        String res = "Reinforcement Event : ";
         for(int i = 0; i < stiffenerData.size; i++){
             res = res + "   "+stiffenerData.get(i).toString();
         }
@@ -172,13 +172,12 @@ public class ReinforcementEvent extends BattleCommand {
 
         @Override
         public String toString() {
-            return "StiffenerData{" +
-                    "entryRow=" + entryRow +
-                    ", entryCol=" + entryCol +
-                    ", deployRow=" + deployRow +
-                    ", deployCol=" + deployCol +
-                    ", unit=" + unit +
-                    '}';
+            return "Stiffener { (" + entryRow +
+                    ", " + entryCol +
+                    ") => (" + deployRow +
+                    ", " + deployCol +
+                    ") : " + unit.getName() +
+                    " }";
         }
 
         public boolean isValid(Battlefield bf) {

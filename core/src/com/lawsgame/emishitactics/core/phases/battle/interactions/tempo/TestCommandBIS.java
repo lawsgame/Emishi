@@ -28,7 +28,7 @@ public class TestCommandBIS extends BattleInteractionState {
     Area ccActionArea;
     Area ccImpactArea;
     Area ccTargets;
-    ActionInfoPanel panel;
+    ActionInfoPanel panel =null;
 
     public TestCommandBIS(BattleInteractionMachine bim) {
         super(bim, true, true, true, false, false);
@@ -45,11 +45,6 @@ public class TestCommandBIS extends BattleInteractionState {
         bim.bfr.addAreaRenderer(ccImpactArea);
         bim.bfr.addAreaRenderer(ccActionArea);
         bim.bfr.addAreaRenderer(ccTargets);
-
-        // INITIATE ACTION PANEL
-        final Skin skin = bim.asm.get(Assets.SKIN_UI);
-        panel = ActionInfoPanel.create(bim.uiStage.getViewport(), skin, bim.bfr, TempoAIP.class);
-        bim.uiStage.addActor(panel);
 
         // OTHERS PARAMS
         setGuardingArea(true);
@@ -105,7 +100,13 @@ public class TestCommandBIS extends BattleInteractionState {
                 cac.setInitiator(actorPos[0], actorPos[1]);
                 cac.setTarget(row, col);
                 // update and display action pan
+                if(panel != null){
+                    panel.remove();
+                    panel = null;
+                }
                 if (bim.pp.isActionPanelAvailable(cac.getActionChoice())) {
+                    panel = bim.wf.getActionInfoPanel(cac.getActionChoice());
+                    bim.uiStage.addActor(panel);
                     panel.hide();
                     panel.setContent(cac);
                     panel.show();

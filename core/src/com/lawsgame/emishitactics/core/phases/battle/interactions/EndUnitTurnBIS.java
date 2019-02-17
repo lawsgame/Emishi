@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.exceptions.BattlefieldException;
@@ -25,7 +26,7 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
 
     @Override
     public void init() {
-        System.out.println("END TURN of "+actor.getName());
+        TacticsGame.debug(this.getClass(), "END TURN BIS "+actor.getName());
 
         super.init();
         if(actor.isOutOfAction()){

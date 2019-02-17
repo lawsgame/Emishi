@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -41,7 +42,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
     @Override
     public void init() {
-        System.out.println("VALIDATE TARGET : "
+        TacticsGame.debug(this.getClass(), "VALIDATE TARGET : "
                 +currentCommand.getInitiator().getName()+" => "
                 +((currentCommand.getTarget() != null) ? currentCommand.getTarget().getName() : "("+currentCommand.getRowTarget()+", "+currentCommand.getColTarget()+")")+" : "
                 +currentCommand.getName(bim.localization));

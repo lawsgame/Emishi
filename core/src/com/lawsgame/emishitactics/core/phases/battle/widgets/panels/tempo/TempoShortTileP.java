@@ -8,7 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortTilePanel;
 
 
-public class TempoSTP extends ShortTilePanel {
+public class TempoShortTileP extends ShortTilePanel {
 
     private static final float SLIDE_DURATION = 0.5f;
     private static final int X_SHOWING_PADDING = 15;
@@ -20,15 +20,15 @@ public class TempoSTP extends ShortTilePanel {
 
     private Label label;
 
-    private TempoSTP(Viewport stageUIViewport, float slidingDuration, int xShowingPadding, int yPadding, int width, int height, boolean top, boolean left, Label label) {
+    private TempoShortTileP(Viewport stageUIViewport, float slidingDuration, int xShowingPadding, int yPadding, int width, int height, boolean top, boolean left, Label label) {
         super(stageUIViewport, slidingDuration, xShowingPadding, yPadding, width, height, top, left);
         this.label = label;
     }
 
-    public static TempoSTP create(Viewport stageUIViewport, Skin skin){
+    public static TempoShortTileP create(Viewport stageUIViewport, Skin skin){
         LabelStyle style = skin.get("default", LabelStyle.class);
         Label label = new Label("TILE TYPE", style);
-        TempoSTP panel = new TempoSTP(stageUIViewport, SLIDE_DURATION, X_SHOWING_PADDING, Y_PADDING, WIDTH, HEIGHT, TOP, LEFT, label);
+        TempoShortTileP panel = new TempoShortTileP(stageUIViewport, SLIDE_DURATION, X_SHOWING_PADDING, Y_PADDING, WIDTH, HEIGHT, TOP, LEFT, label);
         panel.setBackground(skin.getDrawable("black_background"));
         panel.add(label).expand();
 

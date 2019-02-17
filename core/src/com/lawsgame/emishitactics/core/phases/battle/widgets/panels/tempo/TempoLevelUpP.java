@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LevelUpPanel;
 
-public class TempoLUP extends LevelUpPanel {
+public class TempoLevelUpP extends LevelUpPanel {
     private static int WIDTH = 200;
     private static int HEIGHT = 350;
     private static float X_PADDING_RIGHT = 30f;
@@ -17,15 +17,15 @@ public class TempoLUP extends LevelUpPanel {
 
     private Label label;
 
-    private TempoLUP(Viewport stageUIViewport, float fadingDuration, int width, int height, Label label) {
+    private TempoLevelUpP(Viewport stageUIViewport, float fadingDuration, int width, int height, Label label) {
         super(stageUIViewport, fadingDuration, width, height);
         this.label = label;
     }
 
-    public static TempoLUP create(Viewport uiport, Skin skin){
+    public static TempoLevelUpP create(Viewport uiport, Skin skin){
         Label label = new Label("LEVEL UP", skin, "default");
 
-        TempoLUP panel = new TempoLUP(uiport, FADE_DURATION, WIDTH, HEIGHT, label);
+        TempoLevelUpP panel = new TempoLevelUpP(uiport, FADE_DURATION, WIDTH, HEIGHT, label);
         panel.setX(X_PADDING_RIGHT, false);
         panel.setBackground(skin.getDrawable(Assets.UI_BLACK_BACKGROUND));
         panel.add(label).center();

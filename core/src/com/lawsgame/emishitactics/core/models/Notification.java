@@ -19,6 +19,11 @@ public class Notification {
             sparkleType.add(type);
 
         }
+
+        @Override
+        public String toString() {
+            return "IGNITE SPARKLE";
+        }
     }
     
     public static class ExtinguishSparkle {
@@ -39,6 +44,12 @@ public class Notification {
                 changed = new StateChanged();
             return changed;
         }
+
+
+        @Override
+        public String toString() {
+            return "EXTINGUISH SPARKLE";
+        }
     }
 
     public static class StepOn {
@@ -58,13 +69,7 @@ public class Notification {
 
         @Override
         public String toString() {
-            return "StepOn{" +
-                    "walker=" + walker +
-                    ", rowTile=" + rowTile +
-                    ", colTile=" + colTile +
-                    ", fromRow=" + fromRow +
-                    ", fromCol=" + fromCol +
-                    '}';
+            return "STEP ON";
         }
     }
 
@@ -84,6 +89,11 @@ public class Notification {
             this.OOAUnits = new Array<Unit>();
             this.OOACoords = new Array<int[]>();
         }
+
+        @Override
+        public String toString() {
+            return "DEATH REPORT";
+        }
     }
 
     public static class Attack{
@@ -93,6 +103,11 @@ public class Notification {
         public Attack(boolean specialmove) {
             this.specialmove = specialmove;
             this.lifeDrained = 0;
+        }
+
+        @Override
+        public String toString() {
+            return "ATTACK";
         }
     }
 
@@ -137,6 +152,11 @@ public class Notification {
         public boolean isRelevant(){
             return lifeDamageTaken > 0 || moralDamageTaken > 0;
         }
+
+        @Override
+        public String toString() {
+            return wounded.getName()+" took damage";
+        }
     }
 
 
@@ -172,6 +192,11 @@ public class Notification {
             }
             return notif;
         }
+
+        @Override
+        public String toString() {
+            return "Pushed towards "+orientation.name();
+        }
     }
 
 
@@ -197,6 +222,11 @@ public class Notification {
                 case EAST: notif = EAST; break;
             }
             return notif;
+        }
+
+        @Override
+        public String toString() {
+            return "Fled to "+orientation.name();
         }
     }
 
@@ -225,6 +255,11 @@ public class Notification {
         public SetTile(int row, int col, Tile newTile){
             this(row, col, newTile, null, TransformationType.INSTANTANEOUSLY);
         }
+
+        @Override
+        public String toString() {
+            return "Tile : "+oldTile+" => "+newTile;
+        }
     }
 
     public static class Walk {
@@ -236,6 +271,11 @@ public class Notification {
             this.unit = unit;
             this.path = path;
             this.reveal = reveal;
+        }
+
+        @Override
+        public String toString() {
+            return "WALK";
         }
     }
 
@@ -280,7 +320,10 @@ public class Notification {
             return (done) ? TRUE : FALSE;
         }
 
-
+        @Override
+        public String toString() {
+            return "DONE : "+!done+" => "+done;
+        }
     }
 
     public static class Visible {
@@ -297,7 +340,10 @@ public class Notification {
             return (visible) ? TRUE : FALSE;
         }
 
-
+        @Override
+        public String toString() {
+            return "VISIBLE : "+!visible+" => "+visible;
+        }
     }
 
     public static class Crippled {
@@ -314,6 +360,10 @@ public class Notification {
             return (crippled) ? TRUE : FALSE;
         }
 
+        @Override
+        public String toString() {
+            return "CRIPPLED : "+!crippled+" => "+crippled;
+        }
 
     }
 
@@ -329,6 +379,11 @@ public class Notification {
 
         public static Disabled get(boolean visible){
             return (visible) ? TRUE : FALSE;
+        }
+
+        @Override
+        public String toString() {
+            return "DISABLED : "+!disabled+" => "+disabled;
         }
 
 
@@ -350,6 +405,11 @@ public class Notification {
 
         public static Promoted get(boolean promoted){
             return (promoted) ? TRUE : FALSE;
+        }
+
+        @Override
+        public String toString() {
+            return "PROMOTED : "+!promoted+" => "+promoted;
         }
     }
 }

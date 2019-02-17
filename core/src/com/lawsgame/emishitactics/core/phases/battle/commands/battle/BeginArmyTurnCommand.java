@@ -1,6 +1,7 @@
 package com.lawsgame.emishitactics.core.phases.battle.commands.battle;
 
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -116,7 +117,7 @@ public class BeginArmyTurnCommand extends BattleCommand {
                 }
             }
 
-            System.out.println(scheduler);
+            TacticsGame.debug(this.getClass(), "Task scheduled at the beginning the turn of "+army.getName() + scheduler.toString());
 
         }
     }

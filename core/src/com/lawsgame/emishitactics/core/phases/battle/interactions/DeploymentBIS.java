@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -44,7 +45,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
     @Override
     public void init() {
-        System.out.println("DEPLOYEMENT BIS");
+        TacticsGame.debug(this.getClass(), "DEPLOYEMENT BIS");
         super.init();
         bim.uiStage.addActor(startButton);
         bim.bfr.displayDeploymentAreas(true);

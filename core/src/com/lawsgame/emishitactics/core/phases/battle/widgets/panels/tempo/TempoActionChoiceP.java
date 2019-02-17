@@ -15,7 +15,7 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.C
 
 import java.util.Stack;
 
-public class TempoActionCP extends ChoicePanel.ActionChoicePanel {
+public class TempoActionChoiceP extends ChoicePanel.ActionChoicePanel {
 
     public static int WIDTH = 150;
     public static int BUTTON_HEIGTH = 30;
@@ -27,13 +27,17 @@ public class TempoActionCP extends ChoicePanel.ActionChoicePanel {
     private final CommandChoicePanel commandPanel;
 
 
-    public TempoActionCP(Viewport uiport, Skin skin, CommandChoicePanel commandPanel) {
+    public TempoActionChoiceP(Viewport uiport, Skin skin, CommandChoicePanel commandPanel) {
         super(uiport, SLIDE_DURATION, X_PADDING, Y_PADDING, WIDTH, 0, true, false);
         this.skin = skin;
         this.commandPanel = commandPanel;
         commandPanel.attach(this);
     }
 
+    public static TempoActionChoiceP create(Viewport uiPort, Skin skin){
+        CommandChoicePanel commandChoicePanel = new TempoCommandCP(uiPort, skin);
+        return new TempoActionChoiceP(uiPort, skin, commandChoicePanel);
+    }
 
     @Override
     public void setContent(final int rowActor, final int colActor, final BattleCommandManager bcm, final Stack<ActorCommand> history) {
@@ -86,12 +90,17 @@ public class TempoActionCP extends ChoicePanel.ActionChoicePanel {
     }
 
     @Override
-    public void resetPanel(boolean hideCP) {
+    public void resetPanel(boolean hideActionChoicePanel) {
         setTouchable(Touchable.childrenOnly);
         commandPanel.hide();
-        if(hideCP) {
+        if(hideActionChoicePanel) {
             hide();
         }
+    }
+
+    @Override
+    public CommandChoicePanel getCommandChoicePanel() {
+        return commandPanel;
     }
 
     @Override

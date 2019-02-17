@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
@@ -33,8 +34,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
     @Override
     public void init() {
-        System.out.println("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName());
-        System.out.println(outcome);
+        TacticsGame.debug(this.getClass(), "HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName());
 
         /*
          * BUG HANDLE OUTCOME:

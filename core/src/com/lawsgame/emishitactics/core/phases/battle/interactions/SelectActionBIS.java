@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
@@ -32,7 +33,7 @@ public class SelectActionBIS extends BattleInteractionState implements ChoicePan
 
     @Override
     public void init() {
-        System.out.println("SELECT ACTION : "+bim.bfr.getModel().getUnit(rowSltdUnit, colSltdUnit).getName());
+        TacticsGame.debug(this.getClass(), "SELECT ACTION : "+bim.bfr.getModel().getUnit(rowSltdUnit, colSltdUnit).getName());
 
         super.init();
         bim.pp.choicePanel.attach(this);

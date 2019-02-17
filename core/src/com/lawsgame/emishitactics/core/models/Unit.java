@@ -73,14 +73,12 @@ public class Unit extends Model {
         this.name = name;
         this.template = template;
         this.level = template.getStartingLevel();
-        this.setWeaponType(weaponType);
-
         baseStats = new HashMap<UnitStat, Integer>();
         for(UnitStat stat : UnitStat.values()){
             baseStats.put(stat, template.getBaseStat(stat));
         }
-
         this.weapons = new Array<Weapon>();
+        this.setWeaponType(weaponType);
         this.weapons.add(Weapon.FIST);
         this.equipments = new Array<Equipment>();
         this.banner = new Banner(this);
@@ -256,8 +254,10 @@ public class Unit extends Model {
 
     public Array<Weapon> setWeaponType(WeaponType weaponType){
         Array<Weapon> discardedWeapons = new Array<Weapon>();
-        discardedWeapons.addAll(weapons);
-        this.weapons.clear();
+        if(weapons != null) {
+            discardedWeapons.addAll(weapons);
+            this.weapons.clear();
+        }
         this.weaponType = (weaponType == null) ? WeaponType.FIST : weaponType;
         return discardedWeapons;
     }
@@ -633,26 +633,17 @@ public class Unit extends Model {
 
 
     public int getMaxSoldiersAs(boolean warlord) {
-        int maxSoldiers;
-        if(warlord){
-            maxSoldiers = 2 + (this.getAppStat(UnitStat.LEADERSHIP) + 2) / 5;
-            if(maxSoldiers > Data.MAX_UNITS_UNDER_WARLORD){
-                maxSoldiers = 5;
-            }
-        }else{
-            maxSoldiers = 1 + (this.getAppStat(UnitStat.LEADERSHIP) + 1) / 5;
-            if(maxSoldiers > Data.MAX_UNITS_UNDER_WAR_CHIEF){
-                maxSoldiers = 4;
-            }
-        }
-        return maxSoldiers;
+        int ld = getAppStat(UnitStat.LEADERSHIP);
+        if(ld < 0) ld = 0;
+        if(ld >= Data.MAX_SOLDIERS.length) ld = Data.MAX_SOLDIERS.length - 1;
+        return Data.MAX_SOLDIERS[ld][warlord ? 0 : 1];
     }
 
     public int getMaxWarChiefs() {
-        int maxWC = this.getAppStat(UnitStat.LEADERSHIP) / 6;
-        if(maxWC > 3 )
-            maxWC = 3;
-        return maxWC + 1;
+        int ld = getAppStat(UnitStat.LEADERSHIP);
+        if(ld < 0) ld = 0;
+        if(ld >= Data.MAX_WAR_CHIEFS.length) ld = Data.MAX_WAR_CHIEFS.length - 1;
+        return Data.MAX_WAR_CHIEFS[ld];
     }
 
     public boolean isAllyWith(Data.Affiliation affiliation) {

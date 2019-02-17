@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.EndArmyTurnCommand;
@@ -22,7 +23,7 @@ public class EndArmyTurnBIS extends BattleInteractionState implements Observer {
 
     @Override
     public void init() {
-        System.out.println("EndTurnArmy BIS");
+        TacticsGame.debug(this.getClass(), "END TURN ARMY BIS");
 
         super.init();
         endArmyTurnCommand.attach(this);

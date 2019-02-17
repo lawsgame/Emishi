@@ -94,7 +94,7 @@ public class TempoCommandCP extends ChoicePanel.CommandChoicePanel {
 
             BuildCommand bc = (BuildCommand)choice;
             button = new TextButton(bc.getBuildingType().getName(), skin, "commandpan");
-            button.setHeight(TempoActionCP.BUTTON_HEIGTH);
+            button.setHeight(TempoActionChoiceP.BUTTON_HEIGTH);
         }else if(choice instanceof ChangeTactic){
 
             ChangeTactic ctc = (ChangeTactic)choice;
@@ -116,7 +116,7 @@ public class TempoCommandCP extends ChoicePanel.CommandChoicePanel {
         }else{
 
             button = new TextButton("command std choice", skin, "commandpan");
-            button.setHeight(TempoActionCP.BUTTON_HEIGTH);
+            button.setHeight(TempoActionChoiceP.BUTTON_HEIGTH);
         }
         return button;
     }
@@ -124,7 +124,7 @@ public class TempoCommandCP extends ChoicePanel.CommandChoicePanel {
 
     @Override
     public void setButtonIndex(int buttonIndex) {
-        this.yPadding = TempoActionCP.Y_PADDING + TempoActionCP.BUTTON_HEIGTH * buttonIndex + Y_REL_PADDING;
+        this.yPadding = TempoActionChoiceP.Y_PADDING + TempoActionChoiceP.BUTTON_HEIGTH * buttonIndex + Y_REL_PADDING;
     }
 
     @Override

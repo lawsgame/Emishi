@@ -49,6 +49,8 @@ public class TrapEvent extends BattleCommand{
         return event;
     }
 
+
+
     public static TrapEvent addTrigger(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, Tile tile, final int rowTile, final int colTile, ShortUnitPanel shortUnitPanel){
         TrapEvent event = new TrapEvent(bfr, scheduler, playerInventory, Data.TRAP_DAMAGE, rowTile, colTile, shortUnitPanel);
         if(bfr.getModel().isTileExisted(rowTile, colTile) && tile != null) {
@@ -60,6 +62,11 @@ public class TrapEvent extends BattleCommand{
                         return stepOn.rowTile == rowTile && stepOn.colTile == colTile;
                     }
                     return false;
+                }
+
+                @Override
+                public String toString() {
+                    return "triggers when a unit step on the tile "+rowTile+" "+colTile;
                 }
             };
             tile.add(trigger);
@@ -113,5 +120,10 @@ public class TrapEvent extends BattleCommand{
     @Override
     public boolean isUndoable() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Trap event";
     }
 }

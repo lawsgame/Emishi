@@ -32,7 +32,7 @@ public class EarthquakeEvent extends BattleCommand {
     }
 
 
-    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, final int turn){
+    public static EarthquakeEvent addTrigger(final BattlefieldRenderer bfr, AnimationScheduler scheduler, final Inventory playerInventory, final int turn){
         EarthquakeEvent event = new EarthquakeEvent(bfr, scheduler, playerInventory, Data.EARTHQUAKE_DURATION);
         Model.Trigger trigger = new Model.Trigger(true, event) {
             @Override
@@ -41,6 +41,11 @@ public class EarthquakeEvent extends BattleCommand {
                         & bfr.getModel().getTurnSolver().getTurn() == turn
                         && ((Notification.BeginArmyTurn) data).army.isPlayerControlled();
                 return triggered;
+            }
+
+            @Override
+            public String toString(){
+                return "triggers at the beginning of the turn "+turn+" of the player army";
             }
         };
         bfr.getModel().add(trigger);
@@ -136,6 +141,10 @@ public class EarthquakeEvent extends BattleCommand {
     @Override
     protected void unexecute() { }
 
+    @Override
+    public String toString(){
+        return "Earthquake event";
+    }
 
 
     // ----------------- VF HELPER CLASS -------------------

@@ -7,22 +7,22 @@ import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongTilePanel;
 
-public class TempoLongTilePanel extends LongTilePanel {
+public class TempoLongTileP extends LongTilePanel {
     private static int WIDTH = 350;
     private static int HEIGHT = 200;
     private static float FADE_DURATION = 0.2f;
 
     private Label label;
 
-    public TempoLongTilePanel(Viewport stageUIViewport, float fadingDuration, int width, int height, Label label) {
+    public TempoLongTileP(Viewport stageUIViewport, float fadingDuration, int width, int height, Label label) {
         super(stageUIViewport, fadingDuration, width, height);
         this.label = label;
     }
 
-    public static TempoLongTilePanel create(Viewport stageUIViewport, Skin skin){
+    public static TempoLongTileP create(Viewport stageUIViewport, Skin skin){
         Label label = new Label("TILE TYPE", skin, "default");
 
-        TempoLongTilePanel panel = new TempoLongTilePanel(stageUIViewport, FADE_DURATION, WIDTH, HEIGHT, label);
+        TempoLongTileP panel = new TempoLongTileP(stageUIViewport, FADE_DURATION, WIDTH, HEIGHT, label);
         panel.setBackground(skin.getDrawable(Assets.UI_BLACK_BACKGROUND));
         panel.add(label).center();
 

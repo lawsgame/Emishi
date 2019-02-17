@@ -1208,35 +1208,43 @@ public class Battlefield extends Model {
 
     @Override
     public String toString() {
-        return "battlefield";
+        return "Battlefield";
     }
 
 
     public String triggerToString(){
-        String str ="BATTLEFIELD ";
-        str  += "\n"+super.triggerToString();
-        str +="\n\nAREAS : ";
+        StringBuilder builder = new StringBuilder("\nBATTLEFIELD SETUP TRIGGERS : ");
+        builder.append("\n");
+        builder.append(super.triggerToString());
+        builder.append("\nAreas : ");
         for(int i = 0; i< unitAreas.size; i++){
-            if(unitAreas.get(i).holdEventTrigger())
-                str += "\n  "+unitAreas.get(i).triggerToString();
-        }
-
-        str +="\n\nUNITS : ";
-        for(int r = 0; r < getNbRows(); r++){
-            for(int c = 0; c < getNbColumns(); c++){
-                if(isTileOccupied(r,c) && getUnit(r, c).holdEventTrigger())
-                    str += "\n  "+getUnit(r, c).triggerToString();
+            if(unitAreas.get(i).holdEventTrigger()){
+                builder.append("\n  ");
+                builder.append(unitAreas.get(i).triggerToString());
             }
         }
 
-        str +="\n\nTILES : ";
+        builder.append("\nUnits : ");
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
-                if(isTileExisted(r,c) && getTile(r, c).holdEventTrigger())
-                    str += "\n  "+getTile(r, c).triggerToString();
+                if(isTileOccupied(r,c) && getUnit(r, c).holdEventTrigger()) {
+                    builder.append("\n  ");
+                    builder.append(getUnit(r, c).triggerToString());
+                }
             }
         }
-        return str;
+
+        builder.append("\nTiles : ");
+        for(int r = 0; r < getNbRows(); r++){
+            for(int c = 0; c < getNbColumns(); c++){
+                if(isTileExisted(r,c) && getTile(r, c).holdEventTrigger()) {
+                    builder.append("\n  ");
+                    builder.append(getTile(r, c).triggerToString());
+                }
+            }
+        }
+        builder.append("\n");
+        return builder.toString();
     }
 
 

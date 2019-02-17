@@ -8,15 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.badlogic.gdx.utils.XmlReader;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Battlefield;
-import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Player;
-import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.tempo.Mother;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.ReinforcementEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
@@ -26,11 +21,9 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.WidgetFactory;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
-import com.lawsgame.emishitactics.engine.utils.ClassInstanciator;
-
-import java.io.IOException;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
     public final Player player;
@@ -38,11 +31,11 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final BattleCommandManager bcm;
     public final AssetManager asm;
     public final TileHighlighter thl;
+    public final WidgetFactory wf;
     public final PanelPool pp;
     public final InputMultiplexer multiplexer;
     public final AnimationScheduler scheduler;
     public final I18NBundle localization;
-    public final Skin uiBattleSkin;
     public final Stage uiStage;
 
 
@@ -54,8 +47,9 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.scheduler = new AnimationScheduler();
         this.bfr = new IsoBFR(battlefield, gcm, asm);
         this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
-        this.uiBattleSkin = asm.get(Assets.SKIN_UI, Skin.class);
-        this.pp = new PanelPool(stageUI, uiBattleSkin, localization);
+        Skin uiBattleSkin = asm.get(Assets.SKIN_UI, Skin.class);
+        this.wf = new WidgetFactory(stageUI, uiBattleSkin, bfr);
+        this.pp = new PanelPool(wf, localization);
         bfl.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
         this.asm = asm;
         this.player = player;
@@ -77,7 +71,8 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         event.addStiffener(soldier, 10,0, 10,2);
         */
 
-        System.out.println(battlefield.triggerToString());
+
+        TacticsGame.debug(this.getClass(), battlefield.triggerToString());
 
 
     }

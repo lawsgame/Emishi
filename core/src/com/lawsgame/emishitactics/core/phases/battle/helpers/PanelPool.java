@@ -1,15 +1,13 @@
 package com.lawsgame.emishitactics.core.phases.battle.helpers;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.WidgetFactory;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ExperiencePanel;
@@ -20,64 +18,57 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.L
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortTilePanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoActionCP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoActionChoiceP;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoCommandCP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoEP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoLP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoLUP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoLongTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoLongUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoSTP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoSUP;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 
 import java.util.HashMap;
 
 /**
  *
+ * Optional panel provider :
+ * - it provide an easy access to the required panels like the widgetFactory
+ * - but it also serves as a pool of panel to keep the number instanciation of panel objects as low as possible
+ * - it provide also some of the most common commands appliable on some panels, ready to be sent to the scheduler
+ * - it provide also usefuls methods to manipulate its panels
  */
 public class PanelPool implements Disposable {
-    private Skin uiskin;
-    private Viewport uiport;
+    private WidgetFactory wf;
     private Group panelGroup;
 
+    // panel instances
     public final ShortTilePanel shortTilePanel;
     public final LongTilePanel longTilePanel;
     public final ShortUnitPanel shortUnitPanel;
     public final LongUnitPanel longUnitPanel;
-
-    public final SimpleCommand showSTP;
-    public final SimpleCommand hideSTP;
-    public final SimpleCommand showSUP;
-    public final SimpleCommand hideSUP;
-
     public final ExperiencePanel experiencePanel;
     public final LevelUpPanel levelUpPanel;
     public final LootPanel lootPanel;
     public final ChoicePanel.ActionChoicePanel choicePanel;
 
+    // common commands
+    public final SimpleCommand showSTP;
+    public final SimpleCommand hideSTP;
+    public final SimpleCommand showSUP;
+    public final SimpleCommand hideSUP;
 
-    private HashMap<Data.ActionChoice, Class<? extends ActionInfoPanel>> actionPanelTypes;
 
 
-    public PanelPool(Stage uiStage, Skin uiskin, I18NBundle localization){
-        this.uiskin = uiskin;
-        this.uiport = uiStage.getViewport();
+
+    public PanelPool(WidgetFactory widgetFactory, I18NBundle localization){
+        this.wf = widgetFactory;
         this.panelGroup = new Group();
-        uiStage.addActor(panelGroup);
+        wf.getUiStage().addActor(panelGroup);
 
         // main panels imp
-        this.shortTilePanel = TempoSTP.create(uiport, this.uiskin);
-        this.shortUnitPanel = TempoSUP.create(uiport, this.uiskin);
-        this.longUnitPanel = TempoLongUnitPanel.create(uiport, this.uiskin);
-        this.longTilePanel = TempoLongTilePanel.create(uiport, this.uiskin);
-
-        this.experiencePanel = TempoEP.create(uiport, uiskin);
-        this.levelUpPanel = TempoLUP.create(uiport, uiskin);
-        this.lootPanel = TempoLP.create(uiport, uiskin);
-
-        ChoicePanel.CommandChoicePanel commandPanel = new TempoCommandCP(uiport, uiskin);
-        this.choicePanel = new TempoActionCP(uiport, uiskin, commandPanel);
+        this.shortTilePanel = wf.getShortTilePanel();
+        this.shortUnitPanel = wf.getShortUnitPanel();
+        this.longUnitPanel = wf.getLongUnitPanel();
+        this.longTilePanel = wf.getLongTilePanel();
+        this.experiencePanel = wf.getExperiencePanel();
+        this.levelUpPanel = wf.getLevelUpPanel();
+        this.lootPanel = wf.getLootPanel();
+        this.choicePanel = wf.getActionChoicePanel();
 
 
         panelGroup.addActor(shortTilePanel);
@@ -88,15 +79,7 @@ public class PanelPool implements Disposable {
         panelGroup.addActor(levelUpPanel);
         panelGroup.addActor(lootPanel);
         panelGroup.addActor(choicePanel);
-        panelGroup.addActor(commandPanel);
-
-        // panel action choice imp
-        actionPanelTypes = new HashMap<Data.ActionChoice, Class<? extends ActionInfoPanel>>();
-        actionPanelTypes.put(Data.ActionChoice.ATTACK, TempoAIP.class);
-        actionPanelTypes.put(Data.ActionChoice.HEAL, TempoAIP.class);
-        actionPanelTypes.put(Data.ActionChoice.SWITCH_WEAPON, TempoAIP.class);
-        actionPanelTypes.put(Data.ActionChoice.STEAL, TempoAIP.class);
-        actionPanelTypes.put(Data.ActionChoice.BUILD, TempoAIP.class);
+        panelGroup.addActor(choicePanel.getCommandChoicePanel());
 
 
         // utility command for scheduler
@@ -169,19 +152,19 @@ public class PanelPool implements Disposable {
     //----------------------- ACTION PAN MGMT -----------------------------------
 
     public boolean isActionPanelAvailable(Data.ActionChoice choice){
-        return actionPanelTypes.get(choice) != null;
+        return wf.isActionPanelAvailable(choice);
     }
 
     /**
      * Two important remarks:
      *  1) getActionPanel MUST BE called right before applying the associated command (the BFR state must be the same)
-     *  2) the action info panel is automatically attached to the stage and must be removed manually
+     *  2) the action info panel is automatically attached to the stage and MUST BE removed manually
      *
      */
     public ActionInfoPanel getActionPanel(ActorCommand command){
         ActionInfoPanel panel = null;
         if(command != null) {
-            panel = ActionInfoPanel.create(uiport, uiskin, command.getBFR(), actionPanelTypes.get(command.getActionChoice()));
+            panel = wf.getActionInfoPanel(command.getActionChoice());
             panel.setContent(command);
             panelGroup.addActor(panel);
         }

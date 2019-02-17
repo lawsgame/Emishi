@@ -14,8 +14,6 @@ public class Data {
     public static final int PROMOTION_LEVEL = 10;
     public static final int MAX_LEVEL = 30;
     public static final int HEAL_BASE_POWER = 3;
-    public static final float MAX_UNITS_UNDER_WARLORD = 6; // including the warlord himself / herself
-    public static final float MAX_UNITS_UNDER_WAR_CHIEF = 5; // including the war chief himself / herself
     public static final int AP_REGEN = 1;
     public static final int DEX_FACTOR_ATT_ACC = 3;
     public static final int DEX_FACTOR_AVO = 4;
@@ -32,6 +30,14 @@ public class Data {
     public static final float CHANCE_OF_COLLAPSING_FROM_FRAGILE_TILES = 1f; //over 1
     public static final int TRAP_DAMAGE = 3;
     public static final int SCAN_AREA_RANGE = 3;
+    public static final int[][] MAX_SOLDIERS = {
+            {3, 2},
+            {4, 3},
+            {4, 4},
+            {5, 4},
+            {5, 5},
+    };
+    public static final int[] MAX_WAR_CHIEFS = {1,1,2,3,3};
 
     // EXP parameter
     public static final double EXP_ALPHA = 0.15;

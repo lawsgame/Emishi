@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -33,7 +34,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
     @Override
     public void init() {
-        System.out.println("SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.localization));
+        TacticsGame.debug(this.getClass(), "SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.localization));
 
         super.init();
         bim.bfr.addAreaRenderer(actionArea);

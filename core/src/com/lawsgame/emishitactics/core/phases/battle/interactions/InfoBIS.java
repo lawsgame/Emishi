@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 
@@ -16,7 +17,7 @@ public class InfoBIS extends BattleInteractionState{
     @Override
     public void init() {
         super.init();
-        System.out.println("INFO BIS ");
+        TacticsGame.debug(this.getClass(), "INFO BIS ");
         bim.pp.shortUnitPanel.hide();
         bim.pp.shortTilePanel.hide();
         if(bim.bfr.getModel().isTileOccupied(row, col)) {

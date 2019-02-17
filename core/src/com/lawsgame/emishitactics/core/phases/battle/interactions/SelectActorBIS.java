@@ -1,5 +1,6 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
@@ -34,7 +35,7 @@ public class SelectActorBIS extends BattleInteractionState implements Observer {
     @Override
     public void init() {
         if(readyToUse) {
-            System.out.println("SELECT ACTOR");
+            TacticsGame.debug(this.getClass(), "SELECT ACTOR");
             super.init();
             int[] activeUnitPos = new int[2];
             if (bim.bfr.getModel().isTileOccupiedByPlayerControlledUnit(rowInit, colInit)) {

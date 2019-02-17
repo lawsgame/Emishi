@@ -288,7 +288,7 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
             // the unit is a legendary figure
             Data.CharacterTemplate cTemplate = null;
             for(Data.CharacterTemplate characterTemplate : Data.CharacterTemplate.values()){
-                if(characterTemplate.name().equals(unitElt.get("cTemplate"))){
+                if(characterTemplate.name().equals(unitElt.get("template"))){
                     cTemplate = characterTemplate;
                 }
             }

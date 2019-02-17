@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.SlidingPanel;
 
 import java.util.Stack;
 
@@ -62,6 +61,7 @@ public abstract class ChoicePanel<P> extends SlidingPanel {
 
 
         public abstract void resetPanel(boolean hideCPAsWell);
+        public abstract CommandChoicePanel getCommandChoicePanel();
     }
 
 }

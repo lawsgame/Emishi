@@ -3,7 +3,6 @@ package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.SlidingPanel;
 
 public abstract class ShortUnitPanel extends SlidingPanel {
 

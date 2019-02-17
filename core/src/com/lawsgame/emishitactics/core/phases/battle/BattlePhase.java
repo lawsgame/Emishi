@@ -8,11 +8,11 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Timer;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.SceneBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestAssetBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestBIS;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestCommandBIS;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
@@ -77,7 +77,7 @@ public class BattlePhase extends GamePhase {
 
     public BattlePhase(GPM gpm, Player player, int chapterId ){
         super(gpm, getPixelPerfectGamePortWidth());
-        System.out.println("game port width : " +getPixelPerfectGamePortWidth());
+        TacticsGame.debug(this.getClass(), "Game Port Width : " +getPixelPerfectGamePortWidth());
 
         loadRequiredAssets();
         setFontParams(true);
@@ -85,8 +85,8 @@ public class BattlePhase extends GamePhase {
         this.bim = new BattleInteractionMachine(gameCM, asm, stageUI, player, chapterId);
         //BattleInteractionState initBIS = new TestAssetBIS(bim);
         //BattleInteractionState initBIS = new TestCommandBIS(bim);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

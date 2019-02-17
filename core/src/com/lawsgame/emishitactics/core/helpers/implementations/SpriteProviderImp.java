@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
@@ -296,14 +297,9 @@ public class SpriteProviderImp implements SpriteProvider {
             String ext = ".pack";
             for(int i = 0; i < filenamesArray.size; i++){
                 filepath = String.format("%s/%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenamesArray.get(i)[0], filenamesArray.get(i)[1], filenamesArray.get(i)[2], ext);
-
-                System.out.print("\n"+filepath);
-
                 fileHandle = Gdx.files.internal(filepath);
                 if(fileHandle.exists()){
-
-                    System.out.print(" > exists");
-
+                    TacticsGame.debug(this.getClass(), filepath);
                     asm.load(filepath, TextureAtlas.class);
                     asm.finishLoading();
                     atlas =  asm.get(filepath, TextureAtlas.class);
@@ -314,9 +310,10 @@ public class SpriteProviderImp implements SpriteProvider {
                         }
                         fetchAndStoreUnitSpriteSetsIntoMaps(filenamesArray.get(i), atlas);
                     }
+                }else{
+                    TacticsGame.debug(this.getClass(), filepath+" > not found");
                 }
             }
-            System.out.println("\n");
         }
     }
 

@@ -1,14 +1,9 @@
 package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.SlidingPanel;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 
 public abstract class ActionInfoPanel extends SlidingPanel {
@@ -17,29 +12,6 @@ public abstract class ActionInfoPanel extends SlidingPanel {
 
     public ActionInfoPanel(Viewport stageUIViewport, float slidingDuration, float xShowingPadding, float yPadding, int width, int height, boolean top, boolean left) {
         super(stageUIViewport, slidingDuration, xShowingPadding, yPadding, width, height, top, left);
-    }
-
-    public static <T extends ActionInfoPanel> ActionInfoPanel create(Viewport uiport, Skin skin, BattlefieldRenderer bfr, Class<T> c){
-        ActionInfoPanel panel = null;
-
-        try {
-            Class[] paramTypes = new Class[]{Viewport.class, Skin.class, BattlefieldRenderer.class};
-            Constructor<T> constructor = c.getConstructor(paramTypes);
-            Object[] paramArray = new Object[]{uiport, skin, bfr};
-            panel = constructor.newInstance(paramArray);
-
-
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return panel;
     }
 
 

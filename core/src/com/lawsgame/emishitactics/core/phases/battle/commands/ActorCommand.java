@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.commands;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
@@ -125,24 +126,27 @@ public abstract class ActorCommand extends BattleCommand{
             // clean and solve the outcome
             outcome.clean();
             outcome.resolve();
-            printCommand();
+            debugCommand();
             return true;
         }
         return false;
     }
 
-    private void printCommand(){
-        System.out.println("\n              -----***$$ BEGIN $$***-----");
-        System.out.println("\nACTION REPORT of "+initiator.getName()+" performing "+choice.name());
-        System.out.println();
-        if(!isDecoupled())
-            System.out.println(scheduler);
-        else{
-            System.out.println(showTask());
-        }
-        System.out.println(outcome);
-        System.out.println("\nEvent triggered while performing this command ? "+isEventTriggered());
-        System.out.println("\n              ------***$$ END $$***------\n");
+
+    private void debugCommand(){
+        StringBuilder builder = new StringBuilder("\n             -----***$$ ACTION BEGIN $$***-----");
+        builder.append("\nACTION REPORT of ");
+        builder.append(initiator.getName());
+        builder.append(" performing ");
+        builder.append(choice.name());
+        builder.append("\n");
+        builder.append(isDecoupled() ? showTask() : scheduler.toString());
+        builder.append("\n");
+        builder.append(outcome);
+        builder.append("\nEvent triggered while performing this command ? ");
+        builder.append(isEventTriggered());
+        builder.append("\n              ------***$$ ACTION END $$***------");
+        TacticsGame.debug(this.getClass(), builder.toString());
     }
 
     public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){

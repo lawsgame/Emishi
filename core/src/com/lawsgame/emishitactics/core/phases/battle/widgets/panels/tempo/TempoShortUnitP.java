@@ -8,7 +8,7 @@ import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
 
-public class TempoSUP extends ShortUnitPanel {
+public class TempoShortUnitP extends ShortUnitPanel {
     private static final float SLIDE_DURATION = 0.5f;
     private static final int X_SHOWING_PADDING = 15;
     private static final int Y_PADDING = 15;
@@ -19,14 +19,14 @@ public class TempoSUP extends ShortUnitPanel {
 
     private Label label;
 
-    public TempoSUP(Viewport stageUIViewport, float slidingDuration, int xShowingPadding, int yPadding, int width, int height, boolean top, boolean left, Label label) {
+    public TempoShortUnitP(Viewport stageUIViewport, float slidingDuration, int xShowingPadding, int yPadding, int width, int height, boolean top, boolean left, Label label) {
         super(stageUIViewport, slidingDuration, xShowingPadding, yPadding, width, height, top, left);
         this.label = label;
     }
 
-    public static TempoSUP create(Viewport stageUIViewpor, Skin skin){
+    public static TempoShortUnitP create(Viewport stageUIViewpor, Skin skin){
         Label label = new Label("UNIT", skin, "default");
-        TempoSUP panel = new TempoSUP(stageUIViewpor, SLIDE_DURATION, X_SHOWING_PADDING, Y_PADDING, WIDTH, HEIGHT, TOP, LEFT, label);
+        TempoShortUnitP panel = new TempoShortUnitP(stageUIViewpor, SLIDE_DURATION, X_SHOWING_PADDING, Y_PADDING, WIDTH, HEIGHT, TOP, LEFT, label);
         panel.add(label).expand();
         panel.setBackground(skin.getDrawable(Assets.UI_BLACK_BACKGROUND));
         return panel;
