@@ -1,35 +1,29 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.Area;
+import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.WalkCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.MoveCommand;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
-import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
-import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.BattleOverPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoBattleOverPanel;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
-import com.lawsgame.emishitactics.engine.rendering.Animation;
-
-import java.util.LinkedList;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class TestBIS extends BattleInteractionState implements Observer, ChoicePanel.CommandReceiver {
+    private static Lawgger log = Lawgger.createInstance(TestBIS.class);
 
     Unit sltdUnit;
-
-    ChoicePanel.CommandChoicePanel ccp;
-
+    BattleOverPanel bop;
 
 
     public TestBIS(BattleInteractionMachine bim) {
@@ -37,15 +31,11 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
 
         IsoBFR bfr = ((IsoBFR)bim.bfr);
         sltdUnit = bim.player.getArmy().getWarlord();
-        sltdUnit.addNativeAbility(Data.Ability.BUILD);
-        sltdUnit.addNativeAbility(Data.Ability.HEAL);
-        bim.player.getArmy().getSquad(sltdUnit, true).get(1).takeDamage(0, false, 1f);
-
-
+        int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
 
         // -------***<<< ACP and CCP tests >>>***------------------------
 
-        int[] actorPos = bim.bfr.getModel().getUnitPos(sltdUnit);
+
 
         // TEST 0
 
@@ -106,13 +96,28 @@ public class TestBIS extends BattleInteractionState implements Observer, ChoiceP
         bfr.displayAllTraps();
         bfr.displayAllLoots();
 
+
+        Skin uiBattleSkin = bim.asm.get(Assets.SKIN_UI, Skin.class);
+        bop = TempoBattleOverPanel.create(bim.uiStage.getViewport(), uiBattleSkin);
+        bim.uiStage.addActor(bop);
+        Array<Unit> units = bim.player.getArmy().getMobilizedUnits(true);
+        log.debug(units.size);
+        bop.update(units, new int[]{150, 350}, new int[]{600, 1500});
+        bop.hide();
     }
 
 
     @Override
     public void update(float dt) {
         super.update(dt);
+        if(Gdx.input.isKeyJustPressed(Input.Keys.UP)){
+            bop.show();
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)){
+            bop.hide();
+        }
     }
+
 
     @Override
     public void end() {

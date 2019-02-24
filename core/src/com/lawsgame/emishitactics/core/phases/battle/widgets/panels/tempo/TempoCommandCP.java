@@ -16,7 +16,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.BuildCommand
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.ChangeTactic;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ChoicePanel;
 
 public class TempoCommandCP extends ChoicePanel.CommandChoicePanel {
     private static final int BUTTON_WIDTH = 210;

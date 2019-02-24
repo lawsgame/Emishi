@@ -12,10 +12,13 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 import java.util.Stack;
 
 public class SelectTargetBIS extends BattleInteractionState implements Observer {
+    private static Lawgger log = Lawgger.createInstance(SelectTargetBIS.class);
+
     final Stack<ActorCommand> historic;
     final ActorCommand currentCommand;
     Area actionArea;
@@ -34,7 +37,7 @@ public class SelectTargetBIS extends BattleInteractionState implements Observer 
 
     @Override
     public void init() {
-        TacticsGame.debug(this.getClass(), "SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.localization));
+        log.info("SELECT TARGET : "+currentCommand.getInitiator().getName()+" "+currentCommand.getActionChoice().getName(bim.localization));
 
         super.init();
         bim.bfr.addAreaRenderer(actionArea);

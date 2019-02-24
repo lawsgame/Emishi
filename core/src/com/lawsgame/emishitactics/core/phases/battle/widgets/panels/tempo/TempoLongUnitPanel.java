@@ -11,7 +11,7 @@ import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LongUnitPanel;
 
 public class TempoLongUnitPanel extends LongUnitPanel {
     private static int WIDTH = 650;
@@ -22,29 +22,22 @@ public class TempoLongUnitPanel extends LongUnitPanel {
     private Label statisticLabel;
     private Label equipmentLabel;
 
-    public TempoLongUnitPanel(Viewport stageUIViewport, float fadingDuration, int width, int height,
-                              Label generalLabel,
-                              Label statisticLabel,
-                              Label equipmentLabel) {
+    public TempoLongUnitPanel(Viewport stageUIViewport, Skin skin, float fadingDuration, int width, int height) {
 
         super(stageUIViewport, fadingDuration, width, height);
-        this.generalLabel = generalLabel;
-        this.statisticLabel = statisticLabel;
-        this.equipmentLabel = equipmentLabel;
+
+
+        this.generalLabel = new Label("GENERAL", skin, "default");
+        this.statisticLabel = new Label("STATS", skin, "default");
+        this.equipmentLabel = new Label("ITEMS", skin, "default");
+        setBackground(skin.getDrawable(Assets.UI_BLACK_BACKGROUND));
+        add(generalLabel).center().expand().top().padTop(10);
+        add(statisticLabel).center().expand().top().padTop(10);
+        add(equipmentLabel).center().expand().top().padTop(10);
     }
 
     public static TempoLongUnitPanel create(Viewport stageUIViewport, Skin skin){
-        Label gLabel = new Label("GENERAL", skin, "default");
-        Label sLabel = new Label("STATS", skin, "default");
-        Label eLabel = new Label("ITEMS", skin, "default");
-
-        TempoLongUnitPanel panel = new TempoLongUnitPanel(stageUIViewport, FADE_DURATION, WIDTH, HEIGHT, gLabel, sLabel, eLabel);
-        panel.setBackground(skin.getDrawable(Assets.UI_BLACK_BACKGROUND));
-        panel.add(gLabel).center().expand().top().padTop(10);
-        panel.add(sLabel).center().expand().top().padTop(10);
-        panel.add(eLabel).center().expand().top().padTop(10);
-
-        return panel;
+        return new TempoLongUnitPanel(stageUIViewport, skin, FADE_DURATION, WIDTH, HEIGHT);
     }
 
     @Override

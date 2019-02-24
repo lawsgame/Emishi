@@ -47,7 +47,7 @@ public abstract class Model extends Observable{
         return tasks;
     }
 
-    public boolean holdEventTrigger(){
+    public boolean isHoldingEventTrigger(){
         return triggers.size > 0;
     }
 
@@ -58,6 +58,18 @@ public abstract class Model extends Observable{
             }
         }
         return false;
+    }
+
+    public <T extends BattleCommand> Array<T> findEvent(Class<T> eventType){
+        Array<T> events = new Array<T>();
+        T event;
+        for(int i = 0; i < triggers.size; i++){
+            if(eventType.isInstance(triggers.get(i).eventCommand)){
+                event = (T) triggers.get(i).eventCommand;
+                events.add(event);
+            }
+        }
+        return events;
     }
 
 

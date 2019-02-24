@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ExperiencePanel;
 
 public class TempoExpP extends ExperiencePanel {
     private static int WIDTH = 120;

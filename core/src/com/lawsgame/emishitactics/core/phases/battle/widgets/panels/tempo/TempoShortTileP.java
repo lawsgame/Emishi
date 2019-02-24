@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ShortTilePanel;
 
 
 public class TempoShortTileP extends ShortTilePanel {

@@ -2,9 +2,7 @@ package com.lawsgame.emishitactics.core.phases.battle.interactions.tempo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
@@ -15,8 +13,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.AttackComman
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.CoveringFireCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.GuardCommand;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ActionInfoPanel;
 
 import java.util.LinkedList;
 

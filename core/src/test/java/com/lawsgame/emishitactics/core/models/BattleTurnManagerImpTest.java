@@ -8,9 +8,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class TurnSolverImpTest {
+public class BattleTurnManagerImpTest {
     private Battlefield bf;
-    private TurnSolverImp solver;
+    private BattleTurnManagerImp solver;
     private MilitaryForce mf1;
     private MilitaryForce mf2;
     private MilitaryForce mf3;
@@ -18,7 +18,7 @@ public class TurnSolverImpTest {
     @Before
     public void before(){
         bf = BattlefieldTest.createPlainBF(10,10);
-        solver = new TurnSolverImp(bf);
+        solver = new BattleTurnManagerImp(bf);
         mf1 = new Army(Data.Affiliation.ALLY, "mf1");
         mf2 = new Army(Data.Affiliation.ALLY, "mf2");
         mf3 = new Army(Data.Affiliation.ALLY, "mf3");

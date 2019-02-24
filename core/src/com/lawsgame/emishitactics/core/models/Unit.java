@@ -18,6 +18,7 @@ import com.lawsgame.emishitactics.core.models.interfaces.Model;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 public class Unit extends Model {
@@ -30,7 +31,7 @@ public class Unit extends Model {
     protected int experience = 0;
     protected int commandmentExperience = 0;
     private MilitaryForce army = null;
-    protected HashMap<Data.UnitStat, Integer> baseStats;
+    protected Map<UnitStat, Integer> baseStats;
     protected int currentMoral;
     protected int currentHitPoints;
     protected int actionPoints = 0;
@@ -110,7 +111,7 @@ public class Unit extends Model {
         CharacterUnit character = new CharacterUnit(cTemplate);
         if(!playerRoaster){
             // foe character have only one defined weapon type they can used, on the contrary, player can choose which WT the recruited unit will use.
-            character.chooseWeaponFightStyle(0);
+            character.chooseWeaponFightStyle();
         }
         return character;
     }
@@ -334,7 +335,27 @@ public class Unit extends Model {
     }
 
     public int getBaseStat(UnitStat stat){
-        return baseStats.get(stat);
+        return (stat != UnitStat.LEADERSHIP) ? baseStats.get(stat) : getBaseLeadership();
+    }
+
+    private int getBaseLeadership(){
+        int ld = 1;
+        for(int i = 0; i < Data.EXP_REQUIRED_LEADERSHIP.length; i++){
+            if(Data.EXP_REQUIRED_LEADERSHIP[i] < commandmentExperience){
+                ld++;
+            }
+        }
+        return ld;
+    }
+
+    public void setLeadership(int ld){
+        int fixedLd = ld;
+        if(0 < fixedLd ){
+            if(Data.EXP_REQUIRED_LEADERSHIP.length < fixedLd-1){
+                fixedLd = Data.EXP_REQUIRED_LEADERSHIP.length-1;
+            }
+            this.setLeadershipExperience(Data.EXP_REQUIRED_LEADERSHIP[fixedLd-2]);
+        }
     }
 
     public int getAppStat(UnitStat stat){
@@ -367,23 +388,13 @@ public class Unit extends Model {
         return gainLvl;
     }
 
-    public void setLeadership(int leadership){
-        baseStats.put(UnitStat.LEADERSHIP,leadership);
+    public void setLeadershipExperience(int exp){
+        this.commandmentExperience = exp;
     }
 
-    public int addLdExpPoints(int exp) {
-        int ldLevelGained = 0;
+    public void addLdExpPoints(int exp) {
         this.commandmentExperience += exp;
-        if(commandmentExperience > Data.EXP_REQUIRED_LD_LEVEL_UP){
-            ldLevelGained = commandmentExperience / Data.EXP_REQUIRED_LD_LEVEL_UP;
-            this.setLeadership(this.getBaseStat(UnitStat.LEADERSHIP) + ldLevelGained);
-            this.commandmentExperience = this.commandmentExperience % Data.EXP_REQUIRED_LD_LEVEL_UP;
-        }
-        return ldLevelGained;
     }
-
-
-
 
     public void addNativeAbility(Data.Ability ability) {
         if(!nativeAbilities.contains(ability, true))
@@ -876,12 +887,12 @@ public class Unit extends Model {
      
     public int[] setExperience(int experience) {
         // get the number of lvl gained and the resulting exp array
-        int levelsGained = experience / Data.EXP_REQUIRED_LD_LEVEL_UP;
+        int levelsGained = experience / Data.EXP_REQUIRED_LEVEL_UP;
         int[] exps = new int[ 1 + levelsGained];
 
         // fill the exps array
         for(int i = 0; i < exps.length; i++)
-            exps[i] = Data.EXP_REQUIRED_LD_LEVEL_UP;
+            exps[i] = Data.EXP_REQUIRED_LEVEL_UP;
         exps[exps.length - 1] = experience % Data.EXP_REQUIRED_LEVEL_UP;
 
         // set the new experience value
@@ -893,11 +904,6 @@ public class Unit extends Model {
      
     public int getLeadershipExperience() {
         return commandmentExperience;
-    }
-
-
-    public void setLeadershipExperience(int experience) {
-        this.commandmentExperience = experience % Data.EXP_REQUIRED_LD_LEVEL_UP;
     }
 
     public MilitaryForce getArmy() {
@@ -1012,7 +1018,7 @@ public class Unit extends Model {
         return str;
     }
 
-    static class CharacterUnit extends Unit{
+    public static class CharacterUnit extends Unit{
         private String title;
         private WeaponType[]  usableWeaponType;
         private Weapon[] startingWeapons;
@@ -1030,14 +1036,33 @@ public class Unit extends Model {
             return bundle.get(title);
         }
 
-        public void chooseWeaponFightStyle(int wtype){
-            if( 0 <= wtype && wtype < usableWeaponType.length ) {
-                setWeaponType(usableWeaponType[wtype]);
-                Weapon startingWeapon;
-                for (int i = 0; i < startingWeapons.length; i++) {
-                    addWeapon(startingWeapons[i]);
+        public Array<Weapon> chooseWeaponFightStyle(WeaponType weaponType){
+            Array<Weapon> returnedWeapons = new Array<Weapon>();
+            if(weaponType != null && usableWeaponType != null && usableWeaponType.length > 0 && startingWeapons != null){
+                returnedWeapons = ArrayUtils.contains(usableWeaponType, weaponType) ?
+                        setWeaponType(weaponType) :
+                        setWeaponType(usableWeaponType[0]);
+                for(int i = 0; i < startingWeapons.length; i++){
+                    if(startingWeapons[i].getTemplate().getWeaponType() == getWeaponType()){
+                        addWeapon(startingWeapons[i]);
+                    }
                 }
             }
+            return returnedWeapons;
+        }
+
+        public Array<Weapon> chooseWeaponFightStyle(){
+            return (usableWeaponType != null && usableWeaponType.length > 0) ?
+                    chooseWeaponFightStyle(usableWeaponType[0]) :
+                    new Array<Weapon>();
+        }
+
+        public WeaponType[] getUsableWeaponType() {
+            return usableWeaponType;
+        }
+
+        public Weapon[] getStartingWeapons() {
+            return startingWeapons;
         }
     }
 }

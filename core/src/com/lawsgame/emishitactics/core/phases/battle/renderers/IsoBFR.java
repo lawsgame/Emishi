@@ -40,11 +40,11 @@ public class IsoBFR extends BattlefieldRenderer {
     private WindRose windrose;
 
 
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager){
-        this(battlefield, gcm, assetManager, false);
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager, SpriteProvider spriteProvider){
+        this(battlefield, gcm, assetManager, spriteProvider, false);
     }
 
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager, boolean test) {
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager, SpriteProvider spriteProvider, boolean test) {
         super(battlefield, gcm);
         this.assetManager = assetManager;
         int depth = 2*(battlefield.getNbRows() + battlefield.getNbColumns()) - 3;
@@ -67,9 +67,7 @@ public class IsoBFR extends BattlefieldRenderer {
             X_CAM_BOUNDS_OFFSET = 0;
             Y_CAM_BOUNDS_OFFSET = 0;
         } else {
-
-            this.spriteProvider = new SpriteProviderImp(IsoBFR.SPRITE_STD_SIZE);
-            this.spriteProvider.load(assetManager, battlefield);
+            this.spriteProvider = spriteProvider;
             this.bgndRenderer = new ShapeRenderer();
             // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
             for (int r = 0; r < battlefield.getNbRows(); r++) {

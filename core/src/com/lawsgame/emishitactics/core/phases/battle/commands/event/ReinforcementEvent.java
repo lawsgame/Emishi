@@ -28,7 +28,7 @@ public class ReinforcementEvent extends BattleCommand {
         Model.Trigger trigger = new Model.Trigger( true, event) {
             @Override
             public boolean isTriggerable(Object data) {
-                return data instanceof Notification.BeginArmyTurn && bfr.getModel().getTurnSolver().getCurrentArmy() == currentArmy && turn <= bfr.getModel().getTurnSolver().getTurn();
+                return data instanceof Notification.BeginArmyTurn && bfr.getModel().getBattleTurnManager().getCurrentArmy() == currentArmy && turn <= bfr.getModel().getBattleTurnManager().getTurn();
             }
 
             @Override

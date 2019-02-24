@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Battles>
     <Battle battlefieldId = "0" weather="SUNNY" env="PRINCIPALITY" >
-        <Solver type="com.lawsgame.emishitactics.core.models.battlesolvers.AnyKill"/>
+        <Solver type="com.lawsgame.emishitactics.core.models.battlesolvers.KillAll">
+            <Primitive type="int" value="3" name="minturn"/>
+            <Primitive type="int" value="9" name="maxturn"/>
+        </Solver>
         <Earthquake turn="1"/>
         <Recruit row = "1" col = "12" character = "true" template="SOLAIRE">
             <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>

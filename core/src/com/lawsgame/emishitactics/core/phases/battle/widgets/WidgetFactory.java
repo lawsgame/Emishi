@@ -5,17 +5,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LootPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.BattleOverPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LongTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ShortTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ShortUnitPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoActionChoiceP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoBattleOverPanel;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoExpP;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoLootP;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoLevelUpP;
@@ -89,6 +91,10 @@ public class WidgetFactory {
 
     public ChoicePanel.ActionChoicePanel getActionChoicePanel(){
         return TempoActionChoiceP.create(uiStage.getViewport(), uiSkin);
+    }
+
+    public BattleOverPanel getBattleOverPanel(){
+        return TempoBattleOverPanel.create(uiStage.getViewport(), uiSkin);
     }
 
     public boolean isActionPanelAvailable(Data.ActionChoice choice){

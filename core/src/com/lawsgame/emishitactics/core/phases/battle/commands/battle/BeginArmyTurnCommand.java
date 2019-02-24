@@ -15,8 +15,11 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler.
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class BeginArmyTurnCommand extends BattleCommand {
+    private static Lawgger log = Lawgger.createInstance(BeginArmyTurnCommand.class);
+
     protected MilitaryForce army;
 
     public BeginArmyTurnCommand(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, MilitaryForce army) {
@@ -117,7 +120,7 @@ public class BeginArmyTurnCommand extends BattleCommand {
                 }
             }
 
-            TacticsGame.debug(this.getClass(), "Task scheduled at the beginning the turn of "+army.getName() + scheduler.toString());
+            log.info("Task scheduled at the beginning the turn of "+army.getName() + scheduler.toString());
 
         }
     }

@@ -12,8 +12,11 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
+    private static Lawgger log = Lawgger.createInstance(EndUnitTurnBIS.class);
+
     private Unit actor;
     private EndUnitTurnCommand endUnitTurnCommand;
 
@@ -26,7 +29,7 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
 
     @Override
     public void init() {
-        TacticsGame.debug(this.getClass(), "END TURN BIS "+actor.getName());
+        log.info("END TURN BIS "+actor.getName());
 
         super.init();
         if(actor.isOutOfAction()){
@@ -79,7 +82,7 @@ public class EndUnitTurnBIS extends BattleInteractionState implements Observer {
                 }
             }
         }
-        if (bim.bfr.getModel().getTurnSolver().getCurrentArmy().isDone()) {
+        if (bim.bfr.getModel().getBattleTurnManager().getCurrentArmy().isDone()) {
             bim.replace(new EndArmyTurnBIS(bim));
         } else {
             bim.replace(new SelectActorBIS(bim, false));

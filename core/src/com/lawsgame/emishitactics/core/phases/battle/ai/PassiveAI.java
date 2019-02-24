@@ -13,7 +13,7 @@ public class PassiveAI extends AI {
     protected TileHighlighter thl;
 
     public PassiveAI(BattlefieldRenderer bfr, AnimationScheduler scheduler, PanelPool ph, Inventory playerInventory, TileHighlighter thl) {
-        super(bfr, scheduler, ph, playerInventory, bfr.getModel().getTurnSolver().getCurrentArmy());
+        super(bfr, scheduler, ph, playerInventory, bfr.getModel().getBattleTurnManager().getCurrentArmy());
         this.thl = thl;
     }
 

@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTu
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 
 import java.util.LinkedList;
@@ -45,7 +45,7 @@ public abstract class AI extends Observable implements Runnable {
         Battlefield bf = bfr.getModel();
         int[] actorPos;
         CommandBundle bundle;
-        if(!bf.getBattleSolver().isBattleOver()) {
+        if(!bf.getBattleSolver().isBattleOver(bfr.getModel())) {
 
 
             BeginArmyTurnCommand beginCommand = new BeginArmyTurnCommand(bfr, scheduler,playerInventory, army);
@@ -64,7 +64,7 @@ public abstract class AI extends Observable implements Runnable {
                 bundle = new CommandBundle();
                 setCommandBundle(actorPos, bundle);
                 notifyAllObservers(bundle);
-                if (bf.getBattleSolver().isBattleOver()) {
+                if (bf.getBattleSolver().isBattleOver(bfr.getModel())) {
                     break;
                 }
             }

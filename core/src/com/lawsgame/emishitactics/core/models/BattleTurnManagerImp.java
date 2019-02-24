@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
-import com.lawsgame.emishitactics.core.models.interfaces.TurnSolver;
+import com.lawsgame.emishitactics.core.models.interfaces.BattleTurnManager;
 
 import java.util.LinkedList;
 
@@ -9,10 +9,10 @@ import java.util.LinkedList;
 /**
  * multiple process are automatized
  *  - the addition of a new army is warranted once the first man is deployed
- *  - a wipe-out force is removed while calling {@link TurnSolverImp#nextArmy()}
+ *  - a wipe-out force is removed while calling {@link BattleTurnManagerImp#nextArmy()}
  *  - turn is incremented when the player army is the new current army;
  */
-public class TurnSolverImp implements TurnSolver {
+public class BattleTurnManagerImp implements BattleTurnManager {
 
     private int turn;
     private final Battlefield battlefield;
@@ -20,7 +20,7 @@ public class TurnSolverImp implements TurnSolver {
     private MilitaryForce firstTurnArmy;
     public LinkedList<MilitaryForce> armyTurnOrder;
 
-    public TurnSolverImp(Battlefield battlefield) {
+    public BattleTurnManagerImp(Battlefield battlefield) {
         this.turn = 1;
         this.battlefield = battlefield;
         this.firstTurnArmy = null;

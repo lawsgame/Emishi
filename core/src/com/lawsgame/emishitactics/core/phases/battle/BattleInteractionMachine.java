@@ -8,14 +8,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Assets;
+import com.lawsgame.emishitactics.core.helpers.implementations.SpriteProviderImp;
+import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Player;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
-import com.lawsgame.emishitactics.core.phases.battle.helpers.loaders.SimpleBattlefieldLoader;
+import com.lawsgame.emishitactics.core.phases.battle.helpers.loaders.BattlefieldLoaderImp;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.PanelPool;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -24,12 +25,16 @@ import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.Battle
 import com.lawsgame.emishitactics.core.phases.battle.widgets.WidgetFactory;
 import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.patterns.statemachine.StateMachine;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class BattleInteractionMachine extends StateMachine<BattleInteractionState> implements Disposable{
+    private static Lawgger log = Lawgger.createInstance(BattleInteractionMachine.class);
+
     public final Player player;
     public final BattlefieldRenderer bfr;
     public final BattleCommandManager bcm;
     public final AssetManager asm;
+    public final SpriteProvider spriteProvider;
     public final TileHighlighter thl;
     public final WidgetFactory wf;
     public final PanelPool pp;
@@ -37,42 +42,44 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
     public final AnimationScheduler scheduler;
     public final I18NBundle localization;
     public final Stage uiStage;
+    public final Skin uiSkin;
 
 
     public BattleInteractionMachine(CameraManager gcm, AssetManager asm, Stage stageUI, Player player, int chapterId) {
-        BattlefieldLoader bfl = new SimpleBattlefieldLoader();
-        Battlefield battlefield = bfl.load(asm, chapterId);
-        battlefield.randomlyDeploy(player.getArmy(), true);
-        battlefield.getTurnSolver().init(player);
-        this.scheduler = new AnimationScheduler();
-        this.bfr = new IsoBFR(battlefield, gcm, asm);
-        this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
-        Skin uiBattleSkin = asm.get(Assets.SKIN_UI, Skin.class);
-        this.wf = new WidgetFactory(stageUI, uiBattleSkin, bfr);
-        this.pp = new PanelPool(wf, localization);
-        bfl.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
         this.asm = asm;
         this.player = player;
+        this.uiStage = stageUI;
+        this.multiplexer = new InputMultiplexer();
+        this.scheduler = new AnimationScheduler();
+        this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
+        this.uiSkin = asm.get(Assets.SKIN_UI, Skin.class);
+        BattlefieldLoader bfl = new BattlefieldLoaderImp();
+        Battlefield battlefield = bfl.load(asm, chapterId);
+        battlefield.randomlyDeploy(player.getArmy(), true);
+        battlefield.getBattleTurnManager().init(player);
+        this.spriteProvider = new SpriteProviderImp(IsoBFR.SPRITE_STD_SIZE);
+        this.spriteProvider.load(asm, battlefield);
+        this.bfr = new IsoBFR(battlefield, gcm, asm, spriteProvider);
+        this.wf = new WidgetFactory(stageUI, uiSkin, bfr);
+        this.pp = new PanelPool(wf, localization);
+        //bfl.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
         this.thl = new TileHighlighter(bfr);
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
-        this.multiplexer = new InputMultiplexer();
-        this.uiStage = stageUI;
+
 
         // TEST
 
         /*
         ReinforcementEvent event = ReinforcementEvent.addTrigger(1, bfr, scheduler, player.getInventory(), player.getArmy());
         Unit soldier = new Unit("toro", Data.UnitTemplate.SOLAR_KNIGHT, Data.WeaponType.SWORD);
-        MilitaryForce enemyForce = bfr.getModel().getTurnSolver().getArmyByName("enemy army 1");
+        MilitaryForce enemyForce = bfr.getModel().getBattleTurnManager().getArmyByName("enemy army 1");
         if(enemyForce != null){
             enemyForce.add(soldier);
             enemyForce.appointSoldier(soldier, 0);
         }
         event.addStiffener(soldier, 10,0, 10,2);
         */
-
-
-        TacticsGame.debug(this.getClass(), battlefield.triggerToString());
+        log.info(battlefield.triggerToString());
 
 
     }

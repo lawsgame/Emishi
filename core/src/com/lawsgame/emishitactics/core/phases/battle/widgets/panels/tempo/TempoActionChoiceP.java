@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data.ActionChoice;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ChoicePanel;
 
 import java.util.Stack;
 

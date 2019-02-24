@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class BattleOverBIS extends BattleInteractionState {
+    private static Lawgger log = Lawgger.createInstance(BattleOverBIS.class);
 
     public BattleOverBIS(BattleInteractionMachine bim) {
         super(bim, true, false, false, true, false);
@@ -14,7 +16,7 @@ public class BattleOverBIS extends BattleInteractionState {
     @Override
     public void init() {
 
-        TacticsGame.debug(this.getClass(), "BATTLE OVER!");
+        log.info("BATTLE OVER!");
         super.init();
     }
 

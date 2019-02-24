@@ -1,7 +1,7 @@
 package com.lawsgame.emishitactics.core.models;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
+import com.lawsgame.emishitactics.core.models.Unit.CharacterUnit;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
 
@@ -12,7 +12,7 @@ public class Tile extends Model{
 
     protected TileType type;
     protected Item loot;
-    protected Unit recruit;
+    protected CharacterUnit recruit;
     protected boolean fragile;
     protected boolean revealed;
 
@@ -62,8 +62,8 @@ public class Tile extends Model{
         return recruit != null;
     }
 
-    public Unit getRecruit(boolean remove){
-        Unit recruitGotten = recruit;
+    public CharacterUnit getRecruit(boolean remove){
+        CharacterUnit recruitGotten = recruit;
         if(remove) recruit = null;
         return recruitGotten;
     }
@@ -72,7 +72,7 @@ public class Tile extends Model{
         this.loot = loot;
     }
 
-    public void setRecruit(Unit recruit) {
+    public void setRecruit(CharacterUnit recruit) {
         this.recruit = recruit;
     }
 

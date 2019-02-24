@@ -1,7 +1,8 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.FadingPanel;
 
 public abstract class ExperiencePanel extends FadingPanel {
 

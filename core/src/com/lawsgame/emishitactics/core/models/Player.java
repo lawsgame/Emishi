@@ -14,10 +14,10 @@ public class Player {
         Army playerArmy = Army.createPlayerArmyTemplate();
 
         Unit.CharacterUnit warlord = Unit.createCharacterUnit(Data.CharacterTemplate.SOLAIRE, true);
-        warlord.chooseWeaponFightStyle(0);
+        warlord.chooseWeaponFightStyle(Data.WeaponType.SWORD);
         warlord.growup(25);
         warlord.addWeapon(new Weapon(Data.WeaponTemplate.SHORTSWORD));
-        warlord.setLeadership(3);
+        warlord.setLeadership(5);
         Unit soldier1 = new Unit("Taro", Data.UnitTemplate.SOLAR_KNIGHT, 8, Data.WeaponType.BOW, false);
         soldier1.addWeapon(new Weapon(Data.WeaponTemplate.HUNTING_BOW));
         Unit soldier2 = new Unit("Rota", Data.UnitTemplate.SOLAR_KNIGHT, 1, Data.WeaponType.POLEARM, false);
@@ -34,8 +34,8 @@ public class Player {
 
         playerArmy.appointWarLord(warlord);
         playerArmy.appointSoldier(soldier1, 0);
-        //playerArmy.appointSoldier(soldier2, 0);
-        //playerArmy.appointSoldier(soldier3, 0);
+        playerArmy.appointSoldier(soldier2, 0);
+        playerArmy.appointSoldier(soldier3, 0);
 
         warlord.getBanner().increment(Data.BannerBonus.ATTACK_MIGHT);
         warlord.getBanner().increment(Data.BannerBonus.MORAL_SHIELD);

@@ -15,8 +15,11 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class DeploymentBIS extends BattleInteractionState {
+    private static Lawgger log = Lawgger.createInstance(DeploymentBIS.class);
+
     private int rowUnit;
     private int colUnit;
     private Unit sltdUnit;
@@ -45,7 +48,7 @@ public class DeploymentBIS extends BattleInteractionState {
 
     @Override
     public void init() {
-        TacticsGame.debug(this.getClass(), "DEPLOYEMENT BIS");
+        log.info("DEPLOYEMENT BIS");
         super.init();
         bim.uiStage.addActor(startButton);
         bim.bfr.displayDeploymentAreas(true);

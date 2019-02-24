@@ -1,17 +1,18 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Unit;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.FadingPanel;
 
-public abstract class ShortUnitPanel extends SlidingPanel {
+public abstract class LongUnitPanel extends FadingPanel {
 
-    public ShortUnitPanel(Viewport stageUIViewport, float slidingDuration, int xShowingPadding, int yPadding, int width, int height, boolean top, boolean left) {
-        super(stageUIViewport, slidingDuration, xShowingPadding, yPadding, width, height, top, left);
+    public LongUnitPanel(Viewport stageUIViewport, float fadingDuration, int width, int height) {
+        super(stageUIViewport, fadingDuration, width, height);
     }
 
     public void update(final Unit content) {
-        final ShortUnitPanel p = this;
+        final LongUnitPanel p = this;
         this.awaitingActions.add(new Action() {
             @Override
             public boolean act(float delta) {
@@ -22,5 +23,4 @@ public abstract class ShortUnitPanel extends SlidingPanel {
     }
 
     protected abstract void setContent(Unit content);
-
 }

@@ -1,10 +1,12 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class InfoBIS extends BattleInteractionState{
+    private static Lawgger log = Lawgger.createInstance(InfoBIS.class);
+
     int row;
     int col;
 
@@ -17,7 +19,7 @@ public class InfoBIS extends BattleInteractionState{
     @Override
     public void init() {
         super.init();
-        TacticsGame.debug(this.getClass(), "INFO BIS ");
+        log.info("INFO BIS ");
         bim.pp.shortUnitPanel.hide();
         bim.pp.shortTilePanel.hide();
         if(bim.bfr.getModel().isTileOccupied(row, col)) {

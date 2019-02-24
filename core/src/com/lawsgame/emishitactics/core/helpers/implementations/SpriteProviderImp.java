@@ -28,10 +28,12 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.engine.datastructures.maps.Map2;
 import com.lawsgame.emishitactics.engine.datastructures.maps.Map7;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 import java.util.HashMap;
 
 public class SpriteProviderImp implements SpriteProvider {
+    private static Lawgger log = Lawgger.createInstance(SpriteProviderImp.class);
 
     // dimension of the standard  unit /tile sprite
     private float spriteStdSize;
@@ -299,7 +301,7 @@ public class SpriteProviderImp implements SpriteProvider {
                 filepath = String.format("%s/%s/%s/%s%s", Assets.UNIT_SPRITES_DIR, filenamesArray.get(i)[0], filenamesArray.get(i)[1], filenamesArray.get(i)[2], ext);
                 fileHandle = Gdx.files.internal(filepath);
                 if(fileHandle.exists()){
-                    TacticsGame.debug(this.getClass(), filepath);
+                    log.info(filepath);
                     asm.load(filepath, TextureAtlas.class);
                     asm.finishLoading();
                     atlas =  asm.get(filepath, TextureAtlas.class);
@@ -311,7 +313,7 @@ public class SpriteProviderImp implements SpriteProvider {
                         fetchAndStoreUnitSpriteSetsIntoMaps(filenamesArray.get(i), atlas);
                     }
                 }else{
-                    TacticsGame.debug(this.getClass(), filepath+" > not found");
+                    log.info(filepath+" > not found");
                 }
             }
         }
@@ -378,16 +380,22 @@ public class SpriteProviderImp implements SpriteProvider {
         filenames.add(new String[]{"solar_knight", "sword", "pc"});
         // fetch all units deployed and add their spritesheet locations.
         Unit unit;
+        Unit.CharacterUnit chara;
         for(int r = 0; r < battlefield.getNbRows(); r++){
             for (int c = 0; c < battlefield.getNbColumns(); c++) {
+                // fetch deployed units
                 if (battlefield.isTileOccupied(r, c)) {
                     unit = battlefield.getUnit(r, c);
-                    addUnitAssociatedFilePath(unit, filenames);
+                    addUnitAssociatedFilePath(unit, filenames, unit.getWeaponType());
                 }
+                //fetch to be recruited units
                 if(battlefield.isTileExisted(r, c) && battlefield.getTile(r, c).isHidingRecruit()){
-                    unit = battlefield.getTile(r,c).getRecruit(false);
-                    addUnitAssociatedFilePath(unit, filenames);
+                    chara = battlefield.getTile(r,c).getRecruit(false);
+                    for(int i = 0; i < chara.getUsableWeaponType().length; i++) {
+                        addUnitAssociatedFilePath(chara, filenames, chara.getUsableWeaponType()[0]);
+                    }
                 }
+                //fetch reinforcements
                 //TODO: add reinforcements
 
 
@@ -405,11 +413,11 @@ public class SpriteProviderImp implements SpriteProvider {
      * @param unit
      * @param filenames
      */
-    private void addUnitAssociatedFilePath(Unit unit, Array<String[]> filenames){
+    private void addUnitAssociatedFilePath(Unit unit, Array<String[]> filenames, WeaponType weaponType){
         // create filepath
         String[] filename = new String[3];
         filename[0] = unit.getTemplate().name().toLowerCase();
-        filename[1] = unit.getWeaponType().name().toLowerCase();
+        filename[1] = weaponType.name().toLowerCase();
         if(!unit.isCharacter()){
             if(unit.belongToAnArmy()) {
                 filename[2] = (unit.getArmy().isPlayerControlled()) ? "pc" : "ai";

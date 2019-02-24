@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.battle.BeginArmyTurnCommand;
@@ -8,8 +7,10 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class SelectActorBIS extends BattleInteractionState implements Observer {
+    private static Lawgger log = Lawgger.createInstance(SelectActorBIS.class);
     int rowInit;
     int colInit;
     boolean readyToUse;
@@ -35,7 +36,7 @@ public class SelectActorBIS extends BattleInteractionState implements Observer {
     @Override
     public void init() {
         if(readyToUse) {
-            TacticsGame.debug(this.getClass(), "SELECT ACTOR");
+            log.info("SELECT ACTOR");
             super.init();
             int[] activeUnitPos = new int[2];
             if (bim.bfr.getModel().isTileOccupiedByPlayerControlledUnit(rowInit, colInit)) {

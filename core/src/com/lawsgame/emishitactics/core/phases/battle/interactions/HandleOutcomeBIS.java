@@ -1,6 +1,5 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
-import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
@@ -10,15 +9,16 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.HandleOutcomeBIS.HandleOutcomeTask.HOTType;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 import java.util.LinkedList;
 import java.util.Stack;
 
 public class HandleOutcomeBIS extends BattleInteractionState{
+    private static Lawgger log = Lawgger.createInstance(HandleOutcomeBIS.class);
 
     private Stack<ActorCommand> historic;
     private Outcome outcome;
-
     private LinkedList<HandleOutcomeTask> tasks;
     private boolean aiTurn;
 
@@ -34,13 +34,13 @@ public class HandleOutcomeBIS extends BattleInteractionState{
 
     @Override
     public void init() {
-        TacticsGame.debug(this.getClass(), "HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName());
+        log.info("HANDLE OUTCOME : initiator = "+historic.peek().getInitiator().getName());
 
         /*
          * BUG HANDLE OUTCOME:
          * handle outcome has been implemented for handling player interaction first
          * Not to handle outcome of AI-Driven interaction. Therefore, if a unit yet alive at the end of an action of the currently displyad outcome.
-         * An error can arive since if the unit dies later during the AIs turn and the action resulting in this death has already been applied to the model.
+         * An error can arivs since if the unit dies later during the AIs turn and the action resulting in this death has already been applied to the model.
          * Nasty bug!!
          */
 
@@ -139,7 +139,7 @@ public class HandleOutcomeBIS extends BattleInteractionState{
          */
         if(aiTurn) {
              bim.rollback();
-         }else if(bim.bfr.getModel().getBattleSolver().isBattleOver()) {
+         }else if(bim.bfr.getModel().getBattleSolver().isBattleOver(bim.bfr.getModel())) {
             bim.replace(new BattleOverBIS(bim));
         }else{
             if(!historic.isEmpty()&& historic.peek().getInitiator() != null) {

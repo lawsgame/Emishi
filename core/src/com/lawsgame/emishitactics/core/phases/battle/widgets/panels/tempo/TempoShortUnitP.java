@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ShortUnitPanel;
 
 public class TempoShortUnitP extends ShortUnitPanel {
     private static final float SLIDE_DURATION = 0.5f;

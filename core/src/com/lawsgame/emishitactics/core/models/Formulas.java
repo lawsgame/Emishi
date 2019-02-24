@@ -83,6 +83,22 @@ public class Formulas {
         return (int)expGained;
     }
 
+    public static int getGainedLeadershipExperience(Unit warchief, Battlefield bf){
+        float experience = 0;
+        if(warchief.isWarChief() && !warchief.isDead()){
+            float tEnd = bf.getBattleTurnManager().getTurn();
+            float tMin = bf.getBattleSolver().getTurnMin();
+            float tMax = bf.getBattleSolver().getTurrMax();
+            experience = 100 * warchief.getTemplate().getStatGrowth(Data.UnitStat.LEADERSHIP, warchief.isPromoted());
+            experience *= Math.sqrt(tMax);
+            if(warchief.isOutOfAction())
+                experience *= 0.5f;
+            experience *= (1 + (tMax - tEnd)/(tMax - tMin));
+            experience += bf.getBattleSolver().getVictorySecondaryBonus(bf);
+        }
+        return (int)experience;
+    }
+
     public static int getLootRate(Unit attacker, int rowActor, int colActor, Battlefield bf){
         int lootRate = 0;
         if(attacker.getArmy().isPlayerControlled()) {
@@ -148,4 +164,6 @@ public class Formulas {
         }
         return bonusValue;
     }
+
+
 }

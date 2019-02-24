@@ -1,10 +1,11 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattleCommandManager;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.SlidingPanel;
 
 import java.util.Stack;
 

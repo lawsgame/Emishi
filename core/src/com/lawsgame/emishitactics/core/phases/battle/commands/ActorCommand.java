@@ -17,6 +17,7 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattleUnitRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 import static com.lawsgame.emishitactics.core.models.Formulas.getCurrentWeaponRangeMin;
 import static com.lawsgame.emishitactics.core.models.Formulas.getCurrentWeaponRangeMax;
@@ -73,7 +74,7 @@ import static com.lawsgame.emishitactics.core.models.Formulas.getCurrentWeaponRa
  *  4 - (optional) check for events
  */
 public abstract class ActorCommand extends BattleCommand{
-
+    private static Lawgger log = Lawgger.createInstance(ActorCommand.class);
 
     protected final ActionChoice choice;
     //does not set the actor.acted or .moved to true if the command is executed
@@ -146,7 +147,7 @@ public abstract class ActorCommand extends BattleCommand{
         builder.append("\nEvent triggered while performing this command ? ");
         builder.append(isEventTriggered());
         builder.append("\n              ------***$$ ACTION END $$***------");
-        TacticsGame.debug(this.getClass(), builder.toString());
+        log.info(builder.toString());
     }
 
     public final boolean apply(int rowActor, int colActor, int rowTarget, int colTarget){

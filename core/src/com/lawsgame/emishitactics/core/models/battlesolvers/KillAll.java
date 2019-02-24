@@ -1,17 +1,23 @@
 package com.lawsgame.emishitactics.core.models.battlesolvers;
 
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.core.models.BattleSolver;
+import com.lawsgame.emishitactics.core.models.Battlefield;
+import com.lawsgame.emishitactics.core.models.interfaces.BattleSolver;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 
 public class KillAll extends BattleSolver {
+
+    public KillAll(int turnMin, int turnMax) {
+        super(turnMin, turnMax);
+    }
+
     /*
      *
      * @return true if at least two affiliation are represented by two still well and alive units, AND the player army is still active
      */
     @Override
-    public boolean isBattleOver(){
+    public boolean isBattleOver(Battlefield battlefield){
         Array<Data.Affiliation> affiliations = new Array<Data.Affiliation>();
         boolean playerArmyRemain = false;
         for (int r = 0; r < battlefield.getNbRows(); r++) {

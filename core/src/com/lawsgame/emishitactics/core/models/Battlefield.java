@@ -8,10 +8,13 @@ import com.lawsgame.emishitactics.core.models.Data.AreaType;
 import com.lawsgame.emishitactics.core.models.Data.TileType;
 import com.lawsgame.emishitactics.core.models.Data.Environment;
 import com.lawsgame.emishitactics.core.models.Data.Weather;
+import com.lawsgame.emishitactics.core.models.battlesolvers.Endless;
 import com.lawsgame.emishitactics.core.models.battlesolvers.KillAll;
+import com.lawsgame.emishitactics.core.models.interfaces.BattleSolver;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.models.interfaces.Model;
-import com.lawsgame.emishitactics.core.models.interfaces.TurnSolver;
+import com.lawsgame.emishitactics.core.models.interfaces.BattleTurnManager;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 
 
@@ -37,7 +40,7 @@ public class Battlefield extends Model {
     private Weather weather;
     private Environment environment;
     private BattleSolver solver;
-    private TurnSolver turnSolver;
+    private BattleTurnManager battleTurnManager;
 
 
     public Battlefield (int id, int nbRows, int nbCols, Weather weather, Environment env, BattleSolver solver){
@@ -52,11 +55,11 @@ public class Battlefield extends Model {
         this.environment = env;
         setWeather(weather);
         setSolver(solver);
-        this.turnSolver = new TurnSolverImp(this);
+        this.battleTurnManager = new BattleTurnManagerImp(this);
     }
 
     public Battlefield(int id, int nbRows, int nbCols){
-        this(id, nbRows, nbCols, Data.Weather.getDefaultValue(), Environment.getDefaultValue(), new KillAll());
+        this(id, nbRows, nbCols, Data.Weather.getDefaultValue(), Environment.getDefaultValue(), BattleSolver.getDefaultValue());
     }
 
 
@@ -96,11 +99,10 @@ public class Battlefield extends Model {
 
     public void setSolver(BattleSolver battleSolver) {
         this.solver = battleSolver;
-        this.solver.setBattlefield(this);
     }
 
-    public TurnSolver getTurnSolver(){
-        return this.turnSolver;
+    public BattleTurnManager getBattleTurnManager(){
+        return this.battleTurnManager;
     }
 
 
@@ -143,7 +145,7 @@ public class Battlefield extends Model {
     }
 
 
-
+    @Override
     public void remove(Trigger trigger){
         super.remove(trigger);
         for(int r = 0; r < tiles.length; r++){
@@ -159,8 +161,28 @@ public class Battlefield extends Model {
         for(int i = 0; i < unitAreas.size; i++){
             unitAreas.get(i).remove(trigger);
         }
-
     }
+
+    @Override
+    public <T extends BattleCommand> Array<T> findEvent(Class<T> eventType){
+        Array<T> events = super.findEvent(eventType);
+        for(int r = 0; r < tiles.length; r++){
+            for(int c = 0; c < tiles[0].length; c++){
+                if(isTileExisted(r, c)) {
+                    events.addAll(tiles[r][c].findEvent(eventType));
+                    if(isTileOccupied(r, c)){
+                        events.addAll(units[r][c].findEvent(eventType));
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < unitAreas.size; i++){
+            events.addAll(unitAreas.get(i).findEvent(eventType));
+        }
+        return events;
+    }
+
+
 
 
 
@@ -496,7 +518,7 @@ public class Battlefield extends Model {
         if(isTileAvailable(row, col, unit.has(Data.Ability.PATHFINDER)) && isUnitDeployable(unit)){
 
             this.units[row][col] = unit;
-            this.getTurnSolver().addArmy(unit.getArmy());
+            this.getBattleTurnManager().addArmy(unit.getArmy());
             if(notifyObservers) {
                 notifyAllObservers(new Notification.SetUnit(row, col, unit));
             }
@@ -1208,7 +1230,7 @@ public class Battlefield extends Model {
 
     @Override
     public String toString() {
-        return "Battlefield";
+        return "Battlefield : solver ? "+solver.getClass().getSimpleName();
     }
 
 
@@ -1218,7 +1240,7 @@ public class Battlefield extends Model {
         builder.append(super.triggerToString());
         builder.append("\nAreas : ");
         for(int i = 0; i< unitAreas.size; i++){
-            if(unitAreas.get(i).holdEventTrigger()){
+            if(unitAreas.get(i).isHoldingEventTrigger()){
                 builder.append("\n  ");
                 builder.append(unitAreas.get(i).triggerToString());
             }
@@ -1227,7 +1249,7 @@ public class Battlefield extends Model {
         builder.append("\nUnits : ");
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
-                if(isTileOccupied(r,c) && getUnit(r, c).holdEventTrigger()) {
+                if(isTileOccupied(r,c) && getUnit(r, c).isHoldingEventTrigger()) {
                     builder.append("\n  ");
                     builder.append(getUnit(r, c).triggerToString());
                 }
@@ -1237,7 +1259,7 @@ public class Battlefield extends Model {
         builder.append("\nTiles : ");
         for(int r = 0; r < getNbRows(); r++){
             for(int c = 0; c < getNbColumns(); c++){
-                if(isTileExisted(r,c) && getTile(r, c).holdEventTrigger()) {
+                if(isTileExisted(r,c) && getTile(r, c).isHoldingEventTrigger()) {
                     builder.append("\n  ");
                     builder.append(getTile(r, c).triggerToString());
                 }

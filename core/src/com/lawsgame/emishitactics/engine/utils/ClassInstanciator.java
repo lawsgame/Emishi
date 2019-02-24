@@ -49,7 +49,7 @@ public class ClassInstanciator {
      *      <String value="..."/>
      *      <Primitive type="int" value="1/>
      *      <Enum type="classpth" value="value"/>
-     * </'Name'>
+     * </'Name0'>
      *
      * NOT HANDLE :
      *  - any collection pf any sort : array, Java's collections, Gdx's Arrays
@@ -116,50 +116,22 @@ public class ClassInstanciator {
         return null;
     }
 
-
-    public static <T extends Enum<T>> T parseXmlIntoEnumConstant(XmlReader.Element enumElt, T defaultValue){
-        try {
-            String classpath = enumElt.get("type");
-            String value = enumElt.get("value");
-            Class<T> enumClass = (Class<T>)Class.forName(classpath);
-            T t =EnumUtils.getEnum(enumClass, value);
-            return (t == null) ? defaultValue : t;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }catch(ClassCastException e){
-            e.printStackTrace();
-        }
-        return defaultValue;
-
-    }
-
-
 /*
-    public static <T extends Enum<T>> T parseXmlIntoEnumConstant(String classpath, String value){
+    public static <T extends Enum<T>> T parseXmlIntoEnumConstant(XmlReader.Element enumElt, Class<T> expectedEnumType) {
+        T instance = null;
         try {
-            Class<T> enumClass = (Class<T>)Class.forName(classpath);
-            T t =EnumUtils.getEnum(enumClass, value);
-            if(t != null){
-                return t;
-            }else {
-                Method getDefault = enumClass.getMethod("getDefaultValue");
-                Object defaultValue = getDefault.invoke(null);
-                if(defaultValue != null) {
-                    return (T)defaultValue;
-                }
-            }
+            String classPath = enumElt.get("type");
+            Class<? extends T> enumClass = enumClass = Class.forName(classPath).asSubclass(expectedEnumType);
+            instance = EnumUtils.getEnum(enumClass, enumElt.get("value"));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch(ClassCastException e){
-            e.printStackTrace();
+        }finally {
+            if(instance == null){
+                instance = defaultValue;
+            }
         }
-        return null;
+        return instance;
     }
-    */
+*/
+
 }

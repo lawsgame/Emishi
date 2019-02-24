@@ -13,7 +13,6 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.engine.CameraManager;
 import com.lawsgame.emishitactics.engine.math.functions.VectorialFunction;
 
 public class EarthquakeEvent extends BattleCommand {
@@ -38,7 +37,7 @@ public class EarthquakeEvent extends BattleCommand {
             @Override
             public boolean isTriggerable(Object data) {
                 boolean triggered = data instanceof Notification.BeginArmyTurn
-                        & bfr.getModel().getTurnSolver().getTurn() == turn
+                        & bfr.getModel().getBattleTurnManager().getTurn() == turn
                         && ((Notification.BeginArmyTurn) data).army.isPlayerControlled();
                 return triggered;
             }

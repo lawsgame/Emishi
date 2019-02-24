@@ -8,12 +8,15 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ChoicePanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 import java.util.Stack;
 
 public class SelectActionBIS extends BattleInteractionState implements ChoicePanel.CommandReceiver {
+    private static Lawgger log = Lawgger.createInstance(SelectActionBIS.class);
+
     private int rowSltdUnit;
     private int colSltdUnit;
     private Stack<ActorCommand> historic;
@@ -33,7 +36,7 @@ public class SelectActionBIS extends BattleInteractionState implements ChoicePan
 
     @Override
     public void init() {
-        TacticsGame.debug(this.getClass(), "SELECT ACTION : "+bim.bfr.getModel().getUnit(rowSltdUnit, colSltdUnit).getName());
+        log.info("SELECT ACTION : "+bim.bfr.getModel().getUnit(rowSltdUnit, colSltdUnit).getName());
 
         super.init();
         bim.pp.choicePanel.attach(this);

@@ -9,7 +9,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
@@ -94,7 +94,7 @@ public class AiBIS extends BattleInteractionState implements Observer {
 
 
     private void proceed(){
-        if(bim.bfr.getModel().getBattleSolver().isBattleOver()){
+        if(bim.bfr.getModel().getBattleSolver().isBattleOver(bim.bfr.getModel())){
             bim.replace(new BattleOverBIS(bim));
         }else{
             bim.replace(new EndArmyTurnBIS(bim));

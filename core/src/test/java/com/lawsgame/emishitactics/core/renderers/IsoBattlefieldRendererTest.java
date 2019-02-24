@@ -2,6 +2,7 @@ package com.lawsgame.emishitactics.core.renderers;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.lawsgame.emishitactics.core.helpers.AssetProvider;
+import com.lawsgame.emishitactics.core.helpers.implementations.SpriteProviderImp;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
@@ -26,7 +27,7 @@ public class IsoBattlefieldRendererTest {
                 battlefield.setTile(r,c, Data.TileType.PLAIN, true);
             }
         }
-        bfr0 = new IsoBFR(battlefield, null, new AssetManager(), true);
+        bfr0 = new IsoBFR(battlefield, null, new AssetManager(), new SpriteProviderImp(1f), true);
 
     }
 

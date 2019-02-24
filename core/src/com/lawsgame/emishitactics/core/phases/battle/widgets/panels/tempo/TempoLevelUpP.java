@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LevelUpPanel;
 
 public class TempoLevelUpP extends LevelUpPanel {
     private static int WIDTH = 200;

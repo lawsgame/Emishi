@@ -20,7 +20,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.atomic.HitCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ActionInfoPanel;
 
 public class TempoAIP extends ActionInfoPanel {
     private static float X_PADDING = 15f;

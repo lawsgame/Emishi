@@ -18,9 +18,11 @@ import com.lawsgame.emishitactics.core.phases.battle.interactions.tempo.TestComm
 import com.lawsgame.emishitactics.core.phases.battle.renderers.IsoBFR;
 import com.lawsgame.emishitactics.engine.GPM;
 import com.lawsgame.emishitactics.engine.GamePhase;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 
 public class BattlePhase extends GamePhase {
+    private static Lawgger log = Lawgger.createInstance(BattlePhase.class);
 
     public static BitmapFont testFont;
 
@@ -77,7 +79,7 @@ public class BattlePhase extends GamePhase {
 
     public BattlePhase(GPM gpm, Player player, int chapterId ){
         super(gpm, getPixelPerfectGamePortWidth());
-        TacticsGame.debug(this.getClass(), "Game Port Width : " +getPixelPerfectGamePortWidth());
+        log.info("Game Port Width : " +getPixelPerfectGamePortWidth());
 
         loadRequiredAssets();
         setFontParams(true);
@@ -85,8 +87,8 @@ public class BattlePhase extends GamePhase {
         this.bim = new BattleInteractionMachine(gameCM, asm, stageUI, player, chapterId);
         //BattleInteractionState initBIS = new TestAssetBIS(bim);
         //BattleInteractionState initBIS = new TestCommandBIS(bim);
-        //BattleInteractionState initBIS = new TestBIS(bim);
-        BattleInteractionState initBIS = new SceneBIS(bim);
+        BattleInteractionState initBIS = new TestBIS(bim);
+        //BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

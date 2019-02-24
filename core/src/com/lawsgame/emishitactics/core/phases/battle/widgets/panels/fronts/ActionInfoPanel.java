@@ -1,9 +1,10 @@
-package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces;
+package com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.SlidingPanel;
 
 
 public abstract class ActionInfoPanel extends SlidingPanel {

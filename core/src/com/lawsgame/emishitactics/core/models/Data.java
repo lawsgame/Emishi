@@ -44,7 +44,7 @@ public class Data {
     public static final double EXP_LVL_GAP_FACTOR = 3;
     public static final double EXP_WOUNDED_ONLY_FACTOR = 0.33333;
     public static final int EXP_REQUIRED_LEVEL_UP = 100;
-    public static final int EXP_REQUIRED_LD_LEVEL_UP = 100;
+    public static final int[] EXP_REQUIRED_LEADERSHIP = {200, 700, 1300, 2000};
 
     // RENDER parameters
     public static final float SPEED_WALK = 1.5f;

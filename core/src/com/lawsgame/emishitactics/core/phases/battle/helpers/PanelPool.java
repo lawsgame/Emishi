@@ -8,21 +8,17 @@ import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
 import com.lawsgame.emishitactics.core.phases.battle.widgets.WidgetFactory;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ChoicePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ExperiencePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LevelUpPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LongUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.LootPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortTilePanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoAIP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoActionChoiceP;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.tempo.TempoCommandCP;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.BattleOverPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ChoicePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ExperiencePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LevelUpPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LongTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LongUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.LootPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ShortTilePanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ShortUnitPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
-
-import java.util.HashMap;
 
 /**
  *
@@ -45,6 +41,7 @@ public class PanelPool implements Disposable {
     public final LevelUpPanel levelUpPanel;
     public final LootPanel lootPanel;
     public final ChoicePanel.ActionChoicePanel choicePanel;
+    public final BattleOverPanel overPanel;
 
     // common commands
     public final SimpleCommand showSTP;
@@ -69,6 +66,7 @@ public class PanelPool implements Disposable {
         this.levelUpPanel = wf.getLevelUpPanel();
         this.lootPanel = wf.getLootPanel();
         this.choicePanel = wf.getActionChoicePanel();
+        this.overPanel = wf.getBattleOverPanel();
 
 
         panelGroup.addActor(shortTilePanel);
@@ -80,6 +78,7 @@ public class PanelPool implements Disposable {
         panelGroup.addActor(lootPanel);
         panelGroup.addActor(choicePanel);
         panelGroup.addActor(choicePanel.getCommandChoicePanel());
+        panelGroup.addActor(overPanel);
 
 
         // utility command for scheduler
@@ -107,6 +106,7 @@ public class PanelPool implements Disposable {
                 shortUnitPanel.hide();
             }
         };
+
     }
 
     //----------------------- UPDATE SHORT PANELS --------------------------------------------------------------------------------

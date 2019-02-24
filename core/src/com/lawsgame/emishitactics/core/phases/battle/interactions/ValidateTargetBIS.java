@@ -12,18 +12,20 @@ import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask.CommandSubTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ActionInfoPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ActionInfoPanel;
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observable;
 import com.lawsgame.emishitactics.engine.patterns.observer.Observer;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 import java.util.Stack;
 
 public class ValidateTargetBIS extends BattleInteractionState implements Observer {
+    private static Lawgger log = Lawgger.createInstance(ValidateTargetBIS.class);
+
     private Stack<ActorCommand> historic;
     private ActorCommand currentCommand;
     private Area impactArea;
-
     private ChooseOrientationCommand orientationCommand;
     private SimpleCommand hideActionPanelCommand;
     private SimpleCommand removeActionPanelCommand;
@@ -42,7 +44,7 @@ public class ValidateTargetBIS extends BattleInteractionState implements Observe
 
     @Override
     public void init() {
-        TacticsGame.debug(this.getClass(), "VALIDATE TARGET : "
+        log.info("VALIDATE TARGET : "
                 +currentCommand.getInitiator().getName()+" => "
                 +((currentCommand.getTarget() != null) ? currentCommand.getTarget().getName() : "("+currentCommand.getRowTarget()+", "+currentCommand.getColTarget()+")")+" : "
                 +currentCommand.getName(bim.localization));

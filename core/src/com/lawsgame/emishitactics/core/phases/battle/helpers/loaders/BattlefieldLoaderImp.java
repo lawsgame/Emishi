@@ -11,7 +11,6 @@ import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.StringKey;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.models.Army;
-import com.lawsgame.emishitactics.core.models.BattleSolver;
 import com.lawsgame.emishitactics.core.models.Battlefield;
 import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Data.Affiliation;
@@ -28,7 +27,8 @@ import com.lawsgame.emishitactics.core.models.Equipment;
 import com.lawsgame.emishitactics.core.models.Inventory;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.models.Weapon;
-import com.lawsgame.emishitactics.core.models.battlesolvers.KillAll;
+import com.lawsgame.emishitactics.core.models.battlesolvers.Endless;
+import com.lawsgame.emishitactics.core.models.interfaces.BattleSolver;
 import com.lawsgame.emishitactics.core.models.interfaces.Item;
 import com.lawsgame.emishitactics.core.models.interfaces.MilitaryForce;
 import com.lawsgame.emishitactics.core.phases.battle.commands.event.EarthquakeEvent;
@@ -38,7 +38,7 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.event.TrapEvent;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.AnimationScheduler;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.BattlefieldLoader;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
-import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.interfaces.ShortUnitPanel;
+import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.ShortUnitPanel;
 import com.lawsgame.emishitactics.engine.utils.ClassInstanciator;
 
 import org.apache.commons.lang3.EnumUtils;
@@ -46,7 +46,7 @@ import org.apache.commons.lang3.EnumUtils;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class SimpleBattlefieldLoader implements BattlefieldLoader {
+public class BattlefieldLoaderImp implements BattlefieldLoader {
     private XmlReader reader = new XmlReader();
     private Array<String> nameDictionary = new Array<String>();
     private boolean dictionariesLoaded = false;
@@ -156,8 +156,11 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                 bf.setWeather((weather != null) ? weather : Weather.getDefaultValue());
                 Environment environment = EnumUtils.getEnum(Environment.class, battleElt.get("env"));
                 bf.setEnvironment((environment != null) ? environment  : Environment.getDefaultValue());
+
+                // SET BATTEL SOLVER
                 BattleSolver solver = ClassInstanciator.parseXmlIntoInstanceOf(BattleSolver.class, battleElt.getChildByName("Solver"));
-                bf.setSolver((solver != null) ? solver : new KillAll());
+                solver = (solver != null) ? solver : new Endless();
+                bf.setSolver(solver);
 
                 // DEPLOY ARMIES
 
@@ -247,8 +250,9 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                     recruitRow = recruitElt.getInt("row", -1);
                     recruitCol = recruitElt.getInt("col", -1);
                     recruit = instanciate(recruitElt);
-                    if(bf.isTileExisted(recruitRow, recruitCol) && recruit != null) {
-                        bf.getTile(recruitRow, recruitCol).setRecruit(recruit);
+                    if(bf.isTileExisted(recruitRow, recruitCol)
+                            && recruit instanceof Unit.CharacterUnit) {
+                        bf.getTile(recruitRow, recruitCol).setRecruit((Unit.CharacterUnit)recruit);
                     }
                 }
             }
@@ -325,7 +329,7 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                 }
             }
             if(attributeElt.get("id").equals("leadership")) {
-                unit.setLeadership(attributeElt.getInt("leadership", 20));
+                unit.setLeadership(attributeElt.getInt("leadership", Data.EXP_REQUIRED_LEADERSHIP.length));
             }
             if(attributeElt.get("id").equals("equipement")) {
                 for (EquipmentTemplate value : EquipmentTemplate.values()) {
@@ -445,7 +449,7 @@ public class SimpleBattlefieldLoader implements BattlefieldLoader {
                     armyTurn = reienforcementEvents.get(i).get("armyTurn");
                     idReinforcement = reienforcementEvents.get(i).getInt("id");
                     if(turn > 0){
-                        reienforcementEvent = ReinforcementEvent.addTrigger(turn, bfr, scheduler, inventory, bfr.getModel().getTurnSolver().getArmyByName(armyTurn));
+                        reienforcementEvent = ReinforcementEvent.addTrigger(turn, bfr, scheduler, inventory, bfr.getModel().getBattleTurnManager().getArmyByName(armyTurn));
                         data = stiffeners.get(idReinforcement);
                         for(int j = 0; j < data.size; j++){
                             reienforcementEvent.addStiffener(data.get(j));
