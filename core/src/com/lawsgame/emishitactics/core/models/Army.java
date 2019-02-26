@@ -602,20 +602,6 @@ public class Army extends MilitaryForce {
     }
 
     @Override
-    public void updateActionPoints() {
-        for(int i = 0; i < regularTroops.size; i++){
-            for(int j = 0; j < regularTroops.get(i).size; j++){
-                if(!regularTroops.get(i).get(j).isOutOfAction()) {
-                    regularTroops.get(i).get(j).addActionPoints(Data.AP_REGEN);
-                }
-            }
-        }
-        for(int i = 0; i < skirmishers.size ; i++){
-            skirmishers.get(i).addActionPoints(Data.AP_REGEN);
-        }
-    }
-
-    @Override
     public String toLongString(){
         String str = "CURRENT ARMY";
         str += "\nLeader : "+getWarlord();

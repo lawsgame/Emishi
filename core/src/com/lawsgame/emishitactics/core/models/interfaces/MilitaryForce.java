@@ -57,7 +57,6 @@ public abstract class MilitaryForce {
     public abstract void disbandAllSquads();
 
     public abstract void replenishMoral(boolean turnBeginning);
-    public abstract void updateActionPoints();
 
     public abstract String toLongString();
 }

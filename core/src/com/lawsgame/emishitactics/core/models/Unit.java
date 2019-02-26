@@ -96,7 +96,6 @@ public class Unit extends Model {
 
         this.currentHitPoints = getAppStat(UnitStat.HIT_POINTS);
         resetCurrentMoral();
-        resetActionPoints();
     }
 
     public Unit(String name, UnitTemplate template, WeaponType weaponType){
@@ -600,18 +599,6 @@ public class Unit extends Model {
 
     public int getAppAvoidance() {
         return Data.DEX_FACTOR_AVO * getAppStat(UnitStat.AGILITY);
-    }
-
-    public void resetActionPoints() {
-        this.actionPoints = getAppStat(UnitStat.SKILL);
-    }
-
-    public void addActionPoints(int points) {
-        this.actionPoints += points;
-        if(actionPoints < 0 ) {
-            actionPoints = 0;
-        }
-
     }
 
     public boolean isMobilized() { return isRegular() || isSkirmisher(); }

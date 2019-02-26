@@ -57,7 +57,6 @@ public class BeginArmyTurnCommand extends BattleCommand {
             // UPDATE MORAL AND AP OF THE WHOLE ARMY
             StandardTask boostTask = new StandardTask();
             army.replenishMoral(true);
-            army.updateActionPoints();
             Array<int[]> currentArmyUnitPos = bfr.getModel().getUnitsPos(army, false, true);
             int[] heraldPos = bfr.getModel().getUnitPos(army.getWarlord());
             if(heraldPos == null){

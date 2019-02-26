@@ -120,10 +120,6 @@ public abstract class ActorCommand extends BattleCommand{
             } else {
                 getInitiator().setMoved(registerAction);
             }
-            // actor pays the cost of performing this action
-            if(!costless) {
-                initiator.addActionPoints(-choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
-            }
             // clean and solve the outcome
             outcome.clean();
             outcome.resolve();
@@ -169,9 +165,6 @@ public abstract class ActorCommand extends BattleCommand{
                 }else {
                     getInitiator().setMoved(false);
                 }
-            }
-            if (!costless) {
-                initiator.addActionPoints(choice.getCost(rowActor, colActor, initiator, bfr.getModel()));
             }
 
             return true;
