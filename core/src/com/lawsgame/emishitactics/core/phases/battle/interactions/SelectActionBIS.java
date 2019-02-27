@@ -1,10 +1,14 @@
 package com.lawsgame.emishitactics.core.phases.battle.interactions;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
 import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Utils;
+import com.lawsgame.emishitactics.core.models.Data;
 import com.lawsgame.emishitactics.core.models.Unit;
 import com.lawsgame.emishitactics.core.phases.battle.BattleInteractionMachine;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.commands.BattleCommand;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.TileHighlighter;
 import com.lawsgame.emishitactics.core.phases.battle.helpers.tasks.StandardTask;
 import com.lawsgame.emishitactics.core.phases.battle.interactions.interfaces.BattleInteractionState;
@@ -12,6 +16,8 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.Choic
 import com.lawsgame.emishitactics.engine.patterns.command.SimpleCommand;
 import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 public class SelectActionBIS extends BattleInteractionState implements ChoicePanel.CommandReceiver {
@@ -37,7 +43,6 @@ public class SelectActionBIS extends BattleInteractionState implements ChoicePan
     @Override
     public void init() {
         log.info("SELECT ACTION : "+bim.bfr.getModel().getUnit(rowSltdUnit, colSltdUnit).getName());
-
         super.init();
         bim.pp.choicePanel.attach(this);
         bim.pp.choicePanel.setContent(rowSltdUnit, colSltdUnit, bim.bcm, historic);

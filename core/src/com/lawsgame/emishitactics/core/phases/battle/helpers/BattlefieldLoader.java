@@ -8,5 +8,5 @@ import com.lawsgame.emishitactics.core.phases.battle.widgets.panels.fronts.Short
 
 public interface BattlefieldLoader {
     Battlefield load(AssetManager asm, int bfId);
-    void addEventsToBattlefield(AssetManager asm, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory inventory, ShortUnitPanel sup);
+    void addEvents(AssetManager asm, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory inventory, ShortUnitPanel sup);
 }

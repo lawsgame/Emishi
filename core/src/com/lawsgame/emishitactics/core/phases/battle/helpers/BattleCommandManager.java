@@ -21,7 +21,9 @@ import com.lawsgame.emishitactics.core.phases.battle.commands.actor.StealCommand
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchPositionCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.actor.SwitchWeaponCommand;
 import com.lawsgame.emishitactics.core.phases.battle.commands.ActorCommand;
+import com.lawsgame.emishitactics.core.phases.battle.interactions.SelectActionBIS;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.BattlefieldRenderer;
+import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -30,6 +32,7 @@ import java.util.Stack;
 /*
  */
 public class BattleCommandManager {
+    private static Lawgger log = Lawgger.createInstance(BattleCommandManager.class);
     private final Array<Array<ActorCommand>> commandPool;
 
     public BattleCommandManager(BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory playerInventory, TileHighlighter thl){

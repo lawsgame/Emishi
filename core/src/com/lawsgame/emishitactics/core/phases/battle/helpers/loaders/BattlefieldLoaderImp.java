@@ -379,7 +379,7 @@ public class BattlefieldLoaderImp implements BattlefieldLoader {
         return unit;
     }
 
-    public void addEventsToBattlefield(AssetManager asm, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory inventory, ShortUnitPanel sup) {
+    public void addEvents(AssetManager asm, BattlefieldRenderer bfr, AnimationScheduler scheduler, Inventory inventory, ShortUnitPanel sup) {
         try {
 
             XmlReader.Element battlesElt = reader.parse(Gdx.files.internal(Assets.XML_BATTLE_PARAMS));

@@ -32,6 +32,7 @@ public abstract class BattlefieldRenderer extends Renderer<Battlefield> {
         }
     }
 
+    public abstract void init();
     public abstract WindRose getWindRose();
     public abstract void prerender();
     public abstract void render(SpriteBatch batch);

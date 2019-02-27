@@ -23,19 +23,9 @@ import com.lawsgame.emishitactics.engine.utils.Lawgger;
 
 public class BattlePhase extends GamePhase {
     private static Lawgger log = Lawgger.createInstance(BattlePhase.class);
-
     public static BitmapFont testFont;
 
     private BattleInteractionMachine bim;
-    private static Timer timer;
-
-
-    public static Timer getTimer(){
-        if(timer == null){
-            timer = new Timer();
-        }
-        return timer;
-    }
 
     public void loadRequiredAssets() {
         asm.load(Assets.ATLAS_MAPS, TextureAtlas.class);
@@ -87,8 +77,8 @@ public class BattlePhase extends GamePhase {
         this.bim = new BattleInteractionMachine(gameCM, asm, stageUI, player, chapterId);
         //BattleInteractionState initBIS = new TestAssetBIS(bim);
         //BattleInteractionState initBIS = new TestCommandBIS(bim);
-        BattleInteractionState initBIS = new TestBIS(bim);
-        //BattleInteractionState initBIS = new SceneBIS(bim);
+        //BattleInteractionState initBIS = new TestBIS(bim);
+        BattleInteractionState initBIS = new SceneBIS(bim);
         bim.push(initBIS);
 
     }

@@ -39,14 +39,11 @@ public class IsoBFR extends BattlefieldRenderer {
     private ShapeRenderer bgndRenderer;
     private WindRose windrose;
 
-
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager, SpriteProvider spriteProvider){
-        this(battlefield, gcm, assetManager, spriteProvider, false);
-    }
-
-    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager, SpriteProvider spriteProvider, boolean test) {
+    public IsoBFR(Battlefield battlefield, CameraManager gcm, AssetManager assetManager, SpriteProvider spriteProvider) {
         super(battlefield, gcm);
         this.assetManager = assetManager;
+        this.spriteProvider = spriteProvider;
+
         int depth = 2*(battlefield.getNbRows() + battlefield.getNbColumns()) - 3;
         this.tileRenderers = new Array<Array<IsoTileRenderer>> ();
         this.unitRenderers = new Array<Array<BattleUnitRenderer>>();
@@ -61,35 +58,30 @@ public class IsoBFR extends BattlefieldRenderer {
         this.areaRenderers.add(new Array<AreaRenderer>());
         this.visible = true;
 
-        // required for the junit testes
-        if (test) {
+    }
 
-            X_CAM_BOUNDS_OFFSET = 0;
-            Y_CAM_BOUNDS_OFFSET = 0;
-        } else {
-            this.spriteProvider = spriteProvider;
-            this.bgndRenderer = new ShapeRenderer();
-            // pre calculate buildingType coords and texture region to render to prevent extra calculus each game loop.
-            for (int r = 0; r < battlefield.getNbRows(); r++) {
-                for (int c = 0; c < battlefield.getNbColumns(); c++) {
-                    addTileRenderer(r, c, getModel().getTile(r, c));
-                    if (battlefield.isTileOccupied(r, c)) {
-                        addUnitRenderer(r, c, getModel().getUnit(r, c));
-                    }
+    public void init(){
+        this.bgndRenderer = new ShapeRenderer();
+        // pre calculate tile coords and texture region to render to prevent extra calculus each game loop.
+        for (int r = 0; r < getModel().getNbRows(); r++) {
+            for (int c = 0; c < getModel().getNbColumns(); c++) {
+                addTileRenderer(r, c, getModel().getTile(r, c));
+                if (getModel().isTileOccupied(r, c)) {
+                    addUnitRenderer(r, c, getModel().getUnit(r, c));
                 }
             }
-            // set up area renderers
-            for (int i = 0; i < getModel().getUnitAreas().size ; i++) {
-                addAreaRenderer(getModel().getUnitAreas().get(i));
-            }
-            for (int i = 0; i < battlefield.getDeploymentAreas().size; i++) {
-                addAreaRenderer(battlefield.getDeploymentAreas().get(i));
-            }
-            //set weather renderer
-            this.renderedWeather = getModel().getWeather();
-            // set windrose
-            this.windrose = new IsoWindrose(this, assetManager);
         }
+        // set up area renderers
+        for (int i = 0; i < getModel().getUnitAreas().size ; i++) {
+            addAreaRenderer(getModel().getUnitAreas().get(i));
+        }
+        for (int i = 0; i < getModel().getDeploymentAreas().size; i++) {
+            addAreaRenderer(getModel().getDeploymentAreas().get(i));
+        }
+        //set weather renderer
+        this.renderedWeather = getModel().getWeather();
+        // set windrose
+        this.windrose = new IsoWindrose(this, assetManager);
     }
 
     @Override

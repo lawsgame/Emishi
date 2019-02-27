@@ -53,16 +53,17 @@ public class BattleInteractionMachine extends StateMachine<BattleInteractionStat
         this.scheduler = new AnimationScheduler();
         this.localization = asm.get(Assets.STRING_BUNDLE_MAIN);
         this.uiSkin = asm.get(Assets.SKIN_UI, Skin.class);
-        BattlefieldLoader bfl = new BattlefieldLoaderImp();
-        Battlefield battlefield = bfl.load(asm, chapterId);
+        BattlefieldLoader battleLoader = new BattlefieldLoaderImp();
+        Battlefield battlefield = battleLoader.load(asm, chapterId);
         battlefield.randomlyDeploy(player.getArmy(), true);
         battlefield.getBattleTurnManager().init(player);
         this.spriteProvider = new SpriteProviderImp(IsoBFR.SPRITE_STD_SIZE);
-        this.spriteProvider.load(asm, battlefield);
         this.bfr = new IsoBFR(battlefield, gcm, asm, spriteProvider);
         this.wf = new WidgetFactory(stageUI, uiSkin, bfr);
         this.pp = new PanelPool(wf, localization);
-        //bfl.addEventsToBattlefield(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
+        battleLoader.addEvents(asm, bfr, scheduler, player.getInventory(), pp.shortUnitPanel);
+        this.spriteProvider.load(asm, battlefield);
+        this.bfr.init();
         this.thl = new TileHighlighter(bfr);
         this.bcm = new BattleCommandManager(bfr, scheduler, player.getInventory(), thl);
 
