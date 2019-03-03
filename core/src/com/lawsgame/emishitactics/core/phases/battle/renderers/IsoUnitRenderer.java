@@ -34,7 +34,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
 
     // MODEL SNAPHSOT ATTRIBUTES
 
-    protected WeaponType weaponType;
     protected Orientation orientation;
     protected boolean done;
     protected boolean crippled;
@@ -66,7 +65,6 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
         this.bfr = bfr;
         this.pos = new Vector2();
         this.animation = new Animation(1,1,false,false, false);
-        this.weaponType = model.getWeaponType();
         this.orientation = model.getOrientation();
         this.done = model.isDone();
         this.promoted = model.isPromoted();
@@ -228,14 +226,8 @@ public class IsoUnitRenderer extends BattleUnitRenderer  {
     }
 
     @Override
-    public void setWeaponType(WeaponType type) {
-        this.weaponType = type;
-        this.display(state);
-    }
-
-    @Override
-    public WeaponType getCurrentWeaponType() {
-        return weaponType;
+    public WeaponType getWeaponType() {
+        return getModel().getWeaponType();
     }
 
     @Override

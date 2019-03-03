@@ -57,8 +57,6 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
                     Array<int[]> path = (Array<int[]>) query;
                     displayWalk(path, false);
                 }
-            } else if (query instanceof Data.WeaponType) {
-                setWeaponType((Data.WeaponType) query);
             } else if (query instanceof Notification.Visible) {
                 setVisible(((Notification.Visible) query).visible);
             } else if (query instanceof Notification.Promoted) {
@@ -94,8 +92,7 @@ public abstract class BattleUnitRenderer extends Renderer<Unit> implements GameE
     public abstract void setCrippled(boolean crippled);
     public abstract void setOrientation(Data.Orientation or);
     public abstract Data.Orientation getOrientation();
-    public abstract void setWeaponType(Data.WeaponType type);
-    public abstract Data.WeaponType getCurrentWeaponType();
+    public abstract Data.WeaponType getWeaponType();
     public abstract void setPromoted(boolean promoted);
     public abstract boolean isPromoted();
     public abstract boolean isIdling();

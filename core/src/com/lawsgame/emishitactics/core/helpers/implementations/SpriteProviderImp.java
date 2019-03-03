@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.lawsgame.emishitactics.TacticsGame;
 import com.lawsgame.emishitactics.core.constants.Assets;
 import com.lawsgame.emishitactics.core.constants.Utils;
 import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider;
@@ -138,7 +137,7 @@ public class SpriteProviderImp implements SpriteProvider {
     public Array<Sprite> getUnitAnimationSS(BattleUnitRenderer bur, AnimId id, Flavor flavor) {
         return getUnitAnimationSS(
                 bur.getModel().getTemplate(),
-                bur.getCurrentWeaponType(),
+                bur.getWeaponType(),
                 bur.getModel().isCharacter(),
                 bur.isPromoted(),
                 bur.getModel().belongToAnArmy() && bur.getModel().getArmy().isPlayerControlled(),
