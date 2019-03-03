@@ -7,14 +7,21 @@ import com.lawsgame.emishitactics.core.helpers.interfaces.SpriteProvider.AreaSpr
 import com.lawsgame.emishitactics.core.models.Area;
 import com.lawsgame.emishitactics.core.models.Data.AreaColor;
 import com.lawsgame.emishitactics.core.phases.battle.renderers.interfaces.AreaRenderer;
+import com.lawsgame.emishitactics.engine.rendering.Animation;
 
 public class IsoAreaRenderer extends AreaRenderer {
-    protected Array<Sprite> sprites;
+    private static final float SPEED = 0.2f;
+    private static final int LENGTH = 1;
+
+    protected Animation animation;
+    protected Array<Array<Sprite>> sprites;
     protected IsoBFR bfr;
 
     public IsoAreaRenderer(Area model, IsoBFR bfr) {
         super(model);
-        this.sprites = new Array<Sprite>();
+        this.sprites = new Array<Array<Sprite>>();
+        this.animation = new Animation();
+        this.animation.set(LENGTH, SPEED, true, true, false);
         this.bfr = bfr;
         change();
     }
@@ -22,7 +29,7 @@ public class IsoAreaRenderer extends AreaRenderer {
     @Override
     protected void renderArea(SpriteBatch batch) {
         for(int i = 0; i < sprites.size; i++){
-            sprites.get(i).draw(batch);
+            sprites.get(i).get(animation.getCurrentFrame()).draw(batch);
         }
     }
 
@@ -30,7 +37,7 @@ public class IsoAreaRenderer extends AreaRenderer {
     public void change() {
         sprites.clear();
         if(getModel().getCheckmap() != null){
-            Sprite sprite;
+            Array<Sprite> sprites;
             float xCenter;
             float yCenter;
             boolean ntc, etc, otc, wtc, stc;
@@ -54,59 +61,73 @@ public class IsoAreaRenderer extends AreaRenderer {
                         if(otc){
                             if(wtc){
                                 if(!stc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
-                                    sprite.setFlip(true, false);
-                                    sprite.setPosition(xCenter - 0.25f, yCenter - 0.25f );
-                                    sprites.add(sprite);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
+                                    for(int i = 0; i<sprites.size; i++) {
+                                        sprites.get(i).setFlip(true, false);
+                                        sprites.get(i).setPosition(xCenter - 0.25f, yCenter - 0.25f);
+                                    }
+                                    this.sprites.add(sprites);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE).get(0);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE);
                                     }else{
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE).get(0);
-                                        sprite.setPosition(xCenter - 0.5f, yCenter - 0.375f );
-                                        sprite.setFlip(false, false);
-                                        sprites.add(sprite);
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
-                                        sprite.setFlip(true, false);
-                                        sprite.setPosition(xCenter - 0.25f, yCenter - 0.25f );
-                                        sprites.add(sprite);
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE);
+                                        for(int i = 0; i<sprites.size; i++) {
+                                            sprites.get(i).setPosition(xCenter - 0.5f, yCenter - 0.375f);
+                                            sprites.get(i).setFlip(false, false);
+                                        }
+                                        this.sprites.add(sprites);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
+                                        for(int i = 0; i<sprites.size; i++) {
+                                            sprites.get(i).setFlip(true, false);
+                                            sprites.get(i).setPosition(xCenter - 0.25f, yCenter - 0.25f);
+                                        }
+                                        this.sprites.add(sprites);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
                                     }
                                 }
-                                sprite.setPosition(xCenter - 0.25f, yCenter - 0.25f );
-                                sprites.add(sprite);
+                                for(int i = 0; i < sprites.size; i++) {
+                                    sprites.get(i).setPosition(xCenter - 0.25f, yCenter - 0.25f);
+                                }
+                                this.sprites.add(sprites);
                             }
                         }else{
                             if(wtc){
                                 if(stc){
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE).get(0);
-                                        sprite.setPosition(xCenter - 0.25f, yCenter - 0.5f);
-                                        sprite.setFlip(false, true);
-                                        sprites.add(sprite);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE);
+                                        for(int i =0; i < sprites.size; i++) {
+                                            sprites.get(i).setPosition(xCenter - 0.25f, yCenter - 0.5f);
+                                            sprites.get(i).setFlip(false, true);
+                                        }
+                                        this.sprites.add(sprites);
                                     }
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_OBTUSE).get(0);
-                                    sprite.setFlip(false, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_OBTUSE);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(false, true);
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
-                                    sprite.setFlip(true, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, true);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
-                                    sprite.setFlip(false, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(false, true);
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE).get(0);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE);
 
                                 }
                             }
-                            sprite.setPosition(xCenter - 0.25f, yCenter - 0.25f );
-                            sprites.add(sprite);
+                            for(int i = 0; i < sprites.size; i++)
+                                sprites.get(i).setPosition(xCenter - 0.25f, yCenter - 0.25f );
+                            this.sprites.add(sprites);
                         }
 
 
@@ -121,63 +142,74 @@ public class IsoAreaRenderer extends AreaRenderer {
                             if(wtc){
 
                                 if(!ntc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
-                                    sprite.setFlip(false, true);
-                                    sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f );
-                                    sprites.add(sprite);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
+                                    for(int i = 0; i < sprites.size; i++) {
+                                        sprites.get(i).setFlip(false, true);
+                                        sprites.get(i).setPosition(xCenter - 0.5f, yCenter - 0.125f);
+                                    }
+                                    this.sprites.add(sprites);
                                 }
                             }else{
 
                                 if(ntc){
 
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
-                                    sprite.setFlip(false, false);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(false, false);
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE).get(0);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE);
                                     }else {
 
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE).get(0);
-                                        sprite.setPosition(xCenter - 0.75f, yCenter - 0.25f);
-                                        sprite.setFlip(false, true);
-                                        sprites.add(sprite);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE);
+                                        for(int i = 0; i < sprites.size; i++) {
+                                            sprites.get(i).setPosition(xCenter - 0.75f, yCenter - 0.25f);
+                                            sprites.get(i).setFlip(false, true);
+                                        }
+                                        this.sprites.add(sprites);
 
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
-                                        sprite.setFlip(false, true);
-                                        sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f);
-                                        sprites.add(sprite);
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
+                                        for(int i = 0; i < sprites.size; i++) {
+                                            sprites.get(i).setFlip(false, true);
+                                            sprites.get(i).setPosition(xCenter - 0.5f, yCenter - 0.125f);
+                                        }
+                                        this.sprites.add(sprites);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
 
                                     }
 
                                 }
-                                sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f );
-                                sprites.add(sprite);
+                                for(int i = 0; i < sprites.size; i++)
+                                    sprites.get(i).setPosition(xCenter - 0.5f, yCenter - 0.125f );
+                                this.sprites.add(sprites);
 
                             }
                         }else{
                             if(wtc){
                                 if(ntc){
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE).get(0);
-                                        sprite.setPosition(xCenter - 1f, yCenter - 0.125f);
-                                        sprites.add(sprite);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE);
+                                        for(int i = 0; i < sprites.size; i++)
+                                            sprites.get(i).setPosition(xCenter - 1f, yCenter - 0.125f);
+                                        this.sprites.add(sprites);
                                     }
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_ACUTE).get(0);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_ACUTE);
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
                                 }
                             }else{
                                 if(ntc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
-                                    sprite.setFlip(false, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(false, true);
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE).get(0);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE);
                                 }
                             }
-                            sprite.setPosition(xCenter - 0.5f, yCenter - 0.125f );
-                            sprites.add(sprite);
+                            for(int i = 0; i < sprites.size; i++)
+                                sprites.get(i).setPosition(xCenter - 0.5f, yCenter - 0.125f );
+                            this.sprites.add(sprites);
                         }
 
 
@@ -191,62 +223,78 @@ public class IsoAreaRenderer extends AreaRenderer {
                         if(otc){
                             if(etc){
                                 if(!stc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
-                                    sprite.setFlip(true, false);
-                                    sprite.setPosition(xCenter, yCenter - 0.125f );
-                                    sprites.add(sprite);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
+                                    for(int i = 0; i < sprites.size; i++) {
+                                        sprites.get(i).setFlip(true, false);
+                                        sprites.get(i).setPosition(xCenter, yCenter - 0.125f);
+                                    }
+                                    this.sprites.add(sprites);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
-                                    sprite.setFlip(true, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, true);
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE).get(0);
-                                        sprite.setFlip(true, false);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE);
+                                        for(int i = 0; i < sprites.size; i++)
+                                            sprites.get(i).setFlip(true, false);
                                     }else {
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE).get(0);
-                                        sprite.setPosition(xCenter + 0.25f, yCenter);
-                                        sprites.add(sprite);
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
-                                        sprite.setFlip(true, true);
-                                        sprite.setPosition(xCenter, yCenter - 0.125f);
-                                        sprites.add(sprite);
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN).get(0);
-                                        sprite.setFlip(true, false);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE);
+                                        for(int i = 0; i < sprites.size; i++)
+                                            sprites.get(i).setPosition(xCenter + 0.25f, yCenter);
+                                        this.sprites.add(sprites);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
+                                        for(int i = 0; i < sprites.size; i++) {
+                                            sprites.get(i).setFlip(true, true);
+                                            sprites.get(i).setPosition(xCenter, yCenter - 0.125f);
+                                        }
+                                        this.sprites.add(sprites);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE_UPSIDE_DOWN);
+                                        for(int i = 0; i < sprites.size; i++)
+                                            sprites.get(i).setFlip(true, false);
                                     }
                                 }
-                                sprite.setPosition(xCenter, yCenter - 0.125f );
-                                sprites.add(sprite);
+                                for(int i = 0; i < sprites.size; i++)
+                                    sprites.get(i).setPosition(xCenter, yCenter - 0.125f );
+                                this.sprites.add(sprites);
                             }
                         }else{
                             if(etc){
                                 if(stc){
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE).get(0);
-                                        sprite.setPosition(xCenter + 0.5f, yCenter - 0.125f);
-                                        sprite.setFlip(true, false);
-                                        sprites.add(sprite);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE);
+                                        for(int i = 0; i < sprites.size; i++) {
+                                            sprites.get(i).setPosition(xCenter + 0.5f, yCenter - 0.125f);
+                                            sprites.get(i).setFlip(true, false);
+                                        }
+                                        this.sprites.add(sprites);
                                     }
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_ACUTE).get(0);
-                                    sprite.setFlip(true, false);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_ACUTE);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, false);
 
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
-                                    sprite.setFlip(true, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, true);
                                 }
                             }else{
                                 if(stc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
-                                    sprite.setFlip(true, false);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, false);
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE).get(0);
-                                    sprite.setFlip(true, false);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_ACUTE);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, false);
                                 }
                             }
-                            sprite.setPosition(xCenter, yCenter - 0.125f );
-                            sprites.add(sprite);
+                            for(int i = 0; i < sprites.size; i++)
+                                sprites.get(i).setPosition(xCenter, yCenter - 0.125f );
+                            this.sprites.add(sprites);
                         }
 
                         // north-east corner
@@ -258,63 +306,79 @@ public class IsoAreaRenderer extends AreaRenderer {
                         if(otc){
                             if(etc){
                                 if(!ntc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
-                                    sprite.setFlip(false, true);
-                                    sprite.setPosition(xCenter - 0.25f, yCenter );
-                                    sprites.add(sprite);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
+                                    for(int i = 0; i < sprites.size; i++) {
+                                        sprites.get(i).setFlip(false, true);
+                                        sprites.get(i).setPosition(xCenter - 0.25f, yCenter);
+                                    }
+                                    this.sprites.add(sprites);
                                 }
                             }else{
                                 if(ntc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
-                                    sprite.setFlip(true, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, true);
                                 }else{
 
                                     if(getModel().getType().isRectangular()){
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE).get(0);
-                                        sprite.setFlip(false, true);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE);
+                                        for(int i = 0; i < sprites.size; i++)
+                                            sprites.get(i).setFlip(false, true);
                                     }else {
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE).get(0);
-                                        sprite.setPosition(xCenter, yCenter + 0.125f);
-                                        sprite.setFlip(true, false);
-                                        sprites.add(sprite);
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
-                                        sprite.setFlip(false, true);
-                                        sprite.setPosition(xCenter - 0.25f, yCenter);
-                                        sprites.add(sprite);
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE).get(0);
-                                        sprite.setFlip(true, true);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_ACUTE);
+                                        for(int i = 0; i < sprites.size; i++) {
+                                            sprites.get(i).setPosition(xCenter, yCenter + 0.125f);
+                                            sprites.get(i).setFlip(true, false);
+                                        }
+                                        this.sprites.add(sprites);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
+                                        for(int i = 0; i < sprites.size; i++) {
+                                            sprites.get(i).setFlip(false, true);
+                                            sprites.get(i).setPosition(xCenter - 0.25f, yCenter);
+                                        }
+                                        this.sprites.add(sprites);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_SIDE);
+                                        for(int i = 0; i < sprites.size; i++)
+                                            sprites.get(i).setFlip(true, true);
                                     }
                                 }
-                                sprite.setPosition(xCenter - 0.25f, yCenter );
-                                sprites.add(sprite);
+                                for(int i = 0; i < sprites.size; i++)
+                                    sprites.get(i).setPosition(xCenter - 0.25f, yCenter );
+                                this.sprites.add(sprites);
                             }
                         }else{
                             if(etc){
                                 if(ntc){
 
                                     if(!this.getModel().getType().isRectangular()) {
-                                        sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE).get(0);
-                                        sprite.setPosition(xCenter - 0.25f, yCenter + 0.25f);
-                                        sprites.add(sprite);
+                                        sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_OUTSIDE_OBTUSE);
+                                        for(int i = 0; i < sprites.size; i++)
+                                            sprites.get(i).setPosition(xCenter - 0.25f, yCenter + 0.25f);
+                                        this.sprites.add(sprites);
                                     }
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_OBTUSE).get(0);
-                                    sprite.setFlip(false,false);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.ANTI_INSIDE_OBTUSE);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(false,false);
 
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
-                                    sprite.setFlip(false, false);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(false, false);
                                 }
                             }else{
                                 if(ntc){
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER).get(0);
-                                    sprite.setFlip(true, false);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.BORDER);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(true, false);
                                 }else{
-                                    sprite = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE).get(0);
-                                    sprite.setFlip(false, true);
+                                    sprites = bfr.spriteProvider.getAreaSS(color, AreaSpriteType.CORNER_OBTUSE);
+                                    for(int i = 0; i < sprites.size; i++)
+                                        sprites.get(i).setFlip(false, true);
                                 }
                             }
-                            sprite.setPosition(xCenter - 0.25f, yCenter );
-                            sprites.add(sprite);
+                            for(int i = 0; i < sprites.size; i++)
+                                sprites.get(i).setPosition(xCenter - 0.25f, yCenter );
+                            this.sprites.add(sprites);
                         }
 
                     }

@@ -35,6 +35,8 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	public Animation(int length, float speed, boolean loop, boolean backnforth, boolean randomStart){
 		set(length, speed, loop, backnforth, randomStart);
 	}
+
+	public Animation(){}
 	
 	@Override
 	public void update(float dt){
@@ -101,16 +103,8 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	}
 
 	public void set(int length, float speed, boolean loop, boolean backnforth, boolean randomStart){
-		if(length < 1){
-			try {
-				throw new Exception("Animation.class do not accept a lenght lower than 1, however the length parameter is at : "+length);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}else {
-			this.length = length;
-		}
-		this.speed = speed;
+		setLength(length);
+		setSpeed(speed);
 		this.loop = loop;
 		this.backnforth = backnforth;
 		this.randomStart = randomStart;
@@ -120,6 +114,18 @@ public class Animation extends Observable implements GameUpdatableEntity {
 	public void setSpeed(float speed){
 		if(speed > 0) {
 			this.speed = speed;
+		}
+	}
+
+	public void setLength(int length){
+		if(length < 1){
+			try {
+				throw new Exception("Animation.class do not accept a lenght lower than 1, however the length parameter is at : "+length);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else {
+			this.length = length;
 		}
 	}
 
