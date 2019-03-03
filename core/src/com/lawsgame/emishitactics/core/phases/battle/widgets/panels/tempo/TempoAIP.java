@@ -173,7 +173,6 @@ public class TempoAIP extends ActionInfoPanel {
                     builder.append("\nPhysical damage : " + data.damageDealt[0] + " - " + data.damageDealt[1]);
                     builder.append("\nMoral damage : " + data.damageDealt[0] * data.moralModifier + " - " + data.damageDealt[1] * data.moralModifier);
                     builder.append("\nHit rate : " + data.hitrate + "%");
-                    builder.append("\nAP cost : " + data.APCost);
                     builder.append("\nLoot rate : " + data.lootRate + "%");
 
                     if (currentCommand.getRetalationBlow().isApplicable()
@@ -196,7 +195,6 @@ public class TempoAIP extends ActionInfoPanel {
                         builder.append("\nPhysical damage : " + data.damageDealt[0] + " - " + data.damageDealt[1]);
                         builder.append("\nMoral damage : " + data.damageDealt[0] * data.moralModifier + " - " + data.damageDealt[1] * data.moralModifier);
                         builder.append("\nHit rate : " + data.hitrate + "%");
-                        builder.append("\nAP cost : " + data.APCost);
                         builder.append("\nLoot rate : " + data.lootRate + "%");
 
                     }

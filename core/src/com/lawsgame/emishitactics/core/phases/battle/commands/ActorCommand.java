@@ -79,8 +79,6 @@ public abstract class ActorCommand extends BattleCommand{
     protected final ActionChoice choice;
     //does not set the actor.acted or .moved to true if the command is executed
     private boolean registerAction;
-    // does not update the AP of the actor if the command is executed
-    private boolean costless;
 
     private Unit initiator;
     private Unit target;
@@ -94,7 +92,6 @@ public abstract class ActorCommand extends BattleCommand{
         super(bfr, scheduler, playerInventory);
         this.choice = choice;
         this.registerAction = true;
-        this.costless = false;
     }
 
     public final void setInitiator(int rowActor, int colActor) {
@@ -223,12 +220,10 @@ public abstract class ActorCommand extends BattleCommand{
         boolean valid = false;
         if(initiator != null && bfr.getModel().isTileReachable(rowActor, colActor, initiator.has(Data.Ability.PATHFINDER))){
             if(!initiator.isOutOfAction()) {
-                if (costless || choice.getCost(rowActor, colActor, initiator, bfr.getModel()) <= initiator.getActionPoints()) {
-                    if (choice.isActedBased()) {
-                        valid = (!registerAction || !initiator.isActed()) && !initiator.isDisabled();
-                    } else {
-                        valid = (!registerAction || !initiator.isMoved()) && !initiator.isCrippled();
-                    }
+                if (choice.isActedBased()) {
+                    valid = (!registerAction || !initiator.isActed()) && !initiator.isDisabled();
+                } else {
+                    valid = (!registerAction || !initiator.isMoved()) && !initiator.isCrippled();
                 }
             }
         }
@@ -548,12 +543,7 @@ public abstract class ActorCommand extends BattleCommand{
         this.registerAction = registerAction;
     }
 
-    public final void setCostless(boolean costless) {
-        this.costless = costless;
-    }
-
     public final void setFree(boolean free) {
-        setCostless(free);
         setRegisterAction(!free);
     }
 

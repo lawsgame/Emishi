@@ -8,7 +8,7 @@
         <Earthquake turn="1"/>
         <Recruit row = "1" col = "12" character = "true" template="SOLAIRE">
             <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
-            <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>
+            <Attribute id= "banner" strength ="1" range="0" lootrate="0" movement="0" moralshield ="0"/>
             <Attribute id= "orientation" value="SOUTH"/>
             <Attribute id= "behaviour" value="PASSIVE"/>
         </Recruit>
@@ -24,7 +24,7 @@
                 <Unit row = "13" col = "5" character = "false" template="SOLAR_KNIGHT" level="8" weaponType="BOW" >
                     <Attribute id= "leadershio" value="25"/>
                     <Attribute id= "weapon" value="HUNTING_BOW" stealable="true"/>
-                    <Attribute id= "banner" strength ="1" range="0" lootrate="0" apcost="0" moralshield ="0"/>
+                    <Attribute id= "banner" strength ="1" range="0" lootrate="0" movement="0" moralshield ="0"/>
                     <Attribute id= "equipement" value ="WARRIOR" stealable="false"/>
                     <Attribute id= "orientation" value="SOUTH"/>
                     <Attribute id= "behaviour" value="PASSIVE"/>

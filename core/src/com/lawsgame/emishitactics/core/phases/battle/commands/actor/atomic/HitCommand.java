@@ -390,7 +390,6 @@ public class HitCommand extends ActorCommand{
         public final int[] damageDealt;
         public final float moralModifier;
         public final int lootRate;
-        public final int APCost;
 
 
         public DefenderData(
@@ -421,7 +420,6 @@ public class HitCommand extends ActorCommand{
             this.damageDealt = Formulas.getDealtDamageRange(rowAttacker, colAttacker, rowInitTarget, colInitDefender, attacker, defenderRenderer.getModel(), bf);
             this.moralModifier = Formulas.getCurrentMoralModifier(rowAttacker, colAttacker, rowInitTarget, colInitTarget, attacker, defenderRenderer.getModel(), bf);
             this.lootRate = Formulas.getLootRate(attacker, rowAttacker, colAttacker, bf);
-            this.APCost = choice.getCost(rowAttacker, colAttacker, attacker, bf);
         }
 
         public boolean isTargetGuarded(){

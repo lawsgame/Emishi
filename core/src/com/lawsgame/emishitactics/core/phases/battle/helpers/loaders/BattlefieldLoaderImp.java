@@ -351,7 +351,7 @@ public class BattlefieldLoaderImp implements BattlefieldLoader {
                 bonusBanner = attributeElt.getInt("lootrate");
                 for(int i = 0; i < bonusBanner; i++)
                     unit.getBanner().increment(Data.BannerBonus.LOOT_RATE);
-                bonusBanner = attributeElt.getInt("apcost");
+                bonusBanner = attributeElt.getInt("movement");
                 for(int i = 0; i < bonusBanner; i++)
                     unit.getBanner().increment(Data.BannerBonus.AP_COST);
                 bonusBanner = attributeElt.getInt("moralshield");

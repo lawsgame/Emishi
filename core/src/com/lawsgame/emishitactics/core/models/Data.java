@@ -270,24 +270,24 @@ public class Data {
     public enum ActionChoice{
         //TEST_CHOICE         (0, 0, false, true, RangedBasedType.WEAPON, false, new int[][]{{0, 0}, {0, 1}, {0, -1}}),
 
-        MOVE                (0, 0, true, false, false, 0, 0, false, new int[][]{{0, 0}}),
-        WALK                (0, 0, true, false, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
-        ATTACK              (1, 0, false, true, false, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
-        SWITCH_POSITION     (0, 0, true, false, false, 1, 1, false, new int[][]{{0, 0}}),
-        PUSH                (0, 0, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        SWITCH_WEAPON       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
-        CHOOSE_ORIENTATION  (0, 0, false, true, false, 0, 0, true, new int[][]{{0, 0}}),
-        HEAL                (1, 10, false, true, false, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
-        GUARD               (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        STEAL               (1, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        BUILD               (3, 10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
-        PLUNDER             (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        COVER_AREA          (1, 10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        SCAN_AREA           (1, 20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        CHANGE_TACTIC       (0, 0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
-        PICK_LOOT           (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        VISIT(0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
-        END_TURN            (0, 0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
+        MOVE                (0, true, false, false, 0, 0, false, new int[][]{{0, 0}}),
+        WALK                (0, true, false, false, RangedBasedType.MOVE, false, new int[][]{{0, 0}}),
+        ATTACK              (0, false, true, false, RangedBasedType.WEAPON, false, new int[][]{{0, 0}}),
+        SWITCH_POSITION     (0, true, false, false, 1, 1, false, new int[][]{{0, 0}}),
+        PUSH                (0, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        SWITCH_WEAPON       (0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
+        CHOOSE_ORIENTATION  (0, false, true, false, 0, 0, true, new int[][]{{0, 0}}),
+        HEAL                (10, false, true, false, 0, 0, false, new int[][]{{1, 0}, {0, 1}, {-1, 0},{0, -1}}),
+        GUARD               (10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        STEAL               (10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        BUILD               (10, false, true, false, 1, 1, false, new int[][]{{0, 0}}),
+        PLUNDER             (10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        COVER_AREA          (10, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        SCAN_AREA           (20, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        CHANGE_TACTIC       (0, true, true, true, 0, 0, false, new int[][]{{0, 0}}),
+        PICK_LOOT           (0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        VISIT               (0, false, true, false, 0, 0, false, new int[][]{{0, 0}}),
+        END_TURN            (0, false, true, false, 0, 0, false, new int[][]{{0, 0}});
 
         private int cost;
         private int experience;
@@ -311,7 +311,7 @@ public class Data {
          */
         protected Array<int[]> impactArea;
 
-        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, int rangeMin, int rangeMax, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea) {
+        ActionChoice(int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, int rangeMin, int rangeMax, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea) {
             this.cost = cost;
             this.experience = experience;
             this.rangeMin = rangeMin;
@@ -325,17 +325,12 @@ public class Data {
             this.impactArea.addAll(impactArea);
         }
 
-        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, int rangeMin, int rangeMax, boolean endTurnActionOnly, int[][] impactArea){
-            this(cost, experience, undoable, actedBased, infinitlyDoable, rangeMin, rangeMax, RangedBasedType.SPECIFIC, endTurnActionOnly, impactArea);
+        ActionChoice(int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, int rangeMin, int rangeMax, boolean endTurnActionOnly, int[][] impactArea){
+            this(experience, undoable, actedBased, infinitlyDoable, rangeMin, rangeMax, RangedBasedType.SPECIFIC, endTurnActionOnly, impactArea);
         }
 
-        ActionChoice(int cost, int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea){
-            this(cost, experience, undoable, actedBased, infinitlyDoable, -1, -1, rangedBasedType, endTurnActionOnly, impactArea);
-        }
-
-        public int getCost(int rowActor, int colActor, Unit actor, Battlefield battlefield) {
-            int costBannerBonus = (int) Formulas.getCurrentUnitBannerBonus(actor, rowActor, colActor, battlefield, BannerBonus.AP_COST);
-            return (costBannerBonus <= cost) ? cost - costBannerBonus : 0;
+        ActionChoice(int experience, boolean undoable, boolean actedBased, boolean infinitlyDoable, RangedBasedType rangedBasedType, boolean endTurnActionOnly, int[][] impactArea){
+            this(experience, undoable, actedBased, infinitlyDoable, -1, -1, rangedBasedType, endTurnActionOnly, impactArea);
         }
 
         public int getExperience() {
