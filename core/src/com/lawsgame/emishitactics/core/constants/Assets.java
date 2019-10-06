@@ -9,7 +9,7 @@ public class Assets {
 
     // ---***sss  PATH  $$$***----
 
-    public static final String PROJECT_PATH = "com.lawsgame.emishitactics.";
+    public static final String PROJECT_PATH = "com.lawsgame.emishitactics";
 
     // ---***$$$  STRING  $$$***---
 
